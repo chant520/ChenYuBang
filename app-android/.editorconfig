@@ -5,5 +5,7 @@ charset = utf-8
 indent_style = space
 indent_size = 4
 insert_final_newline = true
+# 与 detekt MaxLineLength 默认 120 对齐，避免两门禁行宽口径不一
+max_line_length = 120
 # Composable 函数按惯例大写开头（CButton / Placeholder 等），豁免命名规则
 ktlint_function_naming_ignore_when_annotated_with = Composable

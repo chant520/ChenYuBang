@@ -1,0 +1,112 @@
+import SwiftUI
+import CangyuTokens
+
+/// 内联矢量图标（设计规范 §6）：一律 Path 自绘，viewBox 24 归一化缩放。
+/// 禁 emoji、禁 SF Symbols（语义不精确）、禁图标字体（开发规范 §7 通用规则）。
+/// 路径与试色稿 v0.10 / 构件状态基线板 v2 的同名 SVG 一致（规范 1.3 事实源）。
+public enum CIcons {
+
+    /// 图标语义。边长只取 Tokens.Icon 八档，描边宽度按规范 §6 尺寸-描边表由调用方给定。
+    public enum Kind: String, CaseIterable, Sendable {
+        case plus
+        case check
+        case warn
+        case err
+        case info
+    }
+
+    /// 生成按 size 缩放后的路径（viewBox 24 → size，规范 §6）。
+    public static func path(_ kind: Kind, size: CGFloat) -> Path {
+        let scale = size / 24
+        return basePath(kind).applying(CGAffineTransform(scaleX: scale, y: scale))
+    }
+
+    /// viewBox 24 原始路径（坐标即 SVG d 属性的落地值）。
+    private static func basePath(_ kind: Kind) -> Path {
+        var path = Path()
+        switch kind {
+        case .plus:
+            // M12 5v14M5 12h14
+            path.move(to: CGPoint(x: 12, y: 5))
+            path.addLine(to: CGPoint(x: 12, y: 19))
+            path.move(to: CGPoint(x: 5, y: 12))
+            path.addLine(to: CGPoint(x: 19, y: 12))
+        case .check:
+            // M5 12l4.5 4.5L19 7（规范 5.15 勾选标记）
+            path.move(to: CGPoint(x: 5, y: 12))
+            path.addLine(to: CGPoint(x: 9.5, y: 16.5))
+            path.addLine(to: CGPoint(x: 19, y: 7))
+        case .warn:
+            // M12 4l8 15H4z + M12 9v4 + M12 16.5v.5
+            path.move(to: CGPoint(x: 12, y: 4))
+            path.addLine(to: CGPoint(x: 20, y: 19))
+            path.addLine(to: CGPoint(x: 4, y: 19))
+            path.closeSubpath()
+            path.move(to: CGPoint(x: 12, y: 9))
+            path.addLine(to: CGPoint(x: 12, y: 13))
+            path.move(to: CGPoint(x: 12, y: 16.5))
+            path.addLine(to: CGPoint(x: 12, y: 17))
+        case .err:
+            // circle cx12 cy12 r9 + M9 9l6 6M15 9l-6 6
+            path.addEllipse(in: CGRect(x: 3, y: 3, width: 18, height: 18))
+            path.move(to: CGPoint(x: 9, y: 9))
+            path.addLine(to: CGPoint(x: 15, y: 15))
+            path.move(to: CGPoint(x: 15, y: 9))
+            path.addLine(to: CGPoint(x: 9, y: 15))
+        case .info:
+            // circle cx12 cy12 r9 + M12 11v5 + M12 8v.5
+            path.addEllipse(in: CGRect(x: 3, y: 3, width: 18, height: 18))
+            path.move(to: CGPoint(x: 12, y: 11))
+            path.addLine(to: CGPoint(x: 12, y: 16))
+            path.move(to: CGPoint(x: 12, y: 8))
+            path.addLine(to: CGPoint(x: 12, y: 8.5))
+        }
+        return path
+    }
+}
+
+/// 描边图标视图：fill:none、线性描边（规范 §6）。
+/// 颜色由调用方传 token（CangyuTheme.colors(for:)）；图标与文字同色，不另取第二种强调色。
+public struct CIcon: View {
+    private let kind: CIcons.Kind
+    private let size: CGFloat
+    private let strokeWidth: CGFloat
+    private let color: Color
+    private let lineCap: CGLineCap
+
+    /// - Parameters:
+    ///   - kind: 图标语义。
+    ///   - size: 边长，取 Tokens.Icon 档位（26/24/21/18/15/14/13/12）。
+    ///   - strokeWidth: 描边宽度，按规范 §6 尺寸-描边表（如 18→1.8、13→1.9、12→2）。
+    ///   - color: token 色。
+    ///   - lineCap: 通用 .ic 用 .square，其余构件 SVG 沿用默认 .butt（规范 §6）。
+    public init(
+        _ kind: CIcons.Kind,
+        size: CGFloat,
+        strokeWidth: CGFloat,
+        color: Color,
+        lineCap: CGLineCap = .butt
+    ) {
+        self.kind = kind
+        self.size = size
+        self.strokeWidth = strokeWidth
+        self.color = color
+        self.lineCap = lineCap
+    }
+
+    public var body: some View {
+        CIconShape(kind: kind)
+            .stroke(color, style: StrokeStyle(lineWidth: strokeWidth, lineCap: lineCap))
+            .frame(width: size, height: size)
+            .accessibilityHidden(true)
+    }
+}
+
+/// 把 viewBox 24 路径铺进 Shape 的 rect，避免 Path 直接作 View 时按包围盒居中产生偏移。
+private struct CIconShape: Shape {
+    let kind: CIcons.Kind
+
+    func path(in rect: CGRect) -> Path {
+        CIcons.path(kind, size: min(rect.width, rect.height))
+    }
+}
