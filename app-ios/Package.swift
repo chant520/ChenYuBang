@@ -9,13 +9,13 @@ let package = Package(
     products: [
         .library(name: "CangyuTokens", targets: ["CangyuTokens"]),
         .library(name: "CangyuDesignSystem", targets: ["CangyuDesignSystem"]),
-        .library(name: "CangyuData", targets: ["CangyuData"]),
+        .library(name: "CangyuData", targets: ["CangyuData"])
     ],
     dependencies: [
         // GRDB.swift 固定 6.x（规范 §13.1）
         .package(url: "https://github.com/groue/GRDB.swift.git", from: "6.29.0"),
         // swift-snapshot-testing 固定 1.x 并锁定小版本，供 UI 快照比对（规范 §2.1 / §13.1）
-        .package(url: "https://github.com/pointfreeco/swift-snapshot-testing.git", exact: "1.17.0"),
+        .package(url: "https://github.com/pointfreeco/swift-snapshot-testing.git", exact: "1.17.0")
     ],
     targets: [
         .target(name: "CangyuTokens", path: "Sources/Tokens"),
@@ -28,6 +28,6 @@ let package = Package(
             name: "CangyuData",
             dependencies: [.product(name: "GRDB", package: "GRDB.swift")],
             path: "Sources/Data"
-        ),
+        )
     ]
 )

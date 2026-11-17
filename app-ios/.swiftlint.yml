@@ -1,0 +1,12 @@
+# 生成物不参与风格检查（数值事实源是 tokens.json），与 Android 侧排除 Tokens.kt 同构
+excluded:
+  - Sources/Tokens/Tokens.swift
+
+# GRDB 闭包惯用短名（db / t）
+identifier_name:
+  excluded: [db, t]
+
+# 建库引导函数含 10 张表的 CREATE 语句，93 行属合理长度
+function_body_length:
+  warning: 120
+  error: 200
