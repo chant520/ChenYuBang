@@ -18,6 +18,8 @@ jobs:
         run: python tools/gen_tokens.py --check
       - name: schema 与 fixtures 校验（含备份包 sha256 与题库包合并摘要成功/失败两条断言，规范 v1.4 §4.5）
         run: python tools/validate_schema.py
+      - name: 安装基线校验依赖（baseline.py 需 Pillow）
+        run: pip install pillow
       - name: 截图基线是否与 v2 稿同步
         run: python tools/baseline.py --check
 
@@ -30,22 +32,19 @@ jobs:
         with:
           distribution: temurin
           java-version: "17"
-      - uses: android-actions/setup-android@v3
       - uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: "8.9"
       - name: 编译与单测
-        run: gradle -p app-android :app:assembleDebug test
+        run: cd app-android && ./gradlew :app:assembleDebug test
       - name: 静态检查（ktlint / detekt，零 error 阻断）
-        run: gradle -p app-android ktlintCheck detekt
+        run: cd app-android && ./gradlew ktlintCheck detekt
       - name: Lint
-        run: gradle -p app-android :app:lintDebug
+        run: cd app-android && ./gradlew :app:lintDebug
       - name: 快照比对（Roborazzi 与基线比对，CI 必跑；规范 §13 / §13.1）
-        run: gradle -p app-android :core-ui:verifyRoborazziDebug
+        run: cd app-android && ./gradlew :core-ui:verifyRoborazziDebug
 
   ios:
     name: iOS
-    runs-on: macos-14
+    runs-on: macos-15-intel
     steps:
       - uses: actions/checkout@v4
       - name: 静态检查（SwiftLint，零 error 阻断；规范 §2.1 / §13.1）
@@ -67,5 +66,5 @@ jobs:
         run: |
           cd app-ios
           xcodebuild -project ChenYuBang.xcodeproj -scheme ChenYuBang \
-            -destination 'platform=iOS Simulator,name=iPhone 15' \
+            -destination 'platform=iOS Simulator,name=iPhone 16' \
             test CODE_SIGNING_ALLOWED=NO
