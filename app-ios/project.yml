@@ -1,5 +1,5 @@
-# XcodeGen 工程描述。用法：brew install xcodegen && xcodegen generate
-# 不用 CocoaPods；依赖走 SPM（Package.swift）。
+# XcodeGen 工程描述（仅参考，与已入库的 ChenYuBang.xcodeproj 保持同步）。
+# 规范 §13.1：xcodeproj 已入库，CI 不运行 xcodegen、不用 CocoaPods；依赖走 SPM（Package.swift）。
 name: ChenYuBang
 options:
   bundleIdPrefix: com.chenyubang
@@ -18,6 +18,7 @@ targets:
     platform: iOS
     sources:
       - path: Sources/App
+      - path: Sources/Features
     info:
       path: Sources/App/Info.plist
       properties: {}
@@ -26,6 +27,8 @@ targets:
         product: CangyuDesignSystem
       - package: ChenYuBangKit
         product: CangyuData
+      - package: ChenYuBangKit
+        product: CangyuTokens
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.chenyubang.app
@@ -35,3 +38,31 @@ targets:
         SWIFT_VERSION: "6.0"
         CODE_SIGN_STYLE: Automatic
         GENERATE_INFOPLIST_FILE: NO
+
+  ChenYuBangTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: Tests
+    dependencies:
+      - target: ChenYuBang
+      - package: ChenYuBangKit
+        product: CangyuTokens
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.chenyubang.app.tests
+        MARKETING_VERSION: "0.10.0"
+        CURRENT_PROJECT_VERSION: "1"
+        TARGETED_DEVICE_FAMILY: "1"
+        SWIFT_VERSION: "6.0"
+        CODE_SIGN_STYLE: Automatic
+        GENERATE_INFOPLIST_FILE: YES
+
+schemes:
+  ChenYuBang:
+    build:
+      targets:
+        ChenYuBang: all
+    test:
+      targets:
+        - ChenYuBangTests
