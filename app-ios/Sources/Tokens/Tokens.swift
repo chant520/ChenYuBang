@@ -319,6 +319,11 @@ public enum Tokens {
         public static let inputDisY: CGFloat = 10
         public static let imgphH: CGFloat = 150
         public static let imgphHSmall: CGFloat = 96
+        public static let tabTop: CGFloat = 11
+        public static let tabBottom: CGFloat = 13
+        public static let tabIconGap: CGFloat = 5
+        public static let tabIndicator: CGFloat = 2
+        public static let modalWidth: CGFloat = 315
     }
 
     public enum Icon {

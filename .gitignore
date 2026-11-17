@@ -5,6 +5,7 @@ __pycache__/
 
 # Android / Gradle
 app-android/.gradle/
+app-android/.kotlin/
 app-android/**/build/
 app-android/local.properties
 *.apk
@@ -15,6 +16,15 @@ app-ios/.build/
 app-ios/DerivedData/
 **/xcuserdata/
 *.xcuserstate
+
+# 内容流水线产物与本机素材投放口
+/content/dist/
+/shared/fixtures/ocr/incoming/*
+!/shared/fixtures/ocr/incoming/.gitkeep
+!/shared/fixtures/ocr/incoming/README.md
+
+# 本机会话快照
+/.workbuddy/context-mode-memory.json
 
 # 工具与系统杂项
 .DS_Store

@@ -218,6 +218,11 @@ object Tokens {
         val inputDisY = 10
         val imgphH = 150
         val imgphHSmall = 96
+        val tabTop = 11
+        val tabBottom = 13
+        val tabIconGap = 5
+        val tabIndicator = 2
+        val modalWidth = 315
     }
 
     /** 图标尺寸（规范 6），单位 dp */
