@@ -1,0 +1,25 @@
+{
+  "$comment": "数据库迁移版本表。口径写在 docs/开发规范-v1.4.md §4.5。两端各有一份实现，但版本号与表结构必须一致。",
+  "schemaVersion": 1,
+  "currentVersion": 1,
+  "rules": [
+    "只增：新版本只能新增表或新增可空列，不删除、不改名、不改类型。",
+    "每版必须同时提交 forward 迁移与回读校验（Android Room TestMigration、iOS GRDB DatabaseMigrator），校验内容：目标表行数、关键索引存在、外键可解析。",
+    "禁止依赖 Room 自动迁移推断；iOS 禁止用 eraseDatabaseOnSchemaChange。",
+    "备份包的 schemaVersion 与 DB version 相互独立，各自演进；导入时按备份的 schemaVersion 判断能否读。",
+    "每版迁移在两端各有一条正常路径用例与一条中断回滚用例（fixtures 见 shared/fixtures/）。"
+  ],
+  "migrations": [
+    {
+      "version": 1,
+      "status": "shipped",
+      "description": "初始 schema：成语、例题、错题、复习、设置共 10 张表",
+      "tables": [
+        "idiom", "exam_scope", "idiom_scope", "example", "example_idiom",
+        "mistake", "mistake_idiom", "review_log", "idiom_state", "settings"
+      ],
+      "android": "AppDatabase(version = 1)，schema 导出到 app-android/core-data/schemas/",
+      "ios": "GRDB DatabaseMigrator.registerMigration(\"v1\") { db in … }"
+    }
+  ]
+}

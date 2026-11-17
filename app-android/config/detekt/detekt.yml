@@ -1,0 +1,13 @@
+# detekt 覆写（buildUponDefaultConfig=true，只列与默认不同的项）。
+# 口径：docs/开发规范-v1.4.md §13.1。生成文件 Tokens.kt 在根 build.gradle.kts 里整体排除。
+naming:
+  FunctionNaming:
+    # Composable 构件按惯例大写开头（CButton / ChenYuBangTheme 等）
+    functionPattern: '[a-zA-Z][a-zA-Z0-9]*'
+complexity:
+  LongParameterList:
+    # Compose 构件参数多带默认值，只数必填参数
+    ignoreDefaultParameters: true
+  CyclomaticComplexMethod:
+    # 构件内按 variant/enabled 分支取色属简单 when 项，不计复杂度
+    ignoreSimpleWhenEntries: true

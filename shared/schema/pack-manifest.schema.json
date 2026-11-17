@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "chenyubang/pack-manifest",
+  "title": "题库包 manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "packVersion", "builtAt", "counts", "sha256"],
+  "properties": {
+    "schemaVersion": { "type": "integer", "minimum": 1 },
+    "packVersion": { "type": "string", "pattern": "^v\\d+\\.\\d+\\.\\d+$" },
+    "builtAt": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$" },
+    "counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["idioms", "examples"],
+      "properties": {
+        "idioms": { "type": "integer", "minimum": 1 },
+        "examples": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+  }
+}

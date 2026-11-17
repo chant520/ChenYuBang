@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "appVersion": "0.10.0",
+  "build": 41,
+  "exportedAt": "2026-11-17T02:10:00Z",
+  "counts": {
+    "mistakes": 2,
+    "reviews": 2,
+    "idiomStates": 3,
+    "scopes": 2
+  },
+  "sha256": "5311377e4d3bf4fa585eef5fc9e2ed8967de1863850a24708e7e90accd3c63d9"
+}

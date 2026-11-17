@@ -1,0 +1,22 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Android / Gradle
+app-android/.gradle/
+app-android/**/build/
+app-android/local.properties
+*.apk
+*.aab
+
+# iOS / Xcode
+app-ios/.build/
+app-ios/DerivedData/
+**/xcuserdata/
+*.xcuserstate
+
+# 工具与系统杂项
+.DS_Store
+Thumbs.db
+*.log

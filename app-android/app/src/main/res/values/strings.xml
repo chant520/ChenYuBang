@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">成语帮</string>
+    <!-- 相机页说明（P17），文案与产品文档一致，不写「需联网」 -->
+    <string name="camera_permission_rationale">拍下卷面就能录题。照片只存在本机，不会上传。</string>
+</resources>

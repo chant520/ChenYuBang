@@ -1,0 +1,37 @@
+# XcodeGen 工程描述。用法：brew install xcodegen && xcodegen generate
+# 不用 CocoaPods；依赖走 SPM（Package.swift）。
+name: ChenYuBang
+options:
+  bundleIdPrefix: com.chenyubang
+  deploymentTarget:
+    iOS: "15.0"
+  createIntermediateGroups: true
+  xcodeVersion: "16.2"
+
+packages:
+  ChenYuBangKit:
+    path: .
+
+targets:
+  ChenYuBang:
+    type: application
+    platform: iOS
+    sources:
+      - path: Sources/App
+    info:
+      path: Sources/App/Info.plist
+      properties: {}
+    dependencies:
+      - package: ChenYuBangKit
+        product: CangyuDesignSystem
+      - package: ChenYuBangKit
+        product: CangyuData
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.chenyubang.app
+        MARKETING_VERSION: "0.10.0"
+        CURRENT_PROJECT_VERSION: "1"
+        TARGETED_DEVICE_FAMILY: "1"
+        SWIFT_VERSION: "6.0"
+        CODE_SIGN_STYLE: Automatic
+        GENERATE_INFOPLIST_FILE: NO

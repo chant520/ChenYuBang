@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="gbk">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>浙江 - 考考公务员</title>
+    <meta name="keywords" content="浙江省,事业单位,题库,真题试卷">
+    <meta name="description" content="浙江省事业单位考试题库栏目是一个专门提供浙江省事业单位考试相关题目的资源栏目。该栏目致力于为考生提供丰富的题目库，帮助他们进行针对性的练习和备考。">
+    <link rel="canonical" href="[!--class.url--]">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="浙江 - 考考公务员">
+    <meta property="og:description" content="浙江省事业单位考试题库栏目是一个专门提供浙江省事业单位考试相关题目的资源栏目。该栏目致力于为考生提供丰富的题目库，帮助他们进行针对性的练习和备考。">
+    <meta property="og:url" content="[!--class.url--]">
+    <meta property="og:site_name" content="考考公务员">
+    <script type="text/javascript" src="/e/data/js/ajax.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="bg-white text-gray-900 font-sans antialiased flex flex-col min-h-screen pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0 text-sm md:text-base">
+
+<header id="main-header" class="sticky top-0 z-50 transition-all duration-300 bg-white text-base sm:text-lg border-b border-gray-100 shadow-sm">
+    <style>
+        @keyframes premiumTextShine {
+            0% { background-position: 0% center; }
+            100% { background-position: -200% center; }
+        }
+        .text-shimmer-effect {
+            background: linear-gradient(
+                120deg,
+                #dc2626 30%,
+                #fca5a5 45%,
+                #ffffff 50%,
+                #fca5a5 55%,
+                #dc2626 70%
+            );
+            background-size: 200% auto;
+            color: transparent;
+            -webkit-background-clip: text;
+            background-clip: text;
+            animation: premiumTextShine 3s linear infinite;
+            display: inline-block;
+        }
+    </style>
+
+    <div class="container mx-auto px-2 sm:px-4">
+        <div class="flex items-center justify-between py-2 sm:py-3 h-14 sm:h-auto">
+            
+            <div class="flex items-center flex-shrink-0">
+                <a href="/" title="返回考考公务员首页" class="flex items-center focus:outline-none focus:ring-0 hover:opacity-90 transition-opacity">
+                    <img src="/skin/logo.png" alt="考考公务员Logo" class="h-7 w-7 sm:h-10 sm:w-10 mr-1 sm:mr-2 object-contain" />
+                    <span class="text-base sm:text-2xl font-bold text-red-600 leading-none whitespace-nowrap block">考考公务员</span>
+                </a>
+                
+                <div class="flex items-center ml-1 sm:ml-4 group relative" id="region-selector-container">
+                    <button id="region-btn" class="hidden md:flex items-center px-3 py-1.5 bg-red-50 text-red-700 rounded-md text-sm font-medium transition-all duration-300 hover:bg-red-100 hover:shadow-sm focus:outline-none focus:ring-0 whitespace-nowrap" aria-haspopup="true" aria-expanded="false" aria-label="选择考试地区">
+                        <span id="current-region-text">全国</span>
+                        <i class="fa-solid fa-chevron-down ml-1 text-xs transition-transform duration-300" id="region-icon"></i>
+                    </button>
+
+                    <button id="mobile-region-btn" class="md:hidden flex items-center px-2 py-1 bg-red-50 text-red-700 rounded-sm text-xs font-medium hover:bg-red-100 focus:outline-none whitespace-nowrap" aria-label="选择地区">
+                        <span id="mobile-region-text">全国</span>
+                        <i class="fa-solid fa-chevron-down ml-0.5 text-[8px]"></i>
+                    </button>
+
+                    <div id="region-dropdown" class="hidden absolute top-full left-1/2 transform -translate-x-1/2 mt-2 w-[50rem] max-w-[95vw] bg-white rounded-xl shadow-xl border border-gray-100 z-50 transition-all duration-300 overflow-hidden">
+                        <div id="pc-region-content" class="px-4 py-3 md:px-6 md:py-4 animate-in fade-in duration-200">
+                            </div>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="hidden lg:flex items-center ml-4 xl:ml-8 flex-shrink-0" aria-label="主导航">
+                <a href="/zk/" title="招考公告" class="relative group px-2 xl:px-4 py-1.5 text-sm xl:text-base font-medium text-gray-700 hover:text-red-600 transition-colors">
+                    招考
+                    <span class="absolute bottom-0 left-1/2 w-0 h-[2px] bg-red-600 group-hover:w-[60%] transition-all duration-300 -translate-x-1/2 rounded-full"></span>
+                </a>
+                <a href="/zl/" title="公考题库" class="relative group px-2 xl:px-4 py-1.5 text-sm xl:text-base font-medium text-gray-700 hover:text-red-600 transition-colors">
+                    题库
+                    <span class="absolute bottom-0 left-1/2 w-0 h-[2px] bg-red-600 group-hover:w-[60%] transition-all duration-300 -translate-x-1/2 rounded-full"></span>
+                </a>
+                <a href="/bktk/" title="必考考点" class="relative group px-2 xl:px-4 py-1.5 text-sm xl:text-base font-medium text-gray-700 hover:text-red-600 transition-colors">
+                    必考
+                    <span class="absolute bottom-0 left-1/2 w-0 h-[2px] bg-red-600 group-hover:w-[60%] transition-all duration-300 -translate-x-1/2 rounded-full"></span>
+                </a>
+                <a href="/sszztk.html" title="时政题库" class="relative group px-2 xl:px-4 py-1.5 text-sm xl:text-base font-medium text-gray-700 hover:text-red-600 transition-colors">
+                    时政
+                    <span class="absolute bottom-0 left-1/2 w-0 h-[2px] bg-red-600 group-hover:w-[60%] transition-all duration-300 -translate-x-1/2 rounded-full"></span>
+                </a>
+                <a href="/ask/" title="公考问答" class="relative group px-2 xl:px-4 py-1.5 text-sm xl:text-base font-medium text-gray-700 hover:text-red-600 transition-colors">
+                    问答
+                    <span class="absolute bottom-0 left-1/2 w-0 h-[2px] bg-red-600 group-hover:w-[60%] transition-all duration-300 -translate-x-1/2 rounded-full"></span>
+                </a>
+                
+                <a href="/e/extend/exam/" title="在线考试" class="relative group px-2 xl:px-4 py-1.5 flex items-center transition-all duration-300">
+                    <span class="text-sm xl:text-base font-bold text-shimmer-effect">
+                        在线考试
+                    </span>
+                    <span class="absolute bottom-0 left-1/2 w-0 h-[2px] bg-red-600 group-hover:w-[60%] transition-all duration-300 -translate-x-1/2 rounded-full"></span>
+                </a>
+            </nav>
+            
+            <div class="flex items-center ml-1 sm:ml-auto flex-grow justify-end min-w-0">
+                
+                <div class="hidden md:block relative flex-grow max-w-[120px] min-[375px]:max-w-[150px] sm:max-w-[220px] lg:max-w-[540px] mr-1 sm:mr-3 min-w-[70px]">
+<form action="/e/search/index.php" method="post" name="searchform" aria-label="" class="relative w-full block">
+    <input type="hidden" name="show" value="title">
+    <input type="hidden" name="tempid" value="1">
+    <input type="hidden" name="tbname" value="download">
+    <input type="text" name="keyboard" placeholder="" aria-label="搜索关键字" class="w-full pl-2 sm:pl-3 pr-7 sm:pr-8 py-1.5 text-[12px] sm:text-sm bg-gray-100 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-600 outline-none" />
+    <button type="submit" aria-label="提交搜索" class="absolute inset-y-0 right-0 flex items-center justify-center px-2 sm:px-3 text-gray-500 hover:text-red-600 bg-transparent">
+        <i class="fa-solid fa-search text-[11px] sm:text-sm"></i>
+    </button>
+</form>
+                </div>
+
+                <a href="/search/" class="md:hidden p-1 sm:p-2 text-gray-700 hover:text-red-600 flex-shrink-0 transition-colors mr-1 sm:mr-2" aria-label="全站搜索">
+                    <i class="fa-solid fa-search text-lg sm:text-xl"></i>
+                </a>
+                
+                <div class="hidden lg:flex flex-shrink-0 origin-right whitespace-nowrap scale-[0.75] min-[375px]:scale-[0.85] sm:scale-100 items-center">
+    <script src="/e/member/login/custom_loginjs.php"></script>
+</div>
+
+                <button id="mobile-menu-btn" class="lg:hidden p-1 sm:p-2 text-gray-700 hover:text-red-600 flex-shrink-0 transition-colors" aria-label="展开菜单">
+                    <i class="fa-solid fa-bars text-lg sm:text-xl" id="menu-icon"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="mobile-menu" class="hidden lg:hidden bg-white border-t border-gray-100 shadow-md transition-all duration-300 absolute w-full z-40">
+        <div class="container mx-auto px-4 py-3 space-y-1">
+            <div class="block py-2 px-4 mb-3 bg-gray-50 rounded-md border border-gray-100 text-sm text-center">
+                <script src="/e/member/login/myloginjs_mobile.php"></script>
+            </div>
+            <a href="/zk/" class="block py-2.5 px-4 rounded-md transition-colors hover:bg-gray-50 text-gray-800"><i class="fa-solid fa-bullhorn w-5 text-gray-400 mr-2"></i>招考公告</a>
+            <a href="/zl/" class="block py-2.5 px-4 rounded-md transition-colors hover:bg-gray-50 text-gray-800"><i class="fa-solid fa-layer-group w-5 text-gray-400 mr-2"></i>公考题库</a>
+            <a href="/bktk/" class="block py-2.5 px-4 rounded-md transition-colors hover:bg-gray-50 text-gray-800"><i class="fa-solid fa-star w-5 text-gray-400 mr-2"></i>必考考点</a>
+            <a href="/sszztk.html" class="block py-2.5 px-4 rounded-md transition-colors hover:bg-gray-50 text-gray-800"><i class="fa-regular fa-newspaper w-5 text-gray-400 mr-2"></i>时政热点</a>
+            <a href="/ask/" class="block py-2.5 px-4 rounded-md transition-colors hover:bg-gray-50 text-gray-800"><i class="fa-regular fa-comments w-5 text-gray-400 mr-2"></i>公考问答</a>
+            
+            <a href="/e/extend/exam/" class="block py-2.5 px-4 mt-1 transition-all rounded-md hover:bg-gray-50 text-gray-800">
+                <i class="fa-solid fa-pen-to-square w-5 text-red-500 mr-2"></i>
+                <span class="font-bold text-shimmer-effect">在线考试</span>
+            </a>
+        </div>
+    </div>
+
+    <div id="mobile-region-modal" class="hidden md:hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg w-full max-w-md max-h-[80vh] overflow-y-auto animate-in fade-in slide-in-from-top-5 duration-300">
+            <div class="bg-white px-4 py-3 border-b border-gray-200 flex justify-between items-center sticky top-0 z-10">
+                <h3 class="text-lg font-medium text-gray-900">选择地区</h3>
+                <button id="close-mobile-region" class="text-gray-500 hover:text-gray-700" aria-label="关闭">
+                    <i class="fa-solid fa-times text-xl"></i>
+                </button>
+            </div>
+            <div id="mobile-region-content" class="px-4 py-3 md:px-6 md:py-4">
+            </div>
+        </div>
+    </div>
+</header>
+
+    <main class="flex-grow">
+        
+        <nav class="bg-gray-50 py-3 text-sm text-gray-600 border-b border-gray-100">
+            <div class="container mx-auto px-4">
+                <div class="flex flex-wrap items-center gap-y-1">
+                 <a href="/">首页</a>&nbsp;>&nbsp;<a href="/stk/">考试题库</a>&nbsp;>&nbsp;<a href="/stk/zj/">浙江</a>
+                </div>
+            </div>
+        </nav>
+
+        <section class="py-4 md:py-10">
+            <div class="container mx-auto px-4">
+                <div class="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
+                    
+                    <div class="w-full lg:w-3/4 space-y-6 md:space-y-8">
+                        
+                        <div class="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
+                            <div class="flex items-center justify-between mb-4">
+                                <h2 class="font-bold text-gray-800 text-lg">浙江</h2>
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                                <a href="[!--class.url--]" class="px-4 py-1.5 md:py-2 rounded-md text-sm font-medium transition-all duration-200 bg-red-600 text-white shadow-md">
+                                    全部
+                                </a>
+                                
+                                                            </div>
+                            </div>
+
+                        <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200">
+                            
+                            <div class="bg-white px-4 md:px-6 py-3 flex items-center justify-between border-b border-gray-100">
+                                <h2 class="font-bold text-gray-800 flex items-center text-lg">
+                                    <i class="fa-solid fa-book-open w-5 h-5 mr-2 text-red-600 mt-1"></i>
+                                    浙江列表
+                                </h2>
+                            </div>
+
+                            <div class="p-4 md:p-6">
+                                <div class="space-y-4">
+                                    
+<div class="group flex flex-col md:flex-row md:items-center justify-between p-4 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 mb-4">
+    
+    <div class="flex-1 min-w-0 pr-0 md:pr-6 mb-4 md:mb-0">
+        <div class="flex items-start md:items-center gap-2 mb-2.5 flex-col md:flex-row">
+            <span class="px-2 py-0.5 text-[12px] font-bold border rounded shrink-0 bg-red-50 text-red-600 border-red-200">
+                2026年最新版
+            </span>
+            <a href="/stk/zj/14922.html" class="block truncate w-full" target="_blank">
+                <h3 class="text-[15px] sm:text-[16px] text-gray-800 font-bold truncate transition-colors group-hover:text-[#e60012]">
+                    浙江省公务员考试《行测》+《申论》真题汇总【答案+解析】
+                </h3>
+            </a>
+        </div>
+        
+        <div class="flex items-center text-[12px] sm:text-[13px] mt-1 text-gray-500">
+            <span class="mr-4"><i class="fa-solid fa-fire text-red-500 mr-1.5"></i>热度: <span class="font-bold text-gray-700">5,994</span></span>
+            <span class="text-orange-500 font-medium"><i class="fa-solid fa-star mr-1"></i>好评: 98%</span>
+        </div>
+    </div>
+
+    <div class="shrink-0 flex items-center justify-between md:justify-end gap-3 pt-3 md:pt-0 border-t md:border-t-0 border-gray-50">
+        <div class="px-3 py-1.5 bg-gray-50 text-gray-700 rounded-md text-[13px] font-medium"><i class="fa-solid fa-coins mr-1 text-yellow-500"></i>19 积分</div>
+        <a href="/stk/zj/14922.html" target="_blank" class="px-5 py-2 bg-[#e60012] text-white text-[14px] font-bold rounded-md hover:bg-red-700 transition-colors shadow-sm">立即获取</a>
+    </div>
+</div>
+
+<div class="group flex flex-col md:flex-row md:items-center justify-between p-4 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 mb-4">
+    
+    <div class="flex-1 min-w-0 pr-0 md:pr-6 mb-4 md:mb-0">
+        <div class="flex items-start md:items-center gap-2 mb-2.5 flex-col md:flex-row">
+            <span class="px-2 py-0.5 text-[12px] font-bold border rounded shrink-0 bg-red-50 text-red-600 border-red-200">
+                2026年最新版
+            </span>
+            <a href="/stk/zj/16402.html" class="block truncate w-full" target="_blank">
+                <h3 class="text-[15px] sm:text-[16px] text-gray-800 font-bold truncate transition-colors group-hover:text-[#e60012]">
+                    《2026年浙江省政府工作报告》题库(答案+解析)
+                </h3>
+            </a>
+        </div>
+        
+        <div class="flex items-center text-[12px] sm:text-[13px] mt-1 text-gray-500">
+            <span class="mr-4"><i class="fa-solid fa-fire text-red-500 mr-1.5"></i>热度: <span class="font-bold text-gray-700">2,423</span></span>
+            <span class="text-orange-500 font-medium"><i class="fa-solid fa-star mr-1"></i>好评: 98%</span>
+        </div>
+    </div>
+
+    <div class="shrink-0 flex items-center justify-between md:justify-end gap-3 pt-3 md:pt-0 border-t md:border-t-0 border-gray-50">
+        <div class="px-3 py-1.5 bg-gray-50 text-gray-700 rounded-md text-[13px] font-medium"><i class="fa-solid fa-coins mr-1 text-yellow-500"></i>5 积分</div>
+        <a href="/stk/zj/16402.html" target="_blank" class="px-5 py-2 bg-[#e60012] text-white text-[14px] font-bold rounded-md hover:bg-red-700 transition-colors shadow-sm">立即获取</a>
+    </div>
+</div>
+
+<div class="group flex flex-col md:flex-row md:items-center justify-between p-4 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 mb-4">
+    
+    <div class="flex-1 min-w-0 pr-0 md:pr-6 mb-4 md:mb-0">
+        <div class="flex items-start md:items-center gap-2 mb-2.5 flex-col md:flex-row">
+            <span class="px-2 py-0.5 text-[12px] font-bold border rounded shrink-0 bg-red-50 text-red-600 border-red-200">
+                2026年最新版
+            </span>
+            <a href="/stk/zj/16356.html" class="block truncate w-full" target="_blank">
+                <h3 class="text-[15px] sm:text-[16px] text-gray-800 font-bold truncate transition-colors group-hover:text-[#e60012]">
+                    《浙江省情》题库(答案+解析)（468题）【2026版】
+                </h3>
+            </a>
+        </div>
+        
+        <div class="flex items-center text-[12px] sm:text-[13px] mt-1 text-gray-500">
+            <span class="mr-4"><i class="fa-solid fa-fire text-red-500 mr-1.5"></i>热度: <span class="font-bold text-gray-700">2,411</span></span>
+            <span class="text-orange-500 font-medium"><i class="fa-solid fa-star mr-1"></i>好评: 96%</span>
+        </div>
+    </div>
+
+    <div class="shrink-0 flex items-center justify-between md:justify-end gap-3 pt-3 md:pt-0 border-t md:border-t-0 border-gray-50">
+        <div class="px-3 py-1.5 bg-gray-50 text-gray-700 rounded-md text-[13px] font-medium"><i class="fa-solid fa-coins mr-1 text-yellow-500"></i>19 积分</div>
+        <a href="/stk/zj/16356.html" target="_blank" class="px-5 py-2 bg-[#e60012] text-white text-[14px] font-bold rounded-md hover:bg-red-700 transition-colors shadow-sm">立即获取</a>
+    </div>
+</div>
+
+<div class="group flex flex-col md:flex-row md:items-center justify-between p-4 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 mb-4">
+    
+    <div class="flex-1 min-w-0 pr-0 md:pr-6 mb-4 md:mb-0">
+        <div class="flex items-start md:items-center gap-2 mb-2.5 flex-col md:flex-row">
+            <span class="px-2 py-0.5 text-[12px] font-bold border rounded shrink-0 bg-red-50 text-red-600 border-red-200">
+                2026年最新版
+            </span>
+            <a href="/stk/zj/16267.html" class="block truncate w-full" target="_blank">
+                <h3 class="text-[15px] sm:text-[16px] text-gray-800 font-bold truncate transition-colors group-hover:text-[#e60012]">
+                    《浙江十五五规划建议》题库(答案+解析)
+                </h3>
+            </a>
+        </div>
+        
+        <div class="flex items-center text-[12px] sm:text-[13px] mt-1 text-gray-500">
+            <span class="mr-4"><i class="fa-solid fa-fire text-red-500 mr-1.5"></i>热度: <span class="font-bold text-gray-700">2,336</span></span>
+            <span class="text-orange-500 font-medium"><i class="fa-solid fa-star mr-1"></i>好评: 99%</span>
+        </div>
+    </div>
+
+    <div class="shrink-0 flex items-center justify-between md:justify-end gap-3 pt-3 md:pt-0 border-t md:border-t-0 border-gray-50">
+        <div class="px-3 py-1.5 bg-gray-50 text-gray-700 rounded-md text-[13px] font-medium"><i class="fa-solid fa-coins mr-1 text-yellow-500"></i>9 积分</div>
+        <a href="/stk/zj/16267.html" target="_blank" class="px-5 py-2 bg-[#e60012] text-white text-[14px] font-bold rounded-md hover:bg-red-700 transition-colors shadow-sm">立即获取</a>
+    </div>
+</div>
+
+<div class="group flex flex-col md:flex-row md:items-center justify-between p-4 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 mb-4">
+    
+    <div class="flex-1 min-w-0 pr-0 md:pr-6 mb-4 md:mb-0">
+        <div class="flex items-start md:items-center gap-2 mb-2.5 flex-col md:flex-row">
+            <span class="px-2 py-0.5 text-[12px] font-bold border rounded shrink-0 bg-red-50 text-red-600 border-red-200">
+                2026年最新版
+            </span>
+            <a href="/stk/zj/16231.html" class="block truncate w-full" target="_blank">
+                <h3 class="text-[15px] sm:text-[16px] text-gray-800 font-bold truncate transition-colors group-hover:text-[#e60012]">
+                    《浙江“十四五”成就》题库(答案+解析)
+                </h3>
+            </a>
+        </div>
+        
+        <div class="flex items-center text-[12px] sm:text-[13px] mt-1 text-gray-500">
+            <span class="mr-4"><i class="fa-solid fa-fire text-red-500 mr-1.5"></i>热度: <span class="font-bold text-gray-700">2,228</span></span>
+            <span class="text-orange-500 font-medium"><i class="fa-solid fa-star mr-1"></i>好评: 99%</span>
+        </div>
+    </div>
+
+    <div class="shrink-0 flex items-center justify-between md:justify-end gap-3 pt-3 md:pt-0 border-t md:border-t-0 border-gray-50">
+        <div class="px-3 py-1.5 bg-gray-50 text-gray-700 rounded-md text-[13px] font-medium"><i class="fa-solid fa-coins mr-1 text-yellow-500"></i>3 积分</div>
+        <a href="/stk/zj/16231.html" target="_blank" class="px-5 py-2 bg-[#e60012] text-white text-[14px] font-bold rounded-md hover:bg-red-700 transition-colors shadow-sm">立即获取</a>
+    </div>
+</div>
+
+<div class="group flex flex-col md:flex-row md:items-center justify-between p-4 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 mb-4">
+    
+    <div class="flex-1 min-w-0 pr-0 md:pr-6 mb-4 md:mb-0">
+        <div class="flex items-start md:items-center gap-2 mb-2.5 flex-col md:flex-row">
+            <span class="px-2 py-0.5 text-[12px] font-bold border rounded shrink-0 bg-orange-50 text-orange-600 border-orange-200">
+                2025年版
+            </span>
+            <a href="/stk/zj/16230.html" class="block truncate w-full" target="_blank">
+                <h3 class="text-[15px] sm:text-[16px] text-gray-800 font-bold truncate transition-colors group-hover:text-[#e60012]">
+                    《2025年浙江省政府工作报告》题库(答案+解析)
+                </h3>
+            </a>
+        </div>
+        
+        <div class="flex items-center text-[12px] sm:text-[13px] mt-1 text-gray-500">
+            <span class="mr-4"><i class="fa-solid fa-fire text-red-500 mr-1.5"></i>热度: <span class="font-bold text-gray-700">2,267</span></span>
+            <span class="text-orange-500 font-medium"><i class="fa-solid fa-star mr-1"></i>好评: 98%</span>
+        </div>
+    </div>
+
+    <div class="shrink-0 flex items-center justify-between md:justify-end gap-3 pt-3 md:pt-0 border-t md:border-t-0 border-gray-50">
+        <div class="px-3 py-1.5 bg-gray-50 text-gray-700 rounded-md text-[13px] font-medium"><i class="fa-solid fa-coins mr-1 text-yellow-500"></i>5 积分</div>
+        <a href="/stk/zj/16230.html" target="_blank" class="px-5 py-2 bg-[#e60012] text-white text-[14px] font-bold rounded-md hover:bg-red-700 transition-colors shadow-sm">立即获取</a>
+    </div>
+</div>
+
+<div class="group flex flex-col md:flex-row md:items-center justify-between p-4 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 mb-4">
+    
+    <div class="flex-1 min-w-0 pr-0 md:pr-6 mb-4 md:mb-0">
+        <div class="flex items-start md:items-center gap-2 mb-2.5 flex-col md:flex-row">
+            <span class="px-2 py-0.5 text-[12px] font-bold border rounded shrink-0 bg-red-50 text-red-600 border-red-200">
+                2026年最新版
+            </span>
+            <a href="/stk/zj/16187.html" class="block truncate w-full" target="_blank">
+                <h3 class="text-[15px] sm:text-[16px] text-gray-800 font-bold truncate transition-colors group-hover:text-[#e60012]">
+                    2026年浙江省公务员录用考试《行测》真题试卷及答案【含解析】（A类）
+                </h3>
+            </a>
+        </div>
+        
+        <div class="flex items-center text-[12px] sm:text-[13px] mt-1 text-gray-500">
+            <span class="mr-4"><i class="fa-solid fa-fire text-red-500 mr-1.5"></i>热度: <span class="font-bold text-gray-700">2,177</span></span>
+            <span class="text-orange-500 font-medium"><i class="fa-solid fa-star mr-1"></i>好评: 99%</span>
+        </div>
+    </div>
+
+    <div class="shrink-0 flex items-center justify-between md:justify-end gap-3 pt-3 md:pt-0 border-t md:border-t-0 border-gray-50">
+        <div class="px-3 py-1.5 bg-gray-50 text-gray-700 rounded-md text-[13px] font-medium"><i class="fa-solid fa-coins mr-1 text-yellow-500"></i>5 积分</div>
+        <a href="/stk/zj/16187.html" target="_blank" class="px-5 py-2 bg-[#e60012] text-white text-[14px] font-bold rounded-md hover:bg-red-700 transition-colors shadow-sm">立即获取</a>
+    </div>
+</div>
+
+<div class="group flex flex-col md:flex-row md:items-center justify-between p-4 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 mb-4">
+    
+    <div class="flex-1 min-w-0 pr-0 md:pr-6 mb-4 md:mb-0">
+        <div class="flex items-start md:items-center gap-2 mb-2.5 flex-col md:flex-row">
+            <span class="px-2 py-0.5 text-[12px] font-bold border rounded shrink-0 bg-red-50 text-red-600 border-red-200">
+                2026年最新版
+            </span>
+            <a href="/stk/zj/16186.html" class="block truncate w-full" target="_blank">
+                <h3 class="text-[15px] sm:text-[16px] text-gray-800 font-bold truncate transition-colors group-hover:text-[#e60012]">
+                    2026年浙江省公务员录用考试《行测》真题试卷及答案【含解析】（B类）
+                </h3>
+            </a>
+        </div>
+        
+        <div class="flex items-center text-[12px] sm:text-[13px] mt-1 text-gray-500">
+            <span class="mr-4"><i class="fa-solid fa-fire text-red-500 mr-1.5"></i>热度: <span class="font-bold text-gray-700">2,158</span></span>
+            <span class="text-orange-500 font-medium"><i class="fa-solid fa-star mr-1"></i>好评: 98%</span>
+        </div>
+    </div>
+
+    <div class="shrink-0 flex items-center justify-between md:justify-end gap-3 pt-3 md:pt-0 border-t md:border-t-0 border-gray-50">
+        <div class="px-3 py-1.5 bg-gray-50 text-gray-700 rounded-md text-[13px] font-medium"><i class="fa-solid fa-coins mr-1 text-yellow-500"></i>5 积分</div>
+        <a href="/stk/zj/16186.html" target="_blank" class="px-5 py-2 bg-[#e60012] text-white text-[14px] font-bold rounded-md hover:bg-red-700 transition-colors shadow-sm">立即获取</a>
+    </div>
+</div>
+
+<div class="group flex flex-col md:flex-row md:items-center justify-between p-4 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 mb-4">
+    
+    <div class="flex-1 min-w-0 pr-0 md:pr-6 mb-4 md:mb-0">
+        <div class="flex items-start md:items-center gap-2 mb-2.5 flex-col md:flex-row">
+            <span class="px-2 py-0.5 text-[12px] font-bold border rounded shrink-0 bg-red-50 text-red-600 border-red-200">
+                2026年最新版
+            </span>
+            <a href="/stk/zj/16185.html" class="block truncate w-full" target="_blank">
+                <h3 class="text-[15px] sm:text-[16px] text-gray-800 font-bold truncate transition-colors group-hover:text-[#e60012]">
+                    2026年浙江省公务员录用考试《行测》真题试卷及答案【含解析】（C类）
+                </h3>
+            </a>
+        </div>
+        
+        <div class="flex items-center text-[12px] sm:text-[13px] mt-1 text-gray-500">
+            <span class="mr-4"><i class="fa-solid fa-fire text-red-500 mr-1.5"></i>热度: <span class="font-bold text-gray-700">2,181</span></span>
+            <span class="text-orange-500 font-medium"><i class="fa-solid fa-star mr-1"></i>好评: 97%</span>
+        </div>
+    </div>
+
+    <div class="shrink-0 flex items-center justify-between md:justify-end gap-3 pt-3 md:pt-0 border-t md:border-t-0 border-gray-50">
+        <div class="px-3 py-1.5 bg-gray-50 text-gray-700 rounded-md text-[13px] font-medium"><i class="fa-solid fa-coins mr-1 text-yellow-500"></i>5 积分</div>
+        <a href="/stk/zj/16185.html" target="_blank" class="px-5 py-2 bg-[#e60012] text-white text-[14px] font-bold rounded-md hover:bg-red-700 transition-colors shadow-sm">立即获取</a>
+    </div>
+</div>
+
+<div class="group flex flex-col md:flex-row md:items-center justify-between p-4 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 mb-4">
+    
+    <div class="flex-1 min-w-0 pr-0 md:pr-6 mb-4 md:mb-0">
+        <div class="flex items-start md:items-center gap-2 mb-2.5 flex-col md:flex-row">
+            <span class="px-2 py-0.5 text-[12px] font-bold border rounded shrink-0 bg-orange-50 text-orange-600 border-orange-200">
+                2025年版
+            </span>
+            <a href="/stk/zj/16088.html" class="block truncate w-full" target="_blank">
+                <h3 class="text-[15px] sm:text-[16px] text-gray-800 font-bold truncate transition-colors group-hover:text-[#e60012]">
+                    2025年9月27日浙江省事业单位统考《职业能力倾向测验》笔试真题试卷及答案【含解析】
+                </h3>
+            </a>
+        </div>
+        
+        <div class="flex items-center text-[12px] sm:text-[13px] mt-1 text-gray-500">
+            <span class="mr-4"><i class="fa-solid fa-fire text-red-500 mr-1.5"></i>热度: <span class="font-bold text-gray-700">2,177</span></span>
+            <span class="text-orange-500 font-medium"><i class="fa-solid fa-star mr-1"></i>好评: 96%</span>
+        </div>
+    </div>
+
+    <div class="shrink-0 flex items-center justify-between md:justify-end gap-3 pt-3 md:pt-0 border-t md:border-t-0 border-gray-50">
+        <div class="px-3 py-1.5 bg-gray-50 text-gray-700 rounded-md text-[13px] font-medium"><i class="fa-solid fa-coins mr-1 text-yellow-500"></i>2 积分</div>
+        <a href="/stk/zj/16088.html" target="_blank" class="px-5 py-2 bg-[#e60012] text-white text-[14px] font-bold rounded-md hover:bg-red-700 transition-colors shadow-sm">立即获取</a>
+    </div>
+</div>
+
+<div class="group flex flex-col md:flex-row md:items-center justify-between p-4 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 mb-4">
+    
+    <div class="flex-1 min-w-0 pr-0 md:pr-6 mb-4 md:mb-0">
+        <div class="flex items-start md:items-center gap-2 mb-2.5 flex-col md:flex-row">
+            <span class="px-2 py-0.5 text-[12px] font-bold border rounded shrink-0 bg-orange-50 text-orange-600 border-orange-200">
+                2025年版
+            </span>
+            <a href="/stk/zj/16087.html" class="block truncate w-full" target="_blank">
+                <h3 class="text-[15px] sm:text-[16px] text-gray-800 font-bold truncate transition-colors group-hover:text-[#e60012]">
+                    2025年4月26日浙江省事业单位统考《职业能力倾向测验》笔试真题试卷及答案【含解析】
+                </h3>
+            </a>
+        </div>
+        
+        <div class="flex items-center text-[12px] sm:text-[13px] mt-1 text-gray-500">
+            <span class="mr-4"><i class="fa-solid fa-fire text-red-500 mr-1.5"></i>热度: <span class="font-bold text-gray-700">2,096</span></span>
+            <span class="text-orange-500 font-medium"><i class="fa-solid fa-star mr-1"></i>好评: 99%</span>
+        </div>
+    </div>
+
+    <div class="shrink-0 flex items-center justify-between md:justify-end gap-3 pt-3 md:pt-0 border-t md:border-t-0 border-gray-50">
+        <div class="px-3 py-1.5 bg-gray-50 text-gray-700 rounded-md text-[13px] font-medium"><i class="fa-solid fa-coins mr-1 text-yellow-500"></i>2 积分</div>
+        <a href="/stk/zj/16087.html" target="_blank" class="px-5 py-2 bg-[#e60012] text-white text-[14px] font-bold rounded-md hover:bg-red-700 transition-colors shadow-sm">立即获取</a>
+    </div>
+</div>
+
+<div class="group flex flex-col md:flex-row md:items-center justify-between p-4 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 mb-4">
+    
+    <div class="flex-1 min-w-0 pr-0 md:pr-6 mb-4 md:mb-0">
+        <div class="flex items-start md:items-center gap-2 mb-2.5 flex-col md:flex-row">
+            <span class="px-2 py-0.5 text-[12px] font-bold border rounded shrink-0 bg-orange-50 text-orange-600 border-orange-200">
+                2025年版
+            </span>
+            <a href="/stk/zj/16072.html" class="block truncate w-full" target="_blank">
+                <h3 class="text-[15px] sm:text-[16px] text-gray-800 font-bold truncate transition-colors group-hover:text-[#e60012]">
+                    2025年浙江省公考《申论》真题试卷及答案【含解析】（3套）
+                </h3>
+            </a>
+        </div>
+        
+        <div class="flex items-center text-[12px] sm:text-[13px] mt-1 text-gray-500">
+            <span class="mr-4"><i class="fa-solid fa-fire text-red-500 mr-1.5"></i>热度: <span class="font-bold text-gray-700">2,099</span></span>
+            <span class="text-orange-500 font-medium"><i class="fa-solid fa-star mr-1"></i>好评: 96%</span>
+        </div>
+    </div>
+
+    <div class="shrink-0 flex items-center justify-between md:justify-end gap-3 pt-3 md:pt-0 border-t md:border-t-0 border-gray-50">
+        <div class="px-3 py-1.5 bg-gray-50 text-gray-700 rounded-md text-[13px] font-medium"><i class="fa-solid fa-coins mr-1 text-yellow-500"></i>5 积分</div>
+        <a href="/stk/zj/16072.html" target="_blank" class="px-5 py-2 bg-[#e60012] text-white text-[14px] font-bold rounded-md hover:bg-red-700 transition-colors shadow-sm">立即获取</a>
+    </div>
+</div>
+
+<div class="group flex flex-col md:flex-row md:items-center justify-between p-4 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 mb-4">
+    
+    <div class="flex-1 min-w-0 pr-0 md:pr-6 mb-4 md:mb-0">
+        <div class="flex items-start md:items-center gap-2 mb-2.5 flex-col md:flex-row">
+            <span class="px-2 py-0.5 text-[12px] font-bold border rounded shrink-0 bg-orange-50 text-orange-600 border-orange-200">
+                2025年版
+            </span>
+            <a href="/stk/zj/16018.html" class="block truncate w-full" target="_blank">
+                <h3 class="text-[15px] sm:text-[16px] text-gray-800 font-bold truncate transition-colors group-hover:text-[#e60012]">
+                    2025年浙江省公务员录用考试《行测》真题试卷及答案【含解析】（C类）
+                </h3>
+            </a>
+        </div>
+        
+        <div class="flex items-center text-[12px] sm:text-[13px] mt-1 text-gray-500">
+            <span class="mr-4"><i class="fa-solid fa-fire text-red-500 mr-1.5"></i>热度: <span class="font-bold text-gray-700">2,015</span></span>
+            <span class="text-orange-500 font-medium"><i class="fa-solid fa-star mr-1"></i>好评: 98%</span>
+        </div>
+    </div>
+
+    <div class="shrink-0 flex items-center justify-between md:justify-end gap-3 pt-3 md:pt-0 border-t md:border-t-0 border-gray-50">
+        <div class="px-3 py-1.5 bg-gray-50 text-gray-700 rounded-md text-[13px] font-medium"><i class="fa-solid fa-coins mr-1 text-yellow-500"></i>2 积分</div>
+        <a href="/stk/zj/16018.html" target="_blank" class="px-5 py-2 bg-[#e60012] text-white text-[14px] font-bold rounded-md hover:bg-red-700 transition-colors shadow-sm">立即获取</a>
+    </div>
+</div>
+
+<div class="group flex flex-col md:flex-row md:items-center justify-between p-4 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 mb-4">
+    
+    <div class="flex-1 min-w-0 pr-0 md:pr-6 mb-4 md:mb-0">
+        <div class="flex items-start md:items-center gap-2 mb-2.5 flex-col md:flex-row">
+            <span class="px-2 py-0.5 text-[12px] font-bold border rounded shrink-0 bg-orange-50 text-orange-600 border-orange-200">
+                2025年版
+            </span>
+            <a href="/stk/zj/16017.html" class="block truncate w-full" target="_blank">
+                <h3 class="text-[15px] sm:text-[16px] text-gray-800 font-bold truncate transition-colors group-hover:text-[#e60012]">
+                    2025年浙江省公务员录用考试《行测》真题试卷及答案【含解析】（B类）
+                </h3>
+            </a>
+        </div>
+        
+        <div class="flex items-center text-[12px] sm:text-[13px] mt-1 text-gray-500">
+            <span class="mr-4"><i class="fa-solid fa-fire text-red-500 mr-1.5"></i>热度: <span class="font-bold text-gray-700">2,067</span></span>
+            <span class="text-orange-500 font-medium"><i class="fa-solid fa-star mr-1"></i>好评: 97%</span>
+        </div>
+    </div>
+
+    <div class="shrink-0 flex items-center justify-between md:justify-end gap-3 pt-3 md:pt-0 border-t md:border-t-0 border-gray-50">
+        <div class="px-3 py-1.5 bg-gray-50 text-gray-700 rounded-md text-[13px] font-medium"><i class="fa-solid fa-coins mr-1 text-yellow-500"></i>2 积分</div>
+        <a href="/stk/zj/16017.html" target="_blank" class="px-5 py-2 bg-[#e60012] text-white text-[14px] font-bold rounded-md hover:bg-red-700 transition-colors shadow-sm">立即获取</a>
+    </div>
+</div>
+
+<div class="group flex flex-col md:flex-row md:items-center justify-between p-4 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 mb-4">
+    
+    <div class="flex-1 min-w-0 pr-0 md:pr-6 mb-4 md:mb-0">
+        <div class="flex items-start md:items-center gap-2 mb-2.5 flex-col md:flex-row">
+            <span class="px-2 py-0.5 text-[12px] font-bold border rounded shrink-0 bg-orange-50 text-orange-600 border-orange-200">
+                2025年版
+            </span>
+            <a href="/stk/zj/16016.html" class="block truncate w-full" target="_blank">
+                <h3 class="text-[15px] sm:text-[16px] text-gray-800 font-bold truncate transition-colors group-hover:text-[#e60012]">
+                    2025年浙江省公务员录用考试《行测》真题试卷及答案【含解析】（A类）
+                </h3>
+            </a>
+        </div>
+        
+        <div class="flex items-center text-[12px] sm:text-[13px] mt-1 text-gray-500">
+            <span class="mr-4"><i class="fa-solid fa-fire text-red-500 mr-1.5"></i>热度: <span class="font-bold text-gray-700">1,986</span></span>
+            <span class="text-orange-500 font-medium"><i class="fa-solid fa-star mr-1"></i>好评: 96%</span>
+        </div>
+    </div>
+
+    <div class="shrink-0 flex items-center justify-between md:justify-end gap-3 pt-3 md:pt-0 border-t md:border-t-0 border-gray-50">
+        <div class="px-3 py-1.5 bg-gray-50 text-gray-700 rounded-md text-[13px] font-medium"><i class="fa-solid fa-coins mr-1 text-yellow-500"></i>2 积分</div>
+        <a href="/stk/zj/16016.html" target="_blank" class="px-5 py-2 bg-[#e60012] text-white text-[14px] font-bold rounded-md hover:bg-red-700 transition-colors shadow-sm">立即获取</a>
+    </div>
+</div>
+
+<div class="group flex flex-col md:flex-row md:items-center justify-between p-4 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 mb-4">
+    
+    <div class="flex-1 min-w-0 pr-0 md:pr-6 mb-4 md:mb-0">
+        <div class="flex items-start md:items-center gap-2 mb-2.5 flex-col md:flex-row">
+            <span class="px-2 py-0.5 text-[12px] font-bold border rounded shrink-0 bg-red-50 text-red-600 border-red-200">
+                2026年最新版
+            </span>
+            <a href="/stk/zj/15728.html" class="block truncate w-full" target="_blank">
+                <h3 class="text-[15px] sm:text-[16px] text-gray-800 font-bold truncate transition-colors group-hover:text-[#e60012]">
+                    浙江省金华市浦江县事业单位招聘考试《综合基础知识》题库(答案+解析)
+                </h3>
+            </a>
+        </div>
+        
+        <div class="flex items-center text-[12px] sm:text-[13px] mt-1 text-gray-500">
+            <span class="mr-4"><i class="fa-solid fa-fire text-red-500 mr-1.5"></i>热度: <span class="font-bold text-gray-700">1,761</span></span>
+            <span class="text-orange-500 font-medium"><i class="fa-solid fa-star mr-1"></i>好评: 96%</span>
+        </div>
+    </div>
+
+    <div class="shrink-0 flex items-center justify-between md:justify-end gap-3 pt-3 md:pt-0 border-t md:border-t-0 border-gray-50">
+        <div class="px-3 py-1.5 bg-gray-50 text-gray-700 rounded-md text-[13px] font-medium"><i class="fa-solid fa-coins mr-1 text-yellow-500"></i>39 积分</div>
+        <a href="/stk/zj/15728.html" target="_blank" class="px-5 py-2 bg-[#e60012] text-white text-[14px] font-bold rounded-md hover:bg-red-700 transition-colors shadow-sm">立即获取</a>
+    </div>
+</div>
+
+<div class="group flex flex-col md:flex-row md:items-center justify-between p-4 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 mb-4">
+    
+    <div class="flex-1 min-w-0 pr-0 md:pr-6 mb-4 md:mb-0">
+        <div class="flex items-start md:items-center gap-2 mb-2.5 flex-col md:flex-row">
+            <span class="px-2 py-0.5 text-[12px] font-bold border rounded shrink-0 bg-red-50 text-red-600 border-red-200">
+                2026年最新版
+            </span>
+            <a href="/stk/zj/15624.html" class="block truncate w-full" target="_blank">
+                <h3 class="text-[15px] sm:text-[16px] text-gray-800 font-bold truncate transition-colors group-hover:text-[#e60012]">
+                    浙江省丽水市龙泉市事业单位招聘考试《综合应用能力》题库(答案+解析)
+                </h3>
+            </a>
+        </div>
+        
+        <div class="flex items-center text-[12px] sm:text-[13px] mt-1 text-gray-500">
+            <span class="mr-4"><i class="fa-solid fa-fire text-red-500 mr-1.5"></i>热度: <span class="font-bold text-gray-700">1,644</span></span>
+            <span class="text-orange-500 font-medium"><i class="fa-solid fa-star mr-1"></i>好评: 96%</span>
+        </div>
+    </div>
+
+    <div class="shrink-0 flex items-center justify-between md:justify-end gap-3 pt-3 md:pt-0 border-t md:border-t-0 border-gray-50">
+        <div class="px-3 py-1.5 bg-gray-50 text-gray-700 rounded-md text-[13px] font-medium"><i class="fa-solid fa-coins mr-1 text-yellow-500"></i>19 积分</div>
+        <a href="/stk/zj/15624.html" target="_blank" class="px-5 py-2 bg-[#e60012] text-white text-[14px] font-bold rounded-md hover:bg-red-700 transition-colors shadow-sm">立即获取</a>
+    </div>
+</div>
+
+<div class="group flex flex-col md:flex-row md:items-center justify-between p-4 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 mb-4">
+    
+    <div class="flex-1 min-w-0 pr-0 md:pr-6 mb-4 md:mb-0">
+        <div class="flex items-start md:items-center gap-2 mb-2.5 flex-col md:flex-row">
+            <span class="px-2 py-0.5 text-[12px] font-bold border rounded shrink-0 bg-red-50 text-red-600 border-red-200">
+                2026年最新版
+            </span>
+            <a href="/stk/zj/15623.html" class="block truncate w-full" target="_blank">
+                <h3 class="text-[15px] sm:text-[16px] text-gray-800 font-bold truncate transition-colors group-hover:text-[#e60012]">
+                    浙江省丽水市龙泉市事业单位招聘考试《医学基础知识》题库(答案+解析)
+                </h3>
+            </a>
+        </div>
+        
+        <div class="flex items-center text-[12px] sm:text-[13px] mt-1 text-gray-500">
+            <span class="mr-4"><i class="fa-solid fa-fire text-red-500 mr-1.5"></i>热度: <span class="font-bold text-gray-700">1,674</span></span>
+            <span class="text-orange-500 font-medium"><i class="fa-solid fa-star mr-1"></i>好评: 99%</span>
+        </div>
+    </div>
+
+    <div class="shrink-0 flex items-center justify-between md:justify-end gap-3 pt-3 md:pt-0 border-t md:border-t-0 border-gray-50">
+        <div class="px-3 py-1.5 bg-gray-50 text-gray-700 rounded-md text-[13px] font-medium"><i class="fa-solid fa-coins mr-1 text-yellow-500"></i>29 积分</div>
+        <a href="/stk/zj/15623.html" target="_blank" class="px-5 py-2 bg-[#e60012] text-white text-[14px] font-bold rounded-md hover:bg-red-700 transition-colors shadow-sm">立即获取</a>
+    </div>
+</div>
+
+<div class="group flex flex-col md:flex-row md:items-center justify-between p-4 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 mb-4">
+    
+    <div class="flex-1 min-w-0 pr-0 md:pr-6 mb-4 md:mb-0">
+        <div class="flex items-start md:items-center gap-2 mb-2.5 flex-col md:flex-row">
+            <span class="px-2 py-0.5 text-[12px] font-bold border rounded shrink-0 bg-red-50 text-red-600 border-red-200">
+                2026年最新版
+            </span>
+            <a href="/stk/zj/15622.html" class="block truncate w-full" target="_blank">
+                <h3 class="text-[15px] sm:text-[16px] text-gray-800 font-bold truncate transition-colors group-hover:text-[#e60012]">
+                    浙江省丽水市龙泉市事业单位招聘考试《护理学》题库(答案+解析)
+                </h3>
+            </a>
+        </div>
+        
+        <div class="flex items-center text-[12px] sm:text-[13px] mt-1 text-gray-500">
+            <span class="mr-4"><i class="fa-solid fa-fire text-red-500 mr-1.5"></i>热度: <span class="font-bold text-gray-700">1,696</span></span>
+            <span class="text-orange-500 font-medium"><i class="fa-solid fa-star mr-1"></i>好评: 98%</span>
+        </div>
+    </div>
+
+    <div class="shrink-0 flex items-center justify-between md:justify-end gap-3 pt-3 md:pt-0 border-t md:border-t-0 border-gray-50">
+        <div class="px-3 py-1.5 bg-gray-50 text-gray-700 rounded-md text-[13px] font-medium"><i class="fa-solid fa-coins mr-1 text-yellow-500"></i>29 积分</div>
+        <a href="/stk/zj/15622.html" target="_blank" class="px-5 py-2 bg-[#e60012] text-white text-[14px] font-bold rounded-md hover:bg-red-700 transition-colors shadow-sm">立即获取</a>
+    </div>
+</div>
+
+<div class="group flex flex-col md:flex-row md:items-center justify-between p-4 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 mb-4">
+    
+    <div class="flex-1 min-w-0 pr-0 md:pr-6 mb-4 md:mb-0">
+        <div class="flex items-start md:items-center gap-2 mb-2.5 flex-col md:flex-row">
+            <span class="px-2 py-0.5 text-[12px] font-bold border rounded shrink-0 bg-red-50 text-red-600 border-red-200">
+                2026年最新版
+            </span>
+            <a href="/stk/zj/15621.html" class="block truncate w-full" target="_blank">
+                <h3 class="text-[15px] sm:text-[16px] text-gray-800 font-bold truncate transition-colors group-hover:text-[#e60012]">
+                    浙江省台州市天台县医疗卫生卫技人员招聘考试《护理学》题库(答案+解析)
+                </h3>
+            </a>
+        </div>
+        
+        <div class="flex items-center text-[12px] sm:text-[13px] mt-1 text-gray-500">
+            <span class="mr-4"><i class="fa-solid fa-fire text-red-500 mr-1.5"></i>热度: <span class="font-bold text-gray-700">1,669</span></span>
+            <span class="text-orange-500 font-medium"><i class="fa-solid fa-star mr-1"></i>好评: 97%</span>
+        </div>
+    </div>
+
+    <div class="shrink-0 flex items-center justify-between md:justify-end gap-3 pt-3 md:pt-0 border-t md:border-t-0 border-gray-50">
+        <div class="px-3 py-1.5 bg-gray-50 text-gray-700 rounded-md text-[13px] font-medium"><i class="fa-solid fa-coins mr-1 text-yellow-500"></i>29 积分</div>
+        <a href="/stk/zj/15621.html" target="_blank" class="px-5 py-2 bg-[#e60012] text-white text-[14px] font-bold rounded-md hover:bg-red-700 transition-colors shadow-sm">立即获取</a>
+    </div>
+</div>
+
+<div class="group flex flex-col md:flex-row md:items-center justify-between p-4 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 mb-4">
+    
+    <div class="flex-1 min-w-0 pr-0 md:pr-6 mb-4 md:mb-0">
+        <div class="flex items-start md:items-center gap-2 mb-2.5 flex-col md:flex-row">
+            <span class="px-2 py-0.5 text-[12px] font-bold border rounded shrink-0 bg-red-50 text-red-600 border-red-200">
+                2026年最新版
+            </span>
+            <a href="/stk/zj/15620.html" class="block truncate w-full" target="_blank">
+                <h3 class="text-[15px] sm:text-[16px] text-gray-800 font-bold truncate transition-colors group-hover:text-[#e60012]">
+                    浙江省台州市天台县医疗卫生卫技人员招聘考试《临床医学》题库(答案+解析)
+                </h3>
+            </a>
+        </div>
+        
+        <div class="flex items-center text-[12px] sm:text-[13px] mt-1 text-gray-500">
+            <span class="mr-4"><i class="fa-solid fa-fire text-red-500 mr-1.5"></i>热度: <span class="font-bold text-gray-700">1,648</span></span>
+            <span class="text-orange-500 font-medium"><i class="fa-solid fa-star mr-1"></i>好评: 96%</span>
+        </div>
+    </div>
+
+    <div class="shrink-0 flex items-center justify-between md:justify-end gap-3 pt-3 md:pt-0 border-t md:border-t-0 border-gray-50">
+        <div class="px-3 py-1.5 bg-gray-50 text-gray-700 rounded-md text-[13px] font-medium"><i class="fa-solid fa-coins mr-1 text-yellow-500"></i>29 积分</div>
+        <a href="/stk/zj/15620.html" target="_blank" class="px-5 py-2 bg-[#e60012] text-white text-[14px] font-bold rounded-md hover:bg-red-700 transition-colors shadow-sm">立即获取</a>
+    </div>
+</div>
+
+<div class="group flex flex-col md:flex-row md:items-center justify-between p-4 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 mb-4">
+    
+    <div class="flex-1 min-w-0 pr-0 md:pr-6 mb-4 md:mb-0">
+        <div class="flex items-start md:items-center gap-2 mb-2.5 flex-col md:flex-row">
+            <span class="px-2 py-0.5 text-[12px] font-bold border rounded shrink-0 bg-red-50 text-red-600 border-red-200">
+                2026年最新版
+            </span>
+            <a href="/stk/zj/15595.html" class="block truncate w-full" target="_blank">
+                <h3 class="text-[15px] sm:text-[16px] text-gray-800 font-bold truncate transition-colors group-hover:text-[#e60012]">
+                    浙江省杭州市临平区事业单位招聘考试《综合能力测试》题库(答案+解析)
+                </h3>
+            </a>
+        </div>
+        
+        <div class="flex items-center text-[12px] sm:text-[13px] mt-1 text-gray-500">
+            <span class="mr-4"><i class="fa-solid fa-fire text-red-500 mr-1.5"></i>热度: <span class="font-bold text-gray-700">1,597</span></span>
+            <span class="text-orange-500 font-medium"><i class="fa-solid fa-star mr-1"></i>好评: 99%</span>
+        </div>
+    </div>
+
+    <div class="shrink-0 flex items-center justify-between md:justify-end gap-3 pt-3 md:pt-0 border-t md:border-t-0 border-gray-50">
+        <div class="px-3 py-1.5 bg-gray-50 text-gray-700 rounded-md text-[13px] font-medium"><i class="fa-solid fa-coins mr-1 text-yellow-500"></i>29 积分</div>
+        <a href="/stk/zj/15595.html" target="_blank" class="px-5 py-2 bg-[#e60012] text-white text-[14px] font-bold rounded-md hover:bg-red-700 transition-colors shadow-sm">立即获取</a>
+    </div>
+</div>
+
+<div class="group flex flex-col md:flex-row md:items-center justify-between p-4 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 mb-4">
+    
+    <div class="flex-1 min-w-0 pr-0 md:pr-6 mb-4 md:mb-0">
+        <div class="flex items-start md:items-center gap-2 mb-2.5 flex-col md:flex-row">
+            <span class="px-2 py-0.5 text-[12px] font-bold border rounded shrink-0 bg-red-50 text-red-600 border-red-200">
+                2026年最新版
+            </span>
+            <a href="/stk/zj/15552.html" class="block truncate w-full" target="_blank">
+                <h3 class="text-[15px] sm:text-[16px] text-gray-800 font-bold truncate transition-colors group-hover:text-[#e60012]">
+                    浙江省丽水市遂昌县卫生健康局卫生专技人员招聘考试《护理学》题库(答案+解析)
+                </h3>
+            </a>
+        </div>
+        
+        <div class="flex items-center text-[12px] sm:text-[13px] mt-1 text-gray-500">
+            <span class="mr-4"><i class="fa-solid fa-fire text-red-500 mr-1.5"></i>热度: <span class="font-bold text-gray-700">1,602</span></span>
+            <span class="text-orange-500 font-medium"><i class="fa-solid fa-star mr-1"></i>好评: 96%</span>
+        </div>
+    </div>
+
+    <div class="shrink-0 flex items-center justify-between md:justify-end gap-3 pt-3 md:pt-0 border-t md:border-t-0 border-gray-50">
+        <div class="px-3 py-1.5 bg-gray-50 text-gray-700 rounded-md text-[13px] font-medium"><i class="fa-solid fa-coins mr-1 text-yellow-500"></i>39 积分</div>
+        <a href="/stk/zj/15552.html" target="_blank" class="px-5 py-2 bg-[#e60012] text-white text-[14px] font-bold rounded-md hover:bg-red-700 transition-colors shadow-sm">立即获取</a>
+    </div>
+</div>
+
+<div class="group flex flex-col md:flex-row md:items-center justify-between p-4 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 mb-4">
+    
+    <div class="flex-1 min-w-0 pr-0 md:pr-6 mb-4 md:mb-0">
+        <div class="flex items-start md:items-center gap-2 mb-2.5 flex-col md:flex-row">
+            <span class="px-2 py-0.5 text-[12px] font-bold border rounded shrink-0 bg-red-50 text-red-600 border-red-200">
+                2026年最新版
+            </span>
+            <a href="/stk/zj/15507.html" class="block truncate w-full" target="_blank">
+                <h3 class="text-[15px] sm:text-[16px] text-gray-800 font-bold truncate transition-colors group-hover:text-[#e60012]">
+                    浙江省事业单位招聘考试《综合应用能力》题库(答案+解析)
+                </h3>
+            </a>
+        </div>
+        
+        <div class="flex items-center text-[12px] sm:text-[13px] mt-1 text-gray-500">
+            <span class="mr-4"><i class="fa-solid fa-fire text-red-500 mr-1.5"></i>热度: <span class="font-bold text-gray-700">1,594</span></span>
+            <span class="text-orange-500 font-medium"><i class="fa-solid fa-star mr-1"></i>好评: 99%</span>
+        </div>
+    </div>
+
+    <div class="shrink-0 flex items-center justify-between md:justify-end gap-3 pt-3 md:pt-0 border-t md:border-t-0 border-gray-50">
+        <div class="px-3 py-1.5 bg-gray-50 text-gray-700 rounded-md text-[13px] font-medium"><i class="fa-solid fa-coins mr-1 text-yellow-500"></i>19 积分</div>
+        <a href="/stk/zj/15507.html" target="_blank" class="px-5 py-2 bg-[#e60012] text-white text-[14px] font-bold rounded-md hover:bg-red-700 transition-colors shadow-sm">立即获取</a>
+    </div>
+</div>
+
+<div class="group flex flex-col md:flex-row md:items-center justify-between p-4 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 mb-4">
+    
+    <div class="flex-1 min-w-0 pr-0 md:pr-6 mb-4 md:mb-0">
+        <div class="flex items-start md:items-center gap-2 mb-2.5 flex-col md:flex-row">
+            <span class="px-2 py-0.5 text-[12px] font-bold border rounded shrink-0 bg-red-50 text-red-600 border-red-200">
+                2026年最新版
+            </span>
+            <a href="/stk/zj/15434.html" class="block truncate w-full" target="_blank">
+                <h3 class="text-[15px] sm:text-[16px] text-gray-800 font-bold truncate transition-colors group-hover:text-[#e60012]">
+                    浙江省嘉兴市海盐县医疗卫生事业单位招聘卫生技术人员考试《护理基础知识》题库(答案+解析)
+                </h3>
+            </a>
+        </div>
+        
+        <div class="flex items-center text-[12px] sm:text-[13px] mt-1 text-gray-500">
+            <span class="mr-4"><i class="fa-solid fa-fire text-red-500 mr-1.5"></i>热度: <span class="font-bold text-gray-700">1,523</span></span>
+            <span class="text-orange-500 font-medium"><i class="fa-solid fa-star mr-1"></i>好评: 98%</span>
+        </div>
+    </div>
+
+    <div class="shrink-0 flex items-center justify-between md:justify-end gap-3 pt-3 md:pt-0 border-t md:border-t-0 border-gray-50">
+        <div class="px-3 py-1.5 bg-gray-50 text-gray-700 rounded-md text-[13px] font-medium"><i class="fa-solid fa-coins mr-1 text-yellow-500"></i>39 积分</div>
+        <a href="/stk/zj/15434.html" target="_blank" class="px-5 py-2 bg-[#e60012] text-white text-[14px] font-bold rounded-md hover:bg-red-700 transition-colors shadow-sm">立即获取</a>
+    </div>
+</div>
+
+                                </div>
+                            </div>
+                            
+                            <div class="flex justify-center items-center py-6 px-4 border-t border-gray-100 overflow-x-auto">
+                                <nav class="inline-flex gap-1 text-sm empire-pagination [&>a]:flex [&>a]:items-center [&>a]:justify-center [&>a]:px-3 [&>a]:py-1.5 [&>a]:border [&>a]:border-gray-200 [&>a]:bg-white [&>a]:text-gray-600 [&>a]:rounded-md hover:[&>a]:bg-gray-50 [&>b]:flex [&>b]:items-center [&>b]:justify-center [&>b]:px-3 [&>b]:py-1.5 [&>b]:bg-red-600 [&>b]:text-white [&>b]:font-medium [&>b]:rounded-md [font-size:0] [&>a]:text-sm [&>b]:text-sm">
+                                    <div class="flex justify-center items-center py-6 sm:py-8 mt-4 border-t border-gray-100"><nav class="inline-flex rounded shadow-sm border border-gray-300 divide-x divide-gray-300 overflow-hidden"><span class="px-2.5 sm:px-3.5 py-1.5 sm:py-2 bg-gray-50 text-gray-300 cursor-not-allowed flex items-center justify-center text-[12px] sm:text-sm"><i class="fa-solid fa-angle-left"></i></span><span class="px-3 sm:px-4 py-1.5 sm:py-2 bg-red-50 text-red-600 text-[12px] sm:text-sm font-bold flex items-center justify-center">1</span><a href="/stk/zj/index_2.html" class="px-3 sm:px-4 py-1.5 sm:py-2 bg-white text-gray-700 hover:bg-gray-50 text-[12px] sm:text-sm font-medium transition-colors flex items-center justify-center">2</a><a href="/stk/zj/index_3.html" class="px-3 sm:px-4 py-1.5 sm:py-2 bg-white text-gray-700 hover:bg-gray-50 text-[12px] sm:text-sm font-medium transition-colors flex items-center justify-center">3</a><a href="/stk/zj/index_4.html" class="px-3 sm:px-4 py-1.5 sm:py-2 bg-white text-gray-700 hover:bg-gray-50 text-[12px] sm:text-sm font-medium transition-colors flex items-center justify-center">4</a><a href="/stk/zj/index_5.html" class="px-3 sm:px-4 py-1.5 sm:py-2 bg-white text-gray-700 hover:bg-gray-50 text-[12px] sm:text-sm font-medium transition-colors flex items-center justify-center">5</a><a href="/stk/zj/index_6.html" class="px-3 sm:px-4 py-1.5 sm:py-2 bg-white text-gray-700 hover:bg-gray-50 text-[12px] sm:text-sm font-medium transition-colors flex items-center justify-center">6</a><a href="/stk/zj/index_7.html" class="px-3 sm:px-4 py-1.5 sm:py-2 bg-white text-gray-700 hover:bg-gray-50 text-[12px] sm:text-sm font-medium transition-colors flex items-center justify-center">7</a><a href="/stk/zj/index_8.html" class="px-3 sm:px-4 py-1.5 sm:py-2 bg-white text-gray-700 hover:bg-gray-50 text-[12px] sm:text-sm font-medium transition-colors flex items-center justify-center">8</a><a href="/stk/zj/index_9.html" class="px-3 sm:px-4 py-1.5 sm:py-2 bg-white text-gray-700 hover:bg-gray-50 text-[12px] sm:text-sm font-medium transition-colors flex items-center justify-center">9</a><a href="/stk/zj/index_10.html" class="px-3 sm:px-4 py-1.5 sm:py-2 bg-white text-gray-700 hover:bg-gray-50 text-[12px] sm:text-sm font-medium transition-colors flex items-center justify-center">10</a><a href="/stk/zj/index_11.html" class="px-3 sm:px-4 py-1.5 sm:py-2 bg-white text-gray-700 hover:bg-gray-50 text-[12px] sm:text-sm font-medium transition-colors flex items-center justify-center">11</a><a href="/stk/zj/index_12.html" class="px-3 sm:px-4 py-1.5 sm:py-2 bg-white text-gray-700 hover:bg-gray-50 text-[12px] sm:text-sm font-medium transition-colors flex items-center justify-center">12</a><a href="/stk/zj/index_2.html" class="px-2.5 sm:px-3.5 py-1.5 sm:py-2 bg-white text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition-colors flex items-center justify-center text-[12px] sm:text-sm"><i class="fa-solid fa-angle-right"></i></a></nav></div>
+                                </nav>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="w-full lg:w-1/4 shrink-0">
+                        <aside class="block sticky top-6 space-y-6 h-fit w-full">
+                            <aside class="block sticky top-6 space-y-6 h-fit w-full">
+                        
+    <div class="bg-gradient-to-r from-red-50 to-orange-50 rounded-lg shadow-sm border-red-100 border overflow-hidden hover:shadow-md transition-all duration-300">
+        <div class="flex justify-between items-start p-4">
+            <h3 class="font-bold text-gray-700 flex items-center">
+                <i class="fa-solid fa-landmark mr-2"></i>公共基础知识专用题库
+            </h3>
+            <span class="text-xs px-2 py-0.5 rounded-full border border-red-200 text-red-500 bg-white">推荐</span>
+        </div>
+        <p class="px-4 pb-2 text-sm text-gray-700">涵盖事业单位考试公基核心考点，海量历年真题与高质量模拟题，助您夯实基础，稳步提分！</p>
+        <a class="block w-full p-3 text-center text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition-colors" href="https://www.kkgwy.com/sydwksggtk.html" target="_blank">
+            立即练习
+        </a>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-sm p-4 md:p-6 border border-gray-200">
+        <h3 class="font-bold mb-4 text-gray-800 flex items-center text-lg">
+            <i class="fa-solid fa-arrow-trend-up w-5 h-5 mr-2 text-red-600"></i>
+            热门下载
+        </h3>
+        <ul class="space-y-4">
+                        <li class="flex items-start">
+                <span class="flex-shrink-0 w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold mr-3 bg-red-600 text-white">
+                    1                </span>
+                <div class="flex-grow">
+                    <a href="/stk/zj/14922.html" class="block text-sm font-medium text-gray-800 hover:text-red-600 transition-colors line-clamp-2" title="浙江省公务员考试《行测》+《申论》真题汇总【答案+解析】">
+                        浙江省公务员考试《行测》+《申论》真题汇总【答案+解析】                    </a>
+                </div>
+            </li>
+                        <li class="flex items-start">
+                <span class="flex-shrink-0 w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold mr-3 bg-red-600 text-white">
+                    2                </span>
+                <div class="flex-grow">
+                    <a href="/stk/zj/2874.html" class="block text-sm font-medium text-gray-800 hover:text-red-600 transition-colors line-clamp-2" title="2018年浙江省无锡江阴市事业单位考试《综合能力素质》真题库及答案(一)">
+                        2018年浙江省无锡江阴市事业单位考试《综合能力素质》真题库及答案(一)                    </a>
+                </div>
+            </li>
+                        <li class="flex items-start">
+                <span class="flex-shrink-0 w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold mr-3 bg-red-600 text-white">
+                    3                </span>
+                <div class="flex-grow">
+                    <a href="/stk/zj/1027.html" class="block text-sm font-medium text-gray-800 hover:text-red-600 transition-colors line-clamp-2" title="2017年浙江省衢州市柯城区教师招聘考试《教育公共基础》真题库及答案">
+                        2017年浙江省衢州市柯城区教师招聘考试《教育公共基础》真题库及答案                    </a>
+                </div>
+            </li>
+                        <li class="flex items-start">
+                <span class="flex-shrink-0 w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold mr-3 bg-gray-100 text-gray-700 font-normal">
+                    4                </span>
+                <div class="flex-grow">
+                    <a href="/stk/zj/2282.html" class="block text-sm font-medium text-gray-800 hover:text-red-600 transition-colors line-clamp-2" title="2018年浙江省教师招聘考试《教育基础知识》真题库及答案">
+                        2018年浙江省教师招聘考试《教育基础知识》真题库及答案                    </a>
+                </div>
+            </li>
+                        <li class="flex items-start">
+                <span class="flex-shrink-0 w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold mr-3 bg-gray-100 text-gray-700 font-normal">
+                    5                </span>
+                <div class="flex-grow">
+                    <a href="/stk/zj/4009.html" class="block text-sm font-medium text-gray-800 hover:text-red-600 transition-colors line-clamp-2" title="2018年浙江省丽水市松阳县事业单位招聘考试《综合基础知识》真题库及答案">
+                        2018年浙江省丽水市松阳县事业单位招聘考试《综合基础知识》真题库及答案                    </a>
+                </div>
+            </li>
+                    </ul>
+    </div>
+
+    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg shadow-sm border-blue-100 border overflow-hidden hover:shadow-md transition-all duration-300">
+        <div class="flex justify-between items-start p-4">
+            <h3 class="font-bold text-gray-700 flex items-center">
+                <i class="fa-solid fa-newspaper mr-2"></i>时事政治题库
+            </h3>
+            <span class="text-xs px-2 py-0.5 rounded-full border border-blue-200 text-blue-500 bg-white">必刷</span>
+        </div>
+        <p class="px-4 pb-2 text-sm text-gray-700">每日更新最新时政热点，汇总全年重要会议、政策文件精华，紧跟考试风向，精准押题！</p>
+        <a class="block w-full p-3 text-center text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors" href="https://www.kkgwy.com/sszztk.html" target="_blank">
+            立即刷题
+        </a>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-sm p-4 md:p-6 border border-gray-200">
+        <h3 class="font-bold mb-4 text-gray-800 flex items-center text-lg">
+            <i class="fa-solid fa-thumbs-up w-5 h-5 mr-2 text-red-600"></i>
+            推荐题库
+        </h3>
+        <ul class="space-y-4">
+            <li class="flex items-start">
+                <span class="flex-shrink-0 w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold mr-3 bg-red-600 text-white">1</span>
+                <div class="flex-grow">
+                    <a href="/huatuks.html" class="block text-sm font-medium text-gray-800 hover:text-red-600 transition-colors line-clamp-2" title="《公共基础知识》题库（答案+解析）">
+                        《公共基础知识》题库（答案+解析）
+                    </a>
+                </div>
+            </li>
+            <li class="flex items-start">
+                <span class="flex-shrink-0 w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold mr-3 bg-red-600 text-white">2</span>
+                <div class="flex-grow">
+                    <a href="/sszztk.html" class="block text-sm font-medium text-gray-800 hover:text-red-600 transition-colors line-clamp-2" title=" 《时事政治热点题库》｜时政考点+预测题">
+                         《时事政治热点题库》｜时政考点+预测题
+                    </a>
+                </div>
+            </li>
+            <li class="flex items-start">
+                <span class="flex-shrink-0 w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold mr-3 bg-red-600 text-white">3</span>
+                <div class="flex-grow">
+                    <a href="/zyjh.html" class="block text-sm font-medium text-gray-800 hover:text-red-600 transition-colors line-clamp-2" title="习总书记重要讲话题库">
+                        习总书记重要讲话题库
+                    </a>
+                </div>
+            </li>
+            <li class="flex items-start">
+                <span class="flex-shrink-0 w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold mr-3 bg-gray-100 text-gray-700 font-normal">4</span>
+                <div class="flex-grow">
+                    <a href="/dwgzjczz.html" class="block text-sm font-medium text-gray-800 hover:text-red-600 transition-colors line-clamp-2" title="《党务工作基础知识》 考点+试题">
+                        《党务工作基础知识》 考点+试题
+                    </a>
+                </div>
+            </li>
+            <li class="flex items-start">
+                <span class="flex-shrink-0 w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold mr-3 bg-gray-100 text-gray-700 font-normal">5</span>
+                <div class="flex-grow">
+                    <a href="/jylsszztk.html" class="block text-sm font-medium text-gray-800 hover:text-red-600 transition-colors line-clamp-2" title=" 《教育类时事政治》题库（答案+解析）">
+                         《教育类时事政治》题库（答案+解析）
+                    </a>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+    <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg shadow-sm border-green-100 border overflow-hidden hover:shadow-md transition-all duration-300">
+        <div class="flex justify-between items-start p-4">
+            <h3 class="font-bold text-gray-700 flex items-center">
+                <i class="fa-solid fa-desktop mr-2"></i>在线考试题库
+            </h3>
+            <span class="text-xs px-2 py-0.5 rounded-full border border-green-200 text-green-500 bg-white">实战</span>
+        </div>
+        <p class="px-4 pb-2 text-sm text-gray-700">还原真实机考环境，支持专项练习与全真模拟考试，智能评分解析，查漏补缺更高效！</p>
+        <a class="block w-full p-3 text-center text-sm font-medium text-white bg-green-600 hover:bg-green-700 transition-colors" href="https://www.kkgwy.com/e/extend/exam/" target="_blank">
+            开始考试
+        </a>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-sm p-4 md:p-6 border border-gray-200">
+        <h3 class="font-bold mb-4 text-gray-800 flex items-center text-lg">
+            <i class="fa-solid fa-tags w-5 h-5 mr-2 text-red-600"></i>
+            热门标签
+        </h3>
+        <div class="flex flex-wrap gap-2">
+                        <a href="/e/tags/?tagname=%CC%E2%BF%E2" 
+               target="_blank" 
+               class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-md text-sm hover:bg-red-50 hover:text-red-600 transition-colors flex items-center">
+                题库            </a>
+                        <a href="/e/tags/?tagname=%D5%E6%CC%E2%CA%D4%BE%ED" 
+               target="_blank" 
+               class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-md text-sm hover:bg-red-50 hover:text-red-600 transition-colors flex items-center">
+                真题试卷            </a>
+                        <a href="/e/tags/?tagname=%CA%C2%D2%B5%B5%A5%CE%BB" 
+               target="_blank" 
+               class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-md text-sm hover:bg-red-50 hover:text-red-600 transition-colors flex items-center">
+                事业单位            </a>
+                        <a href="/e/tags/?tagname=%B9%AB%CE%F1%D4%B1" 
+               target="_blank" 
+               class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-md text-sm hover:bg-red-50 hover:text-red-600 transition-colors flex items-center">
+                公务员            </a>
+                        <a href="/e/tags/?tagname=2024%C4%EA" 
+               target="_blank" 
+               class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-md text-sm hover:bg-red-50 hover:text-red-600 transition-colors flex items-center">
+                2024年            </a>
+                        <a href="/e/tags/?tagname=2023%C4%EA" 
+               target="_blank" 
+               class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-md text-sm hover:bg-red-50 hover:text-red-600 transition-colors flex items-center">
+                2023年            </a>
+                        <a href="/e/tags/?tagname=2025%C4%EA" 
+               target="_blank" 
+               class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-md text-sm hover:bg-red-50 hover:text-red-600 transition-colors flex items-center">
+                2025年            </a>
+                        <a href="/e/tags/?tagname=%D5%D0%BF%BC" 
+               target="_blank" 
+               class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-md text-sm hover:bg-red-50 hover:text-red-600 transition-colors flex items-center">
+                招考            </a>
+                        <a href="/e/tags/?tagname=%D0%C5%CF%A2" 
+               target="_blank" 
+               class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-md text-sm hover:bg-red-50 hover:text-red-600 transition-colors flex items-center">
+                信息            </a>
+                        <a href="/e/tags/?tagname=%D7%EE%D0%C2" 
+               target="_blank" 
+               class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-md text-sm hover:bg-red-50 hover:text-red-600 transition-colors flex items-center">
+                最新            </a>
+                        <a href="/e/tags/?tagname=%BB%E3%D7%DC" 
+               target="_blank" 
+               class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-md text-sm hover:bg-red-50 hover:text-red-600 transition-colors flex items-center">
+                汇总            </a>
+                        <a href="/e/tags/?tagname=%A1%B6%D0%D0%B2%E2%A1%B7" 
+               target="_blank" 
+               class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-md text-sm hover:bg-red-50 hover:text-red-600 transition-colors flex items-center">
+                《行测》            </a>
+                        <a href="/e/tags/?tagname=%C1%AA%BF%BC" 
+               target="_blank" 
+               class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-md text-sm hover:bg-red-50 hover:text-red-600 transition-colors flex items-center">
+                联考            </a>
+                        <a href="/e/tags/?tagname=%A1%B6%C9%EA%C2%DB%A1%B7" 
+               target="_blank" 
+               class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-md text-sm hover:bg-red-50 hover:text-red-600 transition-colors flex items-center">
+                《申论》            </a>
+                        <a href="/e/tags/?tagname=%B4%F0%B0%B8" 
+               target="_blank" 
+               class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-md text-sm hover:bg-red-50 hover:text-red-600 transition-colors flex items-center">
+                答案            </a>
+                        <a href="/e/tags/?tagname=2026%C4%EA" 
+               target="_blank" 
+               class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-md text-sm hover:bg-red-50 hover:text-red-600 transition-colors flex items-center">
+                2026年            </a>
+                        <a href="/e/tags/?tagname=%B9%AB%B9%B2%BB%F9%B4%A1%D6%AA%CA%B6" 
+               target="_blank" 
+               class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-md text-sm hover:bg-red-50 hover:text-red-600 transition-colors flex items-center">
+                公共基础知识            </a>
+                        <a href="/e/tags/?tagname=%BA%D3%C4%CF%CA%A1" 
+               target="_blank" 
+               class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-md text-sm hover:bg-red-50 hover:text-red-600 transition-colors flex items-center">
+                河南省            </a>
+                        <a href="/e/tags/?tagname=2022%C4%EA" 
+               target="_blank" 
+               class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-md text-sm hover:bg-red-50 hover:text-red-600 transition-colors flex items-center">
+                2022年            </a>
+                        <a href="/e/tags/?tagname=%BF%BC%CA%D4" 
+               target="_blank" 
+               class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-md text-sm hover:bg-red-50 hover:text-red-600 transition-colors flex items-center">
+                考试            </a>
+                    </div>
+    </div>
+
+</aside>
+                        </aside>
+                    </div>
+                    
+                </div>
+            </div>
+        </section>
+    </main>
+
+<footer class="bg-white border-t border-gray-200">
+        <div class="container mx-auto px-4 py-6 md:py-10">
+            <div class="hidden md:grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="col-span-1">
+                    <a href="/" title="考考公务员主页" class="flex items-center space-x-2 mb-4 hover:opacity-80 transition-opacity w-max">
+                        <i class="fa-solid fa-book-open w-6 h-6 text-red-600"></i>
+                        <span class="text-lg font-bold text-red-600">考考公务员</span>
+                    </a>
+                    <p class="text-gray-600 mb-4 text-sm sm:text-base">公务员考试一站式备考平台，提供最新资讯、优质课程和丰富学习资料。</p>
+                    <div class="flex space-x-4">
+        
+    <a href="/a/winxin.html" title="微信关注" style="color: #07C160 !important;" class="hover:opacity-80 transition-opacity">
+        <span class="fa-brands fa-weixin text-xl"></span>
+    </a>
+    
+    <a href="/a/weibo.html" title="官方微博" style="color: #E6162D !important;" class="hover:opacity-80 transition-opacity">
+        <span class="fa-brands fa-weibo text-xl"></span>
+    </a>
+    
+    <a href="/a/qq.html" title="QQ交流" style="color: #12B7F5 !important;" class="hover:opacity-80 transition-opacity">
+        <span class="fa-brands fa-qq text-xl"></span>
+    </a>
+                    </div>
+                </div>
+                
+                <div class="col-span-1 md:col-span-3 grid grid-cols-2 md:grid-cols-3 gap-6">
+                    <div>
+                        <h3 class="text-base md:text-lg font-bold mb-3 md:mb-4 text-gray-800">学习资源</h3>
+                        <ul class="space-y-2 text-sm sm:text-base">
+                            <li><a href="/gwykszthz.html" title="公考题库" class="text-gray-600 hover:text-red-600 transition-colors">公考题库</a></li>
+                            <li><a href="/xc/" title="行测考点" class="text-gray-600 hover:text-red-600 transition-colors">行测考点</a></li>
+                            <li><a href="/sl/" title="申论范文" class="text-gray-600 hover:text-red-600 transition-colors">申论范文</a></li>
+                            <li><a href="/ms/" title="面试真题" class="text-gray-600 hover:text-red-600 transition-colors">面试真题</a></li>
+                            <li><a href="/zh/" title="综合知识" class="text-gray-600 hover:text-red-600 transition-colors">综合知识</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-base md:text-lg font-bold mb-3 md:mb-4 text-gray-800">考公神器</h3>
+                        <ul class="space-y-2 text-sm sm:text-base">
+                            <li><a href="/tool/sz.php" title="每日时政" class="text-gray-600 hover:text-red-600 transition-colors">每日时政</a></li>
+                            <li><a href="/tool/ms.php" title="面试模拟" class="text-gray-600 hover:text-red-600 transition-colors">面试模拟</a></li>
+                            <li><a href="/tool/sl.php" title="申论金句" class="text-gray-600 hover:text-red-600 transition-colors">申论金句</a></li>
+                            <li><a href="/tool/cx.php" title="职位匹配" class="text-gray-600 hover:text-red-600 transition-colors">职位匹配</a></li>
+                            <li><a href="/tool/zp.php" title="照片处理" class="text-gray-600 hover:text-red-600 transition-colors">照片处理</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="col-span-2 md:col-span-1">
+                        <h3 class="text-base md:text-lg font-bold mb-3 md:mb-4 text-gray-800">帮助中心</h3>
+                        <ul class="space-y-2 text-sm sm:text-base">
+                            <li><a href="/a/aboutus.html" title="关于我们" class="text-gray-600 hover:text-red-600 transition-colors">关于我们</a></li>
+                            <li><a href="/a/disclaimer.html" title="免责声明" class="text-gray-600 hover:text-red-600 transition-colors">免责声明</a></li>
+                            <li><a href="/a/buy.html" title="支付方式" class="text-gray-600 hover:text-red-600 transition-colors">支付方式</a></li>
+                            <li><a href="/a/pay.html" title="充值说明" class="text-gray-600 hover:text-red-600 transition-colors">充值说明</a></li>
+                            <li><a href="/a/studentcases.html" title="学员案例" class="text-gray-600 hover:text-red-600 transition-colors">学员案例</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="md:mt-8 md:pt-4 md:border-t border-gray-300 flex justify-between items-center flex-col md:flex-row pb-[env(safe-area-inset-bottom)] md:pb-0">
+                <div class="text-gray-500 text-sm sm:text-base mb-3 md:mb-0">&copy; <span id="current-year"></span> 考考公务员 版权所有</div>
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-2 text-green-600 text-sm sm:text-base w-full md:w-auto">
+                    <div class="flex items-center justify-center">
+                        <i class="fa-solid fa-shield-alt mr-1"></i>
+                        <span class="font-medium">SSL 安全连接</span>
+                    </div>
+                    <span class="hidden sm:inline-block mx-1 text-gray-300">|</span>
+                    <div class="flex items-center justify-center mt-1 sm:mt-0">
+                        <span class="text-red-600 whitespace-nowrap" id="uptime-display">
+                            已稳健运行: 0天 0时 0分 0秒
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 flex justify-around items-center pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+        <a href="/" class="flex flex-col items-center text-gray-600 hover:text-red-600 p-1 w-1/5 transition-colors">
+            <i class="fa-solid fa-house text-[22px] mb-1"></i>
+            <span class="text-[10px] font-medium">首页</span>
+        </a>
+        <a href="/search" class="flex flex-col items-center text-gray-600 hover:text-red-600 p-1 w-1/5 transition-colors">
+            <i class="fa-solid fa-magnifying-glass text-[22px] mb-1"></i>
+            <span class="text-[10px]">搜索</span>
+        </a>
+        <a href="/e/extend/exam/" class="flex flex-col items-center text-gray-600 hover:text-red-600 p-1 w-1/5 transition-colors">
+            <div class="relative">
+                <i class="fa-regular fa-file-lines text-[22px] mb-1"></i>
+                <span class="absolute -top-0.5 -right-1.5 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
+            </div>
+            <span class="text-[10px]">考试</span>
+        </a>
+        <a href="/e/payapi/" class="flex flex-col items-center text-gray-600 hover:text-red-600 p-1 w-1/5 transition-colors">
+            <i class="fa-regular fa-credit-card text-[22px] mb-1"></i>
+            <span class="text-[10px]">充值</span>
+        </a>
+        <a href="/e/member/cp/" class="flex flex-col items-center text-gray-600 hover:text-red-600 p-1 w-1/5 transition-colors">
+            <i class="fa-regular fa-user text-[22px] mb-1"></i>
+            <span class="text-[10px]">我的</span>
+        </a>
+    </nav>
+<script src="/skin/js/main.js"></script>
+<!-- ========================================== -->
+<!-- 动态销售记录 Toast 弹窗模块 开始           -->
+<!-- ========================================== -->
+
+<!-- 弹窗容器 (使用 Tailwind CSS 工具类) -->
+<div id="sales-toast-container" class="fixed z-[99999] bg-white border-l-4 border-[#e60012] shadow-[0_10px_30px_rgba(0,0,0,0.1)] rounded-lg px-5 py-4 w-[90%] md:w-[320px] left-1/2 -translate-x-1/2 md:left-auto md:translate-x-0 md:-right-[350px] -bottom-[150px] md:bottom-[30px] transition-all duration-500 ease-[cubic-bezier(0.68,-0.55,0.265,1.55)]">
+    
+    <div class="flex items-center mb-2">
+        <div class="w-[18px] h-[18px] bg-[#e60012] text-white rounded-full flex justify-center items-center text-[12px] mr-2">&#10003;</div>
+        <div class="text-[12px] text-[#999999]" id="toast-time-display">刚刚</div>
+    </div>
+    
+    <div class="text-[14px] text-[#333333] leading-relaxed" id="toast-text-display">
+        <!-- 内容将由 JS 动态填充 -->
+    </div>
+
+</div>
+
+
+<script type="text/javascript">
+    // PHP 输出到 JS
+    var salesData = [
+        { time: '3分钟前', user: '第二页89053', action: '下载了', item: '《“十四五”时期发展成就》' },
+        { time: '1分钟前', user: '1997年11月5号', action: '下载了', item: '《理论学习与政治素养（党团知识）》' },
+        { time: '刚刚', user: '阿姝--', action: '下载了', item: '天津市事业单位公基真题试卷' },
+        { time: '8分钟前', user: '咯咯咯哒哒2019', action: '购买了', item: '2026年农业农村知识手册- 最新版' },
+        { time: '刚刚', user: '阿姝--', action: '购买了', item: '联考B类真题试卷' },
+        { time: '2小时前', user: '不上岸不改名呀呀', action: '下载了', item: '《新时代中国特色社会主义思想学习纲要》题库' },
+        { time: '15分钟前', user: '公考女狂人', action: '购买了', item: '2026年习总书记精神重要讲话（时事政治）题库【2026年7月版】' },
+        { time: '3小时前', user: '超级棉花糖L', action: '购买了', item: '天津市事业单位职测真题试卷' },
+        { time: '刚刚', user: '高高在哪里呀', action: '下载了', item: '2026国考高频成语言语积累800词花生十三行测考点知识归纳总结【彩印】' },
+        { time: '22分钟前', user: '还看今朝梦想', action: '购买了', item: '《2026年宁夏党委农村工作会议》' },
+        { time: '半小时前', user: 'bolisha', action: '下载了', item: '《“十四五”时期发展成就》' },
+        { time: '5分钟前', user: 'Honey香槟73905', action: '购买了', item: '北京市事业单位公基真题试卷' },
+        { time: '半小时前', user: '爆发的小宇宙--慧', action: '购买了', item: '《习总书记在庆祝中国共产党成立105周年大会上的讲话》' },
+        { time: '3分钟前', user: '高傲小姐姐01', action: '下载了', item: '教育类时事政治' },
+        { time: '2小时前', user: 'Championsssssssssssssssss', action: '下载了', item: '选调生申论真题试卷' },
+        { time: '3小时前', user: '崇AI', action: '购买了', item: '2026年习总书记精神重要讲话（时事政治）题库【2026年7月版】' },
+        { time: '1分钟前', user: '韩利娟HH', action: '下载了', item: '《黑龙江省十三届九次全会决议（黑龙江经济工作会议）》' },
+        { time: '1小时前', user: '帝王蟹皇', action: '下载了', item: '北京市公务员行测真题试卷' },
+        { time: '刚刚', user: '第七度雨夜阳光', action: '下载了', item: '《2026年宁夏一号文件》' },
+        { time: '3分钟前', user: '草莓味的独角兽hi', action: '下载了', item: '《宁夏党委十三届十二次全会公报（2026年经济工作会议）》' },
+        { time: '22分钟前', user: '爱捡漏的小姑凉', action: '购买了', item: '习总书记关于党务工作的论述' },
+        { time: '22分钟前', user: '陈小洁zm', action: '下载了', item: '联考A类真题试卷' },
+        { time: '1小时前', user: 'Blubell', action: '下载了', item: '河北省事业单位职测真题试卷' },
+        { time: '5小时前', user: 'bosco彩妆师', action: '购买了', item: '《习总书记在庆祝中国共产党成立105周年大会上的讲话》' },
+        { time: '1分钟前', user: '橙儿9316', action: '购买了', item: '《2026年中央经济工作会议》' },
+        { time: '5小时前', user: '橙儿9316', action: '下载了', item: '河北省事业单位职测真题试卷' },
+        { time: '1小时前', user: 'bB心随意动', action: '下载了', item: '《习总书记在河北雄安新区考察》' },
+        { time: '8分钟前', user: '泊客的哈尔滨', action: '下载了', item: '2026国考高频成语言语积累800词花生十三行测考点知识归纳总结【彩印】' },
+        { time: '5分钟前', user: '布丁小姐姐的姐姐K', action: '购买了', item: '新版2026公共基础知识三色学霸背诵笔记彩色本' },
+        { time: '15分钟前', user: '还看今朝梦想', action: '下载了', item: '2026年农业农村知识手册- 最新版' },
+        { time: '刚刚', user: '哆啦哪个A梦', action: '购买了', item: '《理论学习与政治素养（党团知识）》' },
+        { time: '3分钟前', user: '大头娃娃12342017', action: '购买了', item: '国考行政能力测试真题试卷' },
+        { time: '5小时前', user: '陈建志773', action: '购买了', item: '《2026年党务工作基础知识》题库及解析（2026版）' },
+        { time: '8分钟前', user: '花贝啦', action: '下载了', item: '《2026年黑龙江省委农村工作会议》' },
+        { time: '8分钟前', user: 'Hope964181283', action: '下载了', item: '《国民经济和社会发展第十五个五年规划纲要》' },
+        { time: '1小时前', user: 'Amy5327', action: '购买了', item: '《公安机关人民警察职位专业科目》' },
+        { time: '5小时前', user: '布丁小姐姐的姐姐K', action: '下载了', item: '《2026 考公考编政治理论》' },
+        { time: '3小时前', user: '分手别把锅拿走c', action: '购买了', item: '联考E类真题试卷' },
+        { time: '半小时前', user: '凡尘里的一丢丢', action: '下载了', item: '《理论学习与政治素养（党团知识）》' },
+        { time: '3小时前', user: '法医-牧直-灼', action: '下载了', item: '《学习纲要（2023版）》题库（十大部分）' },
+        { time: '15分钟前', user: '傲岸今朝', action: '下载了', item: '国考行政能力测试真题试卷' },
+        { time: '刚刚', user: '绯色琉璃forever艳艳', action: '下载了', item: '《国民经济和社会发展第十五个五年规划纲要》' },
+        { time: '2小时前', user: 'Amy5327', action: '购买了', item: '《新时代中国特色社会主义思想学习纲要》题库' },
+        { time: '15分钟前', user: '梵高先生的烦恼', action: '购买了', item: '事业单位考试《公共基础知识》 题库【含解析】（2026年版）' },
+        { time: '3小时前', user: 'Destiny抹茶茶xx', action: '下载了', item: '北京市事业单位职测真题试卷' },
+        { time: '12分钟前', user: '飞跃的梦824', action: '下载了', item: '《2026年全国各省政府工作报告》' },
+        { time: '半小时前', user: '厚积分秒之功要勇敢77', action: '下载了', item: '《2026 考公考编政治理论》' },
+        { time: '3分钟前', user: '还不是因为你长的不好看SNOW', action: '购买了', item: '《党务工作基础知识》题库及解析' },
+        { time: '3分钟前', user: '不做搁浅的咸鱼', action: '下载了', item: '重庆市公务员行测真题试卷' },
+        { time: '1分钟前', user: '19无始大帝86dou', action: '购买了', item: '《二十大》' },
+        { time: '1小时前', user: '公考女狂人', action: '下载了', item: '上海市公务员行测真题试卷' },
+        { time: '2小时前', user: 'chandler马甲', action: '购买了', item: '北京市公务员行测真题试卷' },
+        { time: '12分钟前', user: '冰川ZL', action: '下载了', item: '法定公文写作规范指南' },
+        { time: '8分钟前', user: '绯色琉璃forever艳艳', action: '下载了', item: '《2026年黑龙江省委农村工作会议》' },
+        { time: '15分钟前', user: '2017张鑫', action: '下载了', item: '2026年公考高频成语1000词【完整版】' },
+        { time: '1小时前', user: '大爱缘起缘灭', action: '购买了', item: '《中共中央关于制定国民经济和社会发展第十五个五年规划的建议》' },
+        { time: '5分钟前', user: '番茄鸡胸肉炒蛋', action: '购买了', item: '《青海十五五规划建议》' },
+        { time: '15分钟前', user: '北岸天骄', action: '购买了', item: '《青海十五五规划建议》' },
+        { time: '3小时前', user: '爱笑的女孩好运连连', action: '下载了', item: '河北省公务员行测真题试卷' },
+        { time: '3分钟前', user: '哎哟扑通啊', action: '下载了', item: '事业单位考试《公共基础知识》 题库【含解析】（2026年版）' }    ];
+
+    // ==================== 核心：前端 JS 打乱数组 ====================
+    // 即使服务器缓存了页面，JS 每次在用户浏览器里也会重新洗牌
+    function shuffleArray(array) {
+        for (var i = array.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var temp = array[i];
+            array[i] = array[j];
+            array[j] = temp;
+        }
+    }
+    shuffleArray(salesData);
+    // =================================================================
+
+    var currentIndex = 0;
+    var toastContainer = document.getElementById('sales-toast-container');
+    var toastTimeDisplay = document.getElementById('toast-time-display');
+    var toastTextDisplay = document.getElementById('toast-text-display');
+
+    function showNextToast() {
+        if (salesData.length === 0) return;
+
+        var currentData = salesData[currentIndex];
+        
+        toastTimeDisplay.innerText = currentData.time;
+        toastTextDisplay.innerHTML = currentData.user + " " + currentData.action + " <span class='text-[#e60012] font-bold'>" + currentData.item + "</span>";
+
+        // 手机端：移除隐藏状态，添加 bottom-[90px]
+        // 电脑端：移除隐藏状态，添加 md:right-[30px]
+        toastContainer.classList.remove("-bottom-[150px]", "md:-right-[350px]");
+        toastContainer.classList.add("bottom-[90px]", "md:right-[30px]");
+
+        setTimeout(function() {
+            toastContainer.classList.remove("bottom-[90px]", "md:right-[30px]");
+            toastContainer.classList.add("-bottom-[150px]", "md:-right-[350px]");
+            
+            currentIndex++;
+            if (currentIndex >= salesData.length) {
+                currentIndex = 0; 
+                shuffleArray(salesData); 
+            }
+        }, 4000);
+    }
+
+    window.onload = function() {
+        setTimeout(function() {
+            showNextToast();
+            setInterval(showNextToast, 12000);
+        }, 2000);
+    };
+</script>
+
+<!-- ========================================== -->
+<!-- 动态销售记录 Toast 弹窗模块 结束           -->
+<!-- ========================================== -->
+</body>  
+</html>

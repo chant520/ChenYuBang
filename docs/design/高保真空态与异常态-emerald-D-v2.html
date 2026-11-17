@@ -1,0 +1,1875 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>emerald 空态与异常态 · IA 5.4</title>
+<style>
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; padding: 34px 26px 80px; background: #e8eaec; color: #1a1a1a;
+    font-family: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 830px; margin: 0 auto; }
+
+  .hd { border-bottom: 3px solid #22262a; padding-bottom: 18px; margin-bottom: 26px; }
+  .hd h1 { margin: 0 0 12px; font-size: 23px; letter-spacing: .01em; }
+  .hd p { margin: 0 0 7px; font-size: 13px; line-height: 1.75; color: #3c4147; max-width: 790px; }
+  .hd p:last-child { margin-bottom: 0; }
+
+  .row { display: flex; gap: 26px; align-items: flex-start; flex-wrap: wrap; }
+  .col { flex: 0 0 375px; width: 375px; }
+
+  .vname { margin: 0 0 11px; font-size: 14px; font-weight: 700; letter-spacing: .02em; }
+  .vname em { font-style: normal; font-weight: 400; font-size: 11.5px; color: #5c6369; margin-left: 8px; }
+
+  .grphd { margin: 32px 0 13px; padding-top: 11px; border-top: 2px solid #b9bfc4;
+           font-size: 12.5px; font-weight: 700; letter-spacing: .04em; color: #22262a; }
+  .grphd span { font-weight: 400; color: #5c6369; margin-left: 8px; letter-spacing: 0; }
+
+  /* ---------- 手机框 ---------- */
+  .phone { position: relative; width: 375px; display: flex; flex-direction: column;
+           border-radius: 2px; overflow: hidden; background: var(--page); color: var(--text); }
+  .phone.h812 { height: 812px; }
+  .phone.tall { min-height: 812px; overflow: visible; }
+
+  .top { display: flex; align-items: center; gap: 10px; flex: 0 0 auto;
+         padding: 20px 20px 15px; border-bottom: 1px solid var(--line); }
+  .pname { flex: 1; font-size: 20px; font-weight: 700; letter-spacing: .02em; color: var(--head); }
+  .pname.sub { font-size: 15px; }
+  .steptxt { flex: 0 0 auto; font-size: 11px; color: var(--text3); white-space: nowrap; }
+  .ic { width: 21px; height: 21px; flex: 0 0 auto; fill: none; stroke: var(--text2);
+        stroke-width: 1.6; stroke-linecap: square; }
+  .ic.ac { stroke: var(--accent); }
+  .ic.dim { stroke: var(--text3); }
+  .ic.sm { width: 15px; height: 15px; }
+
+  .body { flex: 1; padding: 18px 20px 20px; display: flex; flex-direction: column; }
+
+  /* ---------- 卡片 / 文本 ---------- */
+  .card { padding: 16px; margin-bottom: 16px; border-radius: 6px;
+          background: var(--surface); border: 1px solid var(--line); }
+  .card.soft { background: var(--surface2); }
+  .card.flat { background: transparent; }
+  .ctitle { font-size: 15px; font-weight: 700; color: var(--head); letter-spacing: .01em; }
+  .row1 { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .range { margin: 10px 0 0; font-size: 13px; line-height: 1.65; color: var(--text2); }
+  .range b { font-weight: 600; color: var(--text); }
+  .warn { color: var(--warnfg); font-weight: 600; border-bottom: 1px dashed var(--warnfg); padding-bottom: 1px; }
+  .hintrow { display: flex; align-items: baseline; justify-content: space-between; gap: 10px;
+             flex-wrap: wrap; margin-top: 8px; }
+  .hint { margin: 0; font-size: 12px; line-height: 1.65; color: var(--text3); }
+  .linkbtn { font-size: 12px; color: var(--accent); border-bottom: 1px solid var(--accent);
+             padding-bottom: 1px; cursor: default; }
+  .dims { margin: 12px 0 0; padding-top: 12px; border-top: 1px solid var(--line2);
+          font-size: 12px; line-height: 1.6; color: var(--text3); }
+  .more { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--text2); white-space: nowrap; }
+  .more svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 1.6; }
+
+  .lbl { margin: 0 0 7px; font-size: 11px; font-weight: 700; letter-spacing: .1em; color: var(--text3); }
+  .txt { margin: 0 0 7px; font-size: 13px; line-height: 1.7; color: var(--text2); }
+  .txt:last-child { margin-bottom: 0; }
+  .txt b { color: var(--text); font-weight: 700; }
+  .txt.k { color: var(--text); }
+  .txt.dim { margin: 6px 0 0; font-size: 11.5px; line-height: 1.65; color: var(--text3); }
+
+  /* ---------- 数字 ---------- */
+  .nums { display: flex; gap: 30px; margin-top: 14px; flex-wrap: wrap; }
+  .nums.tight { gap: 22px; }
+  .numcell { display: flex; flex-direction: column; align-items: flex-start; }
+  .numv { font-size: 30px; font-weight: 700; line-height: 1; letter-spacing: .01em; color: var(--head); }
+  .numv.hot { color: var(--hot); }
+  .numv.sm { font-size: 20px; }
+  .numl { margin-top: 9px; font-size: 11px; color: var(--text2); letter-spacing: .06em; }
+
+  /* ---------- 按钮 ---------- */
+  .btn { display: block; width: 100%; margin: 6px 0 0; padding: 13px 0; text-align: center;
+         border-radius: 6px; font-size: 14px; font-weight: 700; letter-spacing: .02em;
+         background: var(--btnbg); color: var(--btnfg); border: 1px solid var(--btnline); }
+  .btn.loading { display: flex; align-items: center; justify-content: center; gap: 9px; }
+  .spinner { width: 14px; height: 14px; border: 2px solid currentColor; border-right-color: transparent;
+             border-radius: 50%; }
+  .loadnote { margin: 7px 0 0; font-size: 11px; line-height: 1.65; color: var(--text3); text-align: center; }
+  .disbtn { display: block; width: 100%; padding: 12px 0; text-align: center; border-radius: 6px;
+            font-size: 13.5px; font-weight: 700; background: var(--disbg); color: var(--disfg);
+            border: 1px solid var(--disline); }
+  .dangerbtn { display: block; width: 100%; padding: 12px 0; text-align: center; border-radius: 6px;
+               font-size: 13.5px; font-weight: 700; background: var(--errfill); color: var(--errfillfg);
+               border: 1px solid var(--errfill); }
+  .dangerout { display: block; width: 100%; padding: 12px 0; text-align: center; border-radius: 6px;
+               font-size: 13.5px; font-weight: 700; color: var(--errfg); background: transparent;
+               border: 1px solid var(--errline); }
+  .topbtn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 11px; border-radius: 5px;
+            background: var(--btnbg); color: var(--btnfg); font-size: 11.5px; font-weight: 700; white-space: nowrap; }
+  .topbtn svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.7; }
+  .smallrow { display: flex; gap: 8px; margin: 10px 0 0; }
+  .ghostbtn { flex: 1; padding: 10px 0; text-align: center; font-size: 11.5px; border-radius: 5px;
+              border: 1px solid var(--line); color: var(--text2); }
+
+  /* ---------- 标签 / 徽标 ---------- */
+  .tagrow { display: flex; gap: 8px; flex-wrap: wrap; }
+  .tag { padding: 4px 9px; border-radius: 4px; font-size: 11px; line-height: 1.4;
+         background: var(--tintbg); color: var(--tintfg); border: 1px solid var(--tintline); }
+  .tag.ghost { background: transparent; color: var(--text3); border: 1px dashed var(--line); }
+  .distag { padding: 4px 9px; border-radius: 4px; font-size: 11px; line-height: 1.4;
+            background: var(--disbg); color: var(--disfg); border: 1px solid var(--disline); }
+  .badgewarn { display: inline-block; padding: 2px 6px; border-radius: 3px; font-size: 10px;
+               background: var(--warnbg); color: var(--warnfg); border: 1px solid var(--warnline); }
+  .badgerr { display: inline-block; padding: 2px 6px; border-radius: 3px; font-size: 10px;
+             background: var(--errbg); color: var(--errfg); border: 1px solid var(--errline); }
+
+  /* ---------- 警示 / 错误 ---------- */
+  .warnbar { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; margin-bottom: 16px;
+             border-radius: 6px; background: var(--warnbg); border: 1px solid var(--warnline); }
+  .warnbar svg { width: 18px; height: 18px; margin-top: 2px; flex: 0 0 auto;
+                 fill: none; stroke: var(--warnfg); stroke-width: 1.8; }
+  .warnbar .wt { font-size: 13px; font-weight: 700; line-height: 1.55; color: var(--warnfg); }
+  .warnbar .ws { margin-top: 4px; font-size: 11.5px; line-height: 1.65; color: var(--text2); }
+  .errbar { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; margin-bottom: 16px;
+            border-radius: 6px; background: var(--errbg); border: 1px solid var(--errline); }
+  .errbar svg { width: 18px; height: 18px; margin-top: 2px; flex: 0 0 auto;
+                fill: none; stroke: var(--errfg); stroke-width: 1.8; }
+  .errbar .et { font-size: 13px; font-weight: 700; line-height: 1.55; color: var(--errfg); }
+  .errbar .es { margin-top: 4px; font-size: 11.5px; line-height: 1.65; color: var(--text2); }
+  .winline { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--warnfg); }
+  .winline svg { width: 13px; height: 13px; fill: none; stroke: var(--warnfg); stroke-width: 1.9; }
+  .errline-txt { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--errfg); }
+  .errline-txt svg { width: 13px; height: 13px; fill: none; stroke: var(--errfg); stroke-width: 1.9; }
+  .danger { font-size: 12.5px; font-weight: 600; color: var(--errfg); }
+  .danger.neutral { color: var(--text2); }
+
+  .imgph { height: 150px; margin-bottom: 16px; border-radius: 6px; border: 1px dashed var(--warnline);
+           background: var(--warnbg); display: flex; flex-direction: column;
+           align-items: center; justify-content: center; gap: 7px; }
+  .imgph svg { width: 26px; height: 26px; fill: none; stroke: var(--warnfg); stroke-width: 1.7; }
+  .imgph p { margin: 0; font-size: 12.5px; font-weight: 700; color: var(--warnfg); }
+  .imgph span { font-size: 11px; color: var(--text2); }
+  .ph-rec { flex: 1 1 auto; min-height: 140px; max-height: 250px; margin-bottom: 16px;
+            display: flex; align-items: center; justify-content: center; padding: 0 26px;
+            background: var(--phbg); border: 1px dashed var(--phline); border-radius: 6px; }
+  .ph-rec p { margin: 0; font-size: 13px; line-height: 1.75; color: var(--text3); text-align: center; }
+
+  /* ---------- 输入 ---------- */
+  .editinput { display: flex; align-items: center; gap: 8px; min-height: 42px; padding: 11px 12px;
+               border-radius: 5px; background: var(--inputbg); border: 1px solid var(--line);
+               font-size: 12px; color: var(--text); margin-bottom: 12px; }
+  .editinput .iph { color: var(--text3); }
+  .editinput.focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--tintbg); }
+  .editinput.err { border-color: var(--errline); color: var(--errfg); }
+  .errhint { margin: -6px 0 12px; font-size: 11.5px; line-height: 1.55; color: var(--errfg); }
+  .maskrow { display: flex; align-items: center; justify-content: space-between; gap: 10px;
+             padding: 11px 12px; margin-bottom: 12px; border-radius: 5px;
+             border: 1px solid var(--line); background: var(--inputbg); font-size: 12px; color: var(--text2); }
+  .maskrow .mbtn { font-size: 11.5px; font-weight: 700; color: var(--accent); }
+  .disinput { min-height: 42px; padding: 10px 12px; border-radius: 5px; background: var(--disbg);
+              border: 1px solid var(--disline); font-size: 12.5px; color: var(--disfg); margin-bottom: 12px; }
+
+  /* ---------- 列表 ---------- */
+  .list { border-radius: 6px; background: var(--surface); border: 1px solid var(--line); overflow: hidden; }
+  .lrow { padding: 13px 16px; border-bottom: 1px solid var(--line2); }
+  .lrow:last-child { border-bottom: 0; }
+  .lrow .lt1 { display: flex; align-items: baseline; gap: 8px; }
+  .lrow .lname { font-size: 14px; font-weight: 600; color: var(--text); letter-spacing: .01em; }
+  .lrow .lpy { font-size: 11px; color: var(--text3); }
+  .lrow .lsub { margin: 5px 0 0; font-size: 12px; line-height: 1.6; color: var(--text2); }
+  .lmeta { margin: 6px 0 0; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+              font-size: 11px; color: var(--text3); }
+  .lrow .lmeta { margin: 6px 0 0; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+                 font-size: 11px; color: var(--text3); }
+  .lrow .r { margin-left: auto; font-size: 11px; color: var(--text3); white-space: nowrap; }
+  .listfoot { margin: 10px 0 0; text-align: center; font-size: 11px; color: var(--text3); }
+  .optrow { display: flex; gap: 9px; padding: 8px 0; font-size: 13px; line-height: 1.6;
+            color: var(--text2); border-bottom: 1px solid var(--line2); }
+  .optrow b { flex: 0 0 14px; color: var(--text); font-weight: 700; }
+  .optrow b.w2 { flex: 0 0 31px; font-weight: 600; color: var(--text2); }
+  .optrow:last-child { border-bottom: 0; padding-bottom: 0; }
+  .optrow.on { color: var(--text); }
+  .optrow.on b { color: var(--accent); }
+
+  /* ---------- 分段 / 复选 ---------- */
+  .seg { display: flex; padding: 3px; border-radius: 5px; background: var(--seg); border: 1px solid var(--line);
+         margin-bottom: 16px; }
+  .seg i { flex: 1; padding: 8px 0; text-align: center; font-size: 11px; font-style: normal; color: var(--text2); border-radius: 4px; }
+  .seg i.on { background: var(--segon); color: var(--segonfg); font-weight: 700; }
+  .chkrow { display: flex; align-items: center; gap: 10px; padding: 12px 0; border-bottom: 1px solid var(--line2);
+            font-size: 13px; color: var(--text); }
+  .chkrow:last-child { border-bottom: 0; }
+  .chk { width: 18px; height: 18px; flex: 0 0 auto; border-radius: 4px; background: var(--accent);
+         border: 1px solid var(--accent); display: flex; align-items: center; justify-content: center; }
+  .chk svg { width: 12px; height: 12px; fill: none; stroke: var(--chkfg); stroke-width: 2; }
+  .chk.off { background: transparent; border-color: var(--line); }
+  .chk.dis { background: var(--disbg); border-color: var(--disline); }
+  .chkrow.dis { color: var(--disfg); }
+  .chkrow .r { margin-left: auto; font-size: 11px; color: var(--text3); }
+
+  /* ---------- 标签栏 / FAB ---------- */
+  .tabs { display: flex; flex: 0 0 auto; background: var(--tabbg); border-top: 1px solid var(--line); }
+  .tab { flex: 1; position: relative; text-align: center; padding: 11px 0 13px; font-size: 11px; color: var(--text3); }
+  .tab svg { display: block; margin: 0 auto 5px; width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.5; }
+  .tab.on { color: var(--accent); font-weight: 700; }
+  .tab.on::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--accent); }
+  .fab { position: absolute; right: 20px; bottom: 88px; width: 52px; height: 52px; border-radius: 6px;
+         background: var(--fab); box-shadow: var(--fabshadow);
+         display: flex; align-items: center; justify-content: center; }
+  .fab svg { width: 24px; height: 24px; fill: none; stroke: var(--fabicon); stroke-width: 1.6; }
+
+  /* ---------- 骨架 ---------- */
+  .skel { display: flex; flex-direction: column; gap: 11px; }
+  .skbox { height: 14px; border-radius: 4px; background: var(--skel); position: relative; overflow: hidden; }
+  .skbox::after { content: ""; position: absolute; inset: 0; transform: translateX(-100%);
+                  background: linear-gradient(90deg, transparent, var(--skelhi), transparent); }
+  .skbox.h2 { height: 46px; }
+  .skbox.w70 { width: 70%; }
+
+  /* ---------- 相框 / 裁切 ---------- */
+  .camview { position: relative; flex: 1 1 auto; margin: -1px 0 0; background: #0b1410;
+              display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  .camview .paper { width: 288px; padding: 20px 18px; background: #f4f1ea; color: #26312a;
+                    font-size: 10px; line-height: 2; transform: rotate(-1.5deg); }
+  .camview .paper b { font-size: 11px; }
+  .shutter { display: flex; align-items: center; justify-content: space-between; padding: 16px 26px 22px;
+             background: #0b1410; }
+  .shutter .ring { width: 58px; height: 58px; border-radius: 50%; border: 3px solid rgba(255,255,255,.85);
+                   display: flex; align-items: center; justify-content: center; }
+  .shutter .ring i { display: block; width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,.9); }
+  .shutter .gbtn { width: 40px; height: 40px; border-radius: 5px; border: 1px solid rgba(255,255,255,.5);
+                   display: flex; align-items: center; justify-content: center; }
+  .shutter .gbtn svg { width: 20px; height: 20px; fill: none; stroke: rgba(255,255,255,.85); stroke-width: 1.6; }
+  .shutter .ctxt { width: 40px; text-align: center; font-size: 11px; color: rgba(255,255,255,.75); }
+
+  .cropwrap { position: relative; border-radius: 6px; overflow: hidden; background: #0b1410; }
+  .cropwrap .paper { width: 100%; min-height: 300px; padding: 30px 20px; background: #efece4; color: #26312a;
+                     font-size: 10px; line-height: 2.1; }
+  .cropbox { position: absolute; left: 20px; right: 20px; top: 56px; height: 168px;
+             border: 1px solid rgba(255,255,255,.55); }
+  .cropbox i { position: absolute; width: 18px; height: 18px; border: 2px solid var(--warnfg); }
+  .cropbox i:nth-child(1) { left: -2px; top: -2px; border-right: 0; border-bottom: 0; }
+  .cropbox i:nth-child(2) { right: -2px; top: -2px; border-left: 0; border-bottom: 0; }
+  .cropbox i:nth-child(3) { left: -2px; bottom: -2px; border-right: 0; border-top: 0; }
+  .cropbox i:nth-child(4) { right: -2px; bottom: -2px; border-left: 0; border-top: 0; }
+
+  /* ---------- 空态 ---------- */
+  .empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+           text-align: center; padding: 30px 18px 40px; }
+  .empty .eic { width: 64px; height: 64px; border-radius: 50%; background: var(--surface2);
+                border: 1px solid var(--line2); display: flex; align-items: center; justify-content: center;
+                margin-bottom: 16px; }
+  .empty .eic svg { width: 26px; height: 26px; fill: none; stroke: var(--text3); stroke-width: 1.5; }
+  .empty .et1 { margin: 0 0 8px; font-size: 15px; font-weight: 700; color: var(--head); letter-spacing: .01em; }
+  .empty .et2 { margin: 0; max-width: 258px; font-size: 12px; line-height: 1.75; color: var(--text2); }
+  .empty .eact { margin-top: 20px; width: 100%; max-width: 246px; }
+
+  .eb { text-align: center; padding: 24px 14px 22px; }
+  .eb svg { width: 26px; height: 26px; fill: none; stroke: var(--text3); stroke-width: 1.5; }
+  .eb .et1 { margin: 10px 0 5px; font-size: 13px; font-weight: 700; color: var(--text2); }
+  .eb .et2 { margin: 0; font-size: 11.5px; line-height: 1.65; color: var(--text3); }
+  .eb .eact { margin-top: 12px; }
+
+  /* ---------- 弹层 ---------- */
+  .modal-holder { position: absolute; inset: 0; background: var(--modal);
+                  display: flex; align-items: flex-end; }
+  .modal-holder.center { align-items: center; justify-content: center; }
+  .msheet { width: 100%; background: var(--surface); border-radius: 6px 6px 0 0; padding: 18px 20px 20px;
+            border: 1px solid var(--line); }
+  .msheet.mid { width: 315px; border-radius: 6px; padding: 18px; }
+  .mtitle { font-size: 15px; font-weight: 700; color: var(--head); margin-bottom: 6px; }
+  .mdesc { font-size: 12px; line-height: 1.7; color: var(--text2); margin-bottom: 14px; }
+
+  .cutline { position: absolute; left: 0; right: 0; top: 812px; border-top: 1px dashed var(--cut); }
+  .cutline span { position: absolute; right: 8px; top: -9px; padding: 0 6px; background: var(--page);
+                  font-size: 10px; color: var(--text3); font-family: ui-monospace, Consolas, monospace; }
+
+  .cap { margin: 11px 0 0; font-size: 12.5px; font-weight: 700; }
+  .sub { margin: 4px 0 0; font-size: 11.5px; line-height: 1.7; color: #5c6369; }
+
+  .foot { margin-top: 28px; padding-top: 15px; border-top: 1px solid #c9ced2;
+          font-size: 12px; line-height: 1.8; color: #5c6369; }
+
+  .lt {
+    --page: #F3F9F5;
+    --head: #12291C;
+    --text: #183828;
+    --text2: #4F6B5B;
+    --text3: #5E7569;
+    --line: #D6EADD;
+    --line2: #E4F1E9;
+    --surface: #FFFFFF;
+    --surface2: #EDF8F1;
+    --tintbg: #F0FAF4;
+    --tintfg: #008000;
+    --tintline: #BFE6CC;
+    --accent: #008000;
+    --accent2: #009E60;
+    --hot: #009E60;
+    --warnline: #F3C9A8;
+    --warnfg: #C2410C;
+    --warnbg: #FFF3E6;
+    --errfg: #C62828;
+    --errbg: #FDECEA;
+    --errline: #F0BEBE;
+    --errfill: #C62828;
+    --errfillfg: #FFFFFF;
+    --phbg: #ECF7F0;
+    --phline: #CFE8D9;
+    --tabbg: #FFFFFF;
+    --seg: #ECF7F0;
+    --segon: #008000;
+    --segonfg: #FFFFFF;
+    --inputbg: #F7FBF8;
+    --chkfg: #FFFFFF;
+    --fab: #008000;
+    --fabicon: #FFFFFF;
+    --fabshadow: 0 8px 18px rgba(0,128,0,.22);
+    --btnbg: #008000;
+    --btnfg: #FFFFFF;
+    --btnline: #008000;
+    --disbg: #E6EFE9;
+    --disfg: #93A99C;
+    --disline: #DCE8E1;
+    --loadbg: #008000;
+    --loadfg: #FFFFFF;
+    --skel: #DCE9E0;
+    --skelhi: #F1F8F3;
+    --cut: #BBDCC9;
+    --modal: rgba(12,26,18,.55);
+  }
+
+  .dk {
+    --page: #101E17;
+    --head: #E8F4EB;
+    --text: #D5E8DA;
+    --text2: #A6C2AE;
+    --text3: #7E9B88;
+    --line: #2B4636;
+    --line2: #23392C;
+    --surface: #1A3126;
+    --surface2: #152A20;
+    --tintbg: rgba(80,200,120,.12);
+    --tintfg: #50C878;
+    --tintline: rgba(80,200,120,.38);
+    --accent: #50C878;
+    --accent2: #009E60;
+    --hot: #009E60;
+    --warnline: rgba(255,138,0,.42);
+    --warnfg: #FF8A00;
+    --warnbg: rgba(255,138,0,.14);
+    --errfg: #FF8A80;
+    --errbg: rgba(255,138,128,.14);
+    --errline: rgba(255,138,128,.42);
+    --errfill: #FF8A80;
+    --errfillfg: #0C1A12;
+    --phbg: #16291F;
+    --phline: #2A4433;
+    --tabbg: #15251C;
+    --seg: #16291F;
+    --segon: #50C878;
+    --segonfg: #0C1A12;
+    --inputbg: #152A20;
+    --chkfg: #0C1A12;
+    --fab: #50C878;
+    --fabicon: #0C1A12;
+    --fabshadow: 0 0 0 1px rgba(80,200,120,.35), 0 8px 24px rgba(80,200,120,.30);
+    --btnbg: #50C878;
+    --btnfg: #0C1A12;
+    --btnline: #50C878;
+    --disbg: #1E3327;
+    --disfg: #6E8A78;
+    --disline: #2B4636;
+    --loadbg: #50C878;
+    --loadfg: #0C1A12;
+    --skel: #23392C;
+    --skelhi: #2E4A39;
+    --cut: #2E4A39;
+    --modal: rgba(0,0,0,.62);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="hd">
+<h1>emerald 空态与异常态 · IA 5.4 · v2</h1>
+
+<p><b>v2 变更说明（2026-11-17）</b>：本次为已拍板方案与已确认缺陷的直接落地，原 D 稿（v1）一字不改、保留历史。两项拍板：① P16「题库检查失败 / 下载中断」由红错误条改为橙警示条（可恢复异常），同步修正页首色语义说明与覆盖表第 19 行；② 覆盖表第 4 行措辞改为不声称 P02 主态已覆盖，P02 两屏范围行「国考 · 事业编」保持不动、不新增屏。四类回潮缺陷：CSS 中混入的字面换行转义符（反斜杠加 n）已还原为正常规则；字号收敛（次级页名 17→15px、品牌名 26→20px、P05 成语名 24→20px；文档标题 22→23px，非 App UI 构件）；弹层圆角统一回归 6px。顺带补齐 .steptxt 定义、E08 成语名避开 E13 分组。其余数值与 v1 一致。</p>
+
+  <p>这一批把 IA v1.1 · 5.4 空态与异常态清单落成可见屏：清单共 25 行，其中 <b>22 行</b>在这里单独出稿（浅/深各一屏，共 44 屏），另 <b>3 行</b>按规范处理 — 见文末覆盖表。</p>
+  <p>色语义沿用定稿口径：<b>中性</b>＝空、无数据、纯信息；<b>橙</b>＝可恢复异常（权限、识别失败、未选省份、检查失败 / 下载中断）；<b>红</b>＝硬错误（删除、清空）。红永不作主按钮，空态里的主按钮一律是绿。</p>
+
+</header>
+<p class="grphd">P01 · 启动页 · 三项全取消<span>不阻断进入；软提示走中性色，不与决策I 的橙提示抢注意力</span></p>
+
+<div class="row">
+
+  <div class="col">
+    <p class="vname">浅色模式 · 启动页 · 三项全取消<em>P01</em></p>
+
+    <div class="phone h812 lt">
+<div class="body" style="justify-content:center;padding:52px 20px 24px">
+  <div style="text-align:center;margin-bottom:30px">
+    <svg viewBox="0 0 24 24" style="width:56px;height:56px;fill:none;stroke:var(--accent);stroke-width:1.5">
+      <path d="M4 4h6.5v16H4z"/><path d="M13.5 4H20v16h-6.5z"/></svg>
+    <p style="margin:16px 0 6px;font-size:20px;font-weight:700;color:var(--head);letter-spacing:.04em">成语记忆</p>
+    <p style="margin:0;font-size:12px;color:var(--text3)">把考公考编的成语错题，记成自己的题库</p>
+  </div>
+
+  <div class="card">
+    <p class="lbl">首次打开 · 先定考试范围</p>
+    <div class="chkrow"><span class="chk off"></span><span>国考</span></div>
+    <div class="chkrow"><span class="chk off"></span><span>省考</span></div>
+    <div class="chkrow" style="border-bottom:0"><span class="chk off"></span><span>事业编</span></div>
+    <p class="hint" style="margin-top:12px;padding-top:12px;border-top:1px solid var(--line2)">
+      不选范围时，成语库和例题库会是空的；可以稍后在「我的 → 考试范围设置」里改。
+    </p>
+  </div>
+
+  <div class="btn">进入</div>
+  <div class="ghostbtn" style="flex:none;width:100%;display:block;margin-top:10px">跳过，沿用默认</div>
+  <p class="hint" style="text-align:center;margin-top:16px">版本 1.0.0</p>
+</div>
+</div>
+  </div>
+
+  <div class="col">
+    <p class="vname">深色模式 · 启动页 · 三项全取消<em>P01</em></p>
+
+    <div class="phone h812 dk">
+<div class="body" style="justify-content:center;padding:52px 20px 24px">
+  <div style="text-align:center;margin-bottom:30px">
+    <svg viewBox="0 0 24 24" style="width:56px;height:56px;fill:none;stroke:var(--accent);stroke-width:1.5">
+      <path d="M4 4h6.5v16H4z"/><path d="M13.5 4H20v16h-6.5z"/></svg>
+    <p style="margin:16px 0 6px;font-size:20px;font-weight:700;color:var(--head);letter-spacing:.04em">成语记忆</p>
+    <p style="margin:0;font-size:12px;color:var(--text3)">把考公考编的成语错题，记成自己的题库</p>
+  </div>
+
+  <div class="card">
+    <p class="lbl">首次打开 · 先定考试范围</p>
+    <div class="chkrow"><span class="chk off"></span><span>国考</span></div>
+    <div class="chkrow"><span class="chk off"></span><span>省考</span></div>
+    <div class="chkrow" style="border-bottom:0"><span class="chk off"></span><span>事业编</span></div>
+    <p class="hint" style="margin-top:12px;padding-top:12px;border-top:1px solid var(--line2)">
+      不选范围时，成语库和例题库会是空的；可以稍后在「我的 → 考试范围设置」里改。
+    </p>
+  </div>
+
+  <div class="btn">进入</div>
+  <div class="ghostbtn" style="flex:none;width:100%;display:block;margin-top:10px">跳过，沿用默认</div>
+  <p class="hint" style="text-align:center;margin-top:16px">版本 1.0.0</p>
+</div>
+</div>
+  </div>
+
+</div>
+
+<p class="grphd">P02 · 推荐 · 推荐区占位<span>固定高度占位，不写「加载失败」这类故障文案，不放假成语卡</span></p>
+
+<div class="row">
+
+  <div class="col">
+    <p class="vname">浅色模式 · 推荐 · 推荐区占位<em>P02</em></p>
+
+    <div class="phone h812 lt">
+<div class="top"><div class="pname">推荐</div><svg class="ic ac" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.6-4.6"/></svg></div>
+<div class="body" style="padding-top:16px">
+  <div class="ph-rec">
+    <p>每日推荐将在进阶版本接入，本版先留空位</p>
+  </div>
+
+  <div class="card">
+    <div class="row1"><span class="ctitle">进入成语库</span><svg class="ic sm ac" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></div>
+    <p class="range">当前考试范围：<b>国考 · 事业编</b></p>
+    <p class="txt dim">按范围、按拼音首字母、按考频高低，三种方式翻全部成语。</p>
+  </div>
+
+  <div class="card">
+    <div class="row1"><span class="ctitle">我的错题</span><span class="more">去错题本 <svg class="ic sm ac" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></span></div>
+    <div class="nums tight">
+      <div class="numcell"><div class="numv">12</div><div class="numl">错题总数</div></div>
+      <div class="numcell"><div class="numv hot">7</div><div class="numl">待复习</div></div>
+    </div>
+  </div>
+</div>
+<div class="tabs">
+  <div class="tab on"><svg viewBox="0 0 24 24"><path d="M4 4h6.5v16H4z"/><path d="M13.5 4H20v16h-6.5z"/></svg><span>成语</span></div>
+  <div class="tab"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span>例题</span></div>
+  <div class="tab"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span>错题</span></div>
+  <div class="tab"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span>我的</span></div>
+</div>
+<div class="fab">
+  <svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13"/><circle cx="12" cy="13.5" r="3.6"/><path d="M8.5 7l1.4-3h4.2l1.4 3"/></svg>
+</div>
+</div>
+  </div>
+
+  <div class="col">
+    <p class="vname">深色模式 · 推荐 · 推荐区占位<em>P02</em></p>
+
+    <div class="phone h812 dk">
+<div class="top"><div class="pname">推荐</div><svg class="ic ac" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.6-4.6"/></svg></div>
+<div class="body" style="padding-top:16px">
+  <div class="ph-rec">
+    <p>每日推荐将在进阶版本接入，本版先留空位</p>
+  </div>
+
+  <div class="card">
+    <div class="row1"><span class="ctitle">进入成语库</span><svg class="ic sm ac" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></div>
+    <p class="range">当前考试范围：<b>国考 · 事业编</b></p>
+    <p class="txt dim">按范围、按拼音首字母、按考频高低，三种方式翻全部成语。</p>
+  </div>
+
+  <div class="card">
+    <div class="row1"><span class="ctitle">我的错题</span><span class="more">去错题本 <svg class="ic sm ac" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></span></div>
+    <div class="nums tight">
+      <div class="numcell"><div class="numv">12</div><div class="numl">错题总数</div></div>
+      <div class="numcell"><div class="numv hot">7</div><div class="numl">待复习</div></div>
+    </div>
+  </div>
+</div>
+<div class="tabs">
+  <div class="tab on"><svg viewBox="0 0 24 24"><path d="M4 4h6.5v16H4z"/><path d="M13.5 4H20v16h-6.5z"/></svg><span>成语</span></div>
+  <div class="tab"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span>例题</span></div>
+  <div class="tab"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span>错题</span></div>
+  <div class="tab"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span>我的</span></div>
+</div>
+<div class="fab">
+  <svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13"/><circle cx="12" cy="13.5" r="3.6"/><path d="M8.5 7l1.4-3h4.2l1.4 3"/></svg>
+</div>
+</div>
+  </div>
+
+</div>
+
+<p class="grphd">P02 · 推荐 · 新装错题 0<span>两个数字都写 0，卡仍可点进 P08</span></p>
+
+<div class="row">
+
+  <div class="col">
+    <p class="vname">浅色模式 · 推荐 · 新装错题 0<em>P02</em></p>
+
+    <div class="phone h812 lt">
+<div class="top"><div class="pname">推荐</div><svg class="ic ac" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.6-4.6"/></svg></div>
+<div class="body" style="padding-top:16px">
+  <div class="ph-rec">
+    <p>每日推荐将在进阶版本接入，本版先留空位</p>
+  </div>
+
+  <div class="card">
+    <div class="row1"><span class="ctitle">进入成语库</span><svg class="ic sm ac" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></div>
+    <p class="range">当前考试范围：<b>国考 · 事业编</b></p>
+  </div>
+
+  <div class="card">
+    <div class="row1"><span class="ctitle">我的错题</span><span class="more">去错题本 <svg class="ic sm ac" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></span></div>
+    <div class="nums tight">
+      <div class="numcell"><div class="numv">0</div><div class="numl">错题总数</div></div>
+      <div class="numcell"><div class="numv">0</div><div class="numl">待复习</div></div>
+    </div>
+    <p class="txt dim">拍一道错题就会出现在这里</p>
+  </div>
+</div>
+<div class="tabs">
+  <div class="tab on"><svg viewBox="0 0 24 24"><path d="M4 4h6.5v16H4z"/><path d="M13.5 4H20v16h-6.5z"/></svg><span>成语</span></div>
+  <div class="tab"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span>例题</span></div>
+  <div class="tab"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span>错题</span></div>
+  <div class="tab"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span>我的</span></div>
+</div>
+<div class="fab">
+  <svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13"/><circle cx="12" cy="13.5" r="3.6"/><path d="M8.5 7l1.4-3h4.2l1.4 3"/></svg>
+</div>
+</div>
+  </div>
+
+  <div class="col">
+    <p class="vname">深色模式 · 推荐 · 新装错题 0<em>P02</em></p>
+
+    <div class="phone h812 dk">
+<div class="top"><div class="pname">推荐</div><svg class="ic ac" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.6-4.6"/></svg></div>
+<div class="body" style="padding-top:16px">
+  <div class="ph-rec">
+    <p>每日推荐将在进阶版本接入，本版先留空位</p>
+  </div>
+
+  <div class="card">
+    <div class="row1"><span class="ctitle">进入成语库</span><svg class="ic sm ac" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></div>
+    <p class="range">当前考试范围：<b>国考 · 事业编</b></p>
+  </div>
+
+  <div class="card">
+    <div class="row1"><span class="ctitle">我的错题</span><span class="more">去错题本 <svg class="ic sm ac" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></span></div>
+    <div class="nums tight">
+      <div class="numcell"><div class="numv">0</div><div class="numl">错题总数</div></div>
+      <div class="numcell"><div class="numv">0</div><div class="numl">待复习</div></div>
+    </div>
+    <p class="txt dim">拍一道错题就会出现在这里</p>
+  </div>
+</div>
+<div class="tabs">
+  <div class="tab on"><svg viewBox="0 0 24 24"><path d="M4 4h6.5v16H4z"/><path d="M13.5 4H20v16h-6.5z"/></svg><span>成语</span></div>
+  <div class="tab"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span>例题</span></div>
+  <div class="tab"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span>错题</span></div>
+  <div class="tab"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span>我的</span></div>
+</div>
+<div class="fab">
+  <svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13"/><circle cx="12" cy="13.5" r="3.6"/><path d="M8.5 7l1.4-3h4.2l1.4 3"/></svg>
+</div>
+</div>
+  </div>
+
+</div>
+
+<p class="grphd">P03 · 成语库 · 省考未选省份<span>范围行写明未选省份，橙色警示只此一处</span></p>
+
+<div class="row">
+
+  <div class="col">
+    <p class="vname">浅色模式 · 成语库 · 省考未选省份<em>P03</em></p>
+
+    <div class="phone h812 lt">
+<div class="top"><svg class="ic" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg><div class="pname">成语库</div><svg class="ic ac" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.6-4.6"/></svg></div>
+<div class="body" style="padding-top:16px">
+  <div class="card" style="padding:12px 16px;margin-bottom:12px">
+    <div class="row1">
+      <span class="range" style="margin:0">范围：<b>国考 · 省考<span style="color:var(--warnfg)">（未选省份）</span> · 事业编</b></span>
+      <span class="linkbtn">去选省份</span>
+    </div>
+    <p class="hint" style="margin-top:6px">省考内容暂不显示，选好省份即可看到；国考与事业编的成语照常可用。</p>
+  </div>
+
+  <div class="seg"><i class="on">按考试范围</i><i>按首字母</i><i>按考频</i></div>
+
+  <div class="list" style="margin-top:12px">
+    <div class="lrow">
+      <div class="lt1"><span class="lname">按部就班</span><span class="lpy">àn bù jiù bān</span></div>
+      <div class="lmeta"><span class="tag">高频</span><span class="distag">未学</span></div>
+    </div>
+    <div class="lrow">
+      <div class="lt1"><span class="lname">别出心裁</span><span class="lpy">bié chū xīn cái</span></div>
+      <div class="lmeta"><span class="tag">高频</span><span class="distag">未学</span></div>
+    </div>
+    <div class="lrow">
+      <div class="lt1"><span class="lname">墨守成规</span><span class="lpy">mò shǒu chéng guī</span></div>
+      <div class="lmeta"><span class="distag">未学</span></div>
+    </div>
+  </div>
+  <p class="listfoot">共 1,286 条 · 已到末尾</p>
+</div>
+</div>
+  </div>
+
+  <div class="col">
+    <p class="vname">深色模式 · 成语库 · 省考未选省份<em>P03</em></p>
+
+    <div class="phone h812 dk">
+<div class="top"><svg class="ic" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg><div class="pname">成语库</div><svg class="ic ac" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.6-4.6"/></svg></div>
+<div class="body" style="padding-top:16px">
+  <div class="card" style="padding:12px 16px;margin-bottom:12px">
+    <div class="row1">
+      <span class="range" style="margin:0">范围：<b>国考 · 省考<span style="color:var(--warnfg)">（未选省份）</span> · 事业编</b></span>
+      <span class="linkbtn">去选省份</span>
+    </div>
+    <p class="hint" style="margin-top:6px">省考内容暂不显示，选好省份即可看到；国考与事业编的成语照常可用。</p>
+  </div>
+
+  <div class="seg"><i class="on">按考试范围</i><i>按首字母</i><i>按考频</i></div>
+
+  <div class="list" style="margin-top:12px">
+    <div class="lrow">
+      <div class="lt1"><span class="lname">按部就班</span><span class="lpy">àn bù jiù bān</span></div>
+      <div class="lmeta"><span class="tag">高频</span><span class="distag">未学</span></div>
+    </div>
+    <div class="lrow">
+      <div class="lt1"><span class="lname">别出心裁</span><span class="lpy">bié chū xīn cái</span></div>
+      <div class="lmeta"><span class="tag">高频</span><span class="distag">未学</span></div>
+    </div>
+    <div class="lrow">
+      <div class="lt1"><span class="lname">墨守成规</span><span class="lpy">mò shǒu chéng guī</span></div>
+      <div class="lmeta"><span class="distag">未学</span></div>
+    </div>
+  </div>
+  <p class="listfoot">共 1,286 条 · 已到末尾</p>
+</div>
+</div>
+  </div>
+
+</div>
+
+<p class="grphd">P03 · 成语库 · 该条件下没有成语<span>两条出路：清除条件看全部 / 去改考试范围</span></p>
+
+<div class="row">
+
+  <div class="col">
+    <p class="vname">浅色模式 · 成语库 · 该条件下没有成语<em>P03</em></p>
+
+    <div class="phone h812 lt">
+<div class="top"><svg class="ic" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg><div class="pname">成语库</div><svg class="ic ac" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.6-4.6"/></svg></div>
+<div class="body" style="padding-top:16px">
+  <div class="card" style="padding:12px 16px;margin-bottom:12px">
+    <div class="row1"><span class="range" style="margin:0">范围：<b>国考</b></span><span class="linkbtn">改范围</span></div>
+  </div>
+
+  <div class="seg"><i>按考试范围</i><i class="on">按首字母</i><i>按考频</i></div>
+
+  <div class="empty">
+    <div class="eic"><svg viewBox="0 0 24 24"><path d="M4 4h6.5v16H4z"/><path d="M13.5 4H20v16h-6.5z"/></svg></div>
+    <p class="et1">这个条件下还没有成语</p>
+    <p class="et2">当前范围是「国考」，首字母「X」下没有收录。范围越窄、字母越靠后，能看到的就越少。</p>
+    <div class="eact">
+      <div class="btn" style="margin-top:0">清除条件，看全部</div>
+      <div class="ghostbtn" style="flex:none;width:100%;display:block;margin-top:10px">去改考试范围</div>
+    </div>
+  </div>
+  <p class="listfoot">共 0 条</p>
+</div>
+</div>
+  </div>
+
+  <div class="col">
+    <p class="vname">深色模式 · 成语库 · 该条件下没有成语<em>P03</em></p>
+
+    <div class="phone h812 dk">
+<div class="top"><svg class="ic" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg><div class="pname">成语库</div><svg class="ic ac" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.6-4.6"/></svg></div>
+<div class="body" style="padding-top:16px">
+  <div class="card" style="padding:12px 16px;margin-bottom:12px">
+    <div class="row1"><span class="range" style="margin:0">范围：<b>国考</b></span><span class="linkbtn">改范围</span></div>
+  </div>
+
+  <div class="seg"><i>按考试范围</i><i class="on">按首字母</i><i>按考频</i></div>
+
+  <div class="empty">
+    <div class="eic"><svg viewBox="0 0 24 24"><path d="M4 4h6.5v16H4z"/><path d="M13.5 4H20v16h-6.5z"/></svg></div>
+    <p class="et1">这个条件下还没有成语</p>
+    <p class="et2">当前范围是「国考」，首字母「X」下没有收录。范围越窄、字母越靠后，能看到的就越少。</p>
+    <div class="eact">
+      <div class="btn" style="margin-top:0">清除条件，看全部</div>
+      <div class="ghostbtn" style="flex:none;width:100%;display:block;margin-top:10px">去改考试范围</div>
+    </div>
+  </div>
+  <p class="listfoot">共 0 条</p>
+</div>
+</div>
+  </div>
+
+</div>
+
+<p class="grphd">P04 · 搜索 · 无匹配<span>不清空已输入内容，改字即时出新结果</span></p>
+
+<div class="row">
+
+  <div class="col">
+    <p class="vname">浅色模式 · 搜索 · 无匹配<em>P04</em></p>
+
+    <div class="phone h812 lt">
+<div class="top"><svg class="ic" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6l-12 12"/></svg><div class="pname">搜索</div></div>
+<div class="body" style="padding-top:14px">
+  <div class="editinput focus">
+    <svg class="ic dim" viewBox="0 0 24 24" style="width:15px;height:15px"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.6-4.6"/></svg>
+    <span style="flex:1">按部</span>
+    <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:var(--text3);stroke-width:1.6"><path d="M7 7l10 10M17 7l-10 10"/></svg>
+  </div>
+  <p class="hint" style="margin:8px 0 0">完整成语 / 单字 / 全拼 / 拼音首字母都能搜</p>
+
+  <div class="empty">
+    <div class="eic"><svg viewBox="0 0 24 24"><path d="M4 4h6.5v16H4z"/><path d="M13.5 4H20v16h-6.5z"/></svg></div>
+    <p class="et1">没有找到这个成语，换个字或拼音试试</p>
+    <p class="et2">支持全拼与首字母，比如「bubujiu」或「bbjb」；也可以只输一个字。</p>
+  </div>
+
+  <p class="hint" style="text-align:center">已输入的内容不会自动清空，改字即时出新结果</p>
+</div>
+</div>
+  </div>
+
+  <div class="col">
+    <p class="vname">深色模式 · 搜索 · 无匹配<em>P04</em></p>
+
+    <div class="phone h812 dk">
+<div class="top"><svg class="ic" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6l-12 12"/></svg><div class="pname">搜索</div></div>
+<div class="body" style="padding-top:14px">
+  <div class="editinput focus">
+    <svg class="ic dim" viewBox="0 0 24 24" style="width:15px;height:15px"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.6-4.6"/></svg>
+    <span style="flex:1">按部</span>
+    <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:var(--text3);stroke-width:1.6"><path d="M7 7l10 10M17 7l-10 10"/></svg>
+  </div>
+  <p class="hint" style="margin:8px 0 0">完整成语 / 单字 / 全拼 / 拼音首字母都能搜</p>
+
+  <div class="empty">
+    <div class="eic"><svg viewBox="0 0 24 24"><path d="M4 4h6.5v16H4z"/><path d="M13.5 4H20v16h-6.5z"/></svg></div>
+    <p class="et1">没有找到这个成语，换个字或拼音试试</p>
+    <p class="et2">支持全拼与首字母，比如「bubujiu」或「bbjb」；也可以只输一个字。</p>
+  </div>
+
+  <p class="hint" style="text-align:center">已输入的内容不会自动清空，改字即时出新结果</p>
+</div>
+</div>
+  </div>
+
+</div>
+
+<p class="grphd">P05 · 成语详情 · 暂无真题<span>区块留在原位不隐藏，不给按钮</span></p>
+
+<div class="row">
+
+  <div class="col">
+    <p class="vname">浅色模式 · 成语详情 · 暂无真题<em>P05</em></p>
+
+    <div class="phone tall lt">
+<div class="top"><svg class="ic" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg><div class="pname sub">成语详情</div><span class="tag">已收藏</span></div>
+<div class="body" style="padding-top:16px">
+  <p style="margin:0;font-size:20px;font-weight:700;color:var(--head)">按部就班</p>
+  <p style="margin:4px 0 10px;font-size:12px;color:var(--text3)">àn bù jiù bān</p>
+  <div class="tagrow" style="margin-bottom:14px"><span class="tag">贬义</span></div>
+
+  <div class="card">
+    <p class="lbl">释义</p>
+    <p class="txt k" style="margin:0">按：依照；部、班：门类与次序。原指安排事务依照一定条理，后多指照老规矩办事，缺乏变通。</p>
+  </div>
+
+  <div class="card">
+    <p class="lbl">相关真题</p>
+    <div class="eb">
+      <svg viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/></svg>
+      <p class="et1">暂无真题，后续补充</p>
+      <p class="et2">这一格留在原位，不隐藏也不给入口。</p>
+    </div>
+  </div>
+
+  <div class="card" style="padding:12px 16px">
+    <div class="row1"><span class="hint" style="margin:0">我在这个成语上错过</span><span class="more">3 道题 <svg class="ic sm ac" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></span></div>
+  </div>
+  <div class="btn">复习这个成语</div>
+</div>
+</div>
+  </div>
+
+  <div class="col">
+    <p class="vname">深色模式 · 成语详情 · 暂无真题<em>P05</em></p>
+
+    <div class="phone tall dk">
+<div class="top"><svg class="ic" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg><div class="pname sub">成语详情</div><span class="tag">已收藏</span></div>
+<div class="body" style="padding-top:16px">
+  <p style="margin:0;font-size:20px;font-weight:700;color:var(--head)">按部就班</p>
+  <p style="margin:4px 0 10px;font-size:12px;color:var(--text3)">àn bù jiù bān</p>
+  <div class="tagrow" style="margin-bottom:14px"><span class="tag">贬义</span></div>
+
+  <div class="card">
+    <p class="lbl">释义</p>
+    <p class="txt k" style="margin:0">按：依照；部、班：门类与次序。原指安排事务依照一定条理，后多指照老规矩办事，缺乏变通。</p>
+  </div>
+
+  <div class="card">
+    <p class="lbl">相关真题</p>
+    <div class="eb">
+      <svg viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/></svg>
+      <p class="et1">暂无真题，后续补充</p>
+      <p class="et2">这一格留在原位，不隐藏也不给入口。</p>
+    </div>
+  </div>
+
+  <div class="card" style="padding:12px 16px">
+    <div class="row1"><span class="hint" style="margin:0">我在这个成语上错过</span><span class="more">3 道题 <svg class="ic sm ac" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></span></div>
+  </div>
+  <div class="btn">复习这个成语</div>
+</div>
+</div>
+  </div>
+
+</div>
+
+<p class="grphd">P05 · 成语详情 · 错过 0 题<span>数字 0 灰显不可点；给的是「去错题本」导航，不是相机</span></p>
+
+<div class="row">
+
+  <div class="col">
+    <p class="vname">浅色模式 · 成语详情 · 错过 0 题<em>P05</em></p>
+
+    <div class="phone h812 lt">
+<div class="top"><svg class="ic" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg><div class="pname sub">成语详情</div><span class="tag">已收藏</span></div>
+<div class="body" style="padding-top:16px">
+  <p style="margin:0;font-size:20px;font-weight:700;color:var(--head)">循序渐进</p>
+  <p style="margin:4px 0 10px;font-size:12px;color:var(--text3)">xún xù jiàn jìn</p>
+  <div class="tagrow" style="margin-bottom:14px"><span class="tag">褒义</span></div>
+
+  <div class="card">
+    <p class="lbl">相关真题</p>
+    <p class="txt k" style="margin:0 0 4px">下列各句中，加点的成语使用不恰当的一项是</p>
+    <p class="txt dim" style="margin:0">2023 · 国考 · 言语理解 · 单选题</p>
+  </div>
+
+  <div class="card" style="padding:14px 16px">
+    <div class="row1">
+      <span class="hint" style="margin:0">我在这个成语上错过</span>
+      <span style="font-size:20px;font-weight:700;color:var(--text3);letter-spacing:.01em">0 <span style="font-size:12px;font-weight:400">道题</span></span>
+    </div>
+    <p class="hint" style="margin-top:8px">还没在这个成语上错过题</p>
+    <div class="ghostbtn" style="flex:none;width:100%;display:block;margin-top:12px">去错题本</div>
+    <p class="hint" style="margin-top:8px">在错题页拍一张卷子上的错题，就会归到这个成语下。</p>
+  </div>
+</div>
+</div>
+  </div>
+
+  <div class="col">
+    <p class="vname">深色模式 · 成语详情 · 错过 0 题<em>P05</em></p>
+
+    <div class="phone h812 dk">
+<div class="top"><svg class="ic" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg><div class="pname sub">成语详情</div><span class="tag">已收藏</span></div>
+<div class="body" style="padding-top:16px">
+  <p style="margin:0;font-size:20px;font-weight:700;color:var(--head)">循序渐进</p>
+  <p style="margin:4px 0 10px;font-size:12px;color:var(--text3)">xún xù jiàn jìn</p>
+  <div class="tagrow" style="margin-bottom:14px"><span class="tag">褒义</span></div>
+
+  <div class="card">
+    <p class="lbl">相关真题</p>
+    <p class="txt k" style="margin:0 0 4px">下列各句中，加点的成语使用不恰当的一项是</p>
+    <p class="txt dim" style="margin:0">2023 · 国考 · 言语理解 · 单选题</p>
+  </div>
+
+  <div class="card" style="padding:14px 16px">
+    <div class="row1">
+      <span class="hint" style="margin:0">我在这个成语上错过</span>
+      <span style="font-size:20px;font-weight:700;color:var(--text3);letter-spacing:.01em">0 <span style="font-size:12px;font-weight:400">道题</span></span>
+    </div>
+    <p class="hint" style="margin-top:8px">还没在这个成语上错过题</p>
+    <div class="ghostbtn" style="flex:none;width:100%;display:block;margin-top:12px">去错题本</div>
+    <p class="hint" style="margin-top:8px">在错题页拍一张卷子上的错题，就会归到这个成语下。</p>
+  </div>
+</div>
+</div>
+  </div>
+
+</div>
+
+<p class="grphd">P05 · 成语详情 · 复习按钮置灰<span>按钮灰，上方数字若还有题仍可点</span></p>
+
+<div class="row">
+
+  <div class="col">
+    <p class="vname">浅色模式 · 成语详情 · 复习按钮置灰<em>P05</em></p>
+
+    <div class="phone h812 lt">
+<div class="top"><svg class="ic" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg><div class="pname sub">成语详情</div><span class="tag">已收藏</span></div>
+<div class="body" style="padding-top:16px">
+  <p style="margin:0;font-size:20px;font-weight:700;color:var(--head)">别出心裁</p>
+  <p style="margin:4px 0 10px;font-size:12px;color:var(--text3)">bié chū xīn cái</p>
+  <div class="tagrow" style="margin-bottom:14px"><span class="tag">褒义</span></div>
+
+  <div class="card" style="padding:14px 16px">
+    <div class="row1">
+      <span class="hint" style="margin:0">我在这个成语上错过</span>
+      <span class="more">2 道题 <svg class="ic sm ac" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></span>
+    </div>
+  </div>
+
+  <div class="disbtn">复习这个成语</div>
+  <p class="hint" style="margin-top:8px">这个成语下还没有待复习的错题</p>
+</div>
+</div>
+  </div>
+
+  <div class="col">
+    <p class="vname">深色模式 · 成语详情 · 复习按钮置灰<em>P05</em></p>
+
+    <div class="phone h812 dk">
+<div class="top"><svg class="ic" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg><div class="pname sub">成语详情</div><span class="tag">已收藏</span></div>
+<div class="body" style="padding-top:16px">
+  <p style="margin:0;font-size:20px;font-weight:700;color:var(--head)">别出心裁</p>
+  <p style="margin:4px 0 10px;font-size:12px;color:var(--text3)">bié chū xīn cái</p>
+  <div class="tagrow" style="margin-bottom:14px"><span class="tag">褒义</span></div>
+
+  <div class="card" style="padding:14px 16px">
+    <div class="row1">
+      <span class="hint" style="margin:0">我在这个成语上错过</span>
+      <span class="more">2 道题 <svg class="ic sm ac" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></span>
+    </div>
+  </div>
+
+  <div class="disbtn">复习这个成语</div>
+  <p class="hint" style="margin-top:8px">这个成语下还没有待复习的错题</p>
+</div>
+</div>
+  </div>
+
+</div>
+
+<p class="grphd">P06 · 例题列表 · 当前范围没有例题<span>给一条出路：去考试范围设置</span></p>
+
+<div class="row">
+
+  <div class="col">
+    <p class="vname">浅色模式 · 例题列表 · 当前范围没有例题<em>P06</em></p>
+
+    <div class="phone h812 lt">
+<div class="top"><div class="pname">例题</div><svg class="ic ac" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.6-4.6"/></svg></div>
+<div class="body" style="padding-top:16px">
+  <div class="card" style="padding:12px 16px">
+    <div class="row1"><span class="hint" style="margin:0">筛选：考试类型 / 年份 / 题型 / 是否做过</span><span class="distag">进阶</span></div>
+  </div>
+
+  <div class="empty">
+    <div class="eic"><svg viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/></svg></div>
+    <p class="et1">当前范围还没有例题</p>
+    <p class="et2">例题按考试范围取，范围里没有对应的真题时这里就是空的。</p>
+    <div class="eact"><div class="btn" style="margin-top:0">去考试范围设置</div></div>
+  </div>
+  <p class="listfoot">共 0 条 · 已到末尾</p>
+</div>
+<div class="tabs">
+  <div class="tab"><svg viewBox="0 0 24 24"><path d="M4 4h6.5v16H4z"/><path d="M13.5 4H20v16h-6.5z"/></svg><span>成语</span></div>
+  <div class="tab on"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span>例题</span></div>
+  <div class="tab"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span>错题</span></div>
+  <div class="tab"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span>我的</span></div>
+</div>
+<div class="fab">
+  <svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13"/><circle cx="12" cy="13.5" r="3.6"/><path d="M8.5 7l1.4-3h4.2l1.4 3"/></svg>
+</div>
+</div>
+  </div>
+
+  <div class="col">
+    <p class="vname">深色模式 · 例题列表 · 当前范围没有例题<em>P06</em></p>
+
+    <div class="phone h812 dk">
+<div class="top"><div class="pname">例题</div><svg class="ic ac" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.6-4.6"/></svg></div>
+<div class="body" style="padding-top:16px">
+  <div class="card" style="padding:12px 16px">
+    <div class="row1"><span class="hint" style="margin:0">筛选：考试类型 / 年份 / 题型 / 是否做过</span><span class="distag">进阶</span></div>
+  </div>
+
+  <div class="empty">
+    <div class="eic"><svg viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/></svg></div>
+    <p class="et1">当前范围还没有例题</p>
+    <p class="et2">例题按考试范围取，范围里没有对应的真题时这里就是空的。</p>
+    <div class="eact"><div class="btn" style="margin-top:0">去考试范围设置</div></div>
+  </div>
+  <p class="listfoot">共 0 条 · 已到末尾</p>
+</div>
+<div class="tabs">
+  <div class="tab"><svg viewBox="0 0 24 24"><path d="M4 4h6.5v16H4z"/><path d="M13.5 4H20v16h-6.5z"/></svg><span>成语</span></div>
+  <div class="tab on"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span>例题</span></div>
+  <div class="tab"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span>错题</span></div>
+  <div class="tab"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span>我的</span></div>
+</div>
+<div class="fab">
+  <svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13"/><circle cx="12" cy="13.5" r="3.6"/><path d="M8.5 7l1.4-3h4.2l1.4 3"/></svg>
+</div>
+</div>
+  </div>
+
+</div>
+
+<p class="grphd">P07 · 例题详情 · 暂未关联成语<span>异常数据：关联区空，题干与解析照常显示</span></p>
+
+<div class="row">
+
+  <div class="col">
+    <p class="vname">浅色模式 · 例题详情 · 暂未关联成语<em>P07</em></p>
+
+    <div class="phone h812 lt">
+<div class="top"><svg class="ic" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg><div class="pname sub">例题详情</div><span class="ic dim"><svg viewBox="0 0 24 24"><path d="M7 4h10v17l-5-3-5 3z"/></svg></span></div>
+<div class="body" style="padding-top:16px">
+  <div class="card" style="padding:12px 16px">
+    <p class="hint" style="margin:0">2022 · 湖北选调 · 逻辑填空 · 单选题</p>
+  </div>
+
+  <div class="card">
+    <p class="lbl">题干</p>
+    <p class="txt k" style="margin:0 0 10px">填入横线处最恰当的一项：改革不能______，需因时制宜</p>
+    <div class="optrow"><b>A</b><span>按部就班</span></div>
+    <div class="optrow"><b>B</b><span>墨守成规</span></div>
+    <div class="optrow"><b>C</b><span>循序渐进</span></div>
+    <div class="optrow"><b>D</b><span>别出心裁</span></div>
+  </div>
+
+  <div class="card">
+    <p class="lbl">本题关联成语</p>
+    <div class="eb">
+      <svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16"/><path d="M8 9h8M8 13h8"/></svg>
+      <p class="et1">暂未关联成语</p>
+      <p class="et2">这道题没关联到任何成语，属异常数据；题干与解析照常显示，不影响查看。</p>
+    </div>
+  </div>
+</div>
+</div>
+  </div>
+
+  <div class="col">
+    <p class="vname">深色模式 · 例题详情 · 暂未关联成语<em>P07</em></p>
+
+    <div class="phone h812 dk">
+<div class="top"><svg class="ic" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg><div class="pname sub">例题详情</div><span class="ic dim"><svg viewBox="0 0 24 24"><path d="M7 4h10v17l-5-3-5 3z"/></svg></span></div>
+<div class="body" style="padding-top:16px">
+  <div class="card" style="padding:12px 16px">
+    <p class="hint" style="margin:0">2022 · 湖北选调 · 逻辑填空 · 单选题</p>
+  </div>
+
+  <div class="card">
+    <p class="lbl">题干</p>
+    <p class="txt k" style="margin:0 0 10px">填入横线处最恰当的一项：改革不能______，需因时制宜</p>
+    <div class="optrow"><b>A</b><span>按部就班</span></div>
+    <div class="optrow"><b>B</b><span>墨守成规</span></div>
+    <div class="optrow"><b>C</b><span>循序渐进</span></div>
+    <div class="optrow"><b>D</b><span>别出心裁</span></div>
+  </div>
+
+  <div class="card">
+    <p class="lbl">本题关联成语</p>
+    <div class="eb">
+      <svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16"/><path d="M8 9h8M8 13h8"/></svg>
+      <p class="et1">暂未关联成语</p>
+      <p class="et2">这道题没关联到任何成语，属异常数据；题干与解析照常显示，不影响查看。</p>
+    </div>
+  </div>
+</div>
+</div>
+  </div>
+
+</div>
+
+<p class="grphd">P08 · 错题列表 · 还没有错题<span>插画位 + 一句来源说明 + 拍照录入第一道题</span></p>
+
+<div class="row">
+
+  <div class="col">
+    <p class="vname">浅色模式 · 错题列表 · 还没有错题<em>P08</em></p>
+
+    <div class="phone h812 lt">
+<div class="top"><div class="pname">错题</div><span class="topbtn"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13"/><circle cx="12" cy="13.5" r="3.6"/><path d="M8.5 7l1.4-3h4.2l1.4 3"/></svg>拍照录题</span></div>
+<div class="body" style="padding-top:16px">
+  <div class="card" style="padding:12px 16px">
+    <div class="nums tight" style="margin-top:0">
+      <div class="numcell"><div class="numv sm">0</div><div class="numl">错题总数</div></div>
+      <div class="numcell"><div class="numv sm">0</div><div class="numl">待复习</div></div>
+    </div>
+  </div>
+
+  <div class="seg" style="margin-bottom:12px"><i class="on">按成语分组</i><i>按录入时间</i><i>按考试类型</i></div>
+
+  <div class="empty">
+    <div class="eic"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13"/><circle cx="12" cy="13.5" r="3.6"/><path d="M8.5 7l1.4-3h4.2l1.4 3"/></svg></div>
+    <p class="et1">还没有错题</p>
+    <p class="et2">拍一张卷子上的错题，就会归到对应成语下。</p>
+    <div class="eact"><div class="btn" style="margin-top:0">拍照录入第一道题</div></div>
+  </div>
+</div>
+<div class="tabs">
+  <div class="tab"><svg viewBox="0 0 24 24"><path d="M4 4h6.5v16H4z"/><path d="M13.5 4H20v16h-6.5z"/></svg><span>成语</span></div>
+  <div class="tab"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span>例题</span></div>
+  <div class="tab on"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span>错题</span></div>
+  <div class="tab"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span>我的</span></div>
+</div>
+<div class="fab">
+  <svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13"/><circle cx="12" cy="13.5" r="3.6"/><path d="M8.5 7l1.4-3h4.2l1.4 3"/></svg>
+</div>
+</div>
+  </div>
+
+  <div class="col">
+    <p class="vname">深色模式 · 错题列表 · 还没有错题<em>P08</em></p>
+
+    <div class="phone h812 dk">
+<div class="top"><div class="pname">错题</div><span class="topbtn"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13"/><circle cx="12" cy="13.5" r="3.6"/><path d="M8.5 7l1.4-3h4.2l1.4 3"/></svg>拍照录题</span></div>
+<div class="body" style="padding-top:16px">
+  <div class="card" style="padding:12px 16px">
+    <div class="nums tight" style="margin-top:0">
+      <div class="numcell"><div class="numv sm">0</div><div class="numl">错题总数</div></div>
+      <div class="numcell"><div class="numv sm">0</div><div class="numl">待复习</div></div>
+    </div>
+  </div>
+
+  <div class="seg" style="margin-bottom:12px"><i class="on">按成语分组</i><i>按录入时间</i><i>按考试类型</i></div>
+
+  <div class="empty">
+    <div class="eic"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13"/><circle cx="12" cy="13.5" r="3.6"/><path d="M8.5 7l1.4-3h4.2l1.4 3"/></svg></div>
+    <p class="et1">还没有错题</p>
+    <p class="et2">拍一张卷子上的错题，就会归到对应成语下。</p>
+    <div class="eact"><div class="btn" style="margin-top:0">拍照录入第一道题</div></div>
+  </div>
+</div>
+<div class="tabs">
+  <div class="tab"><svg viewBox="0 0 24 24"><path d="M4 4h6.5v16H4z"/><path d="M13.5 4H20v16h-6.5z"/></svg><span>成语</span></div>
+  <div class="tab"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span>例题</span></div>
+  <div class="tab on"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span>错题</span></div>
+  <div class="tab"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span>我的</span></div>
+</div>
+<div class="fab">
+  <svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13"/><circle cx="12" cy="13.5" r="3.6"/><path d="M8.5 7l1.4-3h4.2l1.4 3"/></svg>
+</div>
+</div>
+  </div>
+
+</div>
+
+<p class="grphd">P08 · 错题列表 · 待复习已清空<span>「开始复习」置灰，可改按成语看全部错题</span></p>
+
+<div class="row">
+
+  <div class="col">
+    <p class="vname">浅色模式 · 错题列表 · 待复习已清空<em>P08</em></p>
+
+    <div class="phone h812 lt">
+<div class="top"><div class="pname">错题</div><span class="topbtn"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13"/><circle cx="12" cy="13.5" r="3.6"/><path d="M8.5 7l1.4-3h4.2l1.4 3"/></svg>拍照录题</span></div>
+<div class="body" style="padding-top:16px">
+  <div class="card" style="padding:12px 16px">
+    <div class="nums tight" style="margin-top:0">
+      <div class="numcell"><div class="numv sm">12</div><div class="numl">错题总数</div></div>
+      <div class="numcell"><div class="numv sm hot">0</div><div class="numl">待复习</div></div>
+    </div>
+    <div class="row1" style="margin-top:10px;padding-top:10px;border-top:1px solid var(--line2)">
+      <span class="tag">待复习已清空</span>
+      <span class="more">按成语看全部错题 <svg class="ic sm ac" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></span>
+    </div>
+  </div>
+
+  <div class="seg" style="margin-bottom:12px"><i class="on">按成语分组</i><i>按录入时间</i><i>按考试类型</i></div>
+
+  <div class="list">
+    <div class="lrow">
+      <div class="row1"><span class="lname">按部就班</span><span class="r">3 道</span></div>
+      <p class="lsub">望文生义 2 · 对象误用 1</p>
+    </div>
+    <div class="lrow">
+      <div class="row1"><span class="lname">别出心裁</span><span class="r">2 道</span></div>
+      <p class="lsub">望文生义 1 · 感情色彩 1</p>
+    </div>
+    <div class="lrow">
+      <div class="row1"><span class="lname">墨守成规</span><span class="r">2 道</span></div>
+      <p class="lsub">对象误用 2</p>
+    </div>
+  </div>
+
+  <div class="disbtn" style="margin-top:16px">开始复习</div>
+  <p class="hint" style="margin-top:8px">当前没有待复习的错题，队列已清空</p>
+</div>
+<div class="tabs">
+  <div class="tab"><svg viewBox="0 0 24 24"><path d="M4 4h6.5v16H4z"/><path d="M13.5 4H20v16h-6.5z"/></svg><span>成语</span></div>
+  <div class="tab"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span>例题</span></div>
+  <div class="tab on"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span>错题</span></div>
+  <div class="tab"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span>我的</span></div>
+</div>
+<div class="fab">
+  <svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13"/><circle cx="12" cy="13.5" r="3.6"/><path d="M8.5 7l1.4-3h4.2l1.4 3"/></svg>
+</div>
+</div>
+  </div>
+
+  <div class="col">
+    <p class="vname">深色模式 · 错题列表 · 待复习已清空<em>P08</em></p>
+
+    <div class="phone h812 dk">
+<div class="top"><div class="pname">错题</div><span class="topbtn"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13"/><circle cx="12" cy="13.5" r="3.6"/><path d="M8.5 7l1.4-3h4.2l1.4 3"/></svg>拍照录题</span></div>
+<div class="body" style="padding-top:16px">
+  <div class="card" style="padding:12px 16px">
+    <div class="nums tight" style="margin-top:0">
+      <div class="numcell"><div class="numv sm">12</div><div class="numl">错题总数</div></div>
+      <div class="numcell"><div class="numv sm hot">0</div><div class="numl">待复习</div></div>
+    </div>
+    <div class="row1" style="margin-top:10px;padding-top:10px;border-top:1px solid var(--line2)">
+      <span class="tag">待复习已清空</span>
+      <span class="more">按成语看全部错题 <svg class="ic sm ac" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></span>
+    </div>
+  </div>
+
+  <div class="seg" style="margin-bottom:12px"><i class="on">按成语分组</i><i>按录入时间</i><i>按考试类型</i></div>
+
+  <div class="list">
+    <div class="lrow">
+      <div class="row1"><span class="lname">按部就班</span><span class="r">3 道</span></div>
+      <p class="lsub">望文生义 2 · 对象误用 1</p>
+    </div>
+    <div class="lrow">
+      <div class="row1"><span class="lname">别出心裁</span><span class="r">2 道</span></div>
+      <p class="lsub">望文生义 1 · 感情色彩 1</p>
+    </div>
+    <div class="lrow">
+      <div class="row1"><span class="lname">墨守成规</span><span class="r">2 道</span></div>
+      <p class="lsub">对象误用 2</p>
+    </div>
+  </div>
+
+  <div class="disbtn" style="margin-top:16px">开始复习</div>
+  <p class="hint" style="margin-top:8px">当前没有待复习的错题，队列已清空</p>
+</div>
+<div class="tabs">
+  <div class="tab"><svg viewBox="0 0 24 24"><path d="M4 4h6.5v16H4z"/><path d="M13.5 4H20v16h-6.5z"/></svg><span>成语</span></div>
+  <div class="tab"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span>例题</span></div>
+  <div class="tab on"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span>错题</span></div>
+  <div class="tab"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span>我的</span></div>
+</div>
+<div class="fab">
+  <svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13"/><circle cx="12" cy="13.5" r="3.6"/><path d="M8.5 7l1.4-3h4.2l1.4 3"/></svg>
+</div>
+</div>
+  </div>
+
+</div>
+
+<p class="grphd">P09 · 某成语下 · 错题已清空<span>只给一条出路：返回错题本</span></p>
+
+<div class="row">
+
+  <div class="col">
+    <p class="vname">浅色模式 · 某成语下 · 错题已清空<em>P09</em></p>
+
+    <div class="phone h812 lt">
+<div class="top"><svg class="ic" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg><div class="pname sub">按部就班</div></div>
+<div class="body" style="padding-top:16px">
+  <div class="card" style="padding:12px 16px">
+    <div class="row1"><span class="txt" style="margin:0;font-size:12px">贬义。原指依照条理，后多指照老规矩办事。</span><svg class="ic sm ac" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></div>
+  </div>
+
+  <div class="empty">
+    <div class="eic"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7"/><rect x="13" y="4" width="7" height="7"/><rect x="4" y="13" width="7" height="7"/><rect x="13" y="13" width="7" height="7"/></svg></div>
+    <p class="et1">这个成语下的错题已清空</p>
+    <p class="et2">之前录的题已经删掉或已归到别的成语下。</p>
+    <div class="eact"><div class="ghostbtn" style="flex:none;width:100%;display:block;margin:0">返回错题本</div></div>
+  </div>
+</div>
+</div>
+  </div>
+
+  <div class="col">
+    <p class="vname">深色模式 · 某成语下 · 错题已清空<em>P09</em></p>
+
+    <div class="phone h812 dk">
+<div class="top"><svg class="ic" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg><div class="pname sub">按部就班</div></div>
+<div class="body" style="padding-top:16px">
+  <div class="card" style="padding:12px 16px">
+    <div class="row1"><span class="txt" style="margin:0;font-size:12px">贬义。原指依照条理，后多指照老规矩办事。</span><svg class="ic sm ac" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></div>
+  </div>
+
+  <div class="empty">
+    <div class="eic"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7"/><rect x="13" y="4" width="7" height="7"/><rect x="4" y="13" width="7" height="7"/><rect x="13" y="13" width="7" height="7"/></svg></div>
+    <p class="et1">这个成语下的错题已清空</p>
+    <p class="et2">之前录的题已经删掉或已归到别的成语下。</p>
+    <div class="eact"><div class="ghostbtn" style="flex:none;width:100%;display:block;margin:0">返回错题本</div></div>
+  </div>
+</div>
+</div>
+  </div>
+
+</div>
+
+<p class="grphd">P11 · 复习队列（全局）· 无待复习<span>回错题本；说明回访节奏，避免像故障</span></p>
+
+<div class="row">
+
+  <div class="col">
+    <p class="vname">浅色模式 · 复习队列（全局）· 无待复习<em>P11</em></p>
+
+    <div class="phone h812 lt">
+<div class="top"><svg class="ic" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6l-12 12"/></svg><div class="pname sub">复习中</div></div>
+<div class="body">
+  <div class="empty">
+    <div class="eic"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7"/><rect x="13" y="4" width="7" height="7"/><rect x="4" y="13" width="7" height="7"/><rect x="13" y="13" width="7" height="7"/></svg></div>
+    <p class="et1">今天没有待复习的错题</p>
+    <p class="et2">MVP 不做记忆算法：待复习按最近录入优先排序，队列清空后这里就是空的。</p>
+    <div class="eact"><div class="ghostbtn" style="flex:none;width:100%;display:block;margin:0">回错题本</div></div>
+  </div>
+</div>
+</div>
+  </div>
+
+  <div class="col">
+    <p class="vname">深色模式 · 复习队列（全局）· 无待复习<em>P11</em></p>
+
+    <div class="phone h812 dk">
+<div class="top"><svg class="ic" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6l-12 12"/></svg><div class="pname sub">复习中</div></div>
+<div class="body">
+  <div class="empty">
+    <div class="eic"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7"/><rect x="13" y="4" width="7" height="7"/><rect x="4" y="13" width="7" height="7"/><rect x="13" y="13" width="7" height="7"/></svg></div>
+    <p class="et1">今天没有待复习的错题</p>
+    <p class="et2">MVP 不做记忆算法：待复习按最近录入优先排序，队列清空后这里就是空的。</p>
+    <div class="eact"><div class="ghostbtn" style="flex:none;width:100%;display:block;margin:0">回错题本</div></div>
+  </div>
+</div>
+</div>
+  </div>
+
+</div>
+
+<p class="grphd">P11 · 复习队列（单成语）· 无待复习<span>兜底态：按钮正常已置灰，直接进来走这条</span></p>
+
+<div class="row">
+
+  <div class="col">
+    <p class="vname">浅色模式 · 复习队列（单成语）· 无待复习<em>P11</em></p>
+
+    <div class="phone h812 lt">
+<div class="top"><svg class="ic" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6l-12 12"/></svg><div class="pname sub">复习 · 按部就班</div></div>
+<div class="body">
+  <div class="empty">
+    <div class="eic"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7"/><rect x="13" y="4" width="7" height="7"/><rect x="4" y="13" width="7" height="7"/><rect x="13" y="13" width="7" height="7"/></svg></div>
+    <p class="et1">这个成语下没有待复习的错题</p>
+    <p class="et2">这个入口正常是灰的；直接进来时走这条兜底。可以回成语详情看它的真题。</p>
+    <div class="eact"><div class="ghostbtn" style="flex:none;width:100%;display:block;margin:0">回成语详情</div></div>
+  </div>
+</div>
+</div>
+  </div>
+
+  <div class="col">
+    <p class="vname">深色模式 · 复习队列（单成语）· 无待复习<em>P11</em></p>
+
+    <div class="phone h812 dk">
+<div class="top"><svg class="ic" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6l-12 12"/></svg><div class="pname sub">复习 · 按部就班</div></div>
+<div class="body">
+  <div class="empty">
+    <div class="eic"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7"/><rect x="13" y="4" width="7" height="7"/><rect x="4" y="13" width="7" height="7"/><rect x="13" y="13" width="7" height="7"/></svg></div>
+    <p class="et1">这个成语下没有待复习的错题</p>
+    <p class="et2">这个入口正常是灰的；直接进来时走这条兜底。可以回成语详情看它的真题。</p>
+    <div class="eact"><div class="ghostbtn" style="flex:none;width:100%;display:block;margin:0">回成语详情</div></div>
+  </div>
+</div>
+</div>
+  </div>
+
+</div>
+
+<p class="grphd">P12 · 复习小结 · 0 题<span>异常情形，只给「回上一页」</span></p>
+
+<div class="row">
+
+  <div class="col">
+    <p class="vname">浅色模式 · 复习小结 · 0 题<em>P12</em></p>
+
+    <div class="phone h812 lt">
+<div class="top"><div class="pname sub">复习小结</div><span class="hint" style="margin:0">本轮结束</span></div>
+<div class="body" style="padding-top:16px">
+  <div class="card">
+    <div class="nums tight" style="margin-top:0">
+      <div class="numcell"><div class="numv sm">0</div><div class="numl">本轮题量</div></div>
+      <div class="numcell"><div class="numv sm">0</div><div class="numl">答对</div></div>
+      <div class="numcell"><div class="numv sm">0</div><div class="numl">答错</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="eb" style="padding:30px 14px">
+      <p class="et1" style="font-size:15px;color:var(--head)">这一轮没有题目</p>
+      <p class="et2">队列在开始时就被清空了，属异常情形，正常不会到这里。</p>
+    </div>
+  </div>
+
+  <div class="ghostbtn" style="flex:none;width:100%;display:block">回上一页</div>
+</div>
+</div>
+  </div>
+
+  <div class="col">
+    <p class="vname">深色模式 · 复习小结 · 0 题<em>P12</em></p>
+
+    <div class="phone h812 dk">
+<div class="top"><div class="pname sub">复习小结</div><span class="hint" style="margin:0">本轮结束</span></div>
+<div class="body" style="padding-top:16px">
+  <div class="card">
+    <div class="nums tight" style="margin-top:0">
+      <div class="numcell"><div class="numv sm">0</div><div class="numl">本轮题量</div></div>
+      <div class="numcell"><div class="numv sm">0</div><div class="numl">答对</div></div>
+      <div class="numcell"><div class="numv sm">0</div><div class="numl">答错</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="eb" style="padding:30px 14px">
+      <p class="et1" style="font-size:15px;color:var(--head)">这一轮没有题目</p>
+      <p class="et2">队列在开始时就被清空了，属异常情形，正常不会到这里。</p>
+    </div>
+  </div>
+
+  <div class="ghostbtn" style="flex:none;width:100%;display:block">回上一页</div>
+</div>
+</div>
+  </div>
+
+</div>
+
+<p class="grphd">P16 · 题库版本 · 检查失败<span>橙＝可恢复；版本号不变，主按钮是重试</span></p>
+
+<div class="row">
+
+  <div class="col">
+    <p class="vname">浅色模式 · 题库版本 · 检查失败<em>P16</em></p>
+
+    <div class="phone h812 lt">
+<div class="top"><svg class="ic" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg><div class="pname sub">题库版本与更新</div></div>
+<div class="body" style="padding-top:16px">
+  <div class="card">
+    <p class="lbl">当前题库版本</p>
+    <p style="margin:0;font-size:30px;font-weight:700;line-height:1;color:var(--head)">v1.0.0</p>
+    <p class="txt dim">内置版本，装好即可离线用</p>
+  </div>
+
+  <div class="warnbar">
+    <svg viewBox="0 0 24 24"><path d="M12 4l8 15H4z"/><path d="M12 9v4"/><path d="M12 16.5v.5"/></svg>
+    <div>
+      <div class="wt">检查失败，请检查网络后重试</div>
+      <div class="ws">当前版本号不变，仍是 v1.0.0；题库本身可离线继续用。</div>
+    </div>
+  </div>
+
+  <div class="btn">重试</div>
+  <p class="loadnote">失败不影响本机学习记录</p>
+
+  <div class="card" style="margin-top:16px">
+    <p class="lbl">重试前可以确认</p>
+    <p class="txt" style="margin:0 0 6px">是否连上了网络；下载中断时，重新点一次通常就能接上。</p>
+    <p class="txt dim">只下载题库增量包，不改动错题、收藏与学习状态。</p>
+  </div>
+</div>
+</div>
+  </div>
+
+  <div class="col">
+    <p class="vname">深色模式 · 题库版本 · 检查失败<em>P16</em></p>
+
+    <div class="phone h812 dk">
+<div class="top"><svg class="ic" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg><div class="pname sub">题库版本与更新</div></div>
+<div class="body" style="padding-top:16px">
+  <div class="card">
+    <p class="lbl">当前题库版本</p>
+    <p style="margin:0;font-size:30px;font-weight:700;line-height:1;color:var(--head)">v1.0.0</p>
+    <p class="txt dim">内置版本，装好即可离线用</p>
+  </div>
+
+  <div class="warnbar">
+    <svg viewBox="0 0 24 24"><path d="M12 4l8 15H4z"/><path d="M12 9v4"/><path d="M12 16.5v.5"/></svg>
+    <div>
+      <div class="wt">检查失败，请检查网络后重试</div>
+      <div class="ws">当前版本号不变，仍是 v1.0.0；题库本身可离线继续用。</div>
+    </div>
+  </div>
+
+  <div class="btn">重试</div>
+  <p class="loadnote">失败不影响本机学习记录</p>
+
+  <div class="card" style="margin-top:16px">
+    <p class="lbl">重试前可以确认</p>
+    <p class="txt" style="margin:0 0 6px">是否连上了网络；下载中断时，重新点一次通常就能接上。</p>
+    <p class="txt dim">只下载题库增量包，不改动错题、收藏与学习状态。</p>
+  </div>
+</div>
+</div>
+  </div>
+
+</div>
+
+<p class="grphd">P17 · 拍照 · 相机权限被拒<span>橙＝可恢复；两条退路：去系统设置 / 改用相册</span></p>
+
+<div class="row">
+
+  <div class="col">
+    <p class="vname">浅色模式 · 拍照 · 相机权限被拒<em>P17</em></p>
+
+    <div class="phone h812 lt">
+<div class="top" style="padding-bottom:12px"><svg class="ic" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6l-12 12"/></svg><div class="pname sub" style="font-size:15px">拍照</div></div>
+<div class="camview" style="align-items:center">
+  <div style="width:290px;padding:20px 18px;border-radius:6px;background:#1A3126;border:1px solid #2B4636;text-align:center">
+    <svg viewBox="0 0 24 24" style="width:30px;height:30px;fill:none;stroke:#FF8A00;stroke-width:1.6">
+      <rect x="3" y="7" width="18" height="13"/><circle cx="12" cy="13.5" r="3.6"/><path d="M8.5 7l1.4-3h4.2l1.4 3"/><path d="M3 21l18-18"/></svg>
+    <p style="margin:12px 0 6px;font-size:15px;font-weight:700;color:#E8F4EB">需要相机权限才能拍照</p>
+    <p style="margin:0;font-size:11.5px;line-height:1.7;color:#A6C2AE">系统里这项权限被关掉了。可以先去开启，也可以先用相册里的照片。</p>
+  </div>
+</div>
+<div style="padding:16px 20px 22px;background:#0b1410">
+  <div class="btn" style="margin:0">去系统设置</div>
+  <div class="ghostbtn" style="flex:none;width:100%;display:block;margin-top:10px;border-color:rgba(255,255,255,.3);color:rgba(255,255,255,.85)">改用相册</div>
+  <p style="margin:12px 0 0;text-align:center;font-size:11px;color:rgba(255,255,255,.6)">取消可回上一页</p>
+</div>
+</div>
+  </div>
+
+  <div class="col">
+    <p class="vname">深色模式 · 拍照 · 相机权限被拒<em>P17</em></p>
+
+    <div class="phone h812 dk">
+<div class="top" style="padding-bottom:12px"><svg class="ic" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6l-12 12"/></svg><div class="pname sub" style="font-size:15px">拍照</div></div>
+<div class="camview" style="align-items:center">
+  <div style="width:290px;padding:20px 18px;border-radius:6px;background:#1A3126;border:1px solid #2B4636;text-align:center">
+    <svg viewBox="0 0 24 24" style="width:30px;height:30px;fill:none;stroke:#FF8A00;stroke-width:1.6">
+      <rect x="3" y="7" width="18" height="13"/><circle cx="12" cy="13.5" r="3.6"/><path d="M8.5 7l1.4-3h4.2l1.4 3"/><path d="M3 21l18-18"/></svg>
+    <p style="margin:12px 0 6px;font-size:15px;font-weight:700;color:#E8F4EB">需要相机权限才能拍照</p>
+    <p style="margin:0;font-size:11.5px;line-height:1.7;color:#A6C2AE">系统里这项权限被关掉了。可以先去开启，也可以先用相册里的照片。</p>
+  </div>
+</div>
+<div style="padding:16px 20px 22px;background:#0b1410">
+  <div class="btn" style="margin:0">去系统设置</div>
+  <div class="ghostbtn" style="flex:none;width:100%;display:block;margin-top:10px;border-color:rgba(255,255,255,.3);color:rgba(255,255,255,.85)">改用相册</div>
+  <p style="margin:12px 0 0;text-align:center;font-size:11px;color:rgba(255,255,255,.6)">取消可回上一页</p>
+</div>
+</div>
+  </div>
+
+</div>
+
+<p class="grphd">P19 · 识别结果 · 没识别出文字<span>橙＝可恢复；三条退路：重拍 / 重新框选 / 手动补字</span></p>
+
+<div class="row">
+
+  <div class="col">
+    <p class="vname">浅色模式 · 识别结果 · 没识别出文字<em>P19</em></p>
+
+    <div class="phone h812 lt">
+<div class="top" style="padding-bottom:12px"><svg class="ic" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg><div class="pname sub" style="font-size:15px">识别结果</div><span class="steptxt">第 3 步 / 共 5 步</span></div>
+<div class="body" style="padding-top:16px">
+  <div class="row1" style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--line2)">
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="width:44px;height:44px;border-radius:4px;background:var(--phbg);border:1px dashed var(--phline);
+                   display:flex;align-items:center;justify-content:center">
+        <svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:none;stroke:var(--text3);stroke-width:1.5"><rect x="3" y="4" width="18" height="16"/><path d="M4 20l16-16"/></svg>
+      </span>
+      <span class="hint" style="margin:0">裁切图 · 可点开放大</span>
+    </div>
+    <span class="tag ghost">识别到 0 字</span>
+  </div>
+
+  <div class="warnbar">
+    <svg viewBox="0 0 24 24"><path d="M12 4l8 15H4z"/><path d="M12 9v4"/><path d="M12 16.5v.5"/></svg>
+    <div>
+      <div class="wt">这张图没识别出文字</div>
+      <div class="ws">可能是拍虚了、光线太暗，或框选里只有卷面的空白处。</div>
+    </div>
+  </div>
+
+  <div class="card soft">
+    <p class="lbl">有三条退路</p>
+    <p class="txt" style="margin:0 0 6px">重拍一张；回上一步把框选收紧到一道题；或者手动补字，直接进匹配页自己填。</p>
+    <p class="txt dim">手动补字后就是空文本进 P20，成语仍可手动挑。</p>
+  </div>
+
+  <div class="btn">手动补字</div>
+  <div class="smallrow" style="margin-top:10px">
+    <span class="ghostbtn">重拍</span>
+    <span class="ghostbtn">重新框选</span>
+  </div>
+</div>
+</div>
+  </div>
+
+  <div class="col">
+    <p class="vname">深色模式 · 识别结果 · 没识别出文字<em>P19</em></p>
+
+    <div class="phone h812 dk">
+<div class="top" style="padding-bottom:12px"><svg class="ic" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg><div class="pname sub" style="font-size:15px">识别结果</div><span class="steptxt">第 3 步 / 共 5 步</span></div>
+<div class="body" style="padding-top:16px">
+  <div class="row1" style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--line2)">
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="width:44px;height:44px;border-radius:4px;background:var(--phbg);border:1px dashed var(--phline);
+                   display:flex;align-items:center;justify-content:center">
+        <svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:none;stroke:var(--text3);stroke-width:1.5"><rect x="3" y="4" width="18" height="16"/><path d="M4 20l16-16"/></svg>
+      </span>
+      <span class="hint" style="margin:0">裁切图 · 可点开放大</span>
+    </div>
+    <span class="tag ghost">识别到 0 字</span>
+  </div>
+
+  <div class="warnbar">
+    <svg viewBox="0 0 24 24"><path d="M12 4l8 15H4z"/><path d="M12 9v4"/><path d="M12 16.5v.5"/></svg>
+    <div>
+      <div class="wt">这张图没识别出文字</div>
+      <div class="ws">可能是拍虚了、光线太暗，或框选里只有卷面的空白处。</div>
+    </div>
+  </div>
+
+  <div class="card soft">
+    <p class="lbl">有三条退路</p>
+    <p class="txt" style="margin:0 0 6px">重拍一张；回上一步把框选收紧到一道题；或者手动补字，直接进匹配页自己填。</p>
+    <p class="txt dim">手动补字后就是空文本进 P20，成语仍可手动挑。</p>
+  </div>
+
+  <div class="btn">手动补字</div>
+  <div class="smallrow" style="margin-top:10px">
+    <span class="ghostbtn">重拍</span>
+    <span class="ghostbtn">重新框选</span>
+  </div>
+</div>
+</div>
+  </div>
+
+</div>
+
+<p class="grphd">P20 · 匹配与修正 · 没匹配到成语<span>候选区空 + 手动挑成语（开 P04 搜索）；未选成语时保存不可用</span></p>
+
+<div class="row">
+
+  <div class="col">
+    <p class="vname">浅色模式 · 匹配与修正 · 没匹配到成语<em>P20</em></p>
+
+    <div class="phone h812 lt">
+<div class="top" style="padding-bottom:12px"><svg class="ic" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg><div class="pname sub" style="font-size:15px">匹配与修正</div><span class="steptxt">第 4 步 / 共 5 步</span></div>
+<div class="body" style="padding-top:16px">
+  <div class="card" style="padding:12px 16px">
+    <div class="row1"><span class="lbl" style="margin:0">识别文字回看</span><span class="linkbtn">改文字</span></div>
+    <p class="txt" style="margin-top:8px">下列各句中，加点的成语使用不恰当的一项是……</p>
+  </div>
+
+  <div class="card">
+    <p class="lbl">系统匹配的成语候选</p>
+    <div class="eb">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.6-4.6"/></svg>
+      <p class="et1">没匹配到成语，可手动选一个</p>
+      <p class="et2">文字里没有命中题库里的成语，或者识别时把成语拆断了。</p>
+      <div class="eact"><div class="btn" style="margin-top:0">手动挑成语</div></div>
+    </div>
+    <p class="hint" style="margin:10px 0 0;text-align:center">会开一个搜索浮层（同 P04），挑完回到这一页</p>
+  </div>
+
+  <p class="hint" style="margin-top:2px">我的答案、错因、标签、来源照常可填；成语没选中时「保存」不可用。</p>
+  <div class="disbtn" style="margin-top:10px">保存这道错题</div>
+</div>
+</div>
+  </div>
+
+  <div class="col">
+    <p class="vname">深色模式 · 匹配与修正 · 没匹配到成语<em>P20</em></p>
+
+    <div class="phone h812 dk">
+<div class="top" style="padding-bottom:12px"><svg class="ic" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg><div class="pname sub" style="font-size:15px">匹配与修正</div><span class="steptxt">第 4 步 / 共 5 步</span></div>
+<div class="body" style="padding-top:16px">
+  <div class="card" style="padding:12px 16px">
+    <div class="row1"><span class="lbl" style="margin:0">识别文字回看</span><span class="linkbtn">改文字</span></div>
+    <p class="txt" style="margin-top:8px">下列各句中，加点的成语使用不恰当的一项是……</p>
+  </div>
+
+  <div class="card">
+    <p class="lbl">系统匹配的成语候选</p>
+    <div class="eb">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.6-4.6"/></svg>
+      <p class="et1">没匹配到成语，可手动选一个</p>
+      <p class="et2">文字里没有命中题库里的成语，或者识别时把成语拆断了。</p>
+      <div class="eact"><div class="btn" style="margin-top:0">手动挑成语</div></div>
+    </div>
+    <p class="hint" style="margin:10px 0 0;text-align:center">会开一个搜索浮层（同 P04），挑完回到这一页</p>
+  </div>
+
+  <p class="hint" style="margin-top:2px">我的答案、错因、标签、来源照常可填；成语没选中时「保存」不可用。</p>
+  <div class="disbtn" style="margin-top:10px">保存这道错题</div>
+</div>
+</div>
+  </div>
+
+</div>
+
+<p class="grphd">P13 · 我的 · 新装统计全 0<span>四个数字写 0，不写「—」；清空入口与主态一致</span></p>
+
+<div class="row">
+
+  <div class="col">
+    <p class="vname">浅色模式 · 我的 · 新装统计全 0<em>P13</em></p>
+
+    <div class="phone h812 lt">
+<div class="top"><div class="pname">我的</div></div>
+<div class="body" style="padding-top:16px">
+  <div class="card" style="padding:12px 16px;margin-bottom:14px">
+    <div class="row1"><span class="range" style="margin:0">考试范围：<b>国考 · 事业编</b></span><svg class="ic sm ac" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></div>
+  </div>
+
+  <div class="card">
+    <p class="lbl">数据概览</p>
+    <div class="nums tight" style="margin-top:10px">
+      <div class="numcell"><div class="numv sm">0</div><div class="numl">已学成语</div></div>
+      <div class="numcell"><div class="numv sm">0</div><div class="numl">收藏</div></div>
+      <div class="numcell"><div class="numv sm">0</div><div class="numl">错题</div></div>
+      <div class="numcell"><div class="numv sm">0</div><div class="numl">待复习</div></div>
+    </div>
+    <p class="txt dim">新装状态：四个数都显示 0，不写「—」也不留白。</p>
+  </div>
+
+  <div class="list">
+    <div class="lrow"><div class="row1"><span class="lname">考试范围设置</span><svg class="ic sm ac" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></div></div>
+    <div class="lrow"><div class="row1"><span class="lname">备份与恢复</span><svg class="ic sm ac" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></div></div>
+    <div class="lrow"><div class="row1"><span class="lname">题库版本</span><svg class="ic sm ac" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></div></div>
+    <div class="lrow"><div class="row1"><span class="lname">复习提醒</span><span class="distag">进阶</span></div></div>
+  </div>
+
+  <p class="hint" style="text-align:center;margin-top:16px">版本 1.0.0 · 题库 v1.0.0</p>
+</div>
+</div>
+  </div>
+
+  <div class="col">
+    <p class="vname">深色模式 · 我的 · 新装统计全 0<em>P13</em></p>
+
+    <div class="phone h812 dk">
+<div class="top"><div class="pname">我的</div></div>
+<div class="body" style="padding-top:16px">
+  <div class="card" style="padding:12px 16px;margin-bottom:14px">
+    <div class="row1"><span class="range" style="margin:0">考试范围：<b>国考 · 事业编</b></span><svg class="ic sm ac" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></div>
+  </div>
+
+  <div class="card">
+    <p class="lbl">数据概览</p>
+    <div class="nums tight" style="margin-top:10px">
+      <div class="numcell"><div class="numv sm">0</div><div class="numl">已学成语</div></div>
+      <div class="numcell"><div class="numv sm">0</div><div class="numl">收藏</div></div>
+      <div class="numcell"><div class="numv sm">0</div><div class="numl">错题</div></div>
+      <div class="numcell"><div class="numv sm">0</div><div class="numl">待复习</div></div>
+    </div>
+    <p class="txt dim">新装状态：四个数都显示 0，不写「—」也不留白。</p>
+  </div>
+
+  <div class="list">
+    <div class="lrow"><div class="row1"><span class="lname">考试范围设置</span><svg class="ic sm ac" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></div></div>
+    <div class="lrow"><div class="row1"><span class="lname">备份与恢复</span><svg class="ic sm ac" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></div></div>
+    <div class="lrow"><div class="row1"><span class="lname">题库版本</span><svg class="ic sm ac" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></div></div>
+    <div class="lrow"><div class="row1"><span class="lname">复习提醒</span><span class="distag">进阶</span></div></div>
+  </div>
+
+  <p class="hint" style="text-align:center;margin-top:16px">版本 1.0.0 · 题库 v1.0.0</p>
+</div>
+</div>
+  </div>
+
+</div>
+
+
+<p class="grphd">覆盖表 · IA 5.4 全 25 行对照<span>哪一行进了屏、哪一行按规则不画，逐条对齐</span></p>
+<div style="max-width:830px">
+<table style="width:100%;border-collapse:collapse;border-top:2px solid #b9bfc4">
+<tr><th style="text-align:left;padding:9px 10px;font-size:11px;letter-spacing:.06em;color:#5c6369;border-bottom:2px solid #22262a">#</th><th style="text-align:left;padding:9px 10px;font-size:11px;letter-spacing:.06em;color:#5c6369;border-bottom:2px solid #22262a">IA 5.4 条目</th><th style="text-align:left;padding:9px 10px;font-size:11px;letter-spacing:.06em;color:#5c6369;border-bottom:2px solid #22262a">本稿处理</th><th style="text-align:left;padding:9px 10px;font-size:11px;letter-spacing:.06em;color:#5c6369;border-bottom:2px solid #22262a">色与按钮语义</th></tr>
+<tr><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#5c6369;width:34px">1</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6">P02 推荐区没有内容</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#22262a">E02 单独出稿</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#4a5157">中性占位，无按钮</td></tr>
+<tr><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#5c6369;width:34px">2</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6">P02 新装错题数 0</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#22262a">E03 单独出稿</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#4a5157">中性；数字写 0</td></tr>
+<tr><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#5c6369;width:34px">3</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6">P03 该范围+首字母下没有成语</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#22262a">E05 单独出稿</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#4a5157">中性；主按钮绿（清除条件）</td></tr>
+<tr><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#5c6369;width:34px">4</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6">P02 / P03 省考未选省份</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#22262a">E04 出 P03 视角；P02 省考未选省份提示见全页 A v2 推荐首页主态范围行，本稿不重复出屏</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#4a5157">橙一处 + 绿链接</td></tr>
+<tr><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#5c6369;width:34px">5</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6">P04 输入无匹配</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#22262a">E06 单独出稿</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#4a5157">中性；不清空输入</td></tr>
+<tr><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#5c6369;width:34px">6</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6">P05 暂无关联真题</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#22262a">E07 单独出稿</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#4a5157">中性；区块不隐藏、无按钮</td></tr>
+<tr><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#5c6369;width:34px">7</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6">P05 错过 0 题</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#22262a">E08 单独出稿</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#4a5157">中性；数字灰不可点，给导航按钮</td></tr>
+<tr><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#5c6369;width:34px">8</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6">P05 复习按钮无内容</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#22262a">E09 单独出稿</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#4a5157">中性；按钮走 disbtn</td></tr>
+<tr><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#5c6369;width:34px">9</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6">P06 当前范围没有例题</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#22262a">E10 单独出稿</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#4a5157">中性；主按钮绿（去范围设置）</td></tr>
+<tr><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#5c6369;width:34px">10</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6">P07 未关联任何成语</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#22262a">E11 单独出稿</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#4a5157">中性；只说明不给出路</td></tr>
+<tr><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#5c6369;width:34px">11</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6">P08 一条错题都没有</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#22262a">E12 单独出稿</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#4a5157">中性；主按钮绿（拍照录入第一道题）</td></tr>
+<tr><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#5c6369;width:34px">12</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6">P08 待复习为 0</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#22262a">E13 单独出稿</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#4a5157">中性绿标；开始复习置灰</td></tr>
+<tr><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#5c6369;width:34px">13</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6">P09 该成语下错题被删空</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#22262a">E14 单独出稿</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#4a5157">中性；幽灵按钮返回</td></tr>
+<tr><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#5c6369;width:34px">14</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6">P10 原图文件丢失</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#22262a">已在主态覆盖（P10 图片位即「原图已不在」橙占位）</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#4a5157">橙一处 + 底部红描边删除</td></tr>
+<tr><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#5c6369;width:34px">15</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6">P11 全局无待复习</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#22262a">E15 单独出稿</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#4a5157">中性；幽灵按钮回错题本</td></tr>
+<tr><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#5c6369;width:34px">16</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6">P11 单成语无待复习</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#22262a">E16 单独出稿</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#4a5157">中性；幽灵按钮回成语详情</td></tr>
+<tr><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#5c6369;width:34px">17</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6">P12 本轮 0 题</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#22262a">E17 单独出稿</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#4a5157">中性；只给回上一页</td></tr>
+<tr><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#5c6369;width:34px">18</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6">P15 选文件时目录为空</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#22262a">不出稿：跟随系统文件面板自身空态，App 不自造第二套</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#4a5157">—</td></tr>
+<tr><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#5c6369;width:34px">19</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6">P16 检查失败 / 下载中断</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#22262a">E18 单独出稿</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#4a5157">橙＝可恢复；主按钮绿（重试）</td></tr>
+<tr><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#5c6369;width:34px">20</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6">P16 版本号已一致</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#22262a">已在主态覆盖（P16 更新状态区「已是最新版本」tag）</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#4a5157">中性绿标</td></tr>
+<tr><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#5c6369;width:34px">21</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6">P17 相机权限被拒</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#22262a">E19 单独出稿</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#4a5157">橙＝可恢复；两条退路</td></tr>
+<tr><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#5c6369;width:34px">22</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6">P19 识别不出文字</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#22262a">E20 单独出稿</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#4a5157">橙＝可恢复；三条退路</td></tr>
+<tr><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#5c6369;width:34px">23</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6">P20 匹配不到任何成语</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#22262a">E21 单独出稿</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#4a5157">中性；主按钮绿（手动挑成语），保存置灰</td></tr>
+<tr><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#5c6369;width:34px">24</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6">P13 新装统计全 0</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#22262a">E22 单独出稿</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#4a5157">中性；四个 0，不写「—」</td></tr>
+<tr><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#5c6369;width:34px">25</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6">P01 三项全取消</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#22262a">E01 单独出稿</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#4a5157">中性软提示；进入与跳过照常可点</td></tr>
+</table>
+</div>
+
+<p class="grphd">三条不单独出稿的理由<span>写下来是为了下一轮别重复问</span></p>
+<div class="row" style="align-items:stretch">
+  <div class="col" style="flex:0 0 263px;width:263px">
+    <p class="cap">P15 · 系统文件面板空</p>
+    <p class="sub">选文件这一步在系统面板里完成，空态由系统给。App 再画一套会变成两个空态打架，规范也不允许自造第二套；取消即回 P15。</p>
+  </div>
+  <div class="col" style="flex:0 0 263px;width:263px">
+    <p class="cap">P10 · 原图丢失</p>
+    <p class="sub">主态 P10 画的就是这一态：橙色虚线图片位 +「原图已不在」+ 一句「题干、选项与解析仍可查看与重做」，正文照常，底部红描边删除。</p>
+  </div>
+  <div class="col" style="flex:0 0 263px;width:263px">
+    <p class="cap">P16 · 已是最新版本</p>
+    <p class="sub">主态 P16 的更新状态区已带「已是最新版本」标签，与失败态共用同一块位置，只换内容与颜色；再单出一屏只是改一句话。</p>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 取自 shared/tokens/tokens.json color.light.accent（#008000），令牌改值时此处同步 -->
+    <color name="ic_launcher_bg">#008000</color>
+</resources>

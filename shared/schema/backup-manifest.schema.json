@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "chenyubang/backup-manifest",
+  "title": "备份包 manifest.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "appVersion", "build", "exportedAt", "counts", "sha256"],
+  "properties": {
+    "schemaVersion": { "type": "integer", "minimum": 1 },
+    "appVersion": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+" },
+    "build": { "type": "integer", "minimum": 1 },
+    "exportedAt": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$" },
+    "counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mistakes", "reviews", "idiomStates", "scopes"],
+      "properties": {
+        "mistakes": { "type": "integer", "minimum": 0 },
+        "reviews": { "type": "integer", "minimum": 0 },
+        "idiomStates": { "type": "integer", "minimum": 0 },
+        "scopes": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+  }
+}

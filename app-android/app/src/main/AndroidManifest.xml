@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 权限口径见 docs/开发规范-v1.4.md §2.3、§13.1：端侧离线 OCR，不允许为 OCR 引入联网 -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- 拍照/裁切（P17–P20） -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <!-- 题库更新（P16）与备份存网盘（P15）是产品允许的两处联网 -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- 相册选图走系统 Photo Picker / SAF，不申请 READ_MEDIA_IMAGES / READ_EXTERNAL_STORAGE（规范 §13.1） -->
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
+    <application
+        android:allowBackup="false"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.ChenYuBang">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- 备份包导出/分享需要把缓存目录里的 zip 交给系统选择器 -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+    </application>
+</manifest>

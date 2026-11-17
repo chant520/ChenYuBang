@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- 打开的书：成语学习工具的占位图标，白色前景叠 accent 底 -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M30,40 C38,36 46,36 54,40 C62,36 70,36 78,40 L78,70 C70,66 62,66 54,70 C46,66 38,66 30,70 Z" />
+    <path
+        android:strokeColor="#008000"
+        android:strokeWidth="2.5"
+        android:pathData="M54,40 L54,70" />
+</vector>

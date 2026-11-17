@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>emerald · 橙 + 红 · 高保真试色 v0.10</title>
+<style>
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; padding: 34px 26px 80px; background: #e8eaec; color: #1a1a1a;
+    font-family: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 830px; margin: 0 auto; }
+
+  .hd { border-bottom: 3px solid #22262a; padding-bottom: 18px; margin-bottom: 28px; }
+  .hd h1 { margin: 0 0 12px; font-size: 23px; letter-spacing: .01em; }
+  .hd p { margin: 0 0 7px; font-size: 13.5px; line-height: 1.75; color: #3c4147; max-width: 790px; }
+  .hd p:last-child { margin-bottom: 0; }
+
+  .row { display: flex; gap: 26px; align-items: flex-start; flex-wrap: wrap; }
+  .col { flex: 0 0 375px; width: 375px; }
+
+  .vname { margin: 0 0 12px; font-size: 15px; font-weight: 700; letter-spacing: .02em; }
+  .vname em { font-style: normal; font-weight: 400; font-size: 12px; color: #5c6369; margin-left: 8px; }
+
+  .grphd { margin: 34px 0 14px; padding-top: 12px; border-top: 2px solid #b9bfc4;
+           font-size: 13px; font-weight: 700; letter-spacing: .04em; color: #22262a; }
+  .grphd span { font-weight: 400; color: #5c6369; margin-left: 8px; letter-spacing: 0; }
+
+  .phone {
+    position: relative; width: 375px; display: flex; flex-direction: column;
+    border-radius: 2px; overflow: hidden; background: var(--page); color: var(--text);
+  }
+  .phone.h812 { height: 812px; }
+  .phone.tall { min-height: 812px; overflow: visible; }
+
+  .top { display: flex; align-items: center; gap: 10px; flex: 0 0 auto;
+         padding: 20px 20px 15px; border-bottom: 1px solid var(--line); }
+  .pname { flex: 1; font-size: 20px; font-weight: 700; letter-spacing: .02em; color: var(--head); }
+
+  .ic { width: 21px; height: 21px; flex: 0 0 auto; fill: none; stroke: var(--text2); stroke-width: 1.6; stroke-linecap: square; }
+  .ic.ac { stroke: var(--accent); }
+  .ic.dim { stroke: var(--text3); }
+  .ic.sm { width: 15px; height: 15px; }
+
+  .topbtn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 11px; border-radius: 5px;
+            background: var(--btnbg); color: var(--btnfg); font-size: 11.5px; font-weight: 700; white-space: nowrap; }
+  .topbtn svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.7; }
+
+  .body { flex: 1; padding: 18px 20px 20px; display: flex; flex-direction: column; }
+
+  .ph-rec {
+    flex: 1 1 auto; min-height: 150px; max-height: 265px; margin-bottom: 16px;
+    display: flex; align-items: center; justify-content: center; padding: 0 26px;
+    background: var(--phbg); border: 1px dashed var(--phline); border-radius: 6px;
+  }
+  .ph-rec p { margin: 0; font-size: 13px; line-height: 1.75; color: var(--text3); text-align: center; }
+
+  .card { padding: 16px; margin-bottom: 16px; border-radius: 6px;
+          background: var(--surface); border: 1px solid var(--line); }
+  .card.soft { background: var(--surface2); }
+  .ctitle { font-size: 15px; font-weight: 700; color: var(--head); letter-spacing: .01em; }
+
+  .row1 { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+
+  .range { margin: 11px 0 0; font-size: 13px; line-height: 1.65; color: var(--text2); }
+  .range b { font-weight: 600; color: var(--text); }
+  .warn { color: var(--warnfg); font-weight: 600; border-bottom: 1px dashed var(--warnfg); padding-bottom: 1px; }
+
+  .hintrow { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+  .hint { margin: 0; font-size: 12px; line-height: 1.65; color: var(--text3); }
+  .linkbtn { font-size: 12px; color: var(--accent); border-bottom: 1px solid var(--accent); padding-bottom: 1px; cursor: default; }
+  .linkbtn.mut { color: var(--text2); border-bottom-color: var(--text2); }
+  .dims { margin: 13px 0 0; padding-top: 13px; border-top: 1px solid var(--line2);
+          font-size: 12px; line-height: 1.6; color: var(--text3); }
+
+  .more { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--text2); white-space: nowrap; }
+  .more svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 1.6; }
+
+  .nums { display: flex; gap: 44px; margin-top: 17px; }
+  .numcell { display: flex; flex-direction: column; align-items: flex-start; }
+  .numv { font-size: 30px; font-weight: 700; line-height: 1; letter-spacing: .01em; color: var(--head); }
+  .numv.hot { color: var(--hot); }
+  .numl { margin-top: 9px; font-size: 11px; color: var(--text2); letter-spacing: .06em; }
+
+  .tabs { display: flex; flex: 0 0 auto; background: var(--tabbg); border-top: 1px solid var(--line); }
+  .tab { flex: 1; position: relative; text-align: center; padding: 11px 0 13px; font-size: 11px; color: var(--text3); }
+  .tab svg { display: block; margin: 0 auto 5px; width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.5; }
+  .tab.on { color: var(--accent); font-weight: 700; }
+  .tab.on::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--accent); }
+
+  .fab { position: absolute; right: 20px; bottom: 88px; width: 52px; height: 52px; border-radius: 6px;
+         background: var(--fab); box-shadow: var(--fabshadow);
+         display: flex; align-items: center; justify-content: center; }
+  .fab svg { width: 24px; height: 24px; fill: none; stroke: var(--fabicon); stroke-width: 1.6; }
+
+  .btn { display: block; width: 100%; margin: 6px 0 0; padding: 13px 0; text-align: center;
+         border-radius: 6px; font-size: 14px; font-weight: 700; letter-spacing: .02em;
+         background: var(--btnbg); color: var(--btnfg); border: 1px solid var(--btnline); }
+
+  .lbl { margin: 0 0 8px; font-size: 11px; font-weight: 700; letter-spacing: .1em; color: var(--text3); }
+  .txt { margin: 0 0 8px; font-size: 13px; line-height: 1.7; color: var(--text2); }
+  .txt:last-child { margin-bottom: 0; }
+  .txt b { color: var(--text); font-weight: 700; }
+  .txt.dim { margin: 6px 0 0; font-size: 11.5px; color: var(--text3); }
+
+  .tagrow { display: flex; gap: 8px; flex-wrap: wrap; }
+  .tag { padding: 4px 9px; border-radius: 4px; font-size: 11px; line-height: 1.4;
+         background: var(--tintbg); color: var(--tintfg); border: 1px solid var(--tintline); }
+  .tag.ghost { background: transparent; color: var(--text3); border: 1px dashed var(--line); }
+
+  .cutline { position: absolute; left: 0; right: 0; top: 812px; border-top: 1px dashed var(--cut); }
+  .cutline span { position: absolute; right: 8px; top: -9px; padding: 0 6px; background: var(--page);
+                  font-size: 10px; color: var(--text3); font-family: ui-monospace, Consolas, monospace; }
+
+  /* ============ 警示构件 ============ */
+  .warnbar { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; margin-bottom: 16px;
+             border-radius: 6px; background: var(--warnbg); border: 1px solid var(--warnline); }
+  .warnbar svg { width: 18px; height: 18px; margin-top: 2px; flex: 0 0 auto;
+                 fill: none; stroke: var(--warnfg); stroke-width: 1.8; }
+  .warnbar .wt { font-size: 13px; font-weight: 700; line-height: 1.55; color: var(--warnfg); }
+  .warnbar .ws { margin-top: 4px; font-size: 11.5px; line-height: 1.65; color: var(--text2); }
+
+  .winline { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--warnfg); }
+  .winline svg { width: 13px; height: 13px; fill: none; stroke: var(--warnfg); stroke-width: 1.9; }
+
+  .danger { font-size: 12.5px; font-weight: 600; color: var(--errfg); }
+  .dangerbtn { display: block; width: 100%; padding: 12px 0; text-align: center; border-radius: 6px;
+               font-size: 13.5px; font-weight: 700; background: var(--errfill); color: var(--errfillfg);
+               border: 1px solid var(--errfill); }
+  .dangerout { display: block; width: 100%; padding: 12px 0; text-align: center; border-radius: 6px;
+               font-size: 13.5px; font-weight: 700; color: var(--errfg); background: transparent;
+               border: 1px solid var(--errline); }
+  .badgewarn { display: inline-block; padding: 2px 6px; border-radius: 3px; font-size: 10px;
+               background: var(--warnbg); color: var(--warnfg); border: 1px solid var(--warnline); }
+  .badgerr { display: inline-block; padding: 2px 6px; border-radius: 3px; font-size: 10px;
+             background: var(--errbg); color: var(--errfg); border: 1px solid var(--errline); }
+
+  .errbar { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; margin-bottom: 16px;
+            border-radius: 6px; background: var(--errbg); border: 1px solid var(--errline); }
+  .errbar svg { width: 18px; height: 18px; margin-top: 2px; flex: 0 0 auto;
+                fill: none; stroke: var(--errfg); stroke-width: 1.8; }
+  .errbar .et { font-size: 13px; font-weight: 700; line-height: 1.55; color: var(--errfg); }
+  .errbar .es { margin-top: 4px; font-size: 11.5px; line-height: 1.65; color: var(--text2); }
+
+  .errline-txt { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--errfg); }
+  .errline-txt svg { width: 13px; height: 13px; fill: none; stroke: var(--errfg); stroke-width: 1.9; }
+
+  .imgph { height: 150px; margin-bottom: 16px; border-radius: 6px; border: 1px dashed var(--warnline);
+           background: var(--warnbg); display: flex; flex-direction: column;
+           align-items: center; justify-content: center; gap: 7px; }
+  .imgph svg { width: 26px; height: 26px; fill: none; stroke: var(--warnfg); stroke-width: 1.7; }
+  .imgph p { margin: 0; font-size: 12.5px; font-weight: 700; color: var(--warnfg); }
+  .imgph span { font-size: 11px; color: var(--text2); }
+
+  .optrow { display: flex; gap: 9px; padding: 8px 0; font-size: 13px; line-height: 1.6;
+            color: var(--text2); border-bottom: 1px solid var(--line2); }
+  .optrow b { flex: 0 0 14px; color: var(--text); font-weight: 700; }
+  .optrow b.w2 { flex: 0 0 31px; font-weight: 600; color: var(--text2); }
+  .optrow:last-child { border-bottom: 0; padding-bottom: 0; }
+
+  .maskrow { display: flex; align-items: center; justify-content: space-between; gap: 10px;
+             padding: 11px 12px; margin-bottom: 12px; border-radius: 5px;
+             border: 1px solid var(--line); background: var(--inputbg);
+             font-size: 12px; color: var(--text2); }
+  .maskrow .mbtn { font-size: 11.5px; font-weight: 700; color: var(--accent); }
+
+  .steps { display: flex; align-items: center; gap: 4px; margin-left: auto; }
+  .steps i { display: block; width: 12px; height: 3px; border-radius: 2px; background: var(--line); }
+  .steps i.on { background: var(--accent); }
+  .steptxt { margin-left: 7px; font-size: 11px; color: var(--text3); }
+
+  .smallrow { display: flex; gap: 8px; margin: 11px 0 0; }
+  .ghostbtn { flex: 1; padding: 10px 0; text-align: center; font-size: 11.5px; border-radius: 5px;
+              border: 1px solid var(--line); color: var(--text2); }
+
+  /* ============ 禁用态 / 加载态构件 ============ */
+  .disbtn { display: block; width: 100%; padding: 12px 0; text-align: center; border-radius: 6px;
+            font-size: 13.5px; font-weight: 700; background: var(--disbg); color: var(--disfg);
+            border: 1px solid var(--disline); }
+  .disinput { display: flex; align-items: center; min-height: 42px; padding: 10px 12px; border-radius: 5px;
+              background: var(--disbg); color: var(--disfg); border: 1px solid var(--disline); font-size: 12.5px; }
+  .distag { display: inline-block; padding: 4px 9px; border-radius: 4px; font-size: 11px;
+            background: var(--disbg); color: var(--disfg); border: 1px solid var(--disline); }
+  .btn.loading { display: flex; align-items: center; justify-content: center; gap: 9px; cursor: default; }
+  .spinner { width: 14px; height: 14px; border: 2px solid currentColor; border-right-color: transparent;
+             border-radius: 50%; animation: spin .8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loadnote { margin: 7px 0 0; font-size: 11px; line-height: 1.65; color: var(--text3); }
+  .skel { display: flex; flex-direction: column; gap: 11px; }
+  .skrow { display: flex; gap: 10px; align-items: center; }
+  .skbox { position: relative; overflow: hidden; background: var(--skel); border-radius: 4px; }
+  .skbox::after { content: ""; position: absolute; inset: 0;
+                  background: linear-gradient(90deg, transparent, var(--skelhi), transparent);
+                  transform: translateX(-100%); animation: shimmer 1.5s ease-in-out infinite; }
+  @keyframes shimmer { to { transform: translateX(100%); } }
+
+  /* ============ 可编辑输入框 · 聚焦态 / 校验错误态（v0.10 新增） ============ */
+  .editinput { display: flex; align-items: center; min-height: 42px; padding: 11px 12px; border-radius: 5px;
+               background: var(--inputbg); border: 1px solid var(--line);
+               font-size: 12px; line-height: 1.6; color: var(--text); }
+  .editinput .iph { color: var(--text3); }
+  .editinput.focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--tintbg); }
+  .editinput.err { border-color: var(--errline); color: var(--errfg); }
+  .errhint { margin: 6px 0 0; font-size: 11.5px; line-height: 1.55; color: var(--errfg); }
+
+  .lt {
+    --page: #F3F9F5;
+    --head: #12291C;
+    --text: #183828;
+    --text2: #4F6B5B;
+    --text3: #5E7569;
+    --line: #D6EADD;
+    --line2: #E4F1E9;
+    --surface: #FFFFFF;
+    --surface2: #EDF8F1;
+    --tintbg: #F0FAF4;
+    --tintfg: #008000;
+    --tintline: #BFE6CC;
+    --accent: #008000;
+    --accent2: #009E60;
+    --hot: #009E60;
+    --warnline: #F3C9A8;
+    --warnfg: #C2410C;
+    --warnbg: #FFF3E6;
+    --errfg: #C62828;
+    --errbg: #FDECEA;
+    --errline: #F0BEBE;
+    --errfill: #C62828;
+    --errfillfg: #FFFFFF;
+    --phbg: #ECF7F0;
+    --phline: #CFE8D9;
+    --tabbg: #FFFFFF;
+    --seg: #ECF7F0;
+    --segon: #008000;
+    --segonfg: #FFFFFF;
+    --inputbg: #F7FBF8;
+    --chkfg: #FFFFFF;
+    --fab: #008000;
+    --fabicon: #FFFFFF;
+    --fabshadow: 0 8px 18px rgba(0,128,0,.22);
+    --btnbg: #008000;
+    --btnfg: #FFFFFF;
+    --btnline: #008000;
+    --disbg: #E6EFE9;
+    --disfg: #93A99C;
+    --disline: #DCE8E1;
+    --loadbg: #008000;
+    --loadfg: #FFFFFF;
+    --skel: #DCE9E0;
+    --skelhi: #F1F8F3;
+    --cut: #BBDCC9;
+  }
+
+  .dk {
+    --page: #101E17;
+    --head: #E8F4EB;
+    --text: #D5E8DA;
+    --text2: #A6C2AE;
+    --text3: #7E9B88;
+    --line: #2B4636;
+    --line2: #23392C;
+    --surface: #1A3126;
+    --surface2: #152A20;
+    --tintbg: rgba(80,200,120,.12);
+    --tintfg: #50C878;
+    --tintline: rgba(80,200,120,.38);
+    --accent: #50C878;
+    --accent2: #009E60;
+    --hot: #009E60;
+    --warnline: rgba(255,138,0,.42);
+    --warnfg: #FF8A00;
+    --warnbg: rgba(255,138,0,.14);
+    --errfg: #FF8A80;
+    --errbg: rgba(255,138,128,.14);
+    --errline: rgba(255,138,128,.42);
+    --errfill: #FF8A80;
+    --errfillfg: #0C1A12;
+    --phbg: #16291F;
+    --phline: #2A4433;
+    --tabbg: #15251C;
+    --seg: #16291F;
+    --segon: #50C878;
+    --segonfg: #0C1A12;
+    --inputbg: #152A20;
+    --chkfg: #0C1A12;
+    --fab: #50C878;
+    --fabicon: #0C1A12;
+    --fabshadow: 0 0 0 1px rgba(80,200,120,.35), 0 8px 24px rgba(80,200,120,.30);
+    --btnbg: #50C878;
+    --btnfg: #0C1A12;
+    --btnline: #50C878;
+    --disbg: #1E3327;
+    --disfg: #6E8A78;
+    --disline: #2B4636;
+    --loadbg: #50C878;
+    --loadfg: #0C1A12;
+    --skel: #23392C;
+    --skelhi: #2E4A39;
+    --cut: #2E4A39;
+  }
+
+  .cap { margin: 12px 0 0; font-size: 13px; font-weight: 700; }
+  .sub { margin: 5px 0 0; font-size: 12px; line-height: 1.7; color: #5c6369; }
+
+  .sheet { width: 375px; padding: 18px 20px 20px; border-radius: 2px;
+           background: var(--page); color: var(--text); }
+  .fig { margin-bottom: 18px; }
+  .fig:last-child { margin-bottom: 0; }
+  .figcap { margin-bottom: 8px; font-size: 10px; font-weight: 700; letter-spacing: .1em; color: var(--text3); }
+
+  .panel { margin-top: 14px; background: #ffffff; border: 1px solid #d3d7da; border-radius: 3px; padding: 14px 16px 16px; }
+  .panel .mood { margin: 0 0 14px; padding-bottom: 12px; border-bottom: 1px solid #e6e9eb; font-size: 12px; line-height: 1.8; color: #22262a; }
+  .panel .mood b { font-weight: 700; }
+  .grp { margin: 0 0 13px; }
+  .grp:last-child { margin-bottom: 0; }
+  .grp h4 { margin: 0 0 7px; font-size: 11px; font-weight: 700; letter-spacing: .12em; color: #6b7176; }
+  .spec { display: grid; grid-template-columns: 80px 1fr; gap: 5px 10px; margin: 0; font-size: 11.5px; line-height: 1.55; }
+  .spec dt { margin: 0; color: #6b7176; white-space: nowrap; }
+  .spec dd { margin: 0; color: #22262a; }
+  .hex { font-family: ui-monospace, "SFMono-Regular", Consolas, monospace; font-size: 11px; letter-spacing: .02em; }
+  .sw { display: inline-block; width: 11px; height: 11px; margin-right: 5px; vertical-align: -1px;
+        border: 1px solid rgba(0, 0, 0, .14); border-radius: 1px; }
+  .rule { margin: 0; font-size: 11.5px; line-height: 1.8; color: #22262a; }
+
+  .foot { margin-top: 30px; padding-top: 16px; border-top: 1px solid #c9ced2; font-size: 12px; line-height: 1.8; color: #5c6369; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hd">
+  <h1>emerald-green-essence · 橙 + 红 · 高保真试色 v0.10</h1>
+  <p style="color:#22262a"><strong>v0.10 基于 v0.9，仅新增一组（用户 2026-11-16 拍板）：</strong>补齐正常可编辑输入框的两态——聚焦态与校验错误态，浅深各一套，含默认态对照、逐态取值说明与参数面板。两态不新增任何色值：聚焦态描边用主色 <span class="hex">--accent</span>（可加 2px <span class="hex">--tintbg</span> 柔光），校验错误态用红系 <span class="hex">--errline</span> / <span class="hex">--errfg</span>，几何沿用既有输入构件 <span class="hex">.maskrow</span> 与 <span class="hex">.disinput</span>。两态对比度按 WCAG2 脚本复算（容差 ±0.05），见第八组参数面板。v0.9 及以下全部保留为历史版本，内容不动。</p>
+  <p style="color:#22262a"><strong>v0.9 基于 v0.8，落地三项（用户 2026-11-16 拍板）：</strong>① P10 同屏两处红收敛为一处——顶部「删除」改中性色 <span class="hex">--text2</span>（与同排「编辑」同一组件层级，仅换中性文字色），底部「删除这道错题」红按钮保留为唯一红动作；组件展示板里的危险动作文字样例保留，不受一处红限制。② P10 文案以本试色稿为准，线框 v0.2 同步（题干、A/B/C/D、正确答案 A、解析）。③ 补齐禁用态展示（禁用按钮 / 禁用输入 / 禁用标签，浅深各一组），新增加载态配色与展示（加载中按钮 + 骨架屏，浅深各一套），色值、理由与脚本复算对比度见第七组参数面板。浅色定稿值、橙红规范值、深色页底 <span class="hex">#101E17</span> 口径、P19「回 P18 裁切页重新框选」文案全部沿用 v0.8 不改；v0.8 保留为历史版本。</p>
+  <p style="color:#22262a"><strong>v0.8 基于 v0.7，仅修改三处（用户 2026-11-16 拍板）：</strong>① 橙色方案定为项目规范值：浅 <span class="hex">#C2410C</span> / 深 <span class="hex">#FF8A00</span>，含各自的底、描边与 14% / 42% 混合口径；② 红色方案定为项目规范值：浅 <span class="hex">#C62828</span> / 深 <span class="hex">#FF8A80</span>，含各自的底、描边与 14% / 42% 混合口径；③ 深色模式 14% / 42% 警示底与错误底统一为页底 <span class="hex">#101E17</span> 单一口径，不再并列卡片底 <span class="hex">#1A3126</span> 口径。其余结构、文案、色值、屏幕数量、字号、圆角沿用 v0.7，浅色部分数值不变；v0.7 保留为历史版本。</p>
+  <p>橙和红分工，不重叠：<strong>橙接「需要注意、可以恢复」</strong>（省份没选、这张图没识别出字、原图不在了——都是提示，退路还在）；<strong>红接「已经错了 / 会丢东西」</strong>（删除、清空、保存失败，动作不可逆）。绿色仍是可用与主行动，一屏里三种颜色的主次就靠这条线分开。</p>
+  <p><strong>数值按脚本重算，橙红已定稿（用户 2026-11-16 拍板）。</strong> v0.5 里橙色那几个比例是手算的，有三处偏差（#FF8A00 在白底实测 2.4:1、#D65200 深底 3.4:1、#FFB74D 深底 8.0:1），现已全部按脚本重新取值：<strong>浅色警示 #C2410C</strong>（白底 5.2:1）、<strong>深色警示 #FF8A00</strong>（页底 #101E17 7.284:1）、<strong>浅色错误 #C62828</strong>（白底 5.6:1）、<strong>深色错误 #FF8A80</strong>（页底 #101E17 7.540:1）。<strong>深底口径说明：</strong>深色数值一律<strong>以页底 #101E17 为准</strong>：主绿 #50C878 8.093:1、辅助文字 #7E9B88 5.681:1。警示条与错误条实际就叠在页底上，故页底口径即落点口径。历史 v0.7 曾按卡片底 #1A3126 口径，已归档、不再作为规范。</p>
+  <p>落点全部取自《信息架构 v1.1》第 5.4 节的既有异常态：P02 的「省考（未选省份）」、P19 识别失败、P10 原图丢失与删除。红色另有组件板里的错误条与失败徽标。<strong>橙、红均已定稿（用户 2026-11-16 拍板），为项目规范值。</strong></p>
+</header>
+<p class="grphd">第一组 · P02 推荐首页<span>橙落在既有的「省考未选省份」提示上，不改结构</span></p>
+
+<div class="row">
+
+  <div class="col">
+    <p class="vname">浅色模式 · P02 推荐首页</p>
+
+    <div class="phone h812 lt">
+      <div class="top">
+        <div class="pname">推荐</div>
+        <svg class="ic ac" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.6-4.6"/></svg>
+      </div>
+
+      <div class="body">
+        <div class="ph-rec">
+          <p>每日推荐将在进阶版本接入，本版先留空位</p>
+        </div>
+
+        <div class="card">
+          <div class="row1">
+            <div class="ctitle">进入成语库</div>
+            <svg class="ic sm ac" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+          </div>
+          <p class="range">当前考试范围：<b>国考 · <span class="warn">省考（未选省份）</span> · 事业编</b></p>
+          <div class="hintrow">
+            <span class="winline">
+              <svg viewBox="0 0 24 24"><path d="M12 4l8 15H4z"/><path d="M12 9v4"/><path d="M12 16.5v.5"/></svg>
+              省考内容暂不显示，选好省份即可看到
+            </span>
+            <span class="linkbtn">去选省份</span>
+          </div>
+          <p class="dims">浏览维度：按范围 / 按首字母 / 按考频</p>
+        </div>
+
+        <div class="card">
+          <div class="row1">
+            <div class="ctitle">我的错题</div>
+            <span class="more">去错题本<svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></span>
+          </div>
+          <div class="nums">
+            <div class="numcell"><div class="numv">12</div><div class="numl">错题总数</div></div>
+            <div class="numcell"><div class="numv hot">7</div><div class="numl">待复习</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="fab">
+        <svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13"/><circle cx="12" cy="13.5" r="3.6"/><path d="M8.5 7l1.4-3h4.2l1.4 3"/></svg>
+      </div>
+
+      <div class="tabs">
+        <div class="tab on"><svg viewBox="0 0 24 24"><path d="M4 4h6.5v16H4z"/><path d="M13.5 4H20v16h-6.5z"/></svg><span>成语</span></div>
+        <div class="tab"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span>例题</span></div>
+        <div class="tab"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span>错题</span></div>
+        <div class="tab"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span>我的</span></div>
+      </div>
+
+    </div>
+
+    <p class="cap">P02 推荐首页 · 浅色模式</p>
+    <p class="sub">橙：省考未选省份是状态提示，不是动作</p>
+  </div>
+
+  <div class="col">
+    <p class="vname">深色模式 · P02 推荐首页</p>
+
+    <div class="phone h812 dk">
+      <div class="top">
+        <div class="pname">推荐</div>
+        <svg class="ic ac" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.6-4.6"/></svg>
+      </div>
+
+      <div class="body">
+        <div class="ph-rec">
+          <p>每日推荐将在进阶版本接入，本版先留空位</p>
+        </div>
+
+        <div class="card">
+          <div class="row1">
+            <div class="ctitle">进入成语库</div>
+            <svg class="ic sm ac" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+          </div>
+          <p class="range">当前考试范围：<b>国考 · <span class="warn">省考（未选省份）</span> · 事业编</b></p>
+          <div class="hintrow">
+            <span class="winline">
+              <svg viewBox="0 0 24 24"><path d="M12 4l8 15H4z"/><path d="M12 9v4"/><path d="M12 16.5v.5"/></svg>
+              省考内容暂不显示，选好省份即可看到
+            </span>
+            <span class="linkbtn">去选省份</span>
+          </div>
+          <p class="dims">浏览维度：按范围 / 按首字母 / 按考频</p>
+        </div>
+
+        <div class="card">
+          <div class="row1">
+            <div class="ctitle">我的错题</div>
+            <span class="more">去错题本<svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></span>
+          </div>
+          <div class="nums">
+            <div class="numcell"><div class="numv">12</div><div class="numl">错题总数</div></div>
+            <div class="numcell"><div class="numv hot">7</div><div class="numl">待复习</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="fab">
+        <svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13"/><circle cx="12" cy="13.5" r="3.6"/><path d="M8.5 7l1.4-3h4.2l1.4 3"/></svg>
+      </div>
+
+      <div class="tabs">
+        <div class="tab on"><svg viewBox="0 0 24 24"><path d="M4 4h6.5v16H4z"/><path d="M13.5 4H20v16h-6.5z"/></svg><span>成语</span></div>
+        <div class="tab"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span>例题</span></div>
+        <div class="tab"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span>错题</span></div>
+        <div class="tab"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span>我的</span></div>
+      </div>
+
+    </div>
+
+    <p class="cap">P02 推荐首页 · 深色模式</p>
+    <p class="sub">橙：省考未选省份是状态提示，不是动作</p>
+  </div>
+
+</div>
+<p class="grphd">第二组 · P19 识别结果 · 识别失败态<span>橙：界面预判还能救回来，把三条退路写清楚</span></p>
+
+<div class="row">
+
+  <div class="col">
+    <p class="vname">浅色模式 · P19 识别结果 · 识别失败态</p>
+
+    <div class="phone h812 lt">
+      <div class="top">
+        <svg class="ic" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6l-12 12"/></svg>
+        <div class="steps">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i>
+          <span class="steptxt">第 3 步 / 共 5 步</span>
+        </div>
+      </div>
+
+      <div class="body">
+        <div class="imgph">
+          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16"/><path d="M8 12l3 3 5-6"/><path d="M3 20l18-16" style="stroke:var(--warnfg)"/></svg>
+          <p>图像已拿到，没有识别出文字</p>
+          <span>边缘裁切与光线都会影响识别</span>
+        </div>
+
+        <div class="warnbar">
+          <svg viewBox="0 0 24 24"><path d="M12 4l8 15H4z"/><path d="M12 9v4"/><path d="M12 16.5v.5"/></svg>
+          <div>
+            <div class="wt">这张图没识别出文字</div>
+            <div class="ws">光线不足、字迹太淡或框选范围不对都会这样。可以重拍，也可以回上一步重新框选，或直接手动补字。</div>
+          </div>
+        </div>
+
+        <div class="btn">重拍这张</div>
+
+        <div class="smallrow">
+          <span class="ghostbtn">回上一步重新框选</span>
+          <span class="ghostbtn">手动补字</span>
+        </div>
+
+        <div class="card soft" style="margin-top:16px">
+          <p class="lbl">三条退路分别去哪</p>
+          <div class="optrow"><b class="w2">重拍</b><span>回到拍照页，重新拍一张</span></div>
+          <div class="optrow"><b class="w2">重框</b><span>回 P18 裁切页重新框选，此前框选范围保留</span></div>
+          <div class="optrow"><b class="w2">补字</b><span>跳到第 4 步，题干与选项自己填</span></div>
+        </div>
+
+        <p class="txt dim">手动补字不影响已拍的图，识别失败也不会把这条错题记成已录入。</p>
+      </div>
+
+    </div>
+
+    <p class="cap">P19 识别结果 · 识别失败态 · 浅色模式</p>
+    <p class="sub">橙：识别可救回来的异常，主按钮仍绿</p>
+  </div>
+
+  <div class="col">
+    <p class="vname">深色模式 · P19 识别结果 · 识别失败态</p>
+
+    <div class="phone h812 dk">
+      <div class="top">
+        <svg class="ic" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6l-12 12"/></svg>
+        <div class="steps">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i>
+          <span class="steptxt">第 3 步 / 共 5 步</span>
+        </div>
+      </div>
+
+      <div class="body">
+        <div class="imgph">
+          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16"/><path d="M8 12l3 3 5-6"/><path d="M3 20l18-16" style="stroke:var(--warnfg)"/></svg>
+          <p>图像已拿到，没有识别出文字</p>
+          <span>边缘裁切与光线都会影响识别</span>
+        </div>
+
+        <div class="warnbar">
+          <svg viewBox="0 0 24 24"><path d="M12 4l8 15H4z"/><path d="M12 9v4"/><path d="M12 16.5v.5"/></svg>
+          <div>
+            <div class="wt">这张图没识别出文字</div>
+            <div class="ws">光线不足、字迹太淡或框选范围不对都会这样。可以重拍，也可以回上一步重新框选，或直接手动补字。</div>
+          </div>
+        </div>
+
+        <div class="btn">重拍这张</div>
+
+        <div class="smallrow">
+          <span class="ghostbtn">回上一步重新框选</span>
+          <span class="ghostbtn">手动补字</span>
+        </div>
+
+        <div class="card soft" style="margin-top:16px">
+          <p class="lbl">三条退路分别去哪</p>
+          <div class="optrow"><b class="w2">重拍</b><span>回到拍照页，重新拍一张</span></div>
+          <div class="optrow"><b class="w2">重框</b><span>回 P18 裁切页重新框选，此前框选范围保留</span></div>
+          <div class="optrow"><b class="w2">补字</b><span>跳到第 4 步，题干与选项自己填</span></div>
+        </div>
+
+        <p class="txt dim">手动补字不影响已拍的图，识别失败也不会把这条错题记成已录入。</p>
+      </div>
+
+    </div>
+
+    <p class="cap">P19 识别结果 · 识别失败态 · 深色模式</p>
+    <p class="sub">橙：识别可救回来的异常，主按钮仍绿</p>
+  </div>
+
+</div>
+<p class="grphd">第三组 · P10 错题详情 · 原图丢失 + 删除<span>同屏三色：橙说状态、红说动作、绿说下一步</span></p>
+
+<div class="row">
+
+  <div class="col">
+    <p class="vname">浅色模式 · P10 错题详情 · 原图丢失 + 删除</p>
+
+    <div class="phone tall lt">
+      <div class="top">
+        <svg class="ic" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>
+        <div class="pname">错题详情</div>
+        <span class="linkbtn" style="font-size:12px">编辑</span>
+        <span class="linkbtn mut">删除</span>
+      </div>
+
+      <div class="body">
+        <div class="imgph">
+          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16"/><path d="M4 20l16-16"/></svg>
+          <p>原图已不在</p>
+          <span>文件可能被清理；题干、选项与解析仍可查看与重做</span>
+        </div>
+
+        <div class="card">
+          <p class="lbl">题干</p>
+          <p class="txt">下列各句中，加点的成语使用不恰当的一项是</p>
+          <div class="optrow" style="margin-top:9px;border-top:1px solid var(--line2);padding-top:10px"><b>A</b><span>新厂长按部就班，提出了一整套创新方案</span></div>
+          <div class="optrow"><b>B</b><span>他别出心裁地解决了这个难题</span></div>
+          <div class="optrow"><b>C</b><span>这种做法墨守成规，难有突破</span></div>
+          <div class="optrow"><b>D</b><span>方案循序渐进，稳步推进</span></div>
+        </div>
+
+        <div class="maskrow">
+          <span>答案已遮住</span>
+          <span class="mbtn">显示答案</span>
+        </div>
+
+        <div class="card">
+          <p class="lbl">正确答案与解析</p>
+          <p class="txt"><b>正确答案：A</b></p>
+          <p class="txt">「按部就班」含墨守成规之意，与「创新方案」语义相冲。</p>
+        </div>
+
+        <div class="card">
+          <p class="lbl">关联成语</p>
+          <div class="tagrow">
+            <span class="tag">按部就班</span>
+            <span class="tag ghost">加一个</span>
+          </div>
+        </div>
+
+        <div class="card soft">
+          <p class="lbl">我的答案与错因</p>
+          <p class="txt">我的答案：<b>B</b></p>
+          <p class="txt">错因：<b>望文生义</b>，把贬义当褒义用</p>
+        </div>
+
+        <div class="btn">重做这道题</div>
+
+        <div style="margin-top:12px">
+          <span class="dangerout">删除这道错题</span>
+        </div>
+
+        <p class="txt dim" style="margin-top:8px">删除会同时从错题本与对应成语详情里移除，需二次确认。</p>
+
+        <div class="cutline"><span>812</span></div>
+      </div>
+
+    </div>
+
+    <p class="cap">P10 错题详情 · 原图丢失 + 删除 · 浅色模式</p>
+    <p class="sub">橙在占位（状态），红在删除（动作），绿在重做（下一步）</p>
+  </div>
+
+  <div class="col">
+    <p class="vname">深色模式 · P10 错题详情 · 原图丢失 + 删除</p>
+
+    <div class="phone tall dk">
+      <div class="top">
+        <svg class="ic" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>
+        <div class="pname">错题详情</div>
+        <span class="linkbtn" style="font-size:12px">编辑</span>
+        <span class="linkbtn mut">删除</span>
+      </div>
+
+      <div class="body">
+        <div class="imgph">
+          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16"/><path d="M4 20l16-16"/></svg>
+          <p>原图已不在</p>
+          <span>文件可能被清理；题干、选项与解析仍可查看与重做</span>
+        </div>
+
+        <div class="card">
+          <p class="lbl">题干</p>
+          <p class="txt">下列各句中，加点的成语使用不恰当的一项是</p>
+          <div class="optrow" style="margin-top:9px;border-top:1px solid var(--line2);padding-top:10px"><b>A</b><span>新厂长按部就班，提出了一整套创新方案</span></div>
+          <div class="optrow"><b>B</b><span>他别出心裁地解决了这个难题</span></div>
+          <div class="optrow"><b>C</b><span>这种做法墨守成规，难有突破</span></div>
+          <div class="optrow"><b>D</b><span>方案循序渐进，稳步推进</span></div>
+        </div>
+
+        <div class="maskrow">
+          <span>答案已遮住</span>
+          <span class="mbtn">显示答案</span>
+        </div>
+
+        <div class="card">
+          <p class="lbl">正确答案与解析</p>
+          <p class="txt"><b>正确答案：A</b></p>
+          <p class="txt">「按部就班」含墨守成规之意，与「创新方案」语义相冲。</p>
+        </div>
+
+        <div class="card">
+          <p class="lbl">关联成语</p>
+          <div class="tagrow">
+            <span class="tag">按部就班</span>
+            <span class="tag ghost">加一个</span>
+          </div>
+        </div>
+
+        <div class="card soft">
+          <p class="lbl">我的答案与错因</p>
+          <p class="txt">我的答案：<b>B</b></p>
+          <p class="txt">错因：<b>望文生义</b>，把贬义当褒义用</p>
+        </div>
+
+        <div class="btn">重做这道题</div>
+
+        <div style="margin-top:12px">
+          <span class="dangerout">删除这道错题</span>
+        </div>
+
+        <p class="txt dim" style="margin-top:8px">删除会同时从错题本与对应成语详情里移除，需二次确认。</p>
+
+        <div class="cutline"><span>812</span></div>
+      </div>
+
+    </div>
+
+    <p class="cap">P10 错题详情 · 原图丢失 + 删除 · 深色模式</p>
+    <p class="sub">橙在占位（状态），红在删除（动作），绿在重做（下一步）</p>
+  </div>
+
+</div>
+<p class="grphd">第四组 · 警示与错误构件<span>橙走状态、红走动作，一一看它们在五种构件上的取法</span></p>
+
+<div class="row">
+
+  <div class="col">
+    <p class="vname">浅色模式 · 警示构件<em>条 / 行内 / 危险按钮 / 徽标 / 占位</em></p>
+
+    <div class="sheet lt">
+      <div class="fig">
+        <p class="figcap">警示条（可带两行）</p>
+        <div class="warnbar" style="margin-bottom:0">
+          <svg viewBox="0 0 24 24"><path d="M12 4l8 15H4z"/><path d="M12 9v4"/><path d="M12 16.5v.5"/></svg>
+          <div>
+            <div class="wt">这张图没识别出文字</div>
+            <div class="ws">光线不足或字迹太淡，建议重拍。</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="fig">
+        <p class="figcap">行内警示</p>
+        <span class="winline">
+          <svg viewBox="0 0 24 24"><path d="M12 4l8 15H4z"/><path d="M12 9v4"/><path d="M12 16.5v.5"/></svg>
+          省考内容暂不显示
+        </span>
+      </div>
+
+      <div class="fig">
+        <p class="figcap">错误条（红）</p>
+        <div class="errbar" style="margin-bottom:0">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 8v5"/><path d="M12 16v.6"/></svg>
+          <div>
+            <div class="et">保存失败，这条错题没存上</div>
+            <div class="es">网络中断，请返回重试；原图与文字都还在。</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="fig">
+        <p class="figcap">危险动作（红）：填充 / 描边 / 文字</p>
+        <div class="dangerbtn">删除这道错题</div>
+        <div style="margin-top:9px"><span class="dangerout">确认清空全部数据</span></div>
+        <div class="row1" style="margin-top:10px">
+          <span class="danger">删除</span>
+          <span class="badgewarn">原图丢失</span>
+          <span class="badgerr">保存失败</span>
+        </div>
+      </div>
+
+      <div class="fig">
+        <p class="figcap">与主色同屏</p>
+        <div class="btn" style="font-size:13px;padding:11px 0">重拍这张</div>
+        <div class="smallrow" style="margin-top:9px">
+          <span class="ghostbtn">回上一步</span>
+          <span class="ghostbtn">手动补字</span>
+        </div>
+      </div>
+
+      <div class="fig">
+        <p class="figcap">警示徽标 / 图片占位</p>
+        <div class="imgph" style="height:96px;margin-bottom:0">
+          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16"/><path d="M4 20l16-16"/></svg>
+          <p>原图已不在</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="col">
+    <p class="vname">深色模式 · 警示构件<em>条 / 行内 / 危险按钮 / 徽标 / 占位</em></p>
+
+    <div class="sheet dk">
+      <div class="fig">
+        <p class="figcap">警示条（可带两行）</p>
+        <div class="warnbar" style="margin-bottom:0">
+          <svg viewBox="0 0 24 24"><path d="M12 4l8 15H4z"/><path d="M12 9v4"/><path d="M12 16.5v.5"/></svg>
+          <div>
+            <div class="wt">这张图没识别出文字</div>
+            <div class="ws">光线不足或字迹太淡，建议重拍。</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="fig">
+        <p class="figcap">行内警示</p>
+        <span class="winline">
+          <svg viewBox="0 0 24 24"><path d="M12 4l8 15H4z"/><path d="M12 9v4"/><path d="M12 16.5v.5"/></svg>
+          省考内容暂不显示
+        </span>
+      </div>
+
+      <div class="fig">
+        <p class="figcap">错误条（红）</p>
+        <div class="errbar" style="margin-bottom:0">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 8v5"/><path d="M12 16v.6"/></svg>
+          <div>
+            <div class="et">保存失败，这条错题没存上</div>
+            <div class="es">网络中断，请返回重试；原图与文字都还在。</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="fig">
+        <p class="figcap">危险动作（红）：填充 / 描边 / 文字</p>
+        <div class="dangerbtn">删除这道错题</div>
+        <div style="margin-top:9px"><span class="dangerout">确认清空全部数据</span></div>
+        <div class="row1" style="margin-top:10px">
+          <span class="danger">删除</span>
+          <span class="badgewarn">原图丢失</span>
+          <span class="badgerr">保存失败</span>
+        </div>
+      </div>
+
+      <div class="fig">
+        <p class="figcap">与主色同屏</p>
+        <div class="btn" style="font-size:13px;padding:11px 0">重拍这张</div>
+        <div class="smallrow" style="margin-top:9px">
+          <span class="ghostbtn">回上一步</span>
+          <span class="ghostbtn">手动补字</span>
+        </div>
+      </div>
+
+      <div class="fig">
+        <p class="figcap">警示徽标 / 图片占位</p>
+        <div class="imgph" style="height:96px;margin-bottom:0">
+          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16"/><path d="M4 20l16-16"/></svg>
+          <p>原图已不在</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+<p class="grphd">第五组 · 橙色参数<span>为什么亮橙不能上白底：两模式各自的可用区间</span></p>
+
+<div class="row">
+
+  <div class="col">
+
+    <div class="panel">
+      <p class="mood"><b>浅色 · 橙（警示，可恢复）</b>　亮橙上不了白底：#FF8A00 实测只有 2.4:1，连大字都勉强，只能做图标与描边；文字要压到 #C2410C（白底 5.2:1，在警示底 #FFF3E6 上 4.7:1）。</p>
+
+      <div class="grp">
+        <h4>色值 → 角色</h4>
+        <dl class="spec">
+          <dt>警示文字</dt><dd><i class="sw" style="background:#C2410C"></i><span class="hex">#C2410C</span> 5.2:1 标题、行内提示</dd>
+          <dt>警示底</dt><dd><i class="sw" style="background:#FFF3E6"></i><span class="hex">#FFF3E6</span> 条底、图片占位底</dd>
+          <dt>警示描边</dt><dd><i class="sw" style="background:#F3C9A8"></i><span class="hex">#F3C9A8</span> 条框、虚线框</dd>
+          <dt>荧光橙</dt><dd><i class="sw" style="background:#FF8A00"></i><span class="hex">#FF8A00</span> 白底 2.4:1，只做图标与描边</dd>
+        </dl>
+      </div>
+
+      <div class="grp">
+        <h4>规则</h4>
+        <p class="rule">① 橙只给「可恢复的异常」：省份没选、图没识别出字；主行动仍是绿。<br>② 一屏最多两处橙，且一提示一动作，不叠三层。<br>③ 警示条不做整块深橙填充，浅底 + 1px 描边即可。<br>④ 图标与文字同色，不再单独取第二种橙。</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col">
+
+    <div class="panel">
+      <p class="mood"><b>深色 · 橙（警示，可恢复）</b>　以页底 #101E17 为准：#FF8A00 对页底 7.284:1，能当字；落在自己的 14% 底 #312D14 上文字 5.862:1；填充配深墨 #0C1A12 得 7.582:1。浅色那支 #C2410C 搬过来会沉底，不能用。</p>
+
+      <div class="grp">
+        <h4>色值 → 角色</h4>
+        <dl class="spec">
+          <dt>警示文字</dt><dd><i class="sw" style="background:#FF8A00"></i><span class="hex">#FF8A00</span> 7.28:1 标题、行内提示</dd>
+          <dt>警示底</dt><dd><i class="sw" style="background:#312D14"></i><span class="hex">#312D14</span> ＝ #FF8A00 14%（以页底 #101E17 为准），条底、图片占位底</dd>
+          <dt>警示描边</dt><dd><i class="sw" style="background:#744B0D"></i><span class="hex">#744B0D</span> ＝ #FF8A00 42%（以页底 #101E17 为准），条框、虚线框</dd>
+          <dt>填充</dt><dd><i class="sw" style="background:#FF8A00"></i><span class="hex">#FF8A00</span> 配深墨 #0C1A12，7.582:1</dd>
+        </dl>
+      </div>
+
+      <div class="grp">
+        <h4>规则</h4>
+        <p class="rule">① 深底一律用 #FF8A00 做字，不要用浅色那支 #C2410C。<br>② 填充橙只在从属位置出现，面积不超过绿主按钮的一半。<br>③ 占位与条底走 14% + 42% 两档，不填实色，避免把页面压暗。<br>④ 别用纯白字压橙底：2.4:1，按钮会糊。</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+<p class="grphd">第六组 · 红色参数<span>为什么深红在深底会消失：破坏性动作的两支红</span></p>
+
+<div class="row">
+
+  <div class="col">
+
+    <div class="panel">
+      <p class="mood"><b>浅色 · 红（错误，不可逆）</b>　红只给破坏性动作与硬错误。#C62828 白底 5.6:1，在错误底 #FDECEA 上 4.9:1，填充配白字同为 5.6:1——一档到底，不另调。</p>
+
+      <div class="grp">
+        <h4>色值 → 角色</h4>
+        <dl class="spec">
+          <dt>错误文字</dt><dd><i class="sw" style="background:#C62828"></i><span class="hex">#C62828</span> 5.6:1 删除文字、错误条标题</dd>
+          <dt>错误填充</dt><dd><i class="sw" style="background:#C62828"></i><span class="hex">#C62828</span> 配白字 5.6:1</dd>
+          <dt>错误底</dt><dd><i class="sw" style="background:#FDECEA"></i><span class="hex">#FDECEA</span> 错误条底、徽标底</dd>
+          <dt>错误描边</dt><dd><i class="sw" style="background:#F0BEBE"></i><span class="hex">#F0BEBE</span> 条框、描边按钮</dd>
+        </dl>
+      </div>
+
+      <div class="grp">
+        <h4>规则</h4>
+        <p class="rule">① 红只给删除、清空、覆盖、保存失败，不做状态装饰。<br>② 一屏最多一处红动作；带后果说明，不靠颜色独扛。<br>③ 与橙同屏时，橙在状态、红在动作，各占一边。<br>④ 红永远不是主按钮，主按钮始终是绿。</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col">
+
+    <div class="panel">
+      <p class="mood"><b>深色 · 红（错误，不可逆）</b>　深红在深底只剩 2.5:1，等于消失，红必须提到 #FF8A80（以页底 #101E17 为准，对页底 7.540:1；落在自己的 14% 底 #312D26 上文字 5.997:1）；填充配深墨 #0C1A12 得 7.848:1。</p>
+
+      <div class="grp">
+        <h4>色值 → 角色</h4>
+        <dl class="spec">
+          <dt>错误文字</dt><dd><i class="sw" style="background:#FF8A80"></i><span class="hex">#FF8A80</span> 7.54:1 删除文字、错误条标题</dd>
+          <dt>错误填充</dt><dd><i class="sw" style="background:#FF8A80"></i><span class="hex">#FF8A80</span> 配深墨，7.848:1</dd>
+          <dt>错误底</dt><dd><i class="sw" style="background:#312D26"></i><span class="hex">#312D26</span> ＝ #FF8A80 14%（以页底 #101E17 为准），条底、徽标底</dd>
+          <dt>错误描边</dt><dd><i class="sw" style="background:#744B43"></i><span class="hex">#744B43</span> ＝ #FF8A80 42%（以页底 #101E17 为准），条框、描边按钮</dd>
+        </dl>
+      </div>
+
+      <div class="grp">
+        <h4>规则</h4>
+        <p class="rule">① 深底红用 #FF8A80，别用深红——它会沉进底色。<br>② 填充红配深墨字，白字压红底只有 2.3:1。<br>③ 错误条不做实色填充，走 14% + 42% 两档。<br>④ 红与绿不同权：一屏里只允许一处红，且不能是主按钮。</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<p class="grphd">第七组 · 禁用态与加载态<span>补齐缺失组件状态，浅深各一套；色值与对比度见下方参数面板</span></p>
+
+<div class="row">
+
+  <div class="col">
+    <p class="vname">浅色模式 · 禁用态 / 加载态</p>
+    <div class="sheet lt">
+      <div class="fig">
+        <p class="figcap">禁用态：按钮 / 输入 / 标签</p>
+        <div class="disbtn">提交（暂不可用）</div>
+        <div class="disinput" style="margin-top:9px">请输入题干（当前不可编辑）</div>
+        <div style="margin-top:10px"><span class="distag">待录入</span></div>
+      </div>
+      <div class="fig">
+        <p class="figcap">加载中按钮（主色 + 状态提示）</p>
+        <div class="btn loading"><span class="spinner"></span>正在保存…</div>
+        <p class="loadnote">按钮沿用主色与白字，左侧转圈加文案提示正在处理，期间不再接受点击。</p>
+      </div>
+      <div class="fig">
+        <p class="figcap">骨架屏占位块</p>
+        <div class="skel">
+          <div class="skrow">
+            <div class="skbox" style="width:48px;height:48px;flex:0 0 48px"></div>
+            <div style="flex:1">
+              <div class="skbox" style="width:62%;height:12px"></div>
+              <div class="skbox" style="width:42%;height:10px;margin-top:9px"></div>
+            </div>
+          </div>
+          <div class="skbox" style="width:100%;height:11px"></div>
+          <div class="skbox" style="width:86%;height:11px"></div>
+          <div class="skbox" style="width:70%;height:11px"></div>
+        </div>
+        <p class="loadnote">内容未就绪时先给轮廓，加载完成后整块替换为真实内容。</p>
+      </div>
+    </div>
+    <p class="cap">禁用态 / 加载态 · 浅色模式</p>
+    <p class="sub">禁用压低对比以示不可点，加载保留主色不另起强调色</p>
+  </div>
+
+  <div class="col">
+    <p class="vname">深色模式 · 禁用态 / 加载态</p>
+    <div class="sheet dk">
+      <div class="fig">
+        <p class="figcap">禁用态：按钮 / 输入 / 标签</p>
+        <div class="disbtn">提交（暂不可用）</div>
+        <div class="disinput" style="margin-top:9px">请输入题干（当前不可编辑）</div>
+        <div style="margin-top:10px"><span class="distag">待录入</span></div>
+      </div>
+      <div class="fig">
+        <p class="figcap">加载中按钮（主色 + 状态提示）</p>
+        <div class="btn loading"><span class="spinner"></span>正在保存…</div>
+        <p class="loadnote">按钮沿用主色与深墨字，左侧转圈加文案提示正在处理，期间不再接受点击。</p>
+      </div>
+      <div class="fig">
+        <p class="figcap">骨架屏占位块</p>
+        <div class="skel">
+          <div class="skrow">
+            <div class="skbox" style="width:48px;height:48px;flex:0 0 48px"></div>
+            <div style="flex:1">
+              <div class="skbox" style="width:62%;height:12px"></div>
+              <div class="skbox" style="width:42%;height:10px;margin-top:9px"></div>
+            </div>
+          </div>
+          <div class="skbox" style="width:100%;height:11px"></div>
+          <div class="skbox" style="width:86%;height:11px"></div>
+          <div class="skbox" style="width:70%;height:11px"></div>
+        </div>
+        <p class="loadnote">内容未就绪时先给轮廓，加载完成后整块替换为真实内容。</p>
+      </div>
+    </div>
+    <p class="cap">禁用态 / 加载态 · 深色模式</p>
+    <p class="sub">深色一律以页底 #101E17 为准</p>
+  </div>
+
+</div>
+
+<div class="row">
+
+  <div class="col">
+    <div class="panel">
+      <p class="mood"><b>浅色 · 禁用态 / 加载态参数</b>　禁用态沿用既有三档变量、不改色板；加载态由 emerald 主色与分段底派生。所有对比度按 WCAG2 相对亮度公式脚本复算（容差 ±0.05）。</p>
+      <div class="grp">
+        <h4>禁用态（沿用既有变量）</h4>
+        <dl class="spec">
+          <dt>禁用底</dt><dd><i class="sw" style="background:#E6EFE9"></i><span class="hex">--disbg #E6EFE9</span></dd>
+          <dt>禁用字</dt><dd><i class="sw" style="background:#93A99C"></i><span class="hex">--disfg #93A99C</span> 对禁用底 2.13:1</dd>
+          <dt>禁用描边</dt><dd><i class="sw" style="background:#DCE8E1"></i><span class="hex">--disline #DCE8E1</span> 对禁用底 1.07:1</dd>
+        </dl>
+      </div>
+      <div class="grp">
+        <h4>加载态（本次新增）</h4>
+        <dl class="spec">
+          <dt>按钮底</dt><dd><i class="sw" style="background:#008000"></i><span class="hex">--loadbg #008000</span> 取自主色</dd>
+          <dt>按钮字</dt><dd><i class="sw" style="background:#FFFFFF"></i><span class="hex">--loadfg #FFFFFF</span> 对按钮底 5.14:1</dd>
+          <dt>骨架块</dt><dd><i class="sw" style="background:#DCE9E0"></i><span class="hex">--skel #DCE9E0</span> 对页底 1.17:1</dd>
+          <dt>骨架高光</dt><dd><i class="sw" style="background:#F1F8F3"></i><span class="hex">--skelhi #F1F8F3</span> 对骨架块 1.16:1</dd>
+        </dl>
+      </div>
+      <div class="grp">
+        <h4>理由 / 规则</h4>
+        <p class="rule">① 禁用态不改色板：字对底 2.13:1、描边对底 1.07:1，二者都刻意压低。WCAG 对禁用元素豁免 4.5:1，这里要的是「明显不可点」的弱化观感，不是可读。<br>② 加载按钮沿用主色 <span class="hex">#008000</span> 与白字（5.14:1，过 4.5:1），只在原按钮上加转圈与文案，不引入新强调色。<br>③ 骨架块 <span class="hex">#DCE9E0</span> 落在分段底 <span class="hex">#ECF7F0</span> 与描边 <span class="hex">#D6EADD</span> 之间，对页底仅 1.17:1；高光 <span class="hex">#F1F8F3</span> 对骨架块 1.16:1——骨架只给轮廓、不承载信息，低对比是刻意，加载完即替换。<br>④ 上表对比度均为脚本复算值，取两位小数，容差 ±0.05。</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col">
+    <div class="panel">
+      <p class="mood"><b>深色 · 禁用态 / 加载态参数</b>　深色数值一律以页底 <span class="hex">#101E17</span> 为准（用户 2026-11-16 拍板口径）；禁用态沿用既有变量，加载态由深色主色派生。</p>
+      <div class="grp">
+        <h4>禁用态（沿用既有变量）</h4>
+        <dl class="spec">
+          <dt>禁用底</dt><dd><i class="sw" style="background:#1E3327"></i><span class="hex">--disbg #1E3327</span></dd>
+          <dt>禁用字</dt><dd><i class="sw" style="background:#6E8A78"></i><span class="hex">--disfg #6E8A78</span> 对禁用底 3.57:1</dd>
+          <dt>禁用描边</dt><dd><i class="sw" style="background:#2B4636"></i><span class="hex">--disline #2B4636</span> 对禁用底 1.30:1</dd>
+        </dl>
+      </div>
+      <div class="grp">
+        <h4>加载态（本次新增）</h4>
+        <dl class="spec">
+          <dt>按钮底</dt><dd><i class="sw" style="background:#50C878"></i><span class="hex">--loadbg #50C878</span> 取自主色</dd>
+          <dt>按钮字</dt><dd><i class="sw" style="background:#0C1A12"></i><span class="hex">--loadfg #0C1A12</span> 对按钮底 8.42:1</dd>
+          <dt>骨架块</dt><dd><i class="sw" style="background:#23392C"></i><span class="hex">--skel #23392C</span> 对页底 1.39:1（＝既有 --line2）</dd>
+          <dt>骨架高光</dt><dd><i class="sw" style="background:#2E4A39"></i><span class="hex">--skelhi #2E4A39</span> 对骨架块 1.27:1（＝既有 --cut）</dd>
+        </dl>
+      </div>
+      <div class="grp">
+        <h4>理由 / 规则</h4>
+        <p class="rule">① 深底以页底 <span class="hex">#101E17</span> 为准：主绿 <span class="hex">#50C878</span> 对页底 8.09:1，故加载按钮用主绿底配深墨 <span class="hex">#0C1A12</span> 字，对底 8.42:1。<br>② 禁用态字对底 3.57:1、描边对底 1.30:1，沿用既有三档、刻意弱化；不用主绿做禁用字，避免误读为可点。<br>③ 骨架块借既有 <span class="hex">#23392C</span>（line2）、高光借既有 <span class="hex">#2E4A39</span>（cut），不新增孤立色；对页底 1.39:1、高光对骨架 1.27:1，只给轮廓，加载完即替换。<br>④ 上表对比度均为脚本复算值，取两位小数，容差 ±0.05。</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<p class="grphd">第八组 · 可编辑输入框 · 聚焦态 / 校验错误态<span>v0.10 新增：补齐正常可编辑输入框两态，浅深各一套；不新增任何色值</span></p>
+
+<div class="row">
+
+  <div class="col">
+    <p class="vname">浅色模式 · 可编辑输入框三态<em>默认 / 聚焦 / 校验错误</em></p>
+    <div class="sheet lt">
+      <div class="fig">
+        <p class="figcap">默认态（对照）</p>
+        <div class="editinput"><span>下列各句中，加点的成语使用</span></div>
+        <div class="editinput" style="margin-top:9px"><span class="iph">请输入题干（占位）</span></div>
+        <p class="loadnote">底 --inputbg #F7FBF8 · 描边 1px --line #D6EADD · 圆角 5px · min-height 42px · padding 11px 12px · 字号 12px；已输入文字 --text #183828，占位 --text3 #5E7569（对底 4.76:1）</p>
+      </div>
+      <div class="fig">
+        <p class="figcap">聚焦态（本次新增）</p>
+        <div class="editinput focus"><span>下列各句中，加点的成语使用</span></div>
+        <p class="loadnote">底 --inputbg 不变 · 描边 1px --accent #008000（对底 4.92:1）· 外圈 2px --tintbg #F0FAF4 柔光 · 文字 --text · 占位 --text3</p>
+      </div>
+      <div class="fig">
+        <p class="figcap">校验错误态（本次新增）</p>
+        <div class="editinput err"><span>下列各句中，加点的成语使用</span></div>
+        <p class="errhint">题干需补全，请检查后再提交</p>
+        <p class="loadnote">底 --inputbg 不变 · 描边 1px --errline #F0BEBE · 文字 --errfg #C62828（对底 5.38:1）· 框下提示 11.5px/1.55 --errfg</p>
+      </div>
+    </div>
+    <p class="cap">可编辑输入框三态 · 浅色模式</p>
+    <p class="sub">聚焦用主色描边，校验错误用红系描边与文字，几何与默认态完全一致</p>
+  </div>
+
+  <div class="col">
+    <p class="vname">深色模式 · 可编辑输入框三态<em>默认 / 聚焦 / 校验错误</em></p>
+    <div class="sheet dk">
+      <div class="fig">
+        <p class="figcap">默认态（对照）</p>
+        <div class="editinput"><span>下列各句中，加点的成语使用</span></div>
+        <div class="editinput" style="margin-top:9px"><span class="iph">请输入题干（占位）</span></div>
+        <p class="loadnote">底 --inputbg #152A20 · 描边 1px --line #2B4636 · 圆角 5px · min-height 42px · padding 11px 12px · 字号 12px；已输入文字 --text #D5E8DA，占位 --text3 #7E9B88（对底 5.01:1）</p>
+      </div>
+      <div class="fig">
+        <p class="figcap">聚焦态（本次新增）</p>
+        <div class="editinput focus"><span>下列各句中，加点的成语使用</span></div>
+        <p class="loadnote">底 --inputbg 不变 · 描边 1px --accent #50C878（对底 7.13:1）· 外圈 2px --tintbg rgba(80,200,120,.12) 柔光 · 文字 --text · 占位 --text3</p>
+      </div>
+      <div class="fig">
+        <p class="figcap">校验错误态（本次新增）</p>
+        <div class="editinput err"><span>下列各句中，加点的成语使用</span></div>
+        <p class="errhint">题干需补全，请检查后再提交</p>
+        <p class="loadnote">底 --inputbg 不变 · 描边 1px --errline rgba(255,138,128,.42) · 文字 --errfg #FF8A80（对底 6.65:1）· 框下提示 11.5px/1.55 --errfg</p>
+      </div>
+    </div>
+    <p class="cap">可编辑输入框三态 · 深色模式</p>
+    <p class="sub">深色一律以页底 #101E17 为准，输入底 --inputbg #152A20</p>
+  </div>
+
+</div>
+
+<div class="row">
+
+  <div class="col">
+    <div class="panel">
+      <p class="mood"><b>浅色 · 输入框两态参数（v0.10 新增）</b>　两态均不新增色值：聚焦态取既有主色 <span class="hex">--accent</span> 与柔光 <span class="hex">--tintbg</span>，校验错误态取既有错误描边 <span class="hex">--errline</span> 与文字 <span class="hex">--errfg</span>。几何沿用 <span class="hex">.maskrow</span>（底 --inputbg、描边 1px --line、圆角 5px、padding 11px 12px、字号 12px）与 <span class="hex">.disinput</span>（min-height 42px 触控高度）。所有对比度按 WCAG2 相对亮度公式脚本复算（容差 ±0.05）。</p>
+      <div class="grp">
+        <h4>默认态（对照）</h4>
+        <dl class="spec">
+          <dt>底</dt><dd><i class="sw" style="background:#F7FBF8"></i><span class="hex">--inputbg #F7FBF8</span></dd>
+          <dt>描边</dt><dd><i class="sw" style="background:#D6EADD"></i><span class="hex">--line #D6EADD</span> 1px</dd>
+          <dt>文字</dt><dd><i class="sw" style="background:#183828"></i><span class="hex">--text #183828</span></dd>
+          <dt>占位</dt><dd><i class="sw" style="background:#5E7569"></i><span class="hex">--text3 #5E7569</span> 对底 4.76:1</dd>
+        </dl>
+      </div>
+      <div class="grp">
+        <h4>聚焦态（本次新增）</h4>
+        <dl class="spec">
+          <dt>描边</dt><dd><i class="sw" style="background:#008000"></i><span class="hex">--accent #008000</span> 1px，对输入底 4.92:1（过 3:1 组件门槛）</dd>
+          <dt>柔光</dt><dd><i class="sw" style="background:#F0FAF4"></i><span class="hex">--tintbg #F0FAF4</span> 外圈 2px，仅装饰</dd>
+        </dl>
+      </div>
+      <div class="grp">
+        <h4>校验错误态（本次新增）</h4>
+        <dl class="spec">
+          <dt>描边</dt><dd><i class="sw" style="background:#F0BEBE"></i><span class="hex">--errline #F0BEBE</span> 1px，与错误条 .errbar 同色</dd>
+          <dt>文字</dt><dd><i class="sw" style="background:#C62828"></i><span class="hex">--errfg #C62828</span> 对输入底 5.38:1（过 4.5:1）</dd>
+          <dt>提示</dt><dd><i class="sw" style="background:#C62828"></i><span class="hex">--errfg #C62828</span> 11.5px/1.55，置于框下方</dd>
+        </dl>
+      </div>
+      <div class="grp">
+        <h4>理由 / 规则</h4>
+        <p class="rule">① 聚焦态用主色 <span class="hex">--accent</span> 做 1px 描边，延续「主色＝当前可操作」的既有语义（激活标签、链接同色），对输入底 4.92:1，远超图形组件 3:1 门槛。<br>② 外圈柔光用既有 <span class="hex">--tintbg</span>（浅 #F0FAF4），只做视觉提示，不新增孤立色。<br>③ 校验错误态沿用错误条 <span class="hex">.errbar</span> 的红系：描边 <span class="hex">--errline</span>、文字与提示 <span class="hex">--errfg</span>，对输入底 5.38:1；如需整块错误底可换既有 <span class="hex">--errbg</span>，与错误条完全一致，但三态几何不变。<br>④ 三态几何完全相同（底 --inputbg、圆角 5px、min-height 42px、padding 11px 12px、字号 12px），切换只改描边与文字色，不引起布局跳动。<br>⑤ 上表对比度均为脚本复算值，取两位小数，容差 ±0.05。</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col">
+    <div class="panel">
+      <p class="mood"><b>深色 · 输入框两态参数（v0.10 新增）</b>　深色数值一律以页底 <span class="hex">#101E17</span> 为准（用户 2026-11-16 拍板口径）；输入底为 <span class="hex">--inputbg #152A20</span>。两态只取既有 token，未新增色值。</p>
+      <div class="grp">
+        <h4>默认态（对照）</h4>
+        <dl class="spec">
+          <dt>底</dt><dd><i class="sw" style="background:#152A20"></i><span class="hex">--inputbg #152A20</span></dd>
+          <dt>描边</dt><dd><i class="sw" style="background:#2B4636"></i><span class="hex">--line #2B4636</span> 1px</dd>
+          <dt>文字</dt><dd><i class="sw" style="background:#D5E8DA"></i><span class="hex">--text #D5E8DA</span></dd>
+          <dt>占位</dt><dd><i class="sw" style="background:#7E9B88"></i><span class="hex">--text3 #7E9B88</span> 对底 5.01:1</dd>
+        </dl>
+      </div>
+      <div class="grp">
+        <h4>聚焦态（本次新增）</h4>
+        <dl class="spec">
+          <dt>描边</dt><dd><i class="sw" style="background:#50C878"></i><span class="hex">--accent #50C878</span> 1px，对输入底 7.13:1（过 3:1 组件门槛）</dd>
+          <dt>柔光</dt><dd><i class="sw" style="background:rgba(80,200,120,.12)"></i><span class="hex">--tintbg rgba(80,200,120,.12)</span> 外圈 2px，仅装饰</dd>
+        </dl>
+      </div>
+      <div class="grp">
+        <h4>校验错误态（本次新增）</h4>
+        <dl class="spec">
+          <dt>描边</dt><dd><i class="sw" style="background:rgba(255,138,128,.42)"></i><span class="hex">--errline rgba(255,138,128,.42)</span> 1px（页底口径等效 #744B43），与错误条 .errbar 同色</dd>
+          <dt>文字</dt><dd><i class="sw" style="background:#FF8A80"></i><span class="hex">--errfg #FF8A80</span> 对输入底 6.65:1（过 4.5:1）</dd>
+          <dt>提示</dt><dd><i class="sw" style="background:#FF8A80"></i><span class="hex">--errfg #FF8A80</span> 11.5px/1.55，置于框下方</dd>
+        </dl>
+      </div>
+      <div class="grp">
+        <h4>理由 / 规则</h4>
+        <p class="rule">① 深底以页底 <span class="hex">#101E17</span> 为准：主绿 <span class="hex">#50C878</span> 对页底 8.09:1、对输入底 <span class="hex">#152A20</span> 7.13:1，故聚焦描边用 <span class="hex">--accent</span> 做 1px，远超 3:1 门槛。<br>② 柔光取既有 <span class="hex">--tintbg rgba(80,200,120,.12)</span>，不新增色；深底不用浅色 <span class="hex">#008000</span> 做描边之外的用途。<br>③ 校验错误态沿用错误条 <span class="hex">.errbar</span>：描边 <span class="hex">--errline</span>、文字与提示 <span class="hex">--errfg #FF8A80</span>（对输入底 6.65:1）。页底口径下 <span class="hex">--errline</span> 等效 <span class="hex">#744B43</span>、<span class="hex">--errbg</span> 等效 <span class="hex">#312D26</span>，均为 v0.9 既有混合值，非新增色。<br>④ 三态几何完全相同（底 --inputbg、圆角 5px、min-height 42px、padding 11px 12px、字号 12px），切换只改描边与文字色。<br>⑤ 上表对比度均为脚本复算值，取两位小数，容差 ±0.05。</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<p class="foot">三色分工：绿 = 可用与主行动，橙 = 可恢复的异常（省份没选、图没识别出字、原图不在了），红 = 破坏性动作与硬错误（删除、清空、保存失败）。落地四处：P02 的范围提示、P19 的识别失败、P10 的原图丢失与删除、组件板的错误条；其余页面与构件一律沿用 emerald 绿系。四处场景均取自《信息架构 v1.1》第 5.4 节的既有空态/异常态，未为试色新增场景。P10 的题干、选项与解析沿用 P05 的「按部就班」语境，跨页自洽。橙、红均已定稿（用户 2026-11-16 拍板，为项目规范值）：若日后改色，浅深两支要同时动，按白底 4.5:1、页底 4.5:1 两条线重算（深色一律以页底 #101E17 为准；警示条与错误条实际就叠在页底上，页底口径即落点口径），别只改一半。</p>
+
+</div>
+</body>
+</html>

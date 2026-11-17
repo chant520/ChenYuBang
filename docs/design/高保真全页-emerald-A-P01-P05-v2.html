@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>emerald 全页高保真 · P01–P05 · v2</title>
+<style>
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; padding: 34px 26px 80px; background: #e8eaec; color: #1a1a1a;
+    font-family: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 830px; margin: 0 auto; }
+
+  .hd { border-bottom: 3px solid #22262a; padding-bottom: 18px; margin-bottom: 26px; }
+  .hd h1 { margin: 0 0 12px; font-size: 23px; letter-spacing: .01em; }
+  .hd p { margin: 0 0 7px; font-size: 13px; line-height: 1.75; color: #3c4147; max-width: 790px; }
+  .hd p:last-child { margin-bottom: 0; }
+
+  .row { display: flex; gap: 26px; align-items: flex-start; flex-wrap: wrap; }
+  .col { flex: 0 0 375px; width: 375px; }
+
+  .vname { margin: 0 0 11px; font-size: 14px; font-weight: 700; letter-spacing: .02em; }
+  .vname em { font-style: normal; font-weight: 400; font-size: 11.5px; color: #5c6369; margin-left: 8px; }
+
+  .grphd { margin: 32px 0 13px; padding-top: 11px; border-top: 2px solid #b9bfc4;
+           font-size: 12.5px; font-weight: 700; letter-spacing: .04em; color: #22262a; }
+  .grphd span { font-weight: 400; color: #5c6369; margin-left: 8px; letter-spacing: 0; }
+
+  /* ---------- 手机框 ---------- */
+  .phone { position: relative; width: 375px; display: flex; flex-direction: column;
+           border-radius: 2px; overflow: hidden; background: var(--page); color: var(--text); }
+  .phone.h812 { height: 812px; }
+  .phone.tall { min-height: 812px; overflow: visible; }
+
+  .top { display: flex; align-items: center; gap: 10px; flex: 0 0 auto;
+         padding: 20px 20px 15px; border-bottom: 1px solid var(--line); }
+  .pname { flex: 1; font-size: 20px; font-weight: 700; letter-spacing: .02em; color: var(--head); }
+  .pname.sub { font-size: 15px; }
+  .ic { width: 21px; height: 21px; flex: 0 0 auto; fill: none; stroke: var(--text2);
+        stroke-width: 1.6; stroke-linecap: square; }
+  .ic.ac { stroke: var(--accent); }
+  .ic.dim { stroke: var(--text3); }
+  .ic.sm { width: 15px; height: 15px; }
+
+  .body { flex: 1; padding: 18px 20px 20px; display: flex; flex-direction: column; }
+
+  /* ---------- 卡片 / 文本 ---------- */
+  .card { padding: 16px; margin-bottom: 16px; border-radius: 6px;
+          background: var(--surface); border: 1px solid var(--line); }
+  .card.soft { background: var(--surface2); }
+  .card.flat { background: transparent; }
+  .ctitle { font-size: 15px; font-weight: 700; color: var(--head); letter-spacing: .01em; }
+  .row1 { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .range { margin: 10px 0 0; font-size: 13px; line-height: 1.65; color: var(--text2); }
+  .range b { font-weight: 600; color: var(--text); }
+  .warn { color: var(--warnfg); font-weight: 600; border-bottom: 1px dashed var(--warnfg); padding-bottom: 1px; }
+  .hintrow { display: flex; align-items: baseline; justify-content: space-between; gap: 10px;
+             flex-wrap: wrap; margin-top: 8px; }
+  .hint { margin: 0; font-size: 12px; line-height: 1.65; color: var(--text3); }
+  .linkbtn { font-size: 12px; color: var(--accent); border-bottom: 1px solid var(--accent);
+             padding-bottom: 1px; cursor: default; }
+  .dims { margin: 12px 0 0; padding-top: 12px; border-top: 1px solid var(--line2);
+          font-size: 12px; line-height: 1.6; color: var(--text3); }
+  .more { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--text2); white-space: nowrap; }
+  .more svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 1.6; }
+
+  .lbl { margin: 0 0 7px; font-size: 11px; font-weight: 700; letter-spacing: .1em; color: var(--text3); }
+  .txt { margin: 0 0 7px; font-size: 13px; line-height: 1.7; color: var(--text2); }
+  .txt:last-child { margin-bottom: 0; }
+  .txt b { color: var(--text); font-weight: 700; }
+  .txt.k { color: var(--text); }
+  .txt.dim { margin: 6px 0 0; font-size: 11.5px; line-height: 1.65; color: var(--text3); }
+
+  /* ---------- 数字 ---------- */
+  .nums { display: flex; gap: 30px; margin-top: 14px; flex-wrap: wrap; }
+  .nums.tight { gap: 22px; }
+  .numcell { display: flex; flex-direction: column; align-items: flex-start; }
+  .numv { font-size: 30px; font-weight: 700; line-height: 1; letter-spacing: .01em; color: var(--head); }
+  .numv.hot { color: var(--hot); }
+  .numv.sm { font-size: 20px; }
+  .numl { margin-top: 9px; font-size: 11px; color: var(--text2); letter-spacing: .06em; }
+
+  /* ---------- 按钮 ---------- */
+  .btn { display: block; width: 100%; margin: 6px 0 0; padding: 13px 0; text-align: center;
+         border-radius: 6px; font-size: 14px; font-weight: 700; letter-spacing: .02em;
+         background: var(--btnbg); color: var(--btnfg); border: 1px solid var(--btnline); }
+  .btn.loading { display: flex; align-items: center; justify-content: center; gap: 9px; }
+  .spinner { width: 14px; height: 14px; border: 2px solid currentColor; border-right-color: transparent;
+             border-radius: 50%; }
+  .loadnote { margin: 7px 0 0; font-size: 11px; line-height: 1.65; color: var(--text3); text-align: center; }
+  .disbtn { display: block; width: 100%; padding: 12px 0; text-align: center; border-radius: 6px;
+            font-size: 13.5px; font-weight: 700; background: var(--disbg); color: var(--disfg);
+            border: 1px solid var(--disline); }
+  .dangerbtn { display: block; width: 100%; padding: 12px 0; text-align: center; border-radius: 6px;
+               font-size: 13.5px; font-weight: 700; background: var(--errfill); color: var(--errfillfg);
+               border: 1px solid var(--errfill); }
+  .dangerout { display: block; width: 100%; padding: 12px 0; text-align: center; border-radius: 6px;
+               font-size: 13.5px; font-weight: 700; color: var(--errfg); background: transparent;
+               border: 1px solid var(--errline); }
+  .topbtn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 11px; border-radius: 5px;
+            background: var(--btnbg); color: var(--btnfg); font-size: 11.5px; font-weight: 700; white-space: nowrap; }
+  .topbtn svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.7; }
+  .smallrow { display: flex; gap: 8px; margin: 10px 0 0; }
+  .ghostbtn { flex: 1; padding: 10px 0; text-align: center; font-size: 11.5px; border-radius: 5px;
+              border: 1px solid var(--line); color: var(--text2); }
+
+  /* ---------- 标签 / 徽标 ---------- */
+  .tagrow { display: flex; gap: 8px; flex-wrap: wrap; }
+  .tag { padding: 4px 9px; border-radius: 4px; font-size: 11px; line-height: 1.4;
+         background: var(--tintbg); color: var(--tintfg); border: 1px solid var(--tintline); }
+  .tag.ghost { background: transparent; color: var(--text3); border: 1px dashed var(--line); }
+  .distag { padding: 4px 9px; border-radius: 4px; font-size: 11px; line-height: 1.4;
+            background: var(--disbg); color: var(--disfg); border: 1px solid var(--disline); }
+  .badgewarn { display: inline-block; padding: 2px 6px; border-radius: 3px; font-size: 10px;
+               background: var(--warnbg); color: var(--warnfg); border: 1px solid var(--warnline); }
+  .badgerr { display: inline-block; padding: 2px 6px; border-radius: 3px; font-size: 10px;
+             background: var(--errbg); color: var(--errfg); border: 1px solid var(--errline); }
+
+  /* ---------- 警示 / 错误 ---------- */
+  .warnbar { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; margin-bottom: 16px;
+             border-radius: 6px; background: var(--warnbg); border: 1px solid var(--warnline); }
+  .warnbar svg { width: 18px; height: 18px; margin-top: 2px; flex: 0 0 auto;
+                 fill: none; stroke: var(--warnfg); stroke-width: 1.8; }
+  .warnbar .wt { font-size: 13px; font-weight: 700; line-height: 1.55; color: var(--warnfg); }
+  .warnbar .ws { margin-top: 4px; font-size: 11.5px; line-height: 1.65; color: var(--text2); }
+  .errbar { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; margin-bottom: 16px;
+            border-radius: 6px; background: var(--errbg); border: 1px solid var(--errline); }
+  .errbar svg { width: 18px; height: 18px; margin-top: 2px; flex: 0 0 auto;
+                fill: none; stroke: var(--errfg); stroke-width: 1.8; }
+  .errbar .et { font-size: 13px; font-weight: 700; line-height: 1.55; color: var(--errfg); }
+  .errbar .es { margin-top: 4px; font-size: 11.5px; line-height: 1.65; color: var(--text2); }
+  .winline { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--warnfg); }
+  .winline svg { width: 13px; height: 13px; fill: none; stroke: var(--warnfg); stroke-width: 1.9; }
+  .errline-txt { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--errfg); }
+  .errline-txt svg { width: 13px; height: 13px; fill: none; stroke: var(--errfg); stroke-width: 1.9; }
+  .danger { font-size: 12.5px; font-weight: 600; color: var(--errfg); }
+  .danger.neutral { color: var(--text2); }
+
+  .imgph { height: 150px; margin-bottom: 16px; border-radius: 6px; border: 1px dashed var(--warnline);
+           background: var(--warnbg); display: flex; flex-direction: column;
+           align-items: center; justify-content: center; gap: 7px; }
+  .imgph svg { width: 26px; height: 26px; fill: none; stroke: var(--warnfg); stroke-width: 1.7; }
+  .imgph p { margin: 0; font-size: 12.5px; font-weight: 700; color: var(--warnfg); }
+  .imgph span { font-size: 11px; color: var(--text2); }
+  .ph-rec { flex: 1 1 auto; min-height: 140px; max-height: 250px; margin-bottom: 16px;
+            display: flex; align-items: center; justify-content: center; padding: 0 26px;
+            background: var(--phbg); border: 1px dashed var(--phline); border-radius: 6px; }
+  .ph-rec p { margin: 0; font-size: 13px; line-height: 1.75; color: var(--text3); text-align: center; }
+
+  /* ---------- 输入 ---------- */
+  .editinput { display: flex; align-items: center; gap: 8px; min-height: 42px; padding: 11px 12px;
+               border-radius: 5px; background: var(--inputbg); border: 1px solid var(--line);
+               font-size: 12px; color: var(--text); margin-bottom: 12px; }
+  .editinput .iph { color: var(--text3); }
+  .editinput.focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--tintbg); }
+  .editinput.err { border-color: var(--errline); color: var(--errfg); }
+  .errhint { margin: -6px 0 12px; font-size: 11.5px; line-height: 1.55; color: var(--errfg); }
+  .maskrow { display: flex; align-items: center; justify-content: space-between; gap: 10px;
+             padding: 11px 12px; margin-bottom: 12px; border-radius: 5px;
+             border: 1px solid var(--line); background: var(--inputbg); font-size: 12px; color: var(--text2); }
+  .maskrow .mbtn { font-size: 11.5px; font-weight: 700; color: var(--accent); }
+  .disinput { min-height: 42px; padding: 10px 12px; border-radius: 5px; background: var(--disbg);
+              border: 1px solid var(--disline); font-size: 12.5px; color: var(--disfg); margin-bottom: 12px; }
+
+  /* ---------- 列表 ---------- */
+  .list { border-radius: 6px; background: var(--surface); border: 1px solid var(--line); overflow: hidden; }
+  .lrow { padding: 13px 16px; border-bottom: 1px solid var(--line2); }
+  .lrow:last-child { border-bottom: 0; }
+  .lrow .lt1 { display: flex; align-items: baseline; gap: 8px; }
+  .lrow .lname { font-size: 14px; font-weight: 600; color: var(--text); letter-spacing: .01em; }
+  .lrow .lpy { font-size: 11px; color: var(--text3); }
+  .lrow .lsub { margin: 5px 0 0; font-size: 12px; line-height: 1.6; color: var(--text2); }
+  .lmeta { margin: 6px 0 0; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+              font-size: 11px; color: var(--text3); }
+  .lrow .lmeta { margin: 6px 0 0; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+                 font-size: 11px; color: var(--text3); }
+  .lrow .r { margin-left: auto; font-size: 11px; color: var(--text3); white-space: nowrap; }
+  .listfoot { margin: 10px 0 0; text-align: center; font-size: 11px; color: var(--text3); }
+  .optrow { display: flex; gap: 9px; padding: 8px 0; font-size: 13px; line-height: 1.6;
+            color: var(--text2); border-bottom: 1px solid var(--line2); }
+  .optrow b { flex: 0 0 14px; color: var(--text); font-weight: 700; }
+  .optrow b.w2 { flex: 0 0 31px; font-weight: 600; color: var(--text2); }
+  .optrow:last-child { border-bottom: 0; padding-bottom: 0; }
+  .optrow.on { color: var(--text); }
+  .optrow.on b { color: var(--accent); }
+
+  /* ---------- 分段 / 复选 ---------- */
+  .seg { display: flex; padding: 3px; border-radius: 5px; background: var(--seg); border: 1px solid var(--line);
+         margin-bottom: 16px; }
+  .seg i { flex: 1; padding: 8px 0; text-align: center; font-size: 11px; font-style: normal; color: var(--text2); border-radius: 4px; }
+  .seg i.on { background: var(--segon); color: var(--segonfg); font-weight: 700; }
+  .chkrow { display: flex; align-items: center; gap: 10px; padding: 12px 0; border-bottom: 1px solid var(--line2);
+            font-size: 13px; color: var(--text); }
+  .chkrow:last-child { border-bottom: 0; }
+  .chk { width: 18px; height: 18px; flex: 0 0 auto; border-radius: 4px; background: var(--accent);
+         border: 1px solid var(--accent); display: flex; align-items: center; justify-content: center; }
+  .chk svg { width: 12px; height: 12px; fill: none; stroke: var(--chkfg); stroke-width: 2; }
+  .chk.off { background: transparent; border-color: var(--line); }
+  .chk.dis { background: var(--disbg); border-color: var(--disline); }
+  .chkrow.dis { color: var(--disfg); }
+  .chkrow .r { margin-left: auto; font-size: 11px; color: var(--text3); }
+
+  /* ---------- 标签栏 / FAB ---------- */
+  .tabs { display: flex; flex: 0 0 auto; background: var(--tabbg); border-top: 1px solid var(--line); }
+  .tab { flex: 1; position: relative; text-align: center; padding: 11px 0 13px; font-size: 11px; color: var(--text3); }
+  .tab svg { display: block; margin: 0 auto 5px; width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.5; }
+  .tab.on { color: var(--accent); font-weight: 700; }
+  .tab.on::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--accent); }
+  .fab { position: absolute; right: 20px; bottom: 88px; width: 52px; height: 52px; border-radius: 6px;
+         background: var(--fab); box-shadow: var(--fabshadow);
+         display: flex; align-items: center; justify-content: center; }
+  .fab svg { width: 24px; height: 24px; fill: none; stroke: var(--fabicon); stroke-width: 1.6; }
+
+  /* ---------- 骨架 ---------- */
+  .skel { display: flex; flex-direction: column; gap: 11px; }
+  .skbox { height: 14px; border-radius: 4px; background: var(--skel); position: relative; overflow: hidden; }
+  .skbox::after { content: ""; position: absolute; inset: 0; transform: translateX(-100%);
+                  background: linear-gradient(90deg, transparent, var(--skelhi), transparent); }
+  .skbox.h2 { height: 46px; }
+  .skbox.w70 { width: 70%; }
+
+  /* ---------- 相框 / 裁切 ---------- */
+  .camview { position: relative; flex: 1 1 auto; margin: -1px 0 0; background: #0b1410;
+              display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  .camview .paper { width: 288px; padding: 20px 18px; background: #f4f1ea; color: #26312a;
+                    font-size: 10px; line-height: 2; transform: rotate(-1.5deg); }
+  .camview .paper b { font-size: 11px; }
+  .shutter { display: flex; align-items: center; justify-content: space-between; padding: 16px 26px 22px;
+             background: #0b1410; }
+  .shutter .ring { width: 58px; height: 58px; border-radius: 50%; border: 3px solid rgba(255,255,255,.85);
+                   display: flex; align-items: center; justify-content: center; }
+  .shutter .ring i { display: block; width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,.9); }
+  .shutter .gbtn { width: 40px; height: 40px; border-radius: 5px; border: 1px solid rgba(255,255,255,.5);
+                   display: flex; align-items: center; justify-content: center; }
+  .shutter .gbtn svg { width: 20px; height: 20px; fill: none; stroke: rgba(255,255,255,.85); stroke-width: 1.6; }
+  .shutter .ctxt { width: 40px; text-align: center; font-size: 11px; color: rgba(255,255,255,.75); }
+
+  .cropwrap { position: relative; border-radius: 6px; overflow: hidden; background: #0b1410; }
+  .cropwrap .paper { width: 100%; min-height: 300px; padding: 30px 20px; background: #efece4; color: #26312a;
+                     font-size: 10px; line-height: 2.1; }
+  .cropbox { position: absolute; left: 20px; right: 20px; top: 56px; height: 168px;
+             border: 1px solid rgba(255,255,255,.55); }
+  .cropbox i { position: absolute; width: 18px; height: 18px; border: 2px solid var(--warnfg); }
+  .cropbox i:nth-child(1) { left: -2px; top: -2px; border-right: 0; border-bottom: 0; }
+  .cropbox i:nth-child(2) { right: -2px; top: -2px; border-left: 0; border-bottom: 0; }
+  .cropbox i:nth-child(3) { left: -2px; bottom: -2px; border-right: 0; border-top: 0; }
+  .cropbox i:nth-child(4) { right: -2px; bottom: -2px; border-left: 0; border-top: 0; }
+
+  /* ---------- 弹层 ---------- */
+  .modal-holder { position: absolute; inset: 0; background: var(--modal);
+                  display: flex; align-items: flex-end; }
+  .modal-holder.center { align-items: center; justify-content: center; }
+  .msheet { width: 100%; background: var(--surface); border-radius: 6px 6px 0 0; padding: 18px 20px 20px;
+            border: 1px solid var(--line); }
+  .msheet.mid { width: 315px; border-radius: 6px; padding: 18px; }
+  .mtitle { font-size: 15px; font-weight: 700; color: var(--head); margin-bottom: 6px; }
+  .mdesc { font-size: 12px; line-height: 1.7; color: var(--text2); margin-bottom: 14px; }
+
+  .cutline { position: absolute; left: 0; right: 0; top: 812px; border-top: 1px dashed var(--cut); }
+  .cutline span { position: absolute; right: 8px; top: -9px; padding: 0 6px; background: var(--page);
+                  font-size: 10px; color: var(--text3); font-family: ui-monospace, Consolas, monospace; }
+
+  .cap { margin: 11px 0 0; font-size: 12.5px; font-weight: 700; }
+  .sub { margin: 4px 0 0; font-size: 11.5px; line-height: 1.7; color: #5c6369; }
+
+  .foot { margin-top: 28px; padding-top: 15px; border-top: 1px solid #c9ced2;
+          font-size: 12px; line-height: 1.8; color: #5c6369; }
+
+  .lt {
+    --page: #F3F9F5;
+    --head: #12291C;
+    --text: #183828;
+    --text2: #4F6B5B;
+    --text3: #5E7569;
+    --line: #D6EADD;
+    --line2: #E4F1E9;
+    --surface: #FFFFFF;
+    --surface2: #EDF8F1;
+    --tintbg: #F0FAF4;
+    --tintfg: #008000;
+    --tintline: #BFE6CC;
+    --accent: #008000;
+    --accent2: #009E60;
+    --hot: #009E60;
+    --warnline: #F3C9A8;
+    --warnfg: #C2410C;
+    --warnbg: #FFF3E6;
+    --errfg: #C62828;
+    --errbg: #FDECEA;
+    --errline: #F0BEBE;
+    --errfill: #C62828;
+    --errfillfg: #FFFFFF;
+    --phbg: #ECF7F0;
+    --phline: #CFE8D9;
+    --tabbg: #FFFFFF;
+    --seg: #ECF7F0;
+    --segon: #008000;
+    --segonfg: #FFFFFF;
+    --inputbg: #F7FBF8;
+    --chkfg: #FFFFFF;
+    --fab: #008000;
+    --fabicon: #FFFFFF;
+    --fabshadow: 0 8px 18px rgba(0,128,0,.22);
+    --btnbg: #008000;
+    --btnfg: #FFFFFF;
+    --btnline: #008000;
+    --disbg: #E6EFE9;
+    --disfg: #93A99C;
+    --disline: #DCE8E1;
+    --loadbg: #008000;
+    --loadfg: #FFFFFF;
+    --skel: #DCE9E0;
+    --skelhi: #F1F8F3;
+    --cut: #BBDCC9;
+    --modal: rgba(12,26,18,.55);
+  }
+
+  .dk {
+    --page: #101E17;
+    --head: #E8F4EB;
+    --text: #D5E8DA;
+    --text2: #A6C2AE;
+    --text3: #7E9B88;
+    --line: #2B4636;
+    --line2: #23392C;
+    --surface: #1A3126;
+    --surface2: #152A20;
+    --tintbg: rgba(80,200,120,.12);
+    --tintfg: #50C878;
+    --tintline: rgba(80,200,120,.38);
+    --accent: #50C878;
+    --accent2: #009E60;
+    --hot: #009E60;
+    --warnline: rgba(255,138,0,.42);
+    --warnfg: #FF8A00;
+    --warnbg: rgba(255,138,0,.14);
+    --errfg: #FF8A80;
+    --errbg: rgba(255,138,128,.14);
+    --errline: rgba(255,138,128,.42);
+    --errfill: #FF8A80;
+    --errfillfg: #0C1A12;
+    --phbg: #16291F;
+    --phline: #2A4433;
+    --tabbg: #15251C;
+    --seg: #16291F;
+    --segon: #50C878;
+    --segonfg: #0C1A12;
+    --inputbg: #152A20;
+    --chkfg: #0C1A12;
+    --fab: #50C878;
+    --fabicon: #0C1A12;
+    --fabshadow: 0 0 0 1px rgba(80,200,120,.35), 0 8px 24px rgba(80,200,120,.30);
+    --btnbg: #50C878;
+    --btnfg: #0C1A12;
+    --btnline: #50C878;
+    --disbg: #1E3327;
+    --disfg: #6E8A78;
+    --disline: #2B4636;
+    --loadbg: #50C878;
+    --loadfg: #0C1A12;
+    --skel: #23392C;
+    --skelhi: #2E4A39;
+    --cut: #2E4A39;
+    --modal: rgba(0,0,0,.62);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="hd">
+<h1>emerald 全页高保真 · P01–P05</h1>
+
+<p><b>v2 变更说明</b>：字号收敛至 v1.1 的 11 档（品牌名/成语名 26→20px、文档标题 22→23px、字母索引 8.5→10px、次级页名 17→15px）；修复 .lmeta 规则中的字面换行符；弹层圆角统一 6px；P05 收藏改「收藏（预留）」幽灵标签（线框 v0.2 标注预留）。--modal 遮罩色保留原值，其余数值与 v1 一致。</p>
+
+  <p>按《设计规范 v1.1》铺全 23 页，本文件是第一批 P01–P05。色值、字号、圆角、间距全部取自规范第 2–4 章，未新增规范外数值；深色按<b>页底 #101E17 口径</b>。</p>
+    <p>规则落地要点：P10 顶部「删除」改中性色以守一处红（见文件 C）；P19 识别失败、P10 原图丢失沿用警示橙；P01 三项默认勾选、省考只勾选不选省份，橙提示落在这一处。</p>
+
+</header>
+<p class="grphd">P01 · 启动页<span>全屏浮层，无标签栏；三项默认已勾选，省考勾选但未选省份</span></p>
+
+<div class="row">
+
+  <div class="col">
+    <p class="vname">浅色模式 · 启动页<em>P01</em></p>
+
+    <div class="phone h812 lt">
+<div class="body" style="justify-content:center;padding:52px 20px 24px">
+  <div style="text-align:center;margin-bottom:30px">
+    <svg viewBox="0 0 24 24" style="width:52px;height:52px;fill:none;stroke:var(--accent);stroke-width:1.5">
+    <path d="M4 4h7v16H4z"/><path d="M13 4h7v16h-7z"/><path d="M7 9h1M7 13h1M16 9h1M16 13h1"/></svg>
+    <p style="margin:16px 0 6px;font-size:20px;font-weight:700;color:var(--head);letter-spacing:.04em">成语记忆</p>
+    <p style="margin:0;font-size:12px;color:var(--text3)">把考公考编的成语错题，记成自己的题库</p>
+  </div>
+
+  <div class="card">
+    <p class="lbl">首次打开 · 先定考试范围</p>
+    <div class="chkrow">
+      <span class="chk"><svg viewBox="0 0 24 24"><path d="M5 12l4.5 4.5L19 7"/></svg></span>
+      <span>国考</span>
+    </div>
+    <div class="chkrow" style="border-bottom:0">
+      <span class="chk"><svg viewBox="0 0 24 24"><path d="M5 12l4.5 4.5L19 7"/></svg></span>
+      <span>省考</span>
+      <span class="winline" style="margin-left:auto">
+        <svg viewBox="0 0 24 24"><path d="M12 4l8 15H4z"/><path d="M12 9v4"/><path d="M12 16.5v.5"/></svg>
+        未选省份
+      </span>
+    </div>
+    <div class="hintrow" style="padding:0 0 4px">
+      <p class="hint">省考内容暂不显示，选好省份即可看到</p>
+      <span class="linkbtn">去选省份</span>
+    </div>
+    <div class="chkrow" style="border-bottom:0;margin-top:4px">
+      <span class="chk"><svg viewBox="0 0 24 24"><path d="M5 12l4.5 4.5L19 7"/></svg></span>
+      <span>事业编</span>
+    </div>
+  </div>
+
+  <div class="btn">进入</div>
+  <div class="ghostbtn" style="flex:none;width:100%;display:block;margin-top:10px">跳过，沿用默认</div>
+
+  <p class="hint" style="text-align:center;margin-top:18px">版本 1.0.0</p>
+</div>
+</div>
+  </div>
+
+  <div class="col">
+    <p class="vname">深色模式 · 启动页<em>P01</em></p>
+
+    <div class="phone h812 dk">
+<div class="body" style="justify-content:center;padding:52px 20px 24px">
+  <div style="text-align:center;margin-bottom:30px">
+    <svg viewBox="0 0 24 24" style="width:52px;height:52px;fill:none;stroke:var(--accent);stroke-width:1.5">
+    <path d="M4 4h7v16H4z"/><path d="M13 4h7v16h-7z"/><path d="M7 9h1M7 13h1M16 9h1M16 13h1"/></svg>
+    <p style="margin:16px 0 6px;font-size:20px;font-weight:700;color:var(--head);letter-spacing:.04em">成语记忆</p>
+    <p style="margin:0;font-size:12px;color:var(--text3)">把考公考编的成语错题，记成自己的题库</p>
+  </div>
+
+  <div class="card">
+    <p class="lbl">首次打开 · 先定考试范围</p>
+    <div class="chkrow">
+      <span class="chk"><svg viewBox="0 0 24 24"><path d="M5 12l4.5 4.5L19 7"/></svg></span>
+      <span>国考</span>
+    </div>
+    <div class="chkrow" style="border-bottom:0">
+      <span class="chk"><svg viewBox="0 0 24 24"><path d="M5 12l4.5 4.5L19 7"/></svg></span>
+      <span>省考</span>
+      <span class="winline" style="margin-left:auto">
+        <svg viewBox="0 0 24 24"><path d="M12 4l8 15H4z"/><path d="M12 9v4"/><path d="M12 16.5v.5"/></svg>
+        未选省份
+      </span>
+    </div>
+    <div class="hintrow" style="padding:0 0 4px">
+      <p class="hint">省考内容暂不显示，选好省份即可看到</p>
+      <span class="linkbtn">去选省份</span>
+    </div>
+    <div class="chkrow" style="border-bottom:0;margin-top:4px">
+      <span class="chk"><svg viewBox="0 0 24 24"><path d="M5 12l4.5 4.5L19 7"/></svg></span>
+      <span>事业编</span>
+    </div>
+  </div>
+
+  <div class="btn">进入</div>
+  <div class="ghostbtn" style="flex:none;width:100%;display:block;margin-top:10px">跳过，沿用默认</div>
+
+  <p class="hint" style="text-align:center;margin-top:18px">版本 1.0.0</p>
+</div>
+</div>
+  </div>
+
+</div>
+
+<p class="grphd">P02 · 推荐首页<span>一级页，四个主标签页之一；悬浮拍照按钮在此</span></p>
+
+<div class="row">
+
+  <div class="col">
+    <p class="vname">浅色模式 · 推荐首页<em>P02</em></p>
+
+    <div class="phone h812 lt">
+<div class="top"><div class="pname">推荐</div>
+  <svg class="ic ac" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.6-4.6"/></svg></div>
+<div class="body">
+  <div class="ph-rec">
+    <p>每日推荐将在进阶版本接入，本版先留空位</p>
+  </div>
+
+  <div class="card">
+    <div class="row1">
+      <div class="ctitle">进入成语库</div>
+      <svg class="ic sm ac" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+    </div>
+    <p class="range">当前考试范围：<b>国考 · <span class="warn">省考（未选省份）</span> · 事业编</b></p>
+    <div class="hintrow">
+      <span class="winline">
+        <svg viewBox="0 0 24 24"><path d="M12 4l8 15H4z"/><path d="M12 9v4"/><path d="M12 16.5v.5"/></svg>
+        省考内容暂不显示，选好省份即可看到
+      </span>
+      <span class="linkbtn">去选省份</span>
+    </div>
+    <p class="dims">浏览维度：按范围 / 按首字母 / 按考频</p>
+  </div>
+
+  <div class="card">
+    <div class="row1">
+      <div class="ctitle">我的错题</div>
+      <span class="more">去错题本<svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></span>
+    </div>
+    <div class="nums">
+      <div class="numcell"><div class="numv">12</div><div class="numl">错题总数</div></div>
+      <div class="numcell"><div class="numv hot">7</div><div class="numl">待复习</div></div>
+    </div>
+  </div>
+</div>
+<div class="tabs">
+  <div class="tab on"><svg viewBox="0 0 24 24"><path d="M4 4h6.5v16H4z"/><path d="M13.5 4H20v16h-6.5z"/></svg><span>成语</span></div>
+  <div class="tab"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span>例题</span></div>
+  <div class="tab"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span>错题</span></div>
+  <div class="tab"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span>我的</span></div>
+</div>
+<div class="fab">
+  <svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13"/><circle cx="12" cy="13.5" r="3.6"/><path d="M8.5 7l1.4-3h4.2l1.4 3"/></svg>
+</div>
+</div>
+  </div>
+
+  <div class="col">
+    <p class="vname">深色模式 · 推荐首页<em>P02</em></p>
+
+    <div class="phone h812 dk">
+<div class="top"><div class="pname">推荐</div>
+  <svg class="ic ac" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.6-4.6"/></svg></div>
+<div class="body">
+  <div class="ph-rec">
+    <p>每日推荐将在进阶版本接入，本版先留空位</p>
+  </div>
+
+  <div class="card">
+    <div class="row1">
+      <div class="ctitle">进入成语库</div>
+      <svg class="ic sm ac" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+    </div>
+    <p class="range">当前考试范围：<b>国考 · <span class="warn">省考（未选省份）</span> · 事业编</b></p>
+    <div class="hintrow">
+      <span class="winline">
+        <svg viewBox="0 0 24 24"><path d="M12 4l8 15H4z"/><path d="M12 9v4"/><path d="M12 16.5v.5"/></svg>
+        省考内容暂不显示，选好省份即可看到
+      </span>
+      <span class="linkbtn">去选省份</span>
+    </div>
+    <p class="dims">浏览维度：按范围 / 按首字母 / 按考频</p>
+  </div>
+
+  <div class="card">
+    <div class="row1">
+      <div class="ctitle">我的错题</div>
+      <span class="more">去错题本<svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></span>
+    </div>
+    <div class="nums">
+      <div class="numcell"><div class="numv">12</div><div class="numl">错题总数</div></div>
+      <div class="numcell"><div class="numv hot">7</div><div class="numl">待复习</div></div>
+    </div>
+  </div>
+</div>
+<div class="tabs">
+  <div class="tab on"><svg viewBox="0 0 24 24"><path d="M4 4h6.5v16H4z"/><path d="M13.5 4H20v16h-6.5z"/></svg><span>成语</span></div>
+  <div class="tab"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span>例题</span></div>
+  <div class="tab"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span>错题</span></div>
+  <div class="tab"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span>我的</span></div>
+</div>
+<div class="fab">
+  <svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13"/><circle cx="12" cy="13.5" r="3.6"/><path d="M8.5 7l1.4-3h4.2l1.4 3"/></svg>
+</div>
+</div>
+  </div>
+
+</div>
+
+<p class="grphd">P03 · 成语库<span>二级页，无标签栏、无悬浮按钮；右侧字母索引条</span></p>
+
+<div class="row">
+
+  <div class="col">
+    <p class="vname">浅色模式 · 成语库<em>P03</em></p>
+
+    <div class="phone h812 lt">
+<div class="top"><svg class="ic" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>
+  <div class="pname">成语库</div>
+  <svg class="ic ac" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.6-4.6"/></svg></div>
+<div class="body" style="padding-right:20px">
+  <div class="card" style="padding:11px 16px;margin-bottom:12px">
+    <div class="row1">
+      <span class="range" style="margin:0">范围：<b>国考 · 事业编</b></span>
+      <span class="more">改范围<svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></span>
+    </div>
+  </div>
+
+  <div class="seg">
+    <i class="on">按考试范围</i><i>按首字母</i><i>按考频</i>
+  </div>
+
+  <div class="list" style="margin-right:12px">
+    <div class="lrow">
+      <div class="lt1"><span class="lname">按部就班</span><span class="lpy">àn bù jiù bān</span></div>
+      <div class="lmeta"><span class="tag">高频</span><span class="distag">未学</span></div>
+    </div>
+    <div class="lrow">
+      <div class="lt1"><span class="lname">别出心裁</span><span class="lpy">bié chū xīn cái</span></div>
+      <div class="lmeta"><span class="tag">高频</span><span class="distag">未学</span></div>
+    </div>
+    <div class="lrow">
+      <div class="lt1"><span class="lname">墨守成规</span><span class="lpy">mò shǒu chéng guī</span></div>
+      <div class="lmeta"><span class="tag">高频</span><span class="distag">未学</span></div>
+    </div>
+    <div class="lrow">
+      <div class="lt1"><span class="lname">循序渐进</span><span class="lpy">xún xù jiàn jìn</span></div>
+      <div class="lmeta"><span class="tag ghost">中频</span><span class="distag">未学</span></div>
+    </div>
+    <div class="lrow">
+      <div class="lt1"><span class="lname">望其项背</span><span class="lpy">wàng qí xiàng bèi</span></div>
+      <div class="lmeta"><span class="tag ghost">中频</span><span class="distag">未学</span></div>
+    </div>
+    <div class="lrow">
+      <div class="lt1"><span class="lname">同日而语</span><span class="lpy">tóng rì ér yǔ</span></div>
+      <div class="lmeta"><span class="tag ghost">中频</span><span class="distag">未学</span></div>
+    </div>
+  </div>
+
+  <p class="listfoot">共 1,286 条 · 已到末尾</p>
+
+  <div style="position:absolute;right:4px;top:250px;display:flex;flex-direction:column;gap:1px;
+              font-size:10px;line-height:1.45;color:var(--text3);text-align:center">
+    <span style="color:var(--accent);font-weight:700">A</span><span>B</span><span>C</span><span>D</span>
+    <span>E</span><span>F</span><span>G</span><span>H</span><span>J</span><span>K</span><span>L</span>
+  </div>
+</div>
+</div>
+  </div>
+
+  <div class="col">
+    <p class="vname">深色模式 · 成语库<em>P03</em></p>
+
+    <div class="phone h812 dk">
+<div class="top"><svg class="ic" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>
+  <div class="pname">成语库</div>
+  <svg class="ic ac" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.6-4.6"/></svg></div>
+<div class="body" style="padding-right:20px">
+  <div class="card" style="padding:11px 16px;margin-bottom:12px">
+    <div class="row1">
+      <span class="range" style="margin:0">范围：<b>国考 · 事业编</b></span>
+      <span class="more">改范围<svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></span>
+    </div>
+  </div>
+
+  <div class="seg">
+    <i class="on">按考试范围</i><i>按首字母</i><i>按考频</i>
+  </div>
+
+  <div class="list" style="margin-right:12px">
+    <div class="lrow">
+      <div class="lt1"><span class="lname">按部就班</span><span class="lpy">àn bù jiù bān</span></div>
+      <div class="lmeta"><span class="tag">高频</span><span class="distag">未学</span></div>
+    </div>
+    <div class="lrow">
+      <div class="lt1"><span class="lname">别出心裁</span><span class="lpy">bié chū xīn cái</span></div>
+      <div class="lmeta"><span class="tag">高频</span><span class="distag">未学</span></div>
+    </div>
+    <div class="lrow">
+      <div class="lt1"><span class="lname">墨守成规</span><span class="lpy">mò shǒu chéng guī</span></div>
+      <div class="lmeta"><span class="tag">高频</span><span class="distag">未学</span></div>
+    </div>
+    <div class="lrow">
+      <div class="lt1"><span class="lname">循序渐进</span><span class="lpy">xún xù jiàn jìn</span></div>
+      <div class="lmeta"><span class="tag ghost">中频</span><span class="distag">未学</span></div>
+    </div>
+    <div class="lrow">
+      <div class="lt1"><span class="lname">望其项背</span><span class="lpy">wàng qí xiàng bèi</span></div>
+      <div class="lmeta"><span class="tag ghost">中频</span><span class="distag">未学</span></div>
+    </div>
+    <div class="lrow">
+      <div class="lt1"><span class="lname">同日而语</span><span class="lpy">tóng rì ér yǔ</span></div>
+      <div class="lmeta"><span class="tag ghost">中频</span><span class="distag">未学</span></div>
+    </div>
+  </div>
+
+  <p class="listfoot">共 1,286 条 · 已到末尾</p>
+
+  <div style="position:absolute;right:4px;top:250px;display:flex;flex-direction:column;gap:1px;
+              font-size:10px;line-height:1.45;color:var(--text3);text-align:center">
+    <span style="color:var(--accent);font-weight:700">A</span><span>B</span><span>C</span><span>D</span>
+    <span>E</span><span>F</span><span>G</span><span>H</span><span>J</span><span>K</span><span>L</span>
+  </div>
+</div>
+</div>
+  </div>
+
+</div>
+
+<p class="grphd">P04 · 搜索（成语）<span>全屏浮层，盖住标签栏；进页自动聚焦，空输入框带清空按钮</span></p>
+
+<div class="row">
+
+  <div class="col">
+    <p class="vname">浅色模式 · 搜索（成语）<em>P04</em></p>
+
+    <div class="phone h812 lt">
+<div class="top"><svg class="ic" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6l-12 12"/></svg></div>
+<div class="body" style="padding-top:16px">
+  <div class="editinput focus" style="margin-bottom:10px">
+    <svg style="width:15px;height:15px;fill:none;stroke:var(--text3);stroke-width:1.6" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.6-4.6"/></svg>
+    <span style="flex:1">按</span>
+    <svg style="width:15px;height:15px;fill:none;stroke:var(--text3);stroke-width:1.6" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6l-12 12"/></svg>
+  </div>
+  <p class="hint" style="margin-bottom:14px">完整成语 / 单字 / 全拼 / 拼音首字母都行</p>
+
+  <div class="list">
+    <div class="lrow">
+      <div class="lt1"><span class="lname">按部就班</span><span class="lpy">àn bù jiù bān</span></div>
+      <p class="lsub">原指依照一定的条理与步骤，后多含墨守成规之意。</p>
+    </div>
+    <div class="lrow">
+      <div class="lt1"><span class="lname">按图索骥</span><span class="lpy">àn tú suǒ jì</span></div>
+      <p class="lsub">按图上所画的样子去寻找，比喻依照线索办事。</p>
+    </div>
+    <div class="lrow">
+      <div class="lt1"><span class="lname">按兵不动</span><span class="lpy">àn bīng bù dòng</span></div>
+      <p class="lsub">军队暂不行动，后泛指暂不开展行动。</p>
+    </div>
+    <div class="lrow">
+      <div class="lt1"><span class="lname">按名责实</span><span class="lpy">àn míng zé shí</span></div>
+      <p class="lsub">按照名称去核实际内容，要求名实相符。</p>
+    </div>
+  </div>
+  <p class="listfoot">4 条结果</p>
+</div>
+</div>
+  </div>
+
+  <div class="col">
+    <p class="vname">深色模式 · 搜索（成语）<em>P04</em></p>
+
+    <div class="phone h812 dk">
+<div class="top"><svg class="ic" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6l-12 12"/></svg></div>
+<div class="body" style="padding-top:16px">
+  <div class="editinput focus" style="margin-bottom:10px">
+    <svg style="width:15px;height:15px;fill:none;stroke:var(--text3);stroke-width:1.6" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.6-4.6"/></svg>
+    <span style="flex:1">按</span>
+    <svg style="width:15px;height:15px;fill:none;stroke:var(--text3);stroke-width:1.6" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6l-12 12"/></svg>
+  </div>
+  <p class="hint" style="margin-bottom:14px">完整成语 / 单字 / 全拼 / 拼音首字母都行</p>
+
+  <div class="list">
+    <div class="lrow">
+      <div class="lt1"><span class="lname">按部就班</span><span class="lpy">àn bù jiù bān</span></div>
+      <p class="lsub">原指依照一定的条理与步骤，后多含墨守成规之意。</p>
+    </div>
+    <div class="lrow">
+      <div class="lt1"><span class="lname">按图索骥</span><span class="lpy">àn tú suǒ jì</span></div>
+      <p class="lsub">按图上所画的样子去寻找，比喻依照线索办事。</p>
+    </div>
+    <div class="lrow">
+      <div class="lt1"><span class="lname">按兵不动</span><span class="lpy">àn bīng bù dòng</span></div>
+      <p class="lsub">军队暂不行动，后泛指暂不开展行动。</p>
+    </div>
+    <div class="lrow">
+      <div class="lt1"><span class="lname">按名责实</span><span class="lpy">àn míng zé shí</span></div>
+      <p class="lsub">按照名称去核实际内容，要求名实相符。</p>
+    </div>
+  </div>
+  <p class="listfoot">4 条结果</p>
+</div>
+</div>
+  </div>
+
+</div>
+
+<p class="grphd">P05 · 成语详情<span>二级页，长页；错题只给数字不给条目，复习按钮在页尾</span></p>
+
+<div class="row">
+
+  <div class="col">
+    <p class="vname">浅色模式 · 成语详情<em>P05</em></p>
+
+    <div class="phone tall lt">
+<div class="top"><svg class="ic" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>
+  <div class="pname">成语详情</div>
+  <span class="tag ghost">收藏（预留）</span></div>
+<div class="body" style="padding-top:16px">
+  <div style="margin-bottom:15px">
+    <div class="row1" style="align-items:flex-start">
+      <div>
+        <p style="margin:0;font-size:20px;font-weight:700;color:var(--head);letter-spacing:.06em">按部就班</p>
+        <p style="margin:6px 0 0;font-size:12px;color:var(--text3)">àn bù jiù bān</p>
+      </div>
+      <svg class="ic dim" viewBox="0 0 24 24"><path d="M4 13v6h6l10-10-6-6z"/><path d="M9 5l6 6"/></svg>
+    </div>
+    <div class="tagrow" style="margin-top:10px">
+      <span class="tag">贬义</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <p class="lbl">释义</p>
+    <p class="txt k">按：依照；部、班：门类与次序。原指安排事务依照一定条理，后多指照老规矩办事，缺乏变革。</p>
+  </div>
+
+  <div class="card">
+    <p class="lbl">出处</p>
+    <p class="txt">清·李宝嘉《官场现形记》第五十三回：「这算什么按部就班呢？」</p>
+  </div>
+
+  <div class="card">
+    <p class="lbl">易错点</p>
+    <p class="txt"><b>望文生义</b>：常被误解为「按步骤有序完成」，误当褒义用。</p>
+    <p class="txt"><b>对象误用</b>：只能形容做事方式，不形容成绩与进度。</p>
+  </div>
+
+  <div class="card">
+    <p class="lbl">近义与反义</p>
+    <p class="txt">近义：墨守成规、循规蹈矩</p>
+    <p class="txt">反义：别出心裁、标新立异</p>
+  </div>
+
+  <div class="card">
+    <p class="lbl">相关真题</p>
+    <div class="lrow" style="padding:0 0 10px;border-bottom:1px solid var(--line2)">
+      <p class="lsub" style="margin:0">下列各句中，加点的成语使用不恰当的一项是</p>
+      <div class="lmeta"><span>2023 · 国考</span><span>言语理解</span></div>
+    </div>
+    <div class="lrow" style="padding:10px 0 0;border-bottom:0">
+      <p class="lsub" style="margin:0">填入横线处最恰当的一项（节选）</p>
+      <div class="lmeta"><span>2022 · 湖北省考</span><span>逻辑填空</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="row1">
+      <span class="lbl" style="margin:0">我在这个成语上错过</span>
+      <span style="font-size:20px;font-weight:700;color:var(--hot)">3 道题</span>
+    </div>
+    <div class="hintrow"><p class="hint">点数字看这 3 道题</p><span class="linkbtn">去错题本</span></div>
+  </div>
+
+  <div class="btn">复习这个成语</div>
+  <div class="cutline"><span>812</span></div>
+</div>
+<div class="cutline"><span>812</span></div>
+</div>
+  </div>
+
+  <div class="col">
+    <p class="vname">深色模式 · 成语详情<em>P05</em></p>
+
+    <div class="phone tall dk">
+<div class="top"><svg class="ic" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>
+  <div class="pname">成语详情</div>
+  <span class="tag ghost">收藏（预留）</span></div>
+<div class="body" style="padding-top:16px">
+  <div style="margin-bottom:15px">
+    <div class="row1" style="align-items:flex-start">
+      <div>
+        <p style="margin:0;font-size:20px;font-weight:700;color:var(--head);letter-spacing:.06em">按部就班</p>
+        <p style="margin:6px 0 0;font-size:12px;color:var(--text3)">àn bù jiù bān</p>
+      </div>
+      <svg class="ic dim" viewBox="0 0 24 24"><path d="M4 13v6h6l10-10-6-6z"/><path d="M9 5l6 6"/></svg>
+    </div>
+    <div class="tagrow" style="margin-top:10px">
+      <span class="tag">贬义</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <p class="lbl">释义</p>
+    <p class="txt k">按：依照；部、班：门类与次序。原指安排事务依照一定条理，后多指照老规矩办事，缺乏变革。</p>
+  </div>
+
+  <div class="card">
+    <p class="lbl">出处</p>
+    <p class="txt">清·李宝嘉《官场现形记》第五十三回：「这算什么按部就班呢？」</p>
+  </div>
+
+  <div class="card">
+    <p class="lbl">易错点</p>
+    <p class="txt"><b>望文生义</b>：常被误解为「按步骤有序完成」，误当褒义用。</p>
+    <p class="txt"><b>对象误用</b>：只能形容做事方式，不形容成绩与进度。</p>
+  </div>
+
+  <div class="card">
+    <p class="lbl">近义与反义</p>
+    <p class="txt">近义：墨守成规、循规蹈矩</p>
+    <p class="txt">反义：别出心裁、标新立异</p>
+  </div>
+
+  <div class="card">
+    <p class="lbl">相关真题</p>
+    <div class="lrow" style="padding:0 0 10px;border-bottom:1px solid var(--line2)">
+      <p class="lsub" style="margin:0">下列各句中，加点的成语使用不恰当的一项是</p>
+      <div class="lmeta"><span>2023 · 国考</span><span>言语理解</span></div>
+    </div>
+    <div class="lrow" style="padding:10px 0 0;border-bottom:0">
+      <p class="lsub" style="margin:0">填入横线处最恰当的一项（节选）</p>
+      <div class="lmeta"><span>2022 · 湖北省考</span><span>逻辑填空</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="row1">
+      <span class="lbl" style="margin:0">我在这个成语上错过</span>
+      <span style="font-size:20px;font-weight:700;color:var(--hot)">3 道题</span>
+    </div>
+    <div class="hintrow"><p class="hint">点数字看这 3 道题</p><span class="linkbtn">去错题本</span></div>
+  </div>
+
+  <div class="btn">复习这个成语</div>
+  <div class="cutline"><span>812</span></div>
+</div>
+<div class="cutline"><span>812</span></div>
+</div>
+  </div>
+
+</div>
+
+</div>
+</body>
+</html>

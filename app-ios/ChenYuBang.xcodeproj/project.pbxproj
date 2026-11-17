@@ -1,0 +1,419 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 60;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A00000000000000000000010 /* ChenYuBangApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000100 /* ChenYuBangApp.swift */; };
+		A00000000000000000000020 /* IdiomFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000130 /* IdiomFeature.swift */; };
+		A00000000000000000000021 /* ExampleFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000131 /* ExampleFeature.swift */; };
+		A00000000000000000000022 /* MistakeFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000132 /* MistakeFeature.swift */; };
+		A00000000000000000000023 /* ReviewFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000133 /* ReviewFeature.swift */; };
+		A00000000000000000000024 /* MeFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000134 /* MeFeature.swift */; };
+		A00000000000000000000025 /* CaptureFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000135 /* CaptureFeature.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		A00000000000000000000100 /* ChenYuBangApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChenYuBangApp.swift; sourceTree = "<group>"; };
+		A00000000000000000000110 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A00000000000000000000120 /* ChenYuBang.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChenYuBang.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A00000000000000000000130 /* IdiomFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdiomFeature.swift; sourceTree = "<group>"; };
+		A00000000000000000000131 /* ExampleFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleFeature.swift; sourceTree = "<group>"; };
+		A00000000000000000000132 /* MistakeFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MistakeFeature.swift; sourceTree = "<group>"; };
+		A00000000000000000000133 /* ReviewFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewFeature.swift; sourceTree = "<group>"; };
+		A00000000000000000000134 /* MeFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeFeature.swift; sourceTree = "<group>"; };
+		A00000000000000000000135 /* CaptureFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureFeature.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A00000000000000000000200 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A00000000000000000000300 = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000310 /* App */,
+				A00000000000000000000330 /* Features */,
+				A00000000000000000000320 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A00000000000000000000310 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000100 /* ChenYuBangApp.swift */,
+				A00000000000000000000110 /* Info.plist */,
+			);
+			path = Sources/App;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000330 /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000331 /* FeatureIdiom */,
+				A00000000000000000000332 /* FeatureExample */,
+				A00000000000000000000333 /* FeatureMistake */,
+				A00000000000000000000334 /* FeatureReview */,
+				A00000000000000000000335 /* FeatureMe */,
+				A00000000000000000000336 /* FeatureCapture */,
+			);
+			path = Sources/Features;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000331 /* FeatureIdiom */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000130 /* IdiomFeature.swift */,
+			);
+			path = FeatureIdiom;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000332 /* FeatureExample */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000131 /* ExampleFeature.swift */,
+			);
+			path = FeatureExample;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000333 /* FeatureMistake */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000132 /* MistakeFeature.swift */,
+			);
+			path = FeatureMistake;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000334 /* FeatureReview */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000133 /* ReviewFeature.swift */,
+			);
+			path = FeatureReview;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000335 /* FeatureMe */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000134 /* MeFeature.swift */,
+			);
+			path = FeatureMe;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000336 /* FeatureCapture */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000135 /* CaptureFeature.swift */,
+			);
+			path = FeatureCapture;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000320 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000120 /* ChenYuBang.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A00000000000000000000400 /* ChenYuBang */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A00000000000000000000510 /* Build configuration list for PBXNativeTarget "ChenYuBang" */;
+			buildPhases = (
+				A00000000000000000000410 /* Sources */,
+				A00000000000000000000200 /* Frameworks */,
+				A00000000000000000000420 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A00000000000000000000430 /* CangyuDesignSystem */,
+				A00000000000000000000440 /* CangyuData */,
+			);
+			name = ChenYuBang;
+			packageProductDependencies = (
+				A00000000000000000000610 /* CangyuDesignSystem */,
+				A00000000000000000000620 /* CangyuData */,
+			);
+			productName = ChenYuBang;
+			productReference = A00000000000000000000120 /* ChenYuBang.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A00000000000000000000500 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1620;
+				LastUpgradeCheck = 1620;
+				TargetAttributes = {
+					A00000000000000000000400 = {
+						CreatedOnToolsVersion = 16.2;
+					};
+				};
+			};
+			buildConfigurationList = A0000000000000000000050A /* Build configuration list for PBXProject "ChenYuBang" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = zh_CN;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				zh_CN,
+			);
+			mainGroup = A00000000000000000000300;
+			packageReferences = (
+				A00000000000000000000600 /* XCLocalSwiftPackageReference "." */,
+			);
+			productRefGroup = A00000000000000000000320 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A00000000000000000000400 /* ChenYuBang */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A00000000000000000000420 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A00000000000000000000410 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A00000000000000000000010 /* ChenYuBangApp.swift in Sources */,
+				A00000000000000000000020 /* IdiomFeature.swift in Sources */,
+				A00000000000000000000021 /* ExampleFeature.swift in Sources */,
+				A00000000000000000000022 /* MistakeFeature.swift in Sources */,
+				A00000000000000000000023 /* ReviewFeature.swift in Sources */,
+				A00000000000000000000024 /* MeFeature.swift in Sources */,
+				A00000000000000000000025 /* CaptureFeature.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		A00000000000000000000430 /* CangyuDesignSystem */ = {
+			isa = PBXTargetDependency;
+			productRef = A00000000000000000000610 /* CangyuDesignSystem */;
+		};
+		A00000000000000000000440 /* CangyuData */ = {
+			isa = PBXTargetDependency;
+			productRef = A00000000000000000000620 /* CangyuData */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		A0000000000000000000050B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		A0000000000000000000050C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		A00000000000000000000520 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Sources/App/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 0.10.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.chenyubang.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		A00000000000000000000530 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Sources/App/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 0.10.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.chenyubang.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A0000000000000000000050A /* Build configuration list for PBXProject "ChenYuBang" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A0000000000000000000050B /* Debug */,
+				A0000000000000000000050C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A00000000000000000000510 /* Build configuration list for PBXNativeTarget "ChenYuBang" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A00000000000000000000520 /* Debug */,
+				A00000000000000000000530 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		A00000000000000000000600 /* XCLocalSwiftPackageReference "." */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ".";
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A00000000000000000000610 /* CangyuDesignSystem */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A00000000000000000000600 /* XCLocalSwiftPackageReference "." */;
+			productName = CangyuDesignSystem;
+		};
+		A00000000000000000000620 /* CangyuData */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A00000000000000000000600 /* XCLocalSwiftPackageReference "." */;
+			productName = CangyuData;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = A00000000000000000000500 /* Project object */;
+}

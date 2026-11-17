@@ -1,0 +1,9 @@
+{
+  "algorithm": "tools/canonical.py",
+  "sha256": {
+    "backup/data.json": "5311377e4d3bf4fa585eef5fc9e2ed8967de1863850a24708e7e90accd3c63d9",
+    "backup/manifest.json": "911b3dbc2b5e674742800367de0b51f56fd97a2bb3b1391cca84c99b4e568df4",
+    "examples.sample.json": "df8dee96949ef743b96a65700eaafc2e3960946af5be4049fffbd7ccef1113e3",
+    "idioms.sample.json": "7708fa0e77900d23755249d7a70a99b8c64ffbf8853c20fb467f4121f2587147"
+  }
+}

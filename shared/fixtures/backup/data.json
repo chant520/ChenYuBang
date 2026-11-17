@@ -1,0 +1,77 @@
+{
+  "mistakes": [
+    {
+      "id": "dddddddd-dddd-4ddd-8ddd-dddddddddddd",
+      "stem": "下列句子中，加点成语使用不恰当的一项是：",
+      "options": {
+        "A": "他做事按部就班，从不越雷池一步。",
+        "B": "这幅海报的设计别出心裁，吸引了很多人。",
+        "C": "面对新问题，他仍旧墨守成规，结果错失良机。",
+        "D": "这项改革别出心裁地推进了三年。"
+      },
+      "imagePath": "images/dddddddd-dddd-4ddd-8ddd-dddddddddddd.jpg",
+      "ocrText": "下列句子中，加点成语使用不恰当的一项是：\nA 他做事按部就班，从不越雷池一步。\nB 这幅海报的设计别出心裁，吸引了很多人。\nC 面对新问题，他仍旧墨守成规，结果错失良机。\nD 这项改革别出心裁地推进了三年。",
+      "myAnswer": "B",
+      "reason": "D 项「别出心裁」不能修饰「推进」这种常规动作，属于搭配不当。",
+      "tagNames": ["搭配不当", "褒贬误用"],
+      "examType": "国考",
+      "year": 2023,
+      "region": "中央",
+      "state": "待复习",
+      "createdAt": "2026-11-14T13:05:00Z",
+      "lastReviewedAt": "2026-11-16T09:30:00Z",
+      "reviewCount": 1,
+      "idiomIds": ["11111111-1111-4111-8111-111111111111", "22222222-2222-4222-8222-222222222222", "33333333-3333-4333-8333-333333333333"]
+    },
+    {
+      "id": "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee",
+      "stem": "「这家小店的陈列既不模仿大牌，也不追逐潮流，而是____地布置出一片自己的气象。」填入最恰当的一项是：",
+      "options": {
+        "A": "别出心裁",
+        "B": "标新立异",
+        "C": "独树一帜",
+        "D": "匠心独运"
+      },
+      "imagePath": null,
+      "ocrText": null,
+      "myAnswer": "B",
+      "reason": "「标新立异」多含贬义，与题干褒义语境不合。",
+      "tagNames": ["褒贬误用"],
+      "examType": "省考",
+      "year": 2022,
+      "region": "湖北",
+      "state": "已掌握",
+      "createdAt": "2026-11-15T08:20:00Z",
+      "lastReviewedAt": "2026-11-17T01:40:00Z",
+      "reviewCount": 1,
+      "idiomIds": ["22222222-2222-4222-8222-222222222222"]
+    }
+  ],
+  "reviews": [
+    {
+      "id": "ffffffff-ffff-4fff-8fff-fffffffffff1",
+      "mistakeId": "dddddddd-dddd-4ddd-8ddd-dddddddddddd",
+      "result": "错",
+      "at": "2026-11-16T09:30:00Z"
+    },
+    {
+      "id": "ffffffff-ffff-4fff-8fff-fffffffffff2",
+      "mistakeId": "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee",
+      "result": "对",
+      "at": "2026-11-17T01:40:00Z"
+    }
+  ],
+  "idiomStates": [
+    { "idiomId": "11111111-1111-4111-8111-111111111111", "status": "学过", "favorite": false },
+    { "idiomId": "22222222-2222-4222-8222-222222222222", "status": "已掌握", "favorite": true },
+    { "idiomId": "33333333-3333-4333-8333-333333333333", "status": "未学", "favorite": false }
+  ],
+  "scopes": [
+    { "type": "国考", "province": null, "enabled": true },
+    { "type": "省考", "province": "湖北", "enabled": true }
+  ],
+  "tags": [
+    { "name": "搭配不当" },
+    { "name": "褒贬误用" }
+  ]
+}
