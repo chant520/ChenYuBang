@@ -46,11 +46,11 @@ python tools/validate_schema.py
 ## 本轮验证状态（如实标注）
 
 - ✅ 目录、Gradle 配置、Manifest 权限、10 张表、迁移登记表、令牌引用的文件已落地。
-- ✅ **编译验证通过**（2026-11-17）：`:app:assembleDebug` + `test` + `ktlintCheck` + `detekt` 全绿；产物 `app/build/outputs/apk/debug/app-debug.apk`（9,921,998 字节）。
+- ✅ **编译验证通过**（2026-11-17）：`:app:assembleDebug` + `test` + `ktlintCheck` + `detekt` 全绿；产物 `app/build/outputs/apk/debug/app-debug.apk`（9,921,998 字节）。GitHub CI 亦全绿（含 `:app:lintDebug` / `:core-ui:verifyRoborazziDebug`）。
 - ✅ 静态检查口径：生成的 `Tokens.kt` 不参与 ktlint/detekt（数值事实源是 tokens.json，避免生成物漂移）；`@Composable` 大写命名经 .editorconfig 与 detekt.yml 豁免。
 - ❌ OCR 引擎未接入（PaddleOCR 模型与 AAR 待 OCR 实测后落地，见规范 §2.3）。
 - ❌ Room FTS 索引未接入（§4.2 骨架只做了前缀 LIKE）。
-- ❌ iOS 侧编译验证未做（Windows 无 Xcode，需 macOS CI；ci.yml 已备好，待 git 推送后启用）。
+- ✅ iOS 侧编译验证通过（2026-11-17）：GitHub 私有仓库 macos-15-intel CI，SwiftLint / SPM 解析 / 编译 / 单测（3 tests 0 failures）全绿（run 44060637298）。
 
 ## 页面接入顺序（规范 §5.1）
 
