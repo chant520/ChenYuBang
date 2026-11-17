@@ -2,9 +2,10 @@
 """生成构件状态基线板（14 构件 × 4 状态 × 2 模式 = 112 格），并切成 14 张单构件图。
 
 样式全部由 shared/tokens/tokens.json 驱动，不另写色值。
+几何口径：docs/设计规范-v1.3.md（三构件以四份全页稿 v2 为准，用户 2026-11-17 拍板）。
 产物：
   docs/design/构件状态基线-emerald-v2.html   （可人工看的总板）
-  docs/design/baseline/components/<构件>.png （每构件 830×384，含浅/深两模式各 4 态）
+  docs/design/baseline/components/<构件>.png （每构件含浅/深两模式各 4 态）
   docs/design/baseline/components/manifest.json
 
 用法：python tools/gen_component_baseline.py
@@ -23,18 +24,20 @@ DESIGN = ROOT / "docs" / "design"
 OUT = DESIGN / "baseline" / "components"
 EDGE = r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
 
-ROW_H = 96
+ROW_H = 116
 TOP = 320
 CELL_W = 330
 
 
-def hex_vars(table):
-    return "\n".join("    --%s: %s;" % (k, v) for k, v in table.items())
+def mode_vars(table, shadow):
+    lines = ["    --%s: %s;" % (k, v) for k, v in table.items()]
+    lines.append("    --fabshadow: %s;" % shadow)
+    return "\n".join(lines)
 
 
 def stylesheet():
-    light = hex_vars(TOKENS["color"]["light"])
-    dark = hex_vars(TOKENS["color"]["dark"])
+    light = mode_vars(TOKENS["color"]["light"], TOKENS["shadow"]["fab"]["light"])
+    dark = mode_vars(TOKENS["color"]["dark"], TOKENS["shadow"]["fab"]["dark"])
     return """
   * { box-sizing: border-box; }
   body { margin:0; background:#e8eaec; color:#1a1a1a;
@@ -42,7 +45,7 @@ def stylesheet():
          -webkit-font-smoothing:antialiased; }
   .lt { %s }
   .dk { %s }
-  .cell { position:absolute; width:%dpx; height:88px; padding:10px 12px; border-radius:2px;
+  .cell { position:absolute; width:%dpx; height:104px; padding:10px 12px; border-radius:2px;
           background:var(--page); color:var(--text); overflow:hidden; }
   .celltitle { position:absolute; width:112px; font-size:11px; line-height:1.5; color:#3c4147; }
   .celltitle b { display:block; font-size:11.5px; color:#22262a; }
@@ -66,6 +69,7 @@ def stylesheet():
               border-radius:5px; border:1px solid var(--line); color:var(--text2); }
   .topbtn { display:inline-flex; align-items:center; gap:6px; padding:7px 11px; border-radius:5px;
             background:var(--btnbg); color:var(--btnfg); font-size:11.5px; font-weight:700; }
+  .topbtn svg { width:14px; height:14px; fill:none; stroke:currentColor; stroke-width:1.7; }
   .tag { display:inline-block; padding:4px 9px; border-radius:4px; font-size:11px;
          background:var(--tintbg); color:var(--tintfg); border:1px solid var(--tintline); }
   .tag.ghost { background:transparent; color:var(--text3); border:1px dashed var(--line); }
@@ -78,47 +82,66 @@ def stylesheet():
              background:var(--errbg); color:var(--errfg); border:1px solid var(--errline); }
   .badgeinfo { display:inline-block; padding:2px 6px; border-radius:3px; font-size:10px;
                background:var(--tintbg); color:var(--tintfg); border:1px solid var(--tintline); }
-  .bar { display:flex; align-items:center; gap:8px; padding:9px 11px; border-radius:5px;
-         font-size:11.5px; line-height:1.5; }
+  .bar { display:flex; align-items:flex-start; gap:10px; padding:12px 14px; border-radius:6px; }
+  .bar svg { width:18px; height:18px; flex:0 0 auto; fill:none; stroke:currentColor; stroke-width:1.8; }
   .bar.info { background:var(--tintbg); color:var(--tintfg); border:1px solid var(--tintline); }
   .bar.warn { background:var(--warnbg); color:var(--warnfg); border:1px solid var(--warnline); }
   .bar.err { background:var(--errbg); color:var(--errfg); border:1px solid var(--errline); }
-  .bar .act { margin-left:auto; font-weight:700; text-decoration:underline; }
-  .editinput { width:100%%; padding:10px 12px; border-radius:5px; font-size:13px;
+  .bar .bt { font-size:13px; font-weight:700; line-height:1.55; }
+  .bar .bs { font-size:11.5px; line-height:1.65; color:var(--text2); }
+  .bar .act { margin-left:auto; font-size:12px; font-weight:700; text-decoration:underline; }
+  .editinput { width:100%%; min-height:42px; padding:11px 12px; border-radius:5px; font-size:12px;
                background:var(--inputbg); color:var(--text); border:1px solid var(--line); }
-  .editinput.focus { border-color:var(--accent); }
-  .editinput.err { border-color:var(--errline); color:var(--text); }
-  .disinput { width:100%%; padding:10px 12px; border-radius:5px; font-size:13px;
+  .editinput.focus { border-color:var(--accent); box-shadow:0 0 0 2px var(--tintbg); }
+  .editinput.err { border-color:var(--errline); color:var(--errfg); }
+  .errhint { margin-top:4px; font-size:11.5px; line-height:1.55; color:var(--errfg); }
+  .disinput { width:100%%; min-height:42px; padding:10px 12px; border-radius:5px; font-size:12.5px;
               background:var(--disbg); color:var(--disfg); border:1px solid var(--disline); }
   .imgph { display:flex; align-items:center; justify-content:center; height:64px;
-           border-radius:4px; font-size:11.5px; background:var(--phbg); color:var(--text3);
+           border-radius:6px; font-size:11.5px; background:var(--phbg); color:var(--text3);
            border:1px dashed var(--phline); }
   .imgph.warn { background:var(--warnbg); color:var(--warnfg); border-color:var(--warnline); }
   .skel { height:64px; border-radius:4px; background:var(--skel); border:1px solid var(--line2); }
   .cut { margin-top:6px; font-size:10px; letter-spacing:.06em; color:var(--text3);
          border-top:1px dashed var(--cut); padding-top:5px; }
-  .lrow { display:flex; align-items:center; justify-content:space-between; padding:9px 11px;
-          border-radius:5px; background:var(--surface); border:1px solid var(--line); }
-  .lrow.on { border-color:var(--accent); background:var(--tintbg); }
-  .lrow.dis { background:var(--disbg); color:var(--disfg); border-color:var(--disline); }
-  .lmain { font-size:13px; font-weight:700; color:inherit; }
-  .lmeta { font-size:10.5px; color:var(--text3); margin-left:6px; font-weight:400; }
-  .seg { display:flex; border-radius:5px; overflow:hidden; border:1px solid var(--line); }
-  .seg span { flex:1; padding:8px 0; text-align:center; font-size:11.5px;
-              background:var(--seg); color:var(--text2); }
+  .lrow { padding:13px 16px; border-radius:6px; background:var(--surface);
+          border:1px solid var(--line); }
+  .lrow .lt1 { display:flex; align-items:baseline; gap:8px; }
+  .lrow .lname { font-size:14px; font-weight:600; color:var(--text); letter-spacing:.01em; }
+  .lrow .lpy { font-size:11px; color:var(--text3); }
+  .lrow .lsub { margin-top:5px; font-size:12px; line-height:1.6; color:var(--text2); }
+  .lrow .lmeta { margin-top:6px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+                 font-size:11px; color:var(--text3); }
+  .lrow .r { margin-left:auto; font-size:11px; color:var(--text3); white-space:nowrap; }
+  .lrow.on { background:var(--tintbg); }
+  .lrow.on .lname { color:var(--accent); }
+  .lrow.dis { background:var(--disbg); border-color:var(--disline); }
+  .lrow.dis .lname, .lrow.dis .lpy, .lrow.dis .lmeta { color:var(--disfg); }
+  .seg { display:flex; padding:3px; border-radius:5px; background:var(--seg);
+         border:1px solid var(--line); }
+  .seg span { flex:1; padding:8px 0; text-align:center; font-size:11px;
+              color:var(--text2); border-radius:4px; }
   .seg .on { background:var(--segon); color:var(--segonfg); font-weight:700; }
   .seg span.dis { color:var(--disfg); }
-  .chkrow { display:flex; align-items:center; gap:8px; font-size:12px; color:var(--text); }
-  .chk { width:16px; height:16px; border-radius:3px; border:1px solid var(--line);
-         background:var(--surface); display:inline-flex; align-items:center; justify-content:center; }
-  .chk.on { background:var(--accent); border-color:var(--accent); }
-  .chk.on svg { width:11px; height:11px; stroke:var(--chkfg); stroke-width:2.2; fill:none; }
+  .chkrow { display:flex; align-items:center; gap:10px; padding:12px 0;
+            font-size:13px; color:var(--text); }
+  .chk { width:18px; height:18px; flex:0 0 auto; border-radius:4px; background:var(--accent);
+         border:1px solid var(--accent); display:inline-flex; align-items:center; justify-content:center; }
+  .chk svg { width:12px; height:12px; stroke:var(--chkfg); stroke-width:2; fill:none; }
+  .chk.off { background:transparent; border-color:var(--line); }
   .chk.dis { background:var(--disbg); border-color:var(--disline); }
+  .chkrow.dis { color:var(--disfg); }
+  .chkrow .r { margin-left:auto; font-size:11px; color:var(--text3); }
+  .winline { display:inline-flex; align-items:center; gap:6px; margin-left:auto;
+             font-size:12px; font-weight:600; color:var(--warnfg); }
+  .winline svg { width:13px; height:13px; fill:none; stroke:currentColor; stroke-width:1.9; }
   .fabcell { display:flex; align-items:center; gap:10px; }
-  .fab { width:52px; height:52px; border-radius:50%%; background:var(--fab); color:var(--fabicon);
-         display:flex; align-items:center; justify-content:center; font-size:24px; font-weight:700;
-         box-shadow:0 4px 10px rgba(0,0,0,.18); }
-  .fab.dis { background:var(--disbg); color:var(--disfg); box-shadow:none; }
+  .fab { width:52px; height:52px; border-radius:6px; background:var(--fab);
+         display:flex; align-items:center; justify-content:center;
+         box-shadow:var(--fabshadow); }
+  .fab svg { width:24px; height:24px; fill:none; stroke:var(--fabicon); stroke-width:1.6; }
+  .fab.dis { background:var(--disbg); box-shadow:none; }
+  .fab.dis svg { stroke:var(--disfg); }
   """ % (light, dark, CELL_W)
 
 
@@ -127,6 +150,17 @@ def cell(mode, body):
 
 
 CHECK = '<svg viewBox="0 0 24 24"><path d="M5 12l4.5 4.5L19 7"/></svg>'
+PLUS = '<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>'
+ICO_WARN = '<svg viewBox="0 0 24 24"><path d="M12 4l8 15H4z"/><path d="M12 9v4"/><path d="M12 16.5v.5"/></svg>'
+ICO_ERR = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/></svg>'
+ICO_INFO = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 8v.5"/></svg>'
+
+
+def lrow(name, py, meta, cls=""):
+    return ('<div class="lrow %s"><div class="lt1"><span class="lname">%s</span>'
+            '<span class="lpy">%s</span></div><div class="lmeta">%s</div></div>'
+            % (cls, name, py, meta))
+
 
 COMPONENTS = [
     ("主按钮", [
@@ -154,9 +188,9 @@ COMPONENTS = [
         ('加载', '<div class="ghostbtn"><span class="spinner"></span> 收藏中…</div>'),
     ]),
     ("顶部按钮", [
-        ('默认', '<div class="topbtn">+ 拍照录题</div>'),
-        ('按下', '<div class="topbtn pressed">+ 拍照录题</div>'),
-        ('禁用', '<div class="topbtn" style="background:var(--disbg);color:var(--disfg)">+ 拍照录题</div>'),
+        ('默认', '<div class="topbtn">%s 拍照录题</div>' % PLUS),
+        ('按下', '<div class="topbtn pressed">%s 拍照录题</div>' % PLUS),
+        ('禁用', '<div class="topbtn" style="background:var(--disbg);color:var(--disfg)">%s 拍照录题</div>' % PLUS),
         ('加载', '<div class="topbtn"><span class="spinner"></span> 打开相机</div>'),
     ]),
     ("标签", [
@@ -172,15 +206,15 @@ COMPONENTS = [
         ('中性', '<span class="distag">已停用</span>'),
     ]),
     ("提示条", [
-        ('信息（中性）', '<div class="bar info">识别到 5 行，请核对</div>'),
-        ('可恢复（橙）', '<div class="bar warn">省考还没选省份，先选一个再筛题</div>'),
-        ('硬错误（红）', '<div class="bar err">备份包损坏，无法导入</div>'),
-        ('橙 + 操作', '<div class="bar warn">识别失败，可重试<span class="act">重试</span></div>'),
+        ('信息（中性）', '<div class="bar info">%s<span class="bt">识别到 5 行，请核对</span></div>' % ICO_INFO),
+        ('可恢复（橙）', '<div class="bar warn">%s<span><span class="bt">省考还没选省份</span><br><span class="bs">先选一个再筛题</span></span></div>' % ICO_WARN),
+        ('硬错误（红）', '<div class="bar err">%s<span><span class="bt">备份包损坏</span><br><span class="bs">无法导入</span></span></div>' % ICO_ERR),
+        ('橙 + 操作', '<div class="bar warn">%s<span class="bt">识别失败，可重试</span><span class="act">重试</span></div>' % ICO_WARN),
     ]),
     ("输入框", [
         ('默认', '<input class="editinput" value="按部就班">'),
         ('聚焦', '<input class="editinput focus" value="按部就班">'),
-        ('错误', '<input class="editinput err" value="">'),
+        ('错误', '<input class="editinput err" value=""><div class="errhint">请输入成语</div>'),
         ('禁用', '<input class="disinput" value="不可编辑">'),
     ]),
     ("图片占位", [
@@ -190,10 +224,10 @@ COMPONENTS = [
         ('长页截断', '<div class="imgph">继续下滑</div><div class="cut">长页 · 已截断</div>'),
     ]),
     ("列表行", [
-        ('默认', '<div class="lrow"><span class="lmain">按部就班</span><span class="lmeta">贬义 · 高频</span></div>'),
-        ('选中', '<div class="lrow on"><span class="lmain">别出心裁</span><span class="lmeta">褒义 · 高频</span></div>'),
-        ('禁用', '<div class="lrow dis"><span class="lmain">墨守成规</span><span class="lmeta">已停用</span></div>'),
-        ('带徽标', '<div class="lrow"><span class="lmain">墨守成规 <span class="badgewarn">待复习</span></span></div>'),
+        ('默认', lrow("按部就班", "àn bù jiù bān", '<span class="tag">高频</span><span class="distag">未学</span>')),
+        ('选中', lrow("别出心裁", "bié chū xīn cái", '<span class="tag">高频</span><span class="distag">未学</span>', "on")),
+        ('禁用', lrow("墨守成规", "mò shǒu chéng guī", '<span class="distag">已停用</span>', "dis")),
+        ('带徽标', lrow("望其项背", "wàng qí xiàng bèi", '<span class="badgewarn">待复习</span>')),
     ]),
     ("分段控件", [
         ('默认', '<div class="seg"><span class="on">国考</span><span>省考</span></div>'),
@@ -202,16 +236,16 @@ COMPONENTS = [
         ('三段', '<div class="seg"><span class="on">全部</span><span>待复习</span><span>已掌握</span></div>'),
     ]),
     ("勾选行", [
-        ('勾选', '<div class="chkrow"><span class="chk on">%s</span><span>国考</span></div>' % CHECK),
-        ('未勾选', '<div class="chkrow"><span class="chk"></span><span>省考</span></div>'),
-        ('禁用', '<div class="chkrow" style="color:var(--disfg)"><span class="chk dis"></span><span>教师编</span></div>'),
-        ('带警示', '<div class="chkrow"><span class="chk on">%s</span><span>省考</span><span class="badgewarn">未选省份</span></div>' % CHECK),
+        ('勾选', '<div class="chkrow"><span class="chk">%s</span><span>国考</span></div>' % CHECK),
+        ('未勾选', '<div class="chkrow"><span class="chk off"></span><span>省考</span></div>'),
+        ('禁用', '<div class="chkrow dis"><span class="chk dis"></span><span>教师编</span></div>'),
+        ('带警示', '<div class="chkrow"><span class="chk">%s</span><span>省考</span><span class="winline">%s未选省份</span></div>' % (CHECK, ICO_WARN)),
     ]),
     ("悬浮按钮", [
-        ('默认', '<div class="fabcell"><div class="fab">+</div></div>'),
-        ('按下', '<div class="fabcell"><div class="fab pressed" style="filter:brightness(.9)">+</div></div>'),
-        ('禁用', '<div class="fabcell"><div class="fab dis">+</div></div>'),
-        ('带徽标', '<div class="fabcell"><div class="fab">+</div><span class="badgewarn">待复习 3</span></div>'),
+        ('默认', '<div class="fabcell"><div class="fab">%s</div></div>' % PLUS),
+        ('按下', '<div class="fabcell"><div class="fab" style="filter:brightness(.9)">%s</div></div>' % PLUS),
+        ('禁用', '<div class="fabcell"><div class="fab dis">%s</div></div>' % PLUS),
+        ('带徽标', '<div class="fabcell"><div class="fab">%s</div><span class="badgewarn">待复习 3</span></div>' % PLUS),
     ]),
 ]
 
@@ -239,7 +273,9 @@ def build_html():
     <h1 style="margin:0 0 10px;font-size:23px">构件状态基线 · emerald v2</h1>
     <p style="margin:0;font-size:12.5px;line-height:1.75;color:#3c4147">
       14 构件 × 4 状态 × 2 模式 = 112 格。左列浅色、右列深色，色值全部取自
-      shared/tokens/tokens.json。本页是视觉回归基线，不是新设计稿；改设计必须先改 tokens.json 再重生成。
+      shared/tokens/tokens.json，几何按 docs/设计规范-v1.3.md（列表行 / 分段控件 / 勾选行
+      以四份全页稿 v2 为准，FAB 圆角 6px；2026-11-17 对齐重渲）。本页是视觉回归基线，
+      不是新设计稿；改设计必须先改 tokens.json 与规范再重生成。
     </p>
   </div>
 </div>

@@ -1,12 +1,12 @@
 // GENERATED FILE — DO NOT EDIT.
-// Source: shared/tokens/tokens.json (docs/设计规范-v1.2.md)
+// Source: shared/tokens/tokens.json (docs/设计规范-v1.3.md)
 // Regenerate: python tools/gen_tokens.py
 
 package com.chenyubang.core.ui.tokens
 
 import androidx.compose.ui.graphics.Color
 
-/** 设计令牌。数值唯一来源：docs/设计规范-v1.2.md */
+/** 设计令牌。数值唯一来源：docs/设计规范-v1.3.md */
 object Tokens {
 
     /** 浅/深色组共同接口：if/else 选色组时保留类型 */
@@ -15,6 +15,7 @@ object Tokens {
         val accent2: Color
         val btnbg: Color
         val btnfg: Color
+        val btnline: Color
         val chkfg: Color
         val cut: Color
         val disbg: Color
@@ -63,6 +64,7 @@ object Tokens {
         override val accent2 = Color(0xFF009E60)
         override val btnbg = Color(0xFF008000)
         override val btnfg = Color(0xFFFFFFFF)
+        override val btnline = Color(0xFF008000)
         override val chkfg = Color(0xFFFFFFFF)
         override val cut = Color(0xFFBBDCC9)
         override val disbg = Color(0xFFE6EFE9)
@@ -111,6 +113,7 @@ object Tokens {
         override val accent2 = Color(0xFF009E60)
         override val btnbg = Color(0xFF50C878)
         override val btnfg = Color(0xFF0C1A12)
+        override val btnline = Color(0xFF50C878)
         override val chkfg = Color(0xFF0C1A12)
         override val cut = Color(0xFF2E4A39)
         override val disbg = Color(0xFF1E3327)
@@ -195,6 +198,26 @@ object Tokens {
         val fabRight = 20
         val fabBottom = 88
         val hitMin = 44
+        val lrowX = 16
+        val lrowY = 13
+        val lt1Gap = 8
+        val lsubTop = 5
+        val lmetaTop = 6
+        val lmetaGap = 8
+        val segPad = 3
+        val segY = 8
+        val chkGap = 10
+        val chkY = 12
+        val chkSize = 18
+        val barX = 14
+        val barY = 12
+        val barGap = 10
+        val inputMinH = 42
+        val inputX = 12
+        val inputY = 11
+        val inputDisY = 10
+        val imgphH = 150
+        val imgphHSmall = 96
     }
 
     /** 图标尺寸（规范 6），单位 dp */
@@ -207,5 +230,24 @@ object Tokens {
         val n14 = 14
         val n13 = 13
         val n12 = 12
+    }
+
+    /** 投影层参数（规范 2.2/2.3）：CSS box-shadow 解析结果，实现端按平台等效映射 */
+    data class ShadowLayer(
+        val offsetX: Float,
+        val offsetY: Float,
+        val blur: Float,
+        val spread: Float,
+        val color: Color,
+    )
+
+    object Shadow {
+        val fabLight: List<ShadowLayer> = listOf(
+            ShadowLayer(0f, 8f, 18f, 0f, Color(0x38008000)),
+        )
+        val fabDark: List<ShadowLayer> = listOf(
+            ShadowLayer(0f, 0f, 0f, 1f, Color(0x5950C878)),
+            ShadowLayer(0f, 8f, 24f, 0f, Color(0x4C50C878)),
+        )
     }
 }

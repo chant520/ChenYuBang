@@ -1,15 +1,16 @@
 // GENERATED FILE — DO NOT EDIT.
-// Source: shared/tokens/tokens.json (docs/设计规范-v1.2.md)
+// Source: shared/tokens/tokens.json (docs/设计规范-v1.3.md)
 // Regenerate: python tools/gen_tokens.py
 
 import SwiftUI
 
-/// 设计令牌。数值唯一来源：docs/设计规范-v1.2.md
+/// 设计令牌。数值唯一来源：docs/设计规范-v1.3.md
 public struct TokenColors: Sendable {
     public let accent: Color
     public let accent2: Color
     public let btnbg: Color
     public let btnfg: Color
+    public let btnline: Color
     public let chkfg: Color
     public let cut: Color
     public let disbg: Color
@@ -56,6 +57,7 @@ public struct TokenColors: Sendable {
         accent2: Color,
         btnbg: Color,
         btnfg: Color,
+        btnline: Color,
         chkfg: Color,
         cut: Color,
         disbg: Color,
@@ -101,6 +103,7 @@ public struct TokenColors: Sendable {
         self.accent2 = accent2
         self.btnbg = btnbg
         self.btnfg = btnfg
+        self.btnline = btnline
         self.chkfg = chkfg
         self.cut = cut
         self.disbg = disbg
@@ -144,12 +147,30 @@ public struct TokenColors: Sendable {
     }
 }
 
+/// 投影层参数（规范 2.2/2.3）：CSS box-shadow 解析结果，实现端按平台等效映射
+public struct ShadowLayer: Sendable {
+    public let offsetX: CGFloat
+    public let offsetY: CGFloat
+    public let blur: CGFloat
+    public let spread: CGFloat
+    public let color: Color
+
+    public init(offsetX: CGFloat, offsetY: CGFloat, blur: CGFloat, spread: CGFloat, color: Color) {
+        self.offsetX = offsetX
+        self.offsetY = offsetY
+        self.blur = blur
+        self.spread = spread
+        self.color = color
+    }
+}
+
 public enum Tokens {
     public static let light = TokenColors(
         accent: Color(red: 0.0000, green: 0.5020, blue: 0.0000, opacity: 1.0000),
         accent2: Color(red: 0.0000, green: 0.6196, blue: 0.3765, opacity: 1.0000),
         btnbg: Color(red: 0.0000, green: 0.5020, blue: 0.0000, opacity: 1.0000),
         btnfg: Color(red: 1.0000, green: 1.0000, blue: 1.0000, opacity: 1.0000),
+        btnline: Color(red: 0.0000, green: 0.5020, blue: 0.0000, opacity: 1.0000),
         chkfg: Color(red: 1.0000, green: 1.0000, blue: 1.0000, opacity: 1.0000),
         cut: Color(red: 0.7333, green: 0.8627, blue: 0.7882, opacity: 1.0000),
         disbg: Color(red: 0.9020, green: 0.9373, blue: 0.9137, opacity: 1.0000),
@@ -196,6 +217,7 @@ public enum Tokens {
         accent2: Color(red: 0.0000, green: 0.6196, blue: 0.3765, opacity: 1.0000),
         btnbg: Color(red: 0.3137, green: 0.7843, blue: 0.4706, opacity: 1.0000),
         btnfg: Color(red: 0.0471, green: 0.1020, blue: 0.0706, opacity: 1.0000),
+        btnline: Color(red: 0.3137, green: 0.7843, blue: 0.4706, opacity: 1.0000),
         chkfg: Color(red: 0.0471, green: 0.1020, blue: 0.0706, opacity: 1.0000),
         cut: Color(red: 0.1804, green: 0.2902, blue: 0.2235, opacity: 1.0000),
         disbg: Color(red: 0.1176, green: 0.2000, blue: 0.1529, opacity: 1.0000),
@@ -277,6 +299,26 @@ public enum Tokens {
         public static let fabRight: CGFloat = 20
         public static let fabBottom: CGFloat = 88
         public static let hitMin: CGFloat = 44
+        public static let lrowX: CGFloat = 16
+        public static let lrowY: CGFloat = 13
+        public static let lt1Gap: CGFloat = 8
+        public static let lsubTop: CGFloat = 5
+        public static let lmetaTop: CGFloat = 6
+        public static let lmetaGap: CGFloat = 8
+        public static let segPad: CGFloat = 3
+        public static let segY: CGFloat = 8
+        public static let chkGap: CGFloat = 10
+        public static let chkY: CGFloat = 12
+        public static let chkSize: CGFloat = 18
+        public static let barX: CGFloat = 14
+        public static let barY: CGFloat = 12
+        public static let barGap: CGFloat = 10
+        public static let inputMinH: CGFloat = 42
+        public static let inputX: CGFloat = 12
+        public static let inputY: CGFloat = 11
+        public static let inputDisY: CGFloat = 10
+        public static let imgphH: CGFloat = 150
+        public static let imgphHSmall: CGFloat = 96
     }
 
     public enum Icon {
@@ -288,5 +330,15 @@ public enum Tokens {
         public static let n14: CGFloat = 14
         public static let n13: CGFloat = 13
         public static let n12: CGFloat = 12
+    }
+
+    public enum Shadow {
+        public static let fabLight: [ShadowLayer] = [
+            ShadowLayer(offsetX: 0, offsetY: 8, blur: 18, spread: 0, color: Color(red: 0.0000, green: 0.5020, blue: 0.0000, opacity: 0.2196))
+        ]
+        public static let fabDark: [ShadowLayer] = [
+            ShadowLayer(offsetX: 0, offsetY: 0, blur: 0, spread: 1, color: Color(red: 0.3137, green: 0.7843, blue: 0.4706, opacity: 0.3490)),
+            ShadowLayer(offsetX: 0, offsetY: 8, blur: 24, spread: 0, color: Color(red: 0.3137, green: 0.7843, blue: 0.4706, opacity: 0.2980))
+        ]
     }
 }

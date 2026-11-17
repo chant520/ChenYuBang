@@ -41,6 +41,7 @@
     --fabicon: #FFFFFF;
     --btnbg: #008000;
     --btnfg: #FFFFFF;
+    --btnline: #008000;
     --disbg: #E6EFE9;
     --disfg: #93A99C;
     --disline: #DCE8E1;
@@ -49,7 +50,8 @@
     --skel: #DCE9E0;
     --skelhi: #F1F8F3;
     --cut: #BBDCC9;
-    --modal: rgba(12,26,18,0.55); }
+    --modal: rgba(12,26,18,0.55);
+    --fabshadow: 0 8px 18px rgba(0,128,0,0.22); }
   .dk {     --page: #101E17;
     --head: #E8F4EB;
     --text: #D5E8DA;
@@ -85,6 +87,7 @@
     --fabicon: #0C1A12;
     --btnbg: #50C878;
     --btnfg: #0C1A12;
+    --btnline: #50C878;
     --disbg: #1E3327;
     --disfg: #6E8A78;
     --disline: #2B4636;
@@ -93,8 +96,9 @@
     --skel: #23392C;
     --skelhi: #2E4A39;
     --cut: #2E4A39;
-    --modal: rgba(0,0,0,0.62); }
-  .cell { position:absolute; width:330px; height:88px; padding:10px 12px; border-radius:2px;
+    --modal: rgba(0,0,0,0.62);
+    --fabshadow: 0 0 0 1px rgba(80,200,120,0.35), 0 8px 24px rgba(80,200,120,0.30); }
+  .cell { position:absolute; width:330px; height:104px; padding:10px 12px; border-radius:2px;
           background:var(--page); color:var(--text); overflow:hidden; }
   .celltitle { position:absolute; width:112px; font-size:11px; line-height:1.5; color:#3c4147; }
   .celltitle b { display:block; font-size:11.5px; color:#22262a; }
@@ -118,6 +122,7 @@
               border-radius:5px; border:1px solid var(--line); color:var(--text2); }
   .topbtn { display:inline-flex; align-items:center; gap:6px; padding:7px 11px; border-radius:5px;
             background:var(--btnbg); color:var(--btnfg); font-size:11.5px; font-weight:700; }
+  .topbtn svg { width:14px; height:14px; fill:none; stroke:currentColor; stroke-width:1.7; }
   .tag { display:inline-block; padding:4px 9px; border-radius:4px; font-size:11px;
          background:var(--tintbg); color:var(--tintfg); border:1px solid var(--tintline); }
   .tag.ghost { background:transparent; color:var(--text3); border:1px dashed var(--line); }
@@ -130,47 +135,66 @@
              background:var(--errbg); color:var(--errfg); border:1px solid var(--errline); }
   .badgeinfo { display:inline-block; padding:2px 6px; border-radius:3px; font-size:10px;
                background:var(--tintbg); color:var(--tintfg); border:1px solid var(--tintline); }
-  .bar { display:flex; align-items:center; gap:8px; padding:9px 11px; border-radius:5px;
-         font-size:11.5px; line-height:1.5; }
+  .bar { display:flex; align-items:flex-start; gap:10px; padding:12px 14px; border-radius:6px; }
+  .bar svg { width:18px; height:18px; flex:0 0 auto; fill:none; stroke:currentColor; stroke-width:1.8; }
   .bar.info { background:var(--tintbg); color:var(--tintfg); border:1px solid var(--tintline); }
   .bar.warn { background:var(--warnbg); color:var(--warnfg); border:1px solid var(--warnline); }
   .bar.err { background:var(--errbg); color:var(--errfg); border:1px solid var(--errline); }
-  .bar .act { margin-left:auto; font-weight:700; text-decoration:underline; }
-  .editinput { width:100%; padding:10px 12px; border-radius:5px; font-size:13px;
+  .bar .bt { font-size:13px; font-weight:700; line-height:1.55; }
+  .bar .bs { font-size:11.5px; line-height:1.65; color:var(--text2); }
+  .bar .act { margin-left:auto; font-size:12px; font-weight:700; text-decoration:underline; }
+  .editinput { width:100%; min-height:42px; padding:11px 12px; border-radius:5px; font-size:12px;
                background:var(--inputbg); color:var(--text); border:1px solid var(--line); }
-  .editinput.focus { border-color:var(--accent); }
-  .editinput.err { border-color:var(--errline); color:var(--text); }
-  .disinput { width:100%; padding:10px 12px; border-radius:5px; font-size:13px;
+  .editinput.focus { border-color:var(--accent); box-shadow:0 0 0 2px var(--tintbg); }
+  .editinput.err { border-color:var(--errline); color:var(--errfg); }
+  .errhint { margin-top:4px; font-size:11.5px; line-height:1.55; color:var(--errfg); }
+  .disinput { width:100%; min-height:42px; padding:10px 12px; border-radius:5px; font-size:12.5px;
               background:var(--disbg); color:var(--disfg); border:1px solid var(--disline); }
   .imgph { display:flex; align-items:center; justify-content:center; height:64px;
-           border-radius:4px; font-size:11.5px; background:var(--phbg); color:var(--text3);
+           border-radius:6px; font-size:11.5px; background:var(--phbg); color:var(--text3);
            border:1px dashed var(--phline); }
   .imgph.warn { background:var(--warnbg); color:var(--warnfg); border-color:var(--warnline); }
   .skel { height:64px; border-radius:4px; background:var(--skel); border:1px solid var(--line2); }
   .cut { margin-top:6px; font-size:10px; letter-spacing:.06em; color:var(--text3);
          border-top:1px dashed var(--cut); padding-top:5px; }
-  .lrow { display:flex; align-items:center; justify-content:space-between; padding:9px 11px;
-          border-radius:5px; background:var(--surface); border:1px solid var(--line); }
-  .lrow.on { border-color:var(--accent); background:var(--tintbg); }
-  .lrow.dis { background:var(--disbg); color:var(--disfg); border-color:var(--disline); }
-  .lmain { font-size:13px; font-weight:700; color:inherit; }
-  .lmeta { font-size:10.5px; color:var(--text3); margin-left:6px; font-weight:400; }
-  .seg { display:flex; border-radius:5px; overflow:hidden; border:1px solid var(--line); }
-  .seg span { flex:1; padding:8px 0; text-align:center; font-size:11.5px;
-              background:var(--seg); color:var(--text2); }
+  .lrow { padding:13px 16px; border-radius:6px; background:var(--surface);
+          border:1px solid var(--line); }
+  .lrow .lt1 { display:flex; align-items:baseline; gap:8px; }
+  .lrow .lname { font-size:14px; font-weight:600; color:var(--text); letter-spacing:.01em; }
+  .lrow .lpy { font-size:11px; color:var(--text3); }
+  .lrow .lsub { margin-top:5px; font-size:12px; line-height:1.6; color:var(--text2); }
+  .lrow .lmeta { margin-top:6px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+                 font-size:11px; color:var(--text3); }
+  .lrow .r { margin-left:auto; font-size:11px; color:var(--text3); white-space:nowrap; }
+  .lrow.on { background:var(--tintbg); }
+  .lrow.on .lname { color:var(--accent); }
+  .lrow.dis { background:var(--disbg); border-color:var(--disline); }
+  .lrow.dis .lname, .lrow.dis .lpy, .lrow.dis .lmeta { color:var(--disfg); }
+  .seg { display:flex; padding:3px; border-radius:5px; background:var(--seg);
+         border:1px solid var(--line); }
+  .seg span { flex:1; padding:8px 0; text-align:center; font-size:11px;
+              color:var(--text2); border-radius:4px; }
   .seg .on { background:var(--segon); color:var(--segonfg); font-weight:700; }
   .seg span.dis { color:var(--disfg); }
-  .chkrow { display:flex; align-items:center; gap:8px; font-size:12px; color:var(--text); }
-  .chk { width:16px; height:16px; border-radius:3px; border:1px solid var(--line);
-         background:var(--surface); display:inline-flex; align-items:center; justify-content:center; }
-  .chk.on { background:var(--accent); border-color:var(--accent); }
-  .chk.on svg { width:11px; height:11px; stroke:var(--chkfg); stroke-width:2.2; fill:none; }
+  .chkrow { display:flex; align-items:center; gap:10px; padding:12px 0;
+            font-size:13px; color:var(--text); }
+  .chk { width:18px; height:18px; flex:0 0 auto; border-radius:4px; background:var(--accent);
+         border:1px solid var(--accent); display:inline-flex; align-items:center; justify-content:center; }
+  .chk svg { width:12px; height:12px; stroke:var(--chkfg); stroke-width:2; fill:none; }
+  .chk.off { background:transparent; border-color:var(--line); }
   .chk.dis { background:var(--disbg); border-color:var(--disline); }
+  .chkrow.dis { color:var(--disfg); }
+  .chkrow .r { margin-left:auto; font-size:11px; color:var(--text3); }
+  .winline { display:inline-flex; align-items:center; gap:6px; margin-left:auto;
+             font-size:12px; font-weight:600; color:var(--warnfg); }
+  .winline svg { width:13px; height:13px; fill:none; stroke:currentColor; stroke-width:1.9; }
   .fabcell { display:flex; align-items:center; gap:10px; }
-  .fab { width:52px; height:52px; border-radius:50%; background:var(--fab); color:var(--fabicon);
-         display:flex; align-items:center; justify-content:center; font-size:24px; font-weight:700;
-         box-shadow:0 4px 10px rgba(0,0,0,.18); }
-  .fab.dis { background:var(--disbg); color:var(--disfg); box-shadow:none; }
+  .fab { width:52px; height:52px; border-radius:6px; background:var(--fab);
+         display:flex; align-items:center; justify-content:center;
+         box-shadow:var(--fabshadow); }
+  .fab svg { width:24px; height:24px; fill:none; stroke:var(--fabicon); stroke-width:1.6; }
+  .fab.dis { background:var(--disbg); box-shadow:none; }
+  .fab.dis svg { stroke:var(--disfg); }
   </style></head>
 <body>
 <div style="position:absolute;left:20px;top:24px;width:790px">
@@ -178,176 +202,178 @@
     <h1 style="margin:0 0 10px;font-size:23px">构件状态基线 · emerald v2</h1>
     <p style="margin:0;font-size:12.5px;line-height:1.75;color:#3c4147">
       14 构件 × 4 状态 × 2 模式 = 112 格。左列浅色、右列深色，色值全部取自
-      shared/tokens/tokens.json。本页是视觉回归基线，不是新设计稿；改设计必须先改 tokens.json 再重生成。
+      shared/tokens/tokens.json，几何按 docs/设计规范-v1.3.md（列表行 / 分段控件 / 勾选行
+      以四份全页稿 v2 为准，FAB 圆角 6px；2026-11-17 对齐重渲）。本页是视觉回归基线，
+      不是新设计稿；改设计必须先改 tokens.json 与规范再重生成。
     </p>
   </div>
 </div>
 <div class="celltitle" style="left:20px;top:332px"><b>主按钮</b>默认</div>
 <div style="position:absolute;left:150px;top:324px"><div class="cell lt"><div class="btn">保存到错题</div></div></div>
 <div style="position:absolute;left:490px;top:324px"><div class="cell dk"><div class="btn">保存到错题</div></div></div>
-<div class="celltitle" style="left:20px;top:428px"><b>主按钮</b>按下</div>
-<div style="position:absolute;left:150px;top:420px"><div class="cell lt"><div class="btn pressed">保存到错题</div></div></div>
-<div style="position:absolute;left:490px;top:420px"><div class="cell dk"><div class="btn pressed">保存到错题</div></div></div>
-<div class="celltitle" style="left:20px;top:524px"><b>主按钮</b>禁用</div>
-<div style="position:absolute;left:150px;top:516px"><div class="cell lt"><div class="disbtn">保存到错题</div></div></div>
-<div style="position:absolute;left:490px;top:516px"><div class="cell dk"><div class="disbtn">保存到错题</div></div></div>
-<div class="celltitle" style="left:20px;top:620px"><b>主按钮</b>加载</div>
-<div style="position:absolute;left:150px;top:612px"><div class="cell lt"><div class="btn loading"><span class="spinner"></span>正在识别…</div></div></div>
-<div style="position:absolute;left:490px;top:612px"><div class="cell dk"><div class="btn loading"><span class="spinner"></span>正在识别…</div></div></div>
-<div class="celltitle" style="left:20px;top:716px"><b>危险按钮（填充）</b>默认</div>
-<div style="position:absolute;left:150px;top:708px"><div class="cell lt"><div class="dangerbtn">清空全部数据</div></div></div>
-<div style="position:absolute;left:490px;top:708px"><div class="cell dk"><div class="dangerbtn">清空全部数据</div></div></div>
-<div class="celltitle" style="left:20px;top:812px"><b>危险按钮（填充）</b>按下</div>
-<div style="position:absolute;left:150px;top:804px"><div class="cell lt"><div class="dangerbtn pressed">清空全部数据</div></div></div>
-<div style="position:absolute;left:490px;top:804px"><div class="cell dk"><div class="dangerbtn pressed">清空全部数据</div></div></div>
-<div class="celltitle" style="left:20px;top:908px"><b>危险按钮（填充）</b>禁用</div>
-<div style="position:absolute;left:150px;top:900px"><div class="cell lt"><div class="disbtn">清空全部数据</div></div></div>
-<div style="position:absolute;left:490px;top:900px"><div class="cell dk"><div class="disbtn">清空全部数据</div></div></div>
-<div class="celltitle" style="left:20px;top:1004px"><b>危险按钮（填充）</b>加载</div>
-<div style="position:absolute;left:150px;top:996px"><div class="cell lt"><div class="dangerbtn loading"><span class="spinner"></span>正在清空…</div></div></div>
-<div style="position:absolute;left:490px;top:996px"><div class="cell dk"><div class="dangerbtn loading"><span class="spinner"></span>正在清空…</div></div></div>
-<div class="celltitle" style="left:20px;top:1100px"><b>危险按钮（描边）</b>默认</div>
-<div style="position:absolute;left:150px;top:1092px"><div class="cell lt"><div class="dangerout">删除这道错题</div></div></div>
-<div style="position:absolute;left:490px;top:1092px"><div class="cell dk"><div class="dangerout">删除这道错题</div></div></div>
-<div class="celltitle" style="left:20px;top:1196px"><b>危险按钮（描边）</b>按下</div>
-<div style="position:absolute;left:150px;top:1188px"><div class="cell lt"><div class="dangerout pressed">删除这道错题</div></div></div>
-<div style="position:absolute;left:490px;top:1188px"><div class="cell dk"><div class="dangerout pressed">删除这道错题</div></div></div>
-<div class="celltitle" style="left:20px;top:1292px"><b>危险按钮（描边）</b>禁用</div>
-<div style="position:absolute;left:150px;top:1284px"><div class="cell lt"><div class="disbtn">删除这道错题</div></div></div>
-<div style="position:absolute;left:490px;top:1284px"><div class="cell dk"><div class="disbtn">删除这道错题</div></div></div>
-<div class="celltitle" style="left:20px;top:1388px"><b>危险按钮（描边）</b>加载</div>
-<div style="position:absolute;left:150px;top:1380px"><div class="cell lt"><div class="dangerout loading"><span class="spinner"></span>正在删除…</div></div></div>
-<div style="position:absolute;left:490px;top:1380px"><div class="cell dk"><div class="dangerout loading"><span class="spinner"></span>正在删除…</div></div></div>
-<div class="celltitle" style="left:20px;top:1484px"><b>幽灵按钮</b>默认</div>
-<div style="position:absolute;left:150px;top:1476px"><div class="cell lt"><div class="ghostbtn">收藏（预留）</div></div></div>
-<div style="position:absolute;left:490px;top:1476px"><div class="cell dk"><div class="ghostbtn">收藏（预留）</div></div></div>
-<div class="celltitle" style="left:20px;top:1580px"><b>幽灵按钮</b>按下</div>
-<div style="position:absolute;left:150px;top:1572px"><div class="cell lt"><div class="ghostbtn pressed">收藏（预留）</div></div></div>
-<div style="position:absolute;left:490px;top:1572px"><div class="cell dk"><div class="ghostbtn pressed">收藏（预留）</div></div></div>
-<div class="celltitle" style="left:20px;top:1676px"><b>幽灵按钮</b>禁用</div>
-<div style="position:absolute;left:150px;top:1668px"><div class="cell lt"><div class="disbtn">收藏（预留）</div></div></div>
-<div style="position:absolute;left:490px;top:1668px"><div class="cell dk"><div class="disbtn">收藏（预留）</div></div></div>
-<div class="celltitle" style="left:20px;top:1772px"><b>幽灵按钮</b>加载</div>
-<div style="position:absolute;left:150px;top:1764px"><div class="cell lt"><div class="ghostbtn"><span class="spinner"></span> 收藏中…</div></div></div>
-<div style="position:absolute;left:490px;top:1764px"><div class="cell dk"><div class="ghostbtn"><span class="spinner"></span> 收藏中…</div></div></div>
-<div class="celltitle" style="left:20px;top:1868px"><b>顶部按钮</b>默认</div>
-<div style="position:absolute;left:150px;top:1860px"><div class="cell lt"><div class="topbtn">+ 拍照录题</div></div></div>
-<div style="position:absolute;left:490px;top:1860px"><div class="cell dk"><div class="topbtn">+ 拍照录题</div></div></div>
-<div class="celltitle" style="left:20px;top:1964px"><b>顶部按钮</b>按下</div>
-<div style="position:absolute;left:150px;top:1956px"><div class="cell lt"><div class="topbtn pressed">+ 拍照录题</div></div></div>
-<div style="position:absolute;left:490px;top:1956px"><div class="cell dk"><div class="topbtn pressed">+ 拍照录题</div></div></div>
-<div class="celltitle" style="left:20px;top:2060px"><b>顶部按钮</b>禁用</div>
-<div style="position:absolute;left:150px;top:2052px"><div class="cell lt"><div class="topbtn" style="background:var(--disbg);color:var(--disfg)">+ 拍照录题</div></div></div>
-<div style="position:absolute;left:490px;top:2052px"><div class="cell dk"><div class="topbtn" style="background:var(--disbg);color:var(--disfg)">+ 拍照录题</div></div></div>
-<div class="celltitle" style="left:20px;top:2156px"><b>顶部按钮</b>加载</div>
-<div style="position:absolute;left:150px;top:2148px"><div class="cell lt"><div class="topbtn"><span class="spinner"></span> 打开相机</div></div></div>
-<div style="position:absolute;left:490px;top:2148px"><div class="cell dk"><div class="topbtn"><span class="spinner"></span> 打开相机</div></div></div>
-<div class="celltitle" style="left:20px;top:2252px"><b>标签</b>默认</div>
-<div style="position:absolute;left:150px;top:2244px"><div class="cell lt"><span class="tag">搭配不当</span></div></div>
-<div style="position:absolute;left:490px;top:2244px"><div class="cell dk"><span class="tag">搭配不当</span></div></div>
-<div class="celltitle" style="left:20px;top:2348px"><b>标签</b>幽灵</div>
-<div style="position:absolute;left:150px;top:2340px"><div class="cell lt"><span class="tag ghost">收藏（预留）</span></div></div>
-<div style="position:absolute;left:490px;top:2340px"><div class="cell dk"><span class="tag ghost">收藏（预留）</span></div></div>
-<div class="celltitle" style="left:20px;top:2444px"><b>标签</b>选中</div>
-<div style="position:absolute;left:150px;top:2436px"><div class="cell lt"><span class="tag on">褒义</span></div></div>
-<div style="position:absolute;left:490px;top:2436px"><div class="cell dk"><span class="tag on">褒义</span></div></div>
-<div class="celltitle" style="left:20px;top:2540px"><b>标签</b>禁用</div>
-<div style="position:absolute;left:150px;top:2532px"><div class="cell lt"><span class="distag">教师编</span></div></div>
-<div style="position:absolute;left:490px;top:2532px"><div class="cell dk"><span class="distag">教师编</span></div></div>
-<div class="celltitle" style="left:20px;top:2636px"><b>徽标</b>信息</div>
-<div style="position:absolute;left:150px;top:2628px"><div class="cell lt"><span class="badgeinfo">合并</span></div></div>
-<div style="position:absolute;left:490px;top:2628px"><div class="cell dk"><span class="badgeinfo">合并</span></div></div>
-<div class="celltitle" style="left:20px;top:2732px"><b>徽标</b>警示橙</div>
-<div style="position:absolute;left:150px;top:2724px"><div class="cell lt"><span class="badgewarn">覆盖</span></div></div>
-<div style="position:absolute;left:490px;top:2724px"><div class="cell dk"><span class="badgewarn">覆盖</span></div></div>
-<div class="celltitle" style="left:20px;top:2828px"><b>徽标</b>错误红</div>
-<div style="position:absolute;left:150px;top:2820px"><div class="cell lt"><span class="badgerr">损坏</span></div></div>
-<div style="position:absolute;left:490px;top:2820px"><div class="cell dk"><span class="badgerr">损坏</span></div></div>
-<div class="celltitle" style="left:20px;top:2924px"><b>徽标</b>中性</div>
-<div style="position:absolute;left:150px;top:2916px"><div class="cell lt"><span class="distag">已停用</span></div></div>
-<div style="position:absolute;left:490px;top:2916px"><div class="cell dk"><span class="distag">已停用</span></div></div>
-<div class="celltitle" style="left:20px;top:3020px"><b>提示条</b>信息（中性）</div>
-<div style="position:absolute;left:150px;top:3012px"><div class="cell lt"><div class="bar info">识别到 5 行，请核对</div></div></div>
-<div style="position:absolute;left:490px;top:3012px"><div class="cell dk"><div class="bar info">识别到 5 行，请核对</div></div></div>
-<div class="celltitle" style="left:20px;top:3116px"><b>提示条</b>可恢复（橙）</div>
-<div style="position:absolute;left:150px;top:3108px"><div class="cell lt"><div class="bar warn">省考还没选省份，先选一个再筛题</div></div></div>
-<div style="position:absolute;left:490px;top:3108px"><div class="cell dk"><div class="bar warn">省考还没选省份，先选一个再筛题</div></div></div>
-<div class="celltitle" style="left:20px;top:3212px"><b>提示条</b>硬错误（红）</div>
-<div style="position:absolute;left:150px;top:3204px"><div class="cell lt"><div class="bar err">备份包损坏，无法导入</div></div></div>
-<div style="position:absolute;left:490px;top:3204px"><div class="cell dk"><div class="bar err">备份包损坏，无法导入</div></div></div>
-<div class="celltitle" style="left:20px;top:3308px"><b>提示条</b>橙 + 操作</div>
-<div style="position:absolute;left:150px;top:3300px"><div class="cell lt"><div class="bar warn">识别失败，可重试<span class="act">重试</span></div></div></div>
-<div style="position:absolute;left:490px;top:3300px"><div class="cell dk"><div class="bar warn">识别失败，可重试<span class="act">重试</span></div></div></div>
-<div class="celltitle" style="left:20px;top:3404px"><b>输入框</b>默认</div>
-<div style="position:absolute;left:150px;top:3396px"><div class="cell lt"><input class="editinput" value="按部就班"></div></div>
-<div style="position:absolute;left:490px;top:3396px"><div class="cell dk"><input class="editinput" value="按部就班"></div></div>
-<div class="celltitle" style="left:20px;top:3500px"><b>输入框</b>聚焦</div>
-<div style="position:absolute;left:150px;top:3492px"><div class="cell lt"><input class="editinput focus" value="按部就班"></div></div>
-<div style="position:absolute;left:490px;top:3492px"><div class="cell dk"><input class="editinput focus" value="按部就班"></div></div>
-<div class="celltitle" style="left:20px;top:3596px"><b>输入框</b>错误</div>
-<div style="position:absolute;left:150px;top:3588px"><div class="cell lt"><input class="editinput err" value=""></div></div>
-<div style="position:absolute;left:490px;top:3588px"><div class="cell dk"><input class="editinput err" value=""></div></div>
-<div class="celltitle" style="left:20px;top:3692px"><b>输入框</b>禁用</div>
-<div style="position:absolute;left:150px;top:3684px"><div class="cell lt"><input class="disinput" value="不可编辑"></div></div>
-<div style="position:absolute;left:490px;top:3684px"><div class="cell dk"><input class="disinput" value="不可编辑"></div></div>
-<div class="celltitle" style="left:20px;top:3788px"><b>图片占位</b>空态</div>
-<div style="position:absolute;left:150px;top:3780px"><div class="cell lt"><div class="imgph">还没有照片</div></div></div>
-<div style="position:absolute;left:490px;top:3780px"><div class="cell dk"><div class="imgph">还没有照片</div></div></div>
-<div class="celltitle" style="left:20px;top:3884px"><b>图片占位</b>原图丢失（橙）</div>
-<div style="position:absolute;left:150px;top:3876px"><div class="cell lt"><div class="imgph warn">原图已不在</div></div></div>
-<div style="position:absolute;left:490px;top:3876px"><div class="cell dk"><div class="imgph warn">原图已不在</div></div></div>
-<div class="celltitle" style="left:20px;top:3980px"><b>图片占位</b>骨架屏</div>
-<div style="position:absolute;left:150px;top:3972px"><div class="cell lt"><div class="skel"></div></div></div>
-<div style="position:absolute;left:490px;top:3972px"><div class="cell dk"><div class="skel"></div></div></div>
-<div class="celltitle" style="left:20px;top:4076px"><b>图片占位</b>长页截断</div>
-<div style="position:absolute;left:150px;top:4068px"><div class="cell lt"><div class="imgph">继续下滑</div><div class="cut">长页 · 已截断</div></div></div>
-<div style="position:absolute;left:490px;top:4068px"><div class="cell dk"><div class="imgph">继续下滑</div><div class="cut">长页 · 已截断</div></div></div>
-<div class="celltitle" style="left:20px;top:4172px"><b>列表行</b>默认</div>
-<div style="position:absolute;left:150px;top:4164px"><div class="cell lt"><div class="lrow"><span class="lmain">按部就班</span><span class="lmeta">贬义 · 高频</span></div></div></div>
-<div style="position:absolute;left:490px;top:4164px"><div class="cell dk"><div class="lrow"><span class="lmain">按部就班</span><span class="lmeta">贬义 · 高频</span></div></div></div>
-<div class="celltitle" style="left:20px;top:4268px"><b>列表行</b>选中</div>
-<div style="position:absolute;left:150px;top:4260px"><div class="cell lt"><div class="lrow on"><span class="lmain">别出心裁</span><span class="lmeta">褒义 · 高频</span></div></div></div>
-<div style="position:absolute;left:490px;top:4260px"><div class="cell dk"><div class="lrow on"><span class="lmain">别出心裁</span><span class="lmeta">褒义 · 高频</span></div></div></div>
-<div class="celltitle" style="left:20px;top:4364px"><b>列表行</b>禁用</div>
-<div style="position:absolute;left:150px;top:4356px"><div class="cell lt"><div class="lrow dis"><span class="lmain">墨守成规</span><span class="lmeta">已停用</span></div></div></div>
-<div style="position:absolute;left:490px;top:4356px"><div class="cell dk"><div class="lrow dis"><span class="lmain">墨守成规</span><span class="lmeta">已停用</span></div></div></div>
-<div class="celltitle" style="left:20px;top:4460px"><b>列表行</b>带徽标</div>
-<div style="position:absolute;left:150px;top:4452px"><div class="cell lt"><div class="lrow"><span class="lmain">墨守成规 <span class="badgewarn">待复习</span></span></div></div></div>
-<div style="position:absolute;left:490px;top:4452px"><div class="cell dk"><div class="lrow"><span class="lmain">墨守成规 <span class="badgewarn">待复习</span></span></div></div></div>
-<div class="celltitle" style="left:20px;top:4556px"><b>分段控件</b>默认</div>
-<div style="position:absolute;left:150px;top:4548px"><div class="cell lt"><div class="seg"><span class="on">国考</span><span>省考</span></div></div></div>
-<div style="position:absolute;left:490px;top:4548px"><div class="cell dk"><div class="seg"><span class="on">国考</span><span>省考</span></div></div></div>
-<div class="celltitle" style="left:20px;top:4652px"><b>分段控件</b>第二段选中</div>
-<div style="position:absolute;left:150px;top:4644px"><div class="cell lt"><div class="seg"><span>国考</span><span class="on">省考</span></div></div></div>
-<div style="position:absolute;left:490px;top:4644px"><div class="cell dk"><div class="seg"><span>国考</span><span class="on">省考</span></div></div></div>
-<div class="celltitle" style="left:20px;top:4748px"><b>分段控件</b>禁用</div>
-<div style="position:absolute;left:150px;top:4740px"><div class="cell lt"><div class="seg"><span class="on">国考</span><span class="dis">事业编</span></div></div></div>
-<div style="position:absolute;left:490px;top:4740px"><div class="cell dk"><div class="seg"><span class="on">国考</span><span class="dis">事业编</span></div></div></div>
-<div class="celltitle" style="left:20px;top:4844px"><b>分段控件</b>三段</div>
-<div style="position:absolute;left:150px;top:4836px"><div class="cell lt"><div class="seg"><span class="on">全部</span><span>待复习</span><span>已掌握</span></div></div></div>
-<div style="position:absolute;left:490px;top:4836px"><div class="cell dk"><div class="seg"><span class="on">全部</span><span>待复习</span><span>已掌握</span></div></div></div>
-<div class="celltitle" style="left:20px;top:4940px"><b>勾选行</b>勾选</div>
-<div style="position:absolute;left:150px;top:4932px"><div class="cell lt"><div class="chkrow"><span class="chk on"><svg viewBox="0 0 24 24"><path d="M5 12l4.5 4.5L19 7"/></svg></span><span>国考</span></div></div></div>
-<div style="position:absolute;left:490px;top:4932px"><div class="cell dk"><div class="chkrow"><span class="chk on"><svg viewBox="0 0 24 24"><path d="M5 12l4.5 4.5L19 7"/></svg></span><span>国考</span></div></div></div>
-<div class="celltitle" style="left:20px;top:5036px"><b>勾选行</b>未勾选</div>
-<div style="position:absolute;left:150px;top:5028px"><div class="cell lt"><div class="chkrow"><span class="chk"></span><span>省考</span></div></div></div>
-<div style="position:absolute;left:490px;top:5028px"><div class="cell dk"><div class="chkrow"><span class="chk"></span><span>省考</span></div></div></div>
-<div class="celltitle" style="left:20px;top:5132px"><b>勾选行</b>禁用</div>
-<div style="position:absolute;left:150px;top:5124px"><div class="cell lt"><div class="chkrow" style="color:var(--disfg)"><span class="chk dis"></span><span>教师编</span></div></div></div>
-<div style="position:absolute;left:490px;top:5124px"><div class="cell dk"><div class="chkrow" style="color:var(--disfg)"><span class="chk dis"></span><span>教师编</span></div></div></div>
-<div class="celltitle" style="left:20px;top:5228px"><b>勾选行</b>带警示</div>
-<div style="position:absolute;left:150px;top:5220px"><div class="cell lt"><div class="chkrow"><span class="chk on"><svg viewBox="0 0 24 24"><path d="M5 12l4.5 4.5L19 7"/></svg></span><span>省考</span><span class="badgewarn">未选省份</span></div></div></div>
-<div style="position:absolute;left:490px;top:5220px"><div class="cell dk"><div class="chkrow"><span class="chk on"><svg viewBox="0 0 24 24"><path d="M5 12l4.5 4.5L19 7"/></svg></span><span>省考</span><span class="badgewarn">未选省份</span></div></div></div>
-<div class="celltitle" style="left:20px;top:5324px"><b>悬浮按钮</b>默认</div>
-<div style="position:absolute;left:150px;top:5316px"><div class="cell lt"><div class="fabcell"><div class="fab">+</div></div></div></div>
-<div style="position:absolute;left:490px;top:5316px"><div class="cell dk"><div class="fabcell"><div class="fab">+</div></div></div></div>
-<div class="celltitle" style="left:20px;top:5420px"><b>悬浮按钮</b>按下</div>
-<div style="position:absolute;left:150px;top:5412px"><div class="cell lt"><div class="fabcell"><div class="fab pressed" style="filter:brightness(.9)">+</div></div></div></div>
-<div style="position:absolute;left:490px;top:5412px"><div class="cell dk"><div class="fabcell"><div class="fab pressed" style="filter:brightness(.9)">+</div></div></div></div>
-<div class="celltitle" style="left:20px;top:5516px"><b>悬浮按钮</b>禁用</div>
-<div style="position:absolute;left:150px;top:5508px"><div class="cell lt"><div class="fabcell"><div class="fab dis">+</div></div></div></div>
-<div style="position:absolute;left:490px;top:5508px"><div class="cell dk"><div class="fabcell"><div class="fab dis">+</div></div></div></div>
-<div class="celltitle" style="left:20px;top:5612px"><b>悬浮按钮</b>带徽标</div>
-<div style="position:absolute;left:150px;top:5604px"><div class="cell lt"><div class="fabcell"><div class="fab">+</div><span class="badgewarn">待复习 3</span></div></div></div>
-<div style="position:absolute;left:490px;top:5604px"><div class="cell dk"><div class="fabcell"><div class="fab">+</div><span class="badgewarn">待复习 3</span></div></div></div>
+<div class="celltitle" style="left:20px;top:448px"><b>主按钮</b>按下</div>
+<div style="position:absolute;left:150px;top:440px"><div class="cell lt"><div class="btn pressed">保存到错题</div></div></div>
+<div style="position:absolute;left:490px;top:440px"><div class="cell dk"><div class="btn pressed">保存到错题</div></div></div>
+<div class="celltitle" style="left:20px;top:564px"><b>主按钮</b>禁用</div>
+<div style="position:absolute;left:150px;top:556px"><div class="cell lt"><div class="disbtn">保存到错题</div></div></div>
+<div style="position:absolute;left:490px;top:556px"><div class="cell dk"><div class="disbtn">保存到错题</div></div></div>
+<div class="celltitle" style="left:20px;top:680px"><b>主按钮</b>加载</div>
+<div style="position:absolute;left:150px;top:672px"><div class="cell lt"><div class="btn loading"><span class="spinner"></span>正在识别…</div></div></div>
+<div style="position:absolute;left:490px;top:672px"><div class="cell dk"><div class="btn loading"><span class="spinner"></span>正在识别…</div></div></div>
+<div class="celltitle" style="left:20px;top:796px"><b>危险按钮（填充）</b>默认</div>
+<div style="position:absolute;left:150px;top:788px"><div class="cell lt"><div class="dangerbtn">清空全部数据</div></div></div>
+<div style="position:absolute;left:490px;top:788px"><div class="cell dk"><div class="dangerbtn">清空全部数据</div></div></div>
+<div class="celltitle" style="left:20px;top:912px"><b>危险按钮（填充）</b>按下</div>
+<div style="position:absolute;left:150px;top:904px"><div class="cell lt"><div class="dangerbtn pressed">清空全部数据</div></div></div>
+<div style="position:absolute;left:490px;top:904px"><div class="cell dk"><div class="dangerbtn pressed">清空全部数据</div></div></div>
+<div class="celltitle" style="left:20px;top:1028px"><b>危险按钮（填充）</b>禁用</div>
+<div style="position:absolute;left:150px;top:1020px"><div class="cell lt"><div class="disbtn">清空全部数据</div></div></div>
+<div style="position:absolute;left:490px;top:1020px"><div class="cell dk"><div class="disbtn">清空全部数据</div></div></div>
+<div class="celltitle" style="left:20px;top:1144px"><b>危险按钮（填充）</b>加载</div>
+<div style="position:absolute;left:150px;top:1136px"><div class="cell lt"><div class="dangerbtn loading"><span class="spinner"></span>正在清空…</div></div></div>
+<div style="position:absolute;left:490px;top:1136px"><div class="cell dk"><div class="dangerbtn loading"><span class="spinner"></span>正在清空…</div></div></div>
+<div class="celltitle" style="left:20px;top:1260px"><b>危险按钮（描边）</b>默认</div>
+<div style="position:absolute;left:150px;top:1252px"><div class="cell lt"><div class="dangerout">删除这道错题</div></div></div>
+<div style="position:absolute;left:490px;top:1252px"><div class="cell dk"><div class="dangerout">删除这道错题</div></div></div>
+<div class="celltitle" style="left:20px;top:1376px"><b>危险按钮（描边）</b>按下</div>
+<div style="position:absolute;left:150px;top:1368px"><div class="cell lt"><div class="dangerout pressed">删除这道错题</div></div></div>
+<div style="position:absolute;left:490px;top:1368px"><div class="cell dk"><div class="dangerout pressed">删除这道错题</div></div></div>
+<div class="celltitle" style="left:20px;top:1492px"><b>危险按钮（描边）</b>禁用</div>
+<div style="position:absolute;left:150px;top:1484px"><div class="cell lt"><div class="disbtn">删除这道错题</div></div></div>
+<div style="position:absolute;left:490px;top:1484px"><div class="cell dk"><div class="disbtn">删除这道错题</div></div></div>
+<div class="celltitle" style="left:20px;top:1608px"><b>危险按钮（描边）</b>加载</div>
+<div style="position:absolute;left:150px;top:1600px"><div class="cell lt"><div class="dangerout loading"><span class="spinner"></span>正在删除…</div></div></div>
+<div style="position:absolute;left:490px;top:1600px"><div class="cell dk"><div class="dangerout loading"><span class="spinner"></span>正在删除…</div></div></div>
+<div class="celltitle" style="left:20px;top:1724px"><b>幽灵按钮</b>默认</div>
+<div style="position:absolute;left:150px;top:1716px"><div class="cell lt"><div class="ghostbtn">收藏（预留）</div></div></div>
+<div style="position:absolute;left:490px;top:1716px"><div class="cell dk"><div class="ghostbtn">收藏（预留）</div></div></div>
+<div class="celltitle" style="left:20px;top:1840px"><b>幽灵按钮</b>按下</div>
+<div style="position:absolute;left:150px;top:1832px"><div class="cell lt"><div class="ghostbtn pressed">收藏（预留）</div></div></div>
+<div style="position:absolute;left:490px;top:1832px"><div class="cell dk"><div class="ghostbtn pressed">收藏（预留）</div></div></div>
+<div class="celltitle" style="left:20px;top:1956px"><b>幽灵按钮</b>禁用</div>
+<div style="position:absolute;left:150px;top:1948px"><div class="cell lt"><div class="disbtn">收藏（预留）</div></div></div>
+<div style="position:absolute;left:490px;top:1948px"><div class="cell dk"><div class="disbtn">收藏（预留）</div></div></div>
+<div class="celltitle" style="left:20px;top:2072px"><b>幽灵按钮</b>加载</div>
+<div style="position:absolute;left:150px;top:2064px"><div class="cell lt"><div class="ghostbtn"><span class="spinner"></span> 收藏中…</div></div></div>
+<div style="position:absolute;left:490px;top:2064px"><div class="cell dk"><div class="ghostbtn"><span class="spinner"></span> 收藏中…</div></div></div>
+<div class="celltitle" style="left:20px;top:2188px"><b>顶部按钮</b>默认</div>
+<div style="position:absolute;left:150px;top:2180px"><div class="cell lt"><div class="topbtn"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> 拍照录题</div></div></div>
+<div style="position:absolute;left:490px;top:2180px"><div class="cell dk"><div class="topbtn"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> 拍照录题</div></div></div>
+<div class="celltitle" style="left:20px;top:2304px"><b>顶部按钮</b>按下</div>
+<div style="position:absolute;left:150px;top:2296px"><div class="cell lt"><div class="topbtn pressed"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> 拍照录题</div></div></div>
+<div style="position:absolute;left:490px;top:2296px"><div class="cell dk"><div class="topbtn pressed"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> 拍照录题</div></div></div>
+<div class="celltitle" style="left:20px;top:2420px"><b>顶部按钮</b>禁用</div>
+<div style="position:absolute;left:150px;top:2412px"><div class="cell lt"><div class="topbtn" style="background:var(--disbg);color:var(--disfg)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> 拍照录题</div></div></div>
+<div style="position:absolute;left:490px;top:2412px"><div class="cell dk"><div class="topbtn" style="background:var(--disbg);color:var(--disfg)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> 拍照录题</div></div></div>
+<div class="celltitle" style="left:20px;top:2536px"><b>顶部按钮</b>加载</div>
+<div style="position:absolute;left:150px;top:2528px"><div class="cell lt"><div class="topbtn"><span class="spinner"></span> 打开相机</div></div></div>
+<div style="position:absolute;left:490px;top:2528px"><div class="cell dk"><div class="topbtn"><span class="spinner"></span> 打开相机</div></div></div>
+<div class="celltitle" style="left:20px;top:2652px"><b>标签</b>默认</div>
+<div style="position:absolute;left:150px;top:2644px"><div class="cell lt"><span class="tag">搭配不当</span></div></div>
+<div style="position:absolute;left:490px;top:2644px"><div class="cell dk"><span class="tag">搭配不当</span></div></div>
+<div class="celltitle" style="left:20px;top:2768px"><b>标签</b>幽灵</div>
+<div style="position:absolute;left:150px;top:2760px"><div class="cell lt"><span class="tag ghost">收藏（预留）</span></div></div>
+<div style="position:absolute;left:490px;top:2760px"><div class="cell dk"><span class="tag ghost">收藏（预留）</span></div></div>
+<div class="celltitle" style="left:20px;top:2884px"><b>标签</b>选中</div>
+<div style="position:absolute;left:150px;top:2876px"><div class="cell lt"><span class="tag on">褒义</span></div></div>
+<div style="position:absolute;left:490px;top:2876px"><div class="cell dk"><span class="tag on">褒义</span></div></div>
+<div class="celltitle" style="left:20px;top:3000px"><b>标签</b>禁用</div>
+<div style="position:absolute;left:150px;top:2992px"><div class="cell lt"><span class="distag">教师编</span></div></div>
+<div style="position:absolute;left:490px;top:2992px"><div class="cell dk"><span class="distag">教师编</span></div></div>
+<div class="celltitle" style="left:20px;top:3116px"><b>徽标</b>信息</div>
+<div style="position:absolute;left:150px;top:3108px"><div class="cell lt"><span class="badgeinfo">合并</span></div></div>
+<div style="position:absolute;left:490px;top:3108px"><div class="cell dk"><span class="badgeinfo">合并</span></div></div>
+<div class="celltitle" style="left:20px;top:3232px"><b>徽标</b>警示橙</div>
+<div style="position:absolute;left:150px;top:3224px"><div class="cell lt"><span class="badgewarn">覆盖</span></div></div>
+<div style="position:absolute;left:490px;top:3224px"><div class="cell dk"><span class="badgewarn">覆盖</span></div></div>
+<div class="celltitle" style="left:20px;top:3348px"><b>徽标</b>错误红</div>
+<div style="position:absolute;left:150px;top:3340px"><div class="cell lt"><span class="badgerr">损坏</span></div></div>
+<div style="position:absolute;left:490px;top:3340px"><div class="cell dk"><span class="badgerr">损坏</span></div></div>
+<div class="celltitle" style="left:20px;top:3464px"><b>徽标</b>中性</div>
+<div style="position:absolute;left:150px;top:3456px"><div class="cell lt"><span class="distag">已停用</span></div></div>
+<div style="position:absolute;left:490px;top:3456px"><div class="cell dk"><span class="distag">已停用</span></div></div>
+<div class="celltitle" style="left:20px;top:3580px"><b>提示条</b>信息（中性）</div>
+<div style="position:absolute;left:150px;top:3572px"><div class="cell lt"><div class="bar info"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 8v.5"/></svg><span class="bt">识别到 5 行，请核对</span></div></div></div>
+<div style="position:absolute;left:490px;top:3572px"><div class="cell dk"><div class="bar info"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 8v.5"/></svg><span class="bt">识别到 5 行，请核对</span></div></div></div>
+<div class="celltitle" style="left:20px;top:3696px"><b>提示条</b>可恢复（橙）</div>
+<div style="position:absolute;left:150px;top:3688px"><div class="cell lt"><div class="bar warn"><svg viewBox="0 0 24 24"><path d="M12 4l8 15H4z"/><path d="M12 9v4"/><path d="M12 16.5v.5"/></svg><span><span class="bt">省考还没选省份</span><br><span class="bs">先选一个再筛题</span></span></div></div></div>
+<div style="position:absolute;left:490px;top:3688px"><div class="cell dk"><div class="bar warn"><svg viewBox="0 0 24 24"><path d="M12 4l8 15H4z"/><path d="M12 9v4"/><path d="M12 16.5v.5"/></svg><span><span class="bt">省考还没选省份</span><br><span class="bs">先选一个再筛题</span></span></div></div></div>
+<div class="celltitle" style="left:20px;top:3812px"><b>提示条</b>硬错误（红）</div>
+<div style="position:absolute;left:150px;top:3804px"><div class="cell lt"><div class="bar err"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/></svg><span><span class="bt">备份包损坏</span><br><span class="bs">无法导入</span></span></div></div></div>
+<div style="position:absolute;left:490px;top:3804px"><div class="cell dk"><div class="bar err"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/></svg><span><span class="bt">备份包损坏</span><br><span class="bs">无法导入</span></span></div></div></div>
+<div class="celltitle" style="left:20px;top:3928px"><b>提示条</b>橙 + 操作</div>
+<div style="position:absolute;left:150px;top:3920px"><div class="cell lt"><div class="bar warn"><svg viewBox="0 0 24 24"><path d="M12 4l8 15H4z"/><path d="M12 9v4"/><path d="M12 16.5v.5"/></svg><span class="bt">识别失败，可重试</span><span class="act">重试</span></div></div></div>
+<div style="position:absolute;left:490px;top:3920px"><div class="cell dk"><div class="bar warn"><svg viewBox="0 0 24 24"><path d="M12 4l8 15H4z"/><path d="M12 9v4"/><path d="M12 16.5v.5"/></svg><span class="bt">识别失败，可重试</span><span class="act">重试</span></div></div></div>
+<div class="celltitle" style="left:20px;top:4044px"><b>输入框</b>默认</div>
+<div style="position:absolute;left:150px;top:4036px"><div class="cell lt"><input class="editinput" value="按部就班"></div></div>
+<div style="position:absolute;left:490px;top:4036px"><div class="cell dk"><input class="editinput" value="按部就班"></div></div>
+<div class="celltitle" style="left:20px;top:4160px"><b>输入框</b>聚焦</div>
+<div style="position:absolute;left:150px;top:4152px"><div class="cell lt"><input class="editinput focus" value="按部就班"></div></div>
+<div style="position:absolute;left:490px;top:4152px"><div class="cell dk"><input class="editinput focus" value="按部就班"></div></div>
+<div class="celltitle" style="left:20px;top:4276px"><b>输入框</b>错误</div>
+<div style="position:absolute;left:150px;top:4268px"><div class="cell lt"><input class="editinput err" value=""><div class="errhint">请输入成语</div></div></div>
+<div style="position:absolute;left:490px;top:4268px"><div class="cell dk"><input class="editinput err" value=""><div class="errhint">请输入成语</div></div></div>
+<div class="celltitle" style="left:20px;top:4392px"><b>输入框</b>禁用</div>
+<div style="position:absolute;left:150px;top:4384px"><div class="cell lt"><input class="disinput" value="不可编辑"></div></div>
+<div style="position:absolute;left:490px;top:4384px"><div class="cell dk"><input class="disinput" value="不可编辑"></div></div>
+<div class="celltitle" style="left:20px;top:4508px"><b>图片占位</b>空态</div>
+<div style="position:absolute;left:150px;top:4500px"><div class="cell lt"><div class="imgph">还没有照片</div></div></div>
+<div style="position:absolute;left:490px;top:4500px"><div class="cell dk"><div class="imgph">还没有照片</div></div></div>
+<div class="celltitle" style="left:20px;top:4624px"><b>图片占位</b>原图丢失（橙）</div>
+<div style="position:absolute;left:150px;top:4616px"><div class="cell lt"><div class="imgph warn">原图已不在</div></div></div>
+<div style="position:absolute;left:490px;top:4616px"><div class="cell dk"><div class="imgph warn">原图已不在</div></div></div>
+<div class="celltitle" style="left:20px;top:4740px"><b>图片占位</b>骨架屏</div>
+<div style="position:absolute;left:150px;top:4732px"><div class="cell lt"><div class="skel"></div></div></div>
+<div style="position:absolute;left:490px;top:4732px"><div class="cell dk"><div class="skel"></div></div></div>
+<div class="celltitle" style="left:20px;top:4856px"><b>图片占位</b>长页截断</div>
+<div style="position:absolute;left:150px;top:4848px"><div class="cell lt"><div class="imgph">继续下滑</div><div class="cut">长页 · 已截断</div></div></div>
+<div style="position:absolute;left:490px;top:4848px"><div class="cell dk"><div class="imgph">继续下滑</div><div class="cut">长页 · 已截断</div></div></div>
+<div class="celltitle" style="left:20px;top:4972px"><b>列表行</b>默认</div>
+<div style="position:absolute;left:150px;top:4964px"><div class="cell lt"><div class="lrow "><div class="lt1"><span class="lname">按部就班</span><span class="lpy">àn bù jiù bān</span></div><div class="lmeta"><span class="tag">高频</span><span class="distag">未学</span></div></div></div></div>
+<div style="position:absolute;left:490px;top:4964px"><div class="cell dk"><div class="lrow "><div class="lt1"><span class="lname">按部就班</span><span class="lpy">àn bù jiù bān</span></div><div class="lmeta"><span class="tag">高频</span><span class="distag">未学</span></div></div></div></div>
+<div class="celltitle" style="left:20px;top:5088px"><b>列表行</b>选中</div>
+<div style="position:absolute;left:150px;top:5080px"><div class="cell lt"><div class="lrow on"><div class="lt1"><span class="lname">别出心裁</span><span class="lpy">bié chū xīn cái</span></div><div class="lmeta"><span class="tag">高频</span><span class="distag">未学</span></div></div></div></div>
+<div style="position:absolute;left:490px;top:5080px"><div class="cell dk"><div class="lrow on"><div class="lt1"><span class="lname">别出心裁</span><span class="lpy">bié chū xīn cái</span></div><div class="lmeta"><span class="tag">高频</span><span class="distag">未学</span></div></div></div></div>
+<div class="celltitle" style="left:20px;top:5204px"><b>列表行</b>禁用</div>
+<div style="position:absolute;left:150px;top:5196px"><div class="cell lt"><div class="lrow dis"><div class="lt1"><span class="lname">墨守成规</span><span class="lpy">mò shǒu chéng guī</span></div><div class="lmeta"><span class="distag">已停用</span></div></div></div></div>
+<div style="position:absolute;left:490px;top:5196px"><div class="cell dk"><div class="lrow dis"><div class="lt1"><span class="lname">墨守成规</span><span class="lpy">mò shǒu chéng guī</span></div><div class="lmeta"><span class="distag">已停用</span></div></div></div></div>
+<div class="celltitle" style="left:20px;top:5320px"><b>列表行</b>带徽标</div>
+<div style="position:absolute;left:150px;top:5312px"><div class="cell lt"><div class="lrow "><div class="lt1"><span class="lname">望其项背</span><span class="lpy">wàng qí xiàng bèi</span></div><div class="lmeta"><span class="badgewarn">待复习</span></div></div></div></div>
+<div style="position:absolute;left:490px;top:5312px"><div class="cell dk"><div class="lrow "><div class="lt1"><span class="lname">望其项背</span><span class="lpy">wàng qí xiàng bèi</span></div><div class="lmeta"><span class="badgewarn">待复习</span></div></div></div></div>
+<div class="celltitle" style="left:20px;top:5436px"><b>分段控件</b>默认</div>
+<div style="position:absolute;left:150px;top:5428px"><div class="cell lt"><div class="seg"><span class="on">国考</span><span>省考</span></div></div></div>
+<div style="position:absolute;left:490px;top:5428px"><div class="cell dk"><div class="seg"><span class="on">国考</span><span>省考</span></div></div></div>
+<div class="celltitle" style="left:20px;top:5552px"><b>分段控件</b>第二段选中</div>
+<div style="position:absolute;left:150px;top:5544px"><div class="cell lt"><div class="seg"><span>国考</span><span class="on">省考</span></div></div></div>
+<div style="position:absolute;left:490px;top:5544px"><div class="cell dk"><div class="seg"><span>国考</span><span class="on">省考</span></div></div></div>
+<div class="celltitle" style="left:20px;top:5668px"><b>分段控件</b>禁用</div>
+<div style="position:absolute;left:150px;top:5660px"><div class="cell lt"><div class="seg"><span class="on">国考</span><span class="dis">事业编</span></div></div></div>
+<div style="position:absolute;left:490px;top:5660px"><div class="cell dk"><div class="seg"><span class="on">国考</span><span class="dis">事业编</span></div></div></div>
+<div class="celltitle" style="left:20px;top:5784px"><b>分段控件</b>三段</div>
+<div style="position:absolute;left:150px;top:5776px"><div class="cell lt"><div class="seg"><span class="on">全部</span><span>待复习</span><span>已掌握</span></div></div></div>
+<div style="position:absolute;left:490px;top:5776px"><div class="cell dk"><div class="seg"><span class="on">全部</span><span>待复习</span><span>已掌握</span></div></div></div>
+<div class="celltitle" style="left:20px;top:5900px"><b>勾选行</b>勾选</div>
+<div style="position:absolute;left:150px;top:5892px"><div class="cell lt"><div class="chkrow"><span class="chk"><svg viewBox="0 0 24 24"><path d="M5 12l4.5 4.5L19 7"/></svg></span><span>国考</span></div></div></div>
+<div style="position:absolute;left:490px;top:5892px"><div class="cell dk"><div class="chkrow"><span class="chk"><svg viewBox="0 0 24 24"><path d="M5 12l4.5 4.5L19 7"/></svg></span><span>国考</span></div></div></div>
+<div class="celltitle" style="left:20px;top:6016px"><b>勾选行</b>未勾选</div>
+<div style="position:absolute;left:150px;top:6008px"><div class="cell lt"><div class="chkrow"><span class="chk off"></span><span>省考</span></div></div></div>
+<div style="position:absolute;left:490px;top:6008px"><div class="cell dk"><div class="chkrow"><span class="chk off"></span><span>省考</span></div></div></div>
+<div class="celltitle" style="left:20px;top:6132px"><b>勾选行</b>禁用</div>
+<div style="position:absolute;left:150px;top:6124px"><div class="cell lt"><div class="chkrow dis"><span class="chk dis"></span><span>教师编</span></div></div></div>
+<div style="position:absolute;left:490px;top:6124px"><div class="cell dk"><div class="chkrow dis"><span class="chk dis"></span><span>教师编</span></div></div></div>
+<div class="celltitle" style="left:20px;top:6248px"><b>勾选行</b>带警示</div>
+<div style="position:absolute;left:150px;top:6240px"><div class="cell lt"><div class="chkrow"><span class="chk"><svg viewBox="0 0 24 24"><path d="M5 12l4.5 4.5L19 7"/></svg></span><span>省考</span><span class="winline"><svg viewBox="0 0 24 24"><path d="M12 4l8 15H4z"/><path d="M12 9v4"/><path d="M12 16.5v.5"/></svg>未选省份</span></div></div></div>
+<div style="position:absolute;left:490px;top:6240px"><div class="cell dk"><div class="chkrow"><span class="chk"><svg viewBox="0 0 24 24"><path d="M5 12l4.5 4.5L19 7"/></svg></span><span>省考</span><span class="winline"><svg viewBox="0 0 24 24"><path d="M12 4l8 15H4z"/><path d="M12 9v4"/><path d="M12 16.5v.5"/></svg>未选省份</span></div></div></div>
+<div class="celltitle" style="left:20px;top:6364px"><b>悬浮按钮</b>默认</div>
+<div style="position:absolute;left:150px;top:6356px"><div class="cell lt"><div class="fabcell"><div class="fab"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div></div></div></div>
+<div style="position:absolute;left:490px;top:6356px"><div class="cell dk"><div class="fabcell"><div class="fab"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div></div></div></div>
+<div class="celltitle" style="left:20px;top:6480px"><b>悬浮按钮</b>按下</div>
+<div style="position:absolute;left:150px;top:6472px"><div class="cell lt"><div class="fabcell"><div class="fab" style="filter:brightness(.9)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div></div></div></div>
+<div style="position:absolute;left:490px;top:6472px"><div class="cell dk"><div class="fabcell"><div class="fab" style="filter:brightness(.9)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div></div></div></div>
+<div class="celltitle" style="left:20px;top:6596px"><b>悬浮按钮</b>禁用</div>
+<div style="position:absolute;left:150px;top:6588px"><div class="cell lt"><div class="fabcell"><div class="fab dis"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div></div></div></div>
+<div style="position:absolute;left:490px;top:6588px"><div class="cell dk"><div class="fabcell"><div class="fab dis"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div></div></div></div>
+<div class="celltitle" style="left:20px;top:6712px"><b>悬浮按钮</b>带徽标</div>
+<div style="position:absolute;left:150px;top:6704px"><div class="cell lt"><div class="fabcell"><div class="fab"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div><span class="badgewarn">待复习 3</span></div></div></div>
+<div style="position:absolute;left:490px;top:6704px"><div class="cell dk"><div class="fabcell"><div class="fab"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div><span class="badgewarn">待复习 3</span></div></div></div>
 </body></html>

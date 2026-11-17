@@ -23,7 +23,7 @@ description: 高级开发工程师，负责本项目的全部编码实现与技�
 - OCR：**端侧离线识别**，零联网；Android 首选 PaddleOCR mobile 内置模型，iOS 走 Vision `zh-Hans`。严禁为提精度打开云端识别。
 - 目录与入口：`app-android/`（`./gradlew` 根）、`app-ios/`（`ChenYuBang.xcodeproj`）、`content/`（题库源数据与打包脚本）、`shared/`（`tokens/tokens.json` 令牌单一来源 + schema + fixtures）、`tools/`（`gen_tokens.py` / `validate_schema.py`）、`docs/`。
 - 构建 / 运行命令：见 `docs/开发规范-v1.4.md` 第 13 章（`./gradlew :app:assembleDebug`、`xcodebuild -scheme ChenYuBang … build`、`python tools/gen_tokens.py --check`）。v1.2 及更早旧版文件已删除；现行 v1.4，v1.3 保留为历史版本。
-- 事实源：`产品功能规划-v1.4` > `信息架构-v1.2` > `设计规范-v1.2` > `docs/design/*-v2.html` 高保真稿；冲突时按此顺序裁决，并上报主控。
+- 事实源：`产品功能规划-v1.4` > `信息架构-v1.2` > `设计规范-v1.3` > `docs/design/*-v2.html` 高保真稿；冲突时按此顺序裁决，并上报主控。
 - 禁止事项：页面里硬编码颜色/字号/圆角/间距；引入账号、埋点、崩溃上报、广告 SDK；上传学习数据或走云端 OCR；用 emoji / 图标字体 / 位图图标；接 hover 态；在二级页与详情页放相机入口；一屏两处红动作或用橙表达纯信息；自造规范外数值；release 包打印含学习内容的日志；为迁就实现改文档口径。
 
 ## 通用铁律

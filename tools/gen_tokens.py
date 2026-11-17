@@ -11,6 +11,7 @@
   - 十六进制统一转 ARGB；rgba(...) 转 alpha + RGB。
 """
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -19,7 +20,7 @@ TOKENS = ROOT / "shared" / "tokens" / "tokens.json"
 ANDROID_OUT = ROOT / "app-android" / "core-ui" / "src" / "main" / "kotlin" / "com" / "chenyubang" / "core" / "ui" / "tokens" / "Tokens.kt"
 IOS_OUT = ROOT / "app-ios" / "Sources" / "Tokens" / "Tokens.swift"
 
-HEADER = "// GENERATED FILE — DO NOT EDIT.\n// Source: shared/tokens/tokens.json (docs/设计规范-v1.2.md)\n// Regenerate: python tools/gen_tokens.py\n"
+HEADER = "// GENERATED FILE — DO NOT EDIT.\n// Source: shared/tokens/tokens.json (docs/设计规范-v1.3.md)\n// Regenerate: python tools/gen_tokens.py\n"
 
 
 def parse_color(value):
@@ -44,13 +45,50 @@ def camel(name):
     return name
 
 
+def parse_shadow(value):
+    """CSS box-shadow 串 → 逐层 (ox, oy, blur, spread, r, g, b, a)，长度单位 px。"""
+    layers = []
+    depth = 0
+    buf = ""
+    for ch in value:
+        if ch == "(":
+            depth += 1
+        elif ch == ")":
+            depth -= 1
+        if ch == "," and depth == 0:
+            layers.append(buf)
+            buf = ""
+        else:
+            buf += ch
+    if buf.strip():
+        layers.append(buf)
+    out = []
+    for layer in layers:
+        m = re.search(r"rgba\([^)]*\)", layer)
+        if not m:
+            raise ValueError("shadow layer without rgba: %s" % layer)
+        r, g, b, a = parse_color(m.group(0))
+        nums = [float(x[:-2] if x.endswith("px") else x)
+                for x in re.findall(r"-?\d*\.?\d+(?:px)?", layer[:m.start()] + layer[m.end():])]
+        if len(nums) not in (3, 4):
+            raise ValueError("shadow layer lengths: %s" % layer)
+        ox, oy, blur = nums[:3]
+        spread = nums[3] if len(nums) == 4 else 0.0
+        out.append((ox, oy, blur, spread, r, g, b, a))
+    return out
+
+
+def fnum(v):
+    return ("%g" % v) + "f"
+
+
 def kotlin():
     data = json.loads(TOKENS.read_text(encoding="utf-8"))
     light = data["color"]["light"]
     dark = data["color"]["dark"]
     out = [HEADER, "package com.chenyubang.core.ui.tokens", "",
            "import androidx.compose.ui.graphics.Color", "",
-           "/** 设计令牌。数值唯一来源：docs/设计规范-v1.2.md */",
+           "/** 设计令牌。数值唯一来源：docs/设计规范-v1.3.md */",
            "object Tokens {", ""]
 
     if sorted(light.keys()) != sorted(dark.keys()):
@@ -93,6 +131,24 @@ def kotlin():
     for key, val in data["icon"].items():
         out.append("        val %s = %d" % (key, int(val)))
     out.append("    }")
+    out.append("")
+    out.append("    /** 投影层参数（规范 2.2/2.3）：CSS box-shadow 解析结果，实现端按平台等效映射 */")
+    out.append("    data class ShadowLayer(")
+    out.append("        val offsetX: Float,")
+    out.append("        val offsetY: Float,")
+    out.append("        val blur: Float,")
+    out.append("        val spread: Float,")
+    out.append("        val color: Color,")
+    out.append("    )")
+    out.append("")
+    out.append("    object Shadow {")
+    for mode in ("light", "dark"):
+        out.append("        val fab%s: List<ShadowLayer> = listOf(" % mode.capitalize())
+        for ox, oy, blur, spread, r, g, b, a in parse_shadow(data["shadow"]["fab"][mode]):
+            out.append("            ShadowLayer(%s, %s, %s, %s, Color(0x%02X%02X%02X%02X)),"
+                       % (fnum(ox), fnum(oy), fnum(blur), fnum(spread), a, r, g, b))
+        out.append("        )")
+    out.append("    }")
     out.append("}")
     out.append("")
     return "\n".join(out)
@@ -103,7 +159,7 @@ def swift():
     light = data["color"]["light"]
     dark = data["color"]["dark"]
     out = [HEADER, "import SwiftUI", "",
-           "/// 设计令牌。数值唯一来源：docs/设计规范-v1.2.md",
+           "/// 设计令牌。数值唯一来源：docs/设计规范-v1.3.md",
            "public struct TokenColors: Sendable {"]
     for key in sorted(light.keys()):
         out.append("    public let %s: Color" % key)
@@ -114,6 +170,23 @@ def swift():
         out.append("        self.%s = %s" % (key, key))
     out += ["    }", "}", ""]
 
+    out.append("/// 投影层参数（规范 2.2/2.3）：CSS box-shadow 解析结果，实现端按平台等效映射")
+    out.append("public struct ShadowLayer: Sendable {")
+    out.append("    public let offsetX: CGFloat")
+    out.append("    public let offsetY: CGFloat")
+    out.append("    public let blur: CGFloat")
+    out.append("    public let spread: CGFloat")
+    out.append("    public let color: Color")
+    out.append("")
+    out.append("    public init(offsetX: CGFloat, offsetY: CGFloat, blur: CGFloat, spread: CGFloat, color: Color) {")
+    out.append("        self.offsetX = offsetX")
+    out.append("        self.offsetY = offsetY")
+    out.append("        self.blur = blur")
+    out.append("        self.spread = spread")
+    out.append("        self.color = color")
+    out.append("    }")
+    out.append("}")
+    out.append("")
     out.append("public enum Tokens {")
     out.append("    public static let light = TokenColors(")
     for key in sorted(light.keys()):
@@ -147,6 +220,18 @@ def swift():
     out.append("    public enum Icon {")
     for key, val in data["icon"].items():
         out.append("        public static let %s: CGFloat = %s" % (key, fmt(val)))
+    out.append("    }")
+    out.append("")
+    out.append("    public enum Shadow {")
+    for mode in ("light", "dark"):
+        entries = []
+        for ox, oy, blur, spread, r, g, b, a in parse_shadow(data["shadow"]["fab"][mode]):
+            entries.append("            ShadowLayer(offsetX: %s, offsetY: %s, blur: %s, spread: %s, "
+                           "color: Color(red: %.4f, green: %.4f, blue: %.4f, opacity: %.4f))"
+                           % (fmt(ox), fmt(oy), fmt(blur), fmt(spread), r / 255, g / 255, b / 255, a / 255))
+        out.append("        public static let fab%s: [ShadowLayer] = [" % mode.capitalize())
+        out.append(",\n".join(entries))
+        out.append("        ]")
     out.append("    }")
     out.append("}")
     out.append("")
