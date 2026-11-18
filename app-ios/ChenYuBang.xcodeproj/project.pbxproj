@@ -39,6 +39,19 @@
 		A00000000000000000000045 /* GRDB in Frameworks */ = {isa = PBXBuildFile; productRef = A00000000000000000000660 /* GRDB */; };
 		A00000000000000000000046 /* GRDB in Frameworks */ = {isa = PBXBuildFile; productRef = A00000000000000000000680 /* GRDB */; };
 		A00000000000000000000047 /* SnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = A00000000000000000000700 /* SnapshotTesting */; };
+		A00000000000000000000080 /* CTagSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000180 /* CTagSnapshotTests.swift */; };
+		A00000000000000000000081 /* CBadgeSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000181 /* CBadgeSnapshotTests.swift */; };
+		A00000000000000000000082 /* CInputSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000182 /* CInputSnapshotTests.swift */; };
+		A00000000000000000000083 /* CBarSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000183 /* CBarSnapshotTests.swift */; };
+		A00000000000000000000084 /* CImagePlaceholderSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000184 /* CImagePlaceholderSnapshotTests.swift */; };
+		A00000000000000000000085 /* CFabSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000185 /* CFabSnapshotTests.swift */; };
+		A00000000000000000000086 /* CTabBarSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000186 /* CTabBarSnapshotTests.swift */; };
+		A00000000000000000000087 /* COverlaySnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000187 /* COverlaySnapshotTests.swift */; };
+		A00000000000000000000088 /* CListRowSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000188 /* CListRowSnapshotTests.swift */; };
+		A00000000000000000000089 /* CSegmentedControlSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000189 /* CSegmentedControlSnapshotTests.swift */; };
+		A0000000000000000000008A /* CCheckRowSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000018A /* CCheckRowSnapshotTests.swift */; };
+		A0000000000000000000008B /* CSpinnerSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000018B /* CSpinnerSnapshotTests.swift */; };
+		A0000000000000000000008C /* CIconSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000018C /* CIconSnapshotTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -79,6 +92,19 @@
 		A0000000000000000000014A /* CButtonSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CButtonSnapshotTests.swift; sourceTree = "<group>"; };
 		A00000000000000000000151 /* pack-v1.0.0.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = Resources/pack-v1.0.0.zip; sourceTree = "<group>"; };
 		A00000000000000000000152 /* pack fixture */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = Fixtures/pack/pack-v1.0.0.zip; sourceTree = "<group>"; };
+		A00000000000000000000180 /* CTagSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CTagSnapshotTests.swift; sourceTree = "<group>"; };
+		A00000000000000000000181 /* CBadgeSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBadgeSnapshotTests.swift; sourceTree = "<group>"; };
+		A00000000000000000000182 /* CInputSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CInputSnapshotTests.swift; sourceTree = "<group>"; };
+		A00000000000000000000183 /* CBarSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBarSnapshotTests.swift; sourceTree = "<group>"; };
+		A00000000000000000000184 /* CImagePlaceholderSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CImagePlaceholderSnapshotTests.swift; sourceTree = "<group>"; };
+		A00000000000000000000185 /* CFabSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CFabSnapshotTests.swift; sourceTree = "<group>"; };
+		A00000000000000000000186 /* CTabBarSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CTabBarSnapshotTests.swift; sourceTree = "<group>"; };
+		A00000000000000000000187 /* COverlaySnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = COverlaySnapshotTests.swift; sourceTree = "<group>"; };
+		A00000000000000000000188 /* CListRowSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CListRowSnapshotTests.swift; sourceTree = "<group>"; };
+		A00000000000000000000189 /* CSegmentedControlSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSegmentedControlSnapshotTests.swift; sourceTree = "<group>"; };
+		A0000000000000000000018A /* CCheckRowSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CCheckRowSnapshotTests.swift; sourceTree = "<group>"; };
+		A0000000000000000000018B /* CSpinnerSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSpinnerSnapshotTests.swift; sourceTree = "<group>"; };
+		A0000000000000000000018C /* CIconSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CIconSnapshotTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -206,6 +232,19 @@
 				A00000000000000000000148 /* PackScopeTests.swift */,
 				A00000000000000000000149 /* PackTestSupportTests.swift */,
 				A0000000000000000000014A /* CButtonSnapshotTests.swift */,
+				A00000000000000000000180 /* CTagSnapshotTests.swift */,
+				A00000000000000000000181 /* CBadgeSnapshotTests.swift */,
+				A00000000000000000000182 /* CInputSnapshotTests.swift */,
+				A00000000000000000000183 /* CBarSnapshotTests.swift */,
+				A00000000000000000000184 /* CImagePlaceholderSnapshotTests.swift */,
+				A00000000000000000000185 /* CFabSnapshotTests.swift */,
+				A00000000000000000000186 /* CTabBarSnapshotTests.swift */,
+				A00000000000000000000187 /* COverlaySnapshotTests.swift */,
+				A00000000000000000000188 /* CListRowSnapshotTests.swift */,
+				A00000000000000000000189 /* CSegmentedControlSnapshotTests.swift */,
+				A0000000000000000000018A /* CCheckRowSnapshotTests.swift */,
+				A0000000000000000000018B /* CSpinnerSnapshotTests.swift */,
+				A0000000000000000000018C /* CIconSnapshotTests.swift */,
 				A00000000000000000000152 /* pack fixture */,
 			);
 			path = Tests;
@@ -365,6 +404,19 @@
 				A00000000000000000000041 /* PackScopeTests.swift in Sources */,
 				A00000000000000000000042 /* PackTestSupportTests.swift in Sources */,
 				A00000000000000000000048 /* CButtonSnapshotTests.swift in Sources */,
+				A00000000000000000000080 /* CTagSnapshotTests.swift in Sources */,
+				A00000000000000000000081 /* CBadgeSnapshotTests.swift in Sources */,
+				A00000000000000000000082 /* CInputSnapshotTests.swift in Sources */,
+				A00000000000000000000083 /* CBarSnapshotTests.swift in Sources */,
+				A00000000000000000000084 /* CImagePlaceholderSnapshotTests.swift in Sources */,
+				A00000000000000000000085 /* CFabSnapshotTests.swift in Sources */,
+				A00000000000000000000086 /* CTabBarSnapshotTests.swift in Sources */,
+				A00000000000000000000087 /* COverlaySnapshotTests.swift in Sources */,
+				A00000000000000000000088 /* CListRowSnapshotTests.swift in Sources */,
+				A00000000000000000000089 /* CSegmentedControlSnapshotTests.swift in Sources */,
+				A0000000000000000000008A /* CCheckRowSnapshotTests.swift in Sources */,
+				A0000000000000000000008B /* CSpinnerSnapshotTests.swift in Sources */,
+				A0000000000000000000008C /* CIconSnapshotTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
