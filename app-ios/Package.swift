@@ -15,7 +15,7 @@ let package = Package(
         // GRDB.swift 固定 6.x（规范 §13.1）
         .package(url: "https://github.com/groue/GRDB.swift.git", from: "6.29.0"),
         // swift-snapshot-testing 固定 1.x 并锁定小版本，供 UI 快照比对（规范 §2.1 / §13.1）
-        .package(url: "https://github.com/pointfreeco/swift-snapshot-testing.git", exact: "1.17.0"),
+        .package(url: "https://github.com/pointfreeco/swift-snapshot-testing.git", exact: "1.17.7"),
         .package(url: "https://github.com/weichsel/ZIPFoundation.git", exact: "0.9.19")
     ],
     targets: [

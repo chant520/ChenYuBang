@@ -23,8 +23,9 @@ app-ios/DerivedData/
 !/shared/fixtures/ocr/incoming/.gitkeep
 !/shared/fixtures/ocr/incoming/README.md
 
-# 本机会话快照
+# 本机会话快照与项目工作日志（含内部过程记录，不随仓库公开）
 /.workbuddy/context-mode-memory.json
+/.workbuddy/memory/
 
 # 工具与系统杂项
 .DS_Store
