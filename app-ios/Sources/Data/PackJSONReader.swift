@@ -22,7 +22,8 @@ struct PackJSONReader {
         nodes += 1
         guard depth <= 64, nodes <= 200_000 else { throw PackError.limit("JSON complexity") }
         whitespace()
-        switch peek {
+        guard let byte = peek else { throw PackError.json("Expected JSON value at \(offset)") }
+        switch byte {
         case 123: return try object(depth: depth + 1)
         case 91: return try array(depth: depth + 1)
         case 34: return .string(try string())
