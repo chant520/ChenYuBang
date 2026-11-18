@@ -24,9 +24,9 @@ final class COverlaySnapshotTests: XCTestCase {
         testName: String = #function,
         line: UInt = #line
     ) {
-        let view = COverlay(style: style, title: "标题", onDismiss: {}) {
+        let view = COverlay(style: style, title: "标题", onDismiss: {}, content: {
             Text("内容")
-        }
+        })
         .environment(\.colorScheme, dark ? .dark : .light)
         .environment(\.accessibilityReduceMotion, true)
         assertSnapshot(

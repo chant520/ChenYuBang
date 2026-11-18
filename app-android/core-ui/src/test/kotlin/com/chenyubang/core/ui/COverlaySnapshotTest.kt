@@ -1,14 +1,13 @@
 package com.chenyubang.core.ui
 
-import android.content.Context
 import android.content.res.Configuration
-import android.view.View
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.test.isDialog
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.test.core.app.ApplicationProvider
+import com.chenyubang.core.ui.tokens.Tokens
 import com.github.takahirom.roborazzi.captureRoboImage
 import org.junit.Rule
 import org.junit.Test
@@ -16,13 +15,12 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
-import org.robolectric.shadows.ShadowDialog
 
 /**
  * 浮层黄金快照（规范 §5.9 / §11.1 / §13）。居中 dialog / 底部 sheet × 浅/深。
- * COverlay 渲染在独立 Dialog 窗口：onRoot() 只能截到背后的 Activity，故取
- * ShadowDialog.getLatestDialog() 的 decorView，按屏幕尺寸手动 measure/layout 后用
- * Roborazzi View 扩展截图，应含遮罩（modal）+ 面板（surface）+ 标题。
+ * COverlay 渲染在独立 Dialog 窗口：用 isDialog() 精确选择 Compose 弹窗节点，
+ * 避免 onRoot() 多根歧义及 View 扩展的 Espresso 默认窗口查找；
+ * 截取真实布局，包含遮罩（modal）+ 面板（surface）+ 标题。
  * 浅/深通过 LocalConfiguration.uiMode 控制，与 COverlay 内部 isSystemInDarkTheme() 取色一致。
  */
 @RunWith(RobolectricTestRunner::class)
@@ -53,21 +51,11 @@ class COverlaySnapshotTest {
         composeTestRule.setContent {
             Themed(night) {
                 COverlay(title = "标题", centered = centered, onCancel = {}) {
-                    Text("内容")
+                    Text("内容", color = if (night) Tokens.Dark.text else Tokens.Light.text)
                 }
             }
         }
-        composeTestRule.waitForIdle()
-        val decor = ShadowDialog.getLatestDialog().window!!.decorView
-        val metrics = ApplicationProvider.getApplicationContext<Context>().resources.displayMetrics
-        val width = metrics.widthPixels
-        val height = metrics.heightPixels
-        decor.measure(
-            View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY),
-            View.MeasureSpec.makeMeasureSpec(height, View.MeasureSpec.EXACTLY),
-        )
-        decor.layout(0, 0, width, height)
-        decor.captureRoboImage()
+        composeTestRule.onNode(isDialog()).captureRoboImage()
     }
 
     @Test

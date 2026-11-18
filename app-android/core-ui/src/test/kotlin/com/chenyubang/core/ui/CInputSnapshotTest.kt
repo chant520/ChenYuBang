@@ -1,13 +1,20 @@
 package com.chenyubang.core.ui
 
 import android.content.res.Configuration
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.assertIsFocused
 import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.unit.dp
 import com.github.takahirom.roborazzi.captureRoboImage
 import org.junit.Rule
 import org.junit.Test
@@ -73,13 +80,17 @@ class CInputSnapshotTest {
         composeTestRule.mainClock.autoAdvance = false
         composeTestRule.setContent {
             Themed(night) {
-                CInput(value = "输入", onValueChange = {}, placeholder = "占位")
+                // 留出外绘焦点光环的空间；只截此容器，不匹配光标手柄的 Popup 根节点。
+                Box(Modifier.testTag("focusedInput").padding(4.dp)) {
+                    CInput(value = "输入", onValueChange = {}, placeholder = "占位")
+                }
             }
         }
         composeTestRule.mainClock.advanceTimeBy(FIRST_FRAME_MS)
         composeTestRule.onNode(hasSetTextAction()).performClick()
         composeTestRule.mainClock.advanceTimeBy(FOCUS_HOLD_MS)
-        composeTestRule.onRoot().captureRoboImage()
+        composeTestRule.onNode(hasSetTextAction()).assertIsFocused()
+        composeTestRule.onNodeWithTag("focusedInput").captureRoboImage()
     }
 
     @Test

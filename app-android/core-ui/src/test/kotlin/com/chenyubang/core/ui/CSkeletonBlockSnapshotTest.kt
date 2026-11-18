@@ -3,7 +3,9 @@ package com.chenyubang.core.ui
 import android.content.Context
 import android.content.res.Configuration
 import android.provider.Settings
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onRoot
@@ -45,7 +47,8 @@ class CSkeletonBlockSnapshotTest {
             config.uiMode = (config.uiMode and Configuration.UI_MODE_NIGHT_MASK.inv()) or nightBits
             CompositionLocalProvider(LocalConfiguration provides config) {
                 ChenYuBangTheme(darkTheme = night) {
-                    CSkeletonBlock(height = Tokens.Space.imgphH.dp)
+                    // 空 Box 不会自行撑开宽度，由宿主提供真实的可绘制区域。
+                    CSkeletonBlock(height = Tokens.Space.imgphH.dp, modifier = Modifier.fillMaxWidth())
                 }
             }
         }
