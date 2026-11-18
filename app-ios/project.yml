@@ -16,7 +16,7 @@ packages:
     from: 6.29.0
   swift-snapshot-testing:
     url: https://github.com/pointfreeco/swift-snapshot-testing.git
-    exactVersion: 1.17.0
+    exactVersion: 1.17.7
 
 targets:
   ChenYuBang:

@@ -4,6 +4,12 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
+    inputs:
+      record:
+        description: "快照基线录制引导（true=record 并上传产物；默认 false=verify 门禁）"
+        type: boolean
+        default: false
 
 jobs:
   tokens-and-schema:
@@ -39,7 +45,18 @@ jobs:
         run: cd app-android && ./gradlew ktlintCheck detekt
       - name: Lint
         run: cd app-android && ./gradlew :app:lintDebug
+      - name: 快照录制引导（仅手动 record；基线须在 CI 同环境录制，规范 §11.1）
+        if: github.event.inputs.record == 'true'
+        run: cd app-android && ./gradlew :core-ui:recordRoborazziDebug
+      - name: 上传 Android 快照基线产物（record 引导，取回入库；规范 §11.1）
+        if: github.event.inputs.record == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-snapshots
+          path: app-android/core-ui/src/test/snapshots
+          if-no-files-found: error
       - name: 快照比对（Roborazzi 与基线比对，CI 必跑；规范 §13 / §13.1）
+        if: github.event.inputs.record != 'true'
         run: cd app-android && ./gradlew :core-ui:verifyRoborazziDebug
 
   ios:
@@ -65,6 +82,8 @@ jobs:
           xcodebuild -project ChenYuBang.xcodeproj -scheme ChenYuBang \
             -destination 'generic/platform=iOS' build CODE_SIGNING_ALLOWED=NO
       - name: 单测 + 快照比对（swift-snapshot-testing 作为 test 的一部分；规范 §13 / §13.1）
+        env:
+          TEST_RUNNER_SNAPSHOT_RECORD: ${{ github.event.inputs.record == 'true' && '1' || '' }}
         run: |
           cd app-ios
           xcodebuild -project ChenYuBang.xcodeproj -scheme ChenYuBang \
