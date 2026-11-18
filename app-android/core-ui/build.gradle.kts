@@ -50,7 +50,7 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.robolectric:robolectric:4.13")
     testImplementation("androidx.test:core:1.6.1")
-    debugImplementation("androidx.compose.ui:ui-test-manifest")
+    testImplementation("androidx.compose.ui:ui-test-manifest")
 }
 
 // 构件黄金快照基线入库（规范 §11.1 / §13）：record 写入此目录、verify 与此目录比对。
