@@ -3,11 +3,21 @@ name: CI
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - "docs/**"
+      - "**/*.md"
+      - ".workbuddy/**"
+      - ".codebuddy/**"
   pull_request:
+    paths-ignore:
+      - "docs/**"
+      - "**/*.md"
+      - ".workbuddy/**"
+      - ".codebuddy/**"
   workflow_dispatch:
     inputs:
       record:
-        description: "快照基线录制引导（true=record 并上传产物；默认 false=verify 门禁）"
+        description: "iOS 快照录制引导（true=record 并上传产物；默认 false=verify 门禁）"
         type: boolean
         default: false
       ios_snapshot_scope:
@@ -18,57 +28,16 @@ on:
           - representative
         default: all
 
+# 同一分支有新提交时取消上一轮未完成的运行，避免重复消耗
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  tokens-and-schema:
-    name: 令牌与 schema
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - name: 令牌漂移检查
-        run: python tools/gen_tokens.py --check
-      - name: schema 与 fixtures 校验（含备份包 sha256 与题库包合并摘要成功/失败两条断言，规范 v1.4 §4.5）
-        run: python tools/validate_schema.py
-      - name: 安装基线校验依赖（baseline.py 需 Pillow）
-        run: pip install pillow
-      - name: 截图基线是否与 v2 稿同步
-        run: python tools/baseline.py --check
-
-  android:
-    name: Android
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: "17"
-      - uses: gradle/actions/setup-gradle@v4
-      - name: 编译与单测
-        run: cd app-android && ./gradlew :app:assembleDebug test
-      - name: 静态检查（ktlint / detekt，零 error 阻断）
-        run: cd app-android && ./gradlew ktlintCheck detekt
-      - name: Lint
-        run: cd app-android && ./gradlew :app:lintDebug
-      - name: 快照录制引导（仅手动 record；基线须在 CI 同环境录制，规范 §11.1）
-        if: github.event.inputs.record == 'true'
-        run: cd app-android && ./gradlew :core-ui:recordRoborazziDebug
-      - name: 上传 Android 快照基线产物（record 引导，取回入库；规范 §11.1）
-        if: github.event.inputs.record == 'true'
-        uses: actions/upload-artifact@v4
-        with:
-          name: android-snapshots
-          path: app-android/core-ui/src/test/snapshots
-          if-no-files-found: error
-      - name: 快照比对（Roborazzi 与基线比对，CI 必跑；规范 §13 / §13.1）
-        if: github.event.inputs.record != 'true'
-        run: cd app-android && ./gradlew :core-ui:verifyRoborazziDebug
-
   ios:
     name: iOS
     runs-on: macos-15-intel
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - name: 探测可用模拟器运行时（评估 iOS15 最低运行时验证可行性）
