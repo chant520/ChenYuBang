@@ -15,6 +15,28 @@
 		A00000000000000000000024 /* MeFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000134 /* MeFeature.swift */; };
 		A00000000000000000000025 /* CaptureFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000135 /* CaptureFeature.swift */; };
 		A00000000000000000000030 /* ChenYuBangTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000140 /* ChenYuBangTests.swift */; };
+		A00000000000000000000031 /* IdiomSearchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000141 /* IdiomSearchTests.swift */; };
+		A00000000000000000000032 /* CangyuData in Frameworks */ = {isa = PBXBuildFile; productRef = A00000000000000000000650 /* CangyuData */; };
+		A00000000000000000000033 /* CangyuTokens in Frameworks */ = {isa = PBXBuildFile; productRef = A00000000000000000000640 /* CangyuTokens */; };
+		A00000000000000000000034 /* CangyuDesignSystem in Frameworks */ = {isa = PBXBuildFile; productRef = A00000000000000000000610 /* CangyuDesignSystem */; };
+		A00000000000000000000035 /* CangyuData in Frameworks */ = {isa = PBXBuildFile; productRef = A00000000000000000000620 /* CangyuData */; };
+		A00000000000000000000036 /* CangyuTokens in Frameworks */ = {isa = PBXBuildFile; productRef = A00000000000000000000630 /* CangyuTokens */; };
+		A00000000000000000000037 /* RouteRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000101 /* RouteRegistry.swift */; };
+		A00000000000000000000038 /* RouterState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000102 /* RouterState.swift */; };
+		A00000000000000000000039 /* AppRouteHost.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000103 /* AppRouteHost.swift */; };
+		A0000000000000000000003A /* FirstLaunchGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000104 /* FirstLaunchGate.swift */; };
+		A0000000000000000000003B /* RouterStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000142 /* RouterStateTests.swift */; };
+		A0000000000000000000003C /* ExamScopeStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000143 /* ExamScopeStoreTests.swift */; };
+		A0000000000000000000003D /* PackArchiveTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000144 /* PackArchiveTests.swift */; };
+		A0000000000000000000003E /* PackCanonicalTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000145 /* PackCanonicalTests.swift */; };
+		A0000000000000000000003F /* PackImporterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000146 /* PackImporterTests.swift */; };
+		A00000000000000000000040 /* PackSchemaTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000147 /* PackSchemaTests.swift */; };
+		A00000000000000000000041 /* PackScopeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000148 /* PackScopeTests.swift */; };
+		A00000000000000000000042 /* PackTestSupportTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000149 /* PackTestSupportTests.swift */; };
+		A00000000000000000000043 /* pack-v1.0.0.zip in Resources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000151 /* pack-v1.0.0.zip */; };
+		A00000000000000000000044 /* pack fixture in Resources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000152 /* pack fixture */; };
+		A00000000000000000000045 /* GRDB in Frameworks */ = {isa = PBXBuildFile; productRef = A00000000000000000000660 /* GRDB */; };
+		A00000000000000000000046 /* GRDB in Frameworks */ = {isa = PBXBuildFile; productRef = A00000000000000000000680 /* GRDB */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,7 +60,22 @@
 		A00000000000000000000134 /* MeFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeFeature.swift; sourceTree = "<group>"; };
 		A00000000000000000000135 /* CaptureFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureFeature.swift; sourceTree = "<group>"; };
 		A00000000000000000000140 /* ChenYuBangTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChenYuBangTests.swift; sourceTree = "<group>"; };
+		A00000000000000000000141 /* IdiomSearchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdiomSearchTests.swift; sourceTree = "<group>"; };
 		A00000000000000000000150 /* ChenYuBangTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ChenYuBangTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A00000000000000000000101 /* RouteRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteRegistry.swift; sourceTree = "<group>"; };
+		A00000000000000000000102 /* RouterState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouterState.swift; sourceTree = "<group>"; };
+		A00000000000000000000103 /* AppRouteHost.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRouteHost.swift; sourceTree = "<group>"; };
+		A00000000000000000000104 /* FirstLaunchGate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstLaunchGate.swift; sourceTree = "<group>"; };
+		A00000000000000000000142 /* RouterStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouterStateTests.swift; sourceTree = "<group>"; };
+		A00000000000000000000143 /* ExamScopeStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExamScopeStoreTests.swift; sourceTree = "<group>"; };
+		A00000000000000000000144 /* PackArchiveTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackArchiveTests.swift; sourceTree = "<group>"; };
+		A00000000000000000000145 /* PackCanonicalTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackCanonicalTests.swift; sourceTree = "<group>"; };
+		A00000000000000000000146 /* PackImporterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackImporterTests.swift; sourceTree = "<group>"; };
+		A00000000000000000000147 /* PackSchemaTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackSchemaTests.swift; sourceTree = "<group>"; };
+		A00000000000000000000148 /* PackScopeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackScopeTests.swift; sourceTree = "<group>"; };
+		A00000000000000000000149 /* PackTestSupportTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackTestSupportTests.swift; sourceTree = "<group>"; };
+		A00000000000000000000151 /* pack-v1.0.0.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = Resources/pack-v1.0.0.zip; sourceTree = "<group>"; };
+		A00000000000000000000152 /* pack fixture */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = Fixtures/pack/pack-v1.0.0.zip; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -46,6 +83,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A00000000000000000000034 /* CangyuDesignSystem in Frameworks */,
+				A00000000000000000000035 /* CangyuData in Frameworks */,
+				A00000000000000000000036 /* CangyuTokens in Frameworks */,
+				A00000000000000000000046 /* GRDB in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -53,6 +94,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A00000000000000000000032 /* CangyuData in Frameworks */,
+				A00000000000000000000033 /* CangyuTokens in Frameworks */,
+				A00000000000000000000045 /* GRDB in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -73,6 +117,11 @@
 			isa = PBXGroup;
 			children = (
 				A00000000000000000000100 /* ChenYuBangApp.swift */,
+				A00000000000000000000101 /* RouteRegistry.swift */,
+				A00000000000000000000102 /* RouterState.swift */,
+				A00000000000000000000103 /* AppRouteHost.swift */,
+				A00000000000000000000104 /* FirstLaunchGate.swift */,
+				A00000000000000000000151 /* pack-v1.0.0.zip */,
 				A00000000000000000000110 /* Info.plist */,
 			);
 			path = Sources/App;
@@ -143,6 +192,16 @@
 			isa = PBXGroup;
 			children = (
 				A00000000000000000000140 /* ChenYuBangTests.swift */,
+				A00000000000000000000141 /* IdiomSearchTests.swift */,
+				A00000000000000000000142 /* RouterStateTests.swift */,
+				A00000000000000000000143 /* ExamScopeStoreTests.swift */,
+				A00000000000000000000144 /* PackArchiveTests.swift */,
+				A00000000000000000000145 /* PackCanonicalTests.swift */,
+				A00000000000000000000146 /* PackImporterTests.swift */,
+				A00000000000000000000147 /* PackSchemaTests.swift */,
+				A00000000000000000000148 /* PackScopeTests.swift */,
+				A00000000000000000000149 /* PackTestSupportTests.swift */,
+				A00000000000000000000152 /* pack fixture */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -178,6 +237,7 @@
 				A00000000000000000000610 /* CangyuDesignSystem */,
 				A00000000000000000000620 /* CangyuData */,
 				A00000000000000000000630 /* CangyuTokens */,
+				A00000000000000000000680 /* GRDB */,
 			);
 			productName = ChenYuBang;
 			productReference = A00000000000000000000120 /* ChenYuBang.app */;
@@ -195,10 +255,13 @@
 			);
 			dependencies = (
 				A00000000000000000000450 /* PBXTargetDependency */,
+				A00000000000000000000451 /* CangyuData */,
 			);
 			name = ChenYuBangTests;
 			packageProductDependencies = (
 				A00000000000000000000640 /* CangyuTokens */,
+				A00000000000000000000650 /* CangyuData */,
+				A00000000000000000000660 /* GRDB */,
 			);
 			productName = ChenYuBangTests;
 			productReference = A00000000000000000000150 /* ChenYuBangTests.xctest */;
@@ -230,6 +293,7 @@
 			mainGroup = A00000000000000000000300;
 			packageReferences = (
 				A00000000000000000000600 /* XCLocalSwiftPackageReference "." */,
+				A00000000000000000000670 /* XCRemoteSwiftPackageReference "GRDB.swift" */,
 			);
 			productRefGroup = A00000000000000000000320 /* Products */;
 			projectDirPath = "";
@@ -246,6 +310,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A00000000000000000000043 /* pack-v1.0.0.zip in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -253,6 +318,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A00000000000000000000044 /* pack fixture in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -264,6 +330,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				A00000000000000000000010 /* ChenYuBangApp.swift in Sources */,
+				A00000000000000000000037 /* RouteRegistry.swift in Sources */,
+				A00000000000000000000038 /* RouterState.swift in Sources */,
+				A00000000000000000000039 /* AppRouteHost.swift in Sources */,
+				A0000000000000000000003A /* FirstLaunchGate.swift in Sources */,
 				A00000000000000000000020 /* IdiomFeature.swift in Sources */,
 				A00000000000000000000021 /* ExampleFeature.swift in Sources */,
 				A00000000000000000000022 /* MistakeFeature.swift in Sources */,
@@ -278,6 +348,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				A00000000000000000000030 /* ChenYuBangTests.swift in Sources */,
+				A00000000000000000000031 /* IdiomSearchTests.swift in Sources */,
+				A0000000000000000000003B /* RouterStateTests.swift in Sources */,
+				A0000000000000000000003C /* ExamScopeStoreTests.swift in Sources */,
+				A0000000000000000000003D /* PackArchiveTests.swift in Sources */,
+				A0000000000000000000003E /* PackCanonicalTests.swift in Sources */,
+				A0000000000000000000003F /* PackImporterTests.swift in Sources */,
+				A00000000000000000000040 /* PackSchemaTests.swift in Sources */,
+				A00000000000000000000041 /* PackScopeTests.swift in Sources */,
+				A00000000000000000000042 /* PackTestSupportTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -296,6 +375,10 @@
 			isa = PBXTargetDependency;
 			target = A00000000000000000000400 /* ChenYuBang */;
 			targetProxy = A00000000000000000000490 /* PBXContainerItemProxy */;
+		};
+		A00000000000000000000451 /* CangyuData */ = {
+			isa = PBXTargetDependency;
+			productRef = A00000000000000000000650 /* CangyuData */;
 		};
 /* End PBXTargetDependency section */
 
@@ -511,6 +594,17 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		A00000000000000000000670 /* XCRemoteSwiftPackageReference "GRDB.swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/groue/GRDB.swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.29.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCLocalSwiftPackageReference section */
 		A00000000000000000000600 /* XCLocalSwiftPackageReference "." */ = {
 			isa = XCLocalSwiftPackageReference;
@@ -538,6 +632,21 @@
 			isa = XCSwiftPackageProductDependency;
 			package = A00000000000000000000600 /* XCLocalSwiftPackageReference "." */;
 			productName = CangyuTokens;
+		};
+		A00000000000000000000650 /* CangyuData */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A00000000000000000000600 /* XCLocalSwiftPackageReference "." */;
+			productName = CangyuData;
+		};
+		A00000000000000000000660 /* GRDB */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A00000000000000000000670 /* XCRemoteSwiftPackageReference "GRDB.swift" */;
+			productName = GRDB;
+		};
+		A00000000000000000000680 /* GRDB */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A00000000000000000000670 /* XCRemoteSwiftPackageReference "GRDB.swift" */;
+			productName = GRDB;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

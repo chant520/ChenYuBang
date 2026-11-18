@@ -8,26 +8,119 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.Transaction
 import androidx.room.TypeConverters
 import kotlinx.coroutines.flow.Flow
 
+/**
+ * 成语 DAO。A3 搜索走 FTS4 虚表 idiom_fts（规范 §4.2），支持四种输入：
+ * 完整成语 / 单字 / 全拼 / 首字母。单字走「前缀 LIKE + FTS 组合」，不做分词库。
+ *
+ * 路由：含汉字（HAN）走中文路径；纯 ASCII 字母走拼音路径（去空格连写后 MATCH pinyin/initials）。
+ * 结果 JOIN 回 idiom，ORDER BY word，分页 50（§4.2）。查无结果返回空列表，文案由上层给。
+ * MATCH 串里的用户输入一律用双引号包裹成 FTS phrase（内部双引号翻倍），防注入。
+ */
 @Dao
-interface IdiomDao {
-    /**
-     * A3 搜索的骨架实现：完整成语 / 首字母 / 全拼走前缀匹配。
-     * 单字检索与 FTS 索引按规范 §4.2 在下一阶段接入（Room FTS4）。
-     */
-    @Query(
-        "SELECT * FROM idiom WHERE word LIKE :q || '%' " +
-            "OR initials LIKE :q || '%' OR pinyin LIKE :q || '%' ORDER BY word LIMIT 50",
-    )
-    suspend fun search(q: String): List<IdiomEntity>
+abstract class IdiomDao {
+    companion object {
+        const val SEARCH_LIMIT = 50
+    }
+
+    suspend fun search(
+        q: String,
+        limit: Int = SEARCH_LIMIT,
+    ): List<IdiomEntity> {
+        val query = q.trim()
+        if (query.isEmpty() || '\u0000' in query) return emptyList()
+        return if (containsHan(query)) {
+            val phrase = ftsPhrase(query)
+            if (query.codePointCount(0, query.length) == 1) {
+                // 单字：前缀 LIKE + FTS(word 前缀 OR sense 精确) 组合，按 id 去重后合并
+                val byPrefix = prefixSearch(query + "%", limit)
+                val byFts = hanFtsSearch(ftsPhrase(query, prefix = true), phrase, limit)
+                mergeById(byPrefix, byFts, limit)
+            } else {
+                // 完整成语（≥2 字）：FTS MATCH word/sense
+                hanFtsSearch(phrase, phrase, limit)
+            }
+        } else {
+            // 纯 ASCII：全拼去空格连写命中 pinyin，首字母命中 initials，前缀支持部分输入
+            val phrase = ftsPhrase(query.replace(" ", "").lowercase(), prefix = true)
+            romanFtsSearch(phrase, limit)
+        }
+    }
 
     @Query("SELECT * FROM idiom WHERE id = :id")
-    suspend fun byId(id: String): IdiomEntity?
+    abstract suspend fun byId(id: String): IdiomEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun upsertAll(idioms: List<IdiomEntity>)
+    abstract suspend fun upsertAll(idioms: List<IdiomEntity>)
+
+    /** 整表重建 idiom_fts（供 0.5 导入引擎调用）。只重建内容表 FTS，绝不触碰用户表（§4.6）。 */
+    @Transaction
+    open suspend fun rebuildIdiomFts() {
+        clearIdiomFts()
+        populateIdiomFts()
+    }
+
+    @Query(
+        "SELECT idiom.* FROM idiom JOIN idiom_fts ON idiom.id = idiom_fts.idiomid " +
+            "WHERE idiom_fts.word MATCH :wordMatch UNION " +
+            "SELECT idiom.* FROM idiom JOIN idiom_fts ON idiom.id = idiom_fts.idiomid " +
+            "WHERE idiom_fts.sense MATCH :senseMatch ORDER BY word LIMIT :limit",
+    )
+    abstract suspend fun hanFtsSearch(
+        wordMatch: String,
+        senseMatch: String,
+        limit: Int,
+    ): List<IdiomEntity>
+
+    @Query(
+        "SELECT idiom.* FROM idiom JOIN idiom_fts ON idiom.id = idiom_fts.idiomid " +
+            "WHERE idiom_fts.pinyin MATCH :match UNION " +
+            "SELECT idiom.* FROM idiom JOIN idiom_fts ON idiom.id = idiom_fts.idiomid " +
+            "WHERE idiom_fts.initials MATCH :match ORDER BY word LIMIT :limit",
+    )
+    abstract suspend fun romanFtsSearch(
+        match: String,
+        limit: Int,
+    ): List<IdiomEntity>
+
+    @Query(
+        "SELECT idiom.* FROM idiom JOIN idiom_fts ON idiom.id = idiom_fts.idiomid " +
+            "WHERE idiom.word LIKE :prefix ORDER BY idiom.word LIMIT :limit",
+    )
+    abstract suspend fun prefixSearch(
+        prefix: String,
+        limit: Int,
+    ): List<IdiomEntity>
+
+    @Query("DELETE FROM idiom_fts")
+    abstract suspend fun clearIdiomFts()
+
+    @Query(
+        "INSERT INTO idiom_fts(idiomid, word, pinyin, initials, sense) " +
+            "SELECT id, word, replace(pinyin, ' ', ''), initials, sense FROM idiom",
+    )
+    abstract suspend fun populateIdiomFts()
+}
+
+private fun containsHan(q: String): Boolean =
+    q.any { Character.UnicodeScript.of(it.code) == Character.UnicodeScript.HAN }
+
+private fun ftsPhrase(
+    token: String,
+    prefix: Boolean = false,
+): String = "\"" + token.replace("\"", "\"\"") + (if (prefix) "*" else "") + "\""
+
+private fun mergeById(
+    a: List<IdiomEntity>,
+    b: List<IdiomEntity>,
+    limit: Int,
+): List<IdiomEntity> {
+    val seen = LinkedHashMap<String, IdiomEntity>()
+    for (entity in a + b) seen.putIfAbsent(entity.id, entity)
+    return seen.values.sortedBy { it.word }.take(limit)
 }
 
 @Dao
@@ -63,6 +156,7 @@ interface MistakeDao {
         ReviewLogEntity::class,
         IdiomStateEntity::class,
         SettingEntity::class,
+        IdiomFtsEntity::class,
     ],
     version = 1,
     exportSchema = true,

@@ -6,33 +6,51 @@ import CangyuTokens
 struct ChenYuBangApp: App {
     var body: some Scene {
         WindowGroup {
-            // 骨架占位：P02 推荐首页在下一阶段接入，路由表见规范 §5.1
-            PlaceholderView()
+            LocalAppRoot()
                 .preferredColorScheme(nil)
         }
     }
 }
 
-private struct PlaceholderView: View {
+private struct LocalAppRoot: View {
     @Environment(\.colorScheme) private var colorScheme
-
-    private var colors: TokenColors {
-        colorScheme == .dark ? Tokens.dark : Tokens.light
-    }
+    @StateObject private var launch = FirstLaunchState()
+    @StateObject private var router = RouterState(needsFirstLaunch: true)
 
     var body: some View {
-        VStack(alignment: .leading, spacing: Tokens.Space.block) {
-            Text("成语帮")
-                .font(.system(size: Tokens.Font.n20, weight: .semibold))
-                .foregroundStyle(colors.text)
-            Text("工程骨架已初始化，页面待接入。")
-                .font(.system(size: Tokens.Font.n13))
-                .foregroundStyle(colors.text2)
-            Spacer()
+        let colors = CangyuTheme.colors(for: colorScheme)
+        Group {
+            if launch.preferences != nil {
+                AppRouteHost(router: router, launch: launch)
+            } else {
+                VStack(alignment: .leading, spacing: Tokens.Space.block) {
+                    Text("成语帮")
+                        .font(.system(size: Tokens.Font.n20, weight: .semibold))
+                        .foregroundStyle(colors.text)
+                    if let error = launch.initializationError {
+                        Text(error)
+                            .font(.system(size: Tokens.Font.n13))
+                            .foregroundStyle(launch.contentError ? colors.warnfg : colors.errfg)
+                        CButton(text: "重试初始化", action: initialize)
+                    } else {
+                        CSpinner()
+                            .foregroundStyle(colors.text2)
+                        Text("正在初始化本机数据…")
+                            .font(.system(size: Tokens.Font.n13))
+                            .foregroundStyle(colors.text2)
+                    }
+                }
+                .padding(.horizontal, Tokens.Space.pageX)
+                .padding(.vertical, Tokens.Space.contentTop)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                .background(colors.page)
+            }
         }
-        .padding(.horizontal, Tokens.Space.pageX)
-        .padding(.top, Tokens.Space.contentTop)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .background(colors.page)
+        .task { initialize() }
+    }
+
+    private func initialize() {
+        launch.initialize()
+        if launch.preferences?.complete == true { router.completeFirstLaunch() }
     }
 }
