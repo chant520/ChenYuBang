@@ -2,9 +2,9 @@
 excluded:
   - Sources/Tokens/Tokens.swift
 
-# GRDB 闭包惯用短名（db / t）
+# GRDB 闭包惯用短名（db / t）；id 是规范 §4.1 各表 uuid 主键字段名
 identifier_name:
-  excluded: [db, t]
+  excluded: [db, t, id]
 
 # 建库引导函数含 10 张表的 CREATE 语句，93 行属合理长度
 function_body_length:

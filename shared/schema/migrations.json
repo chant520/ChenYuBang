@@ -13,11 +13,12 @@
     {
       "version": 1,
       "status": "shipped",
-      "description": "初始 schema：成语、例题、错题、复习、设置共 10 张表",
+      "description": "初始 schema：成语、例题、错题、复习、设置共 10 张数据表 + 成语全文检索虚表 idiom_fts（Android Room FTS4 / iOS GRDB FTS5，§4.2；导入时整表重建，§4.6）",
       "tables": [
         "idiom", "exam_scope", "idiom_scope", "example", "example_idiom",
         "mistake", "mistake_idiom", "review_log", "idiom_state", "settings"
       ],
+      "fts": ["idiom_fts"],
       "android": "AppDatabase(version = 1)，schema 导出到 app-android/core-data/schemas/",
       "ios": "GRDB DatabaseMigrator.registerMigration(\"v1\") { db in … }"
     }

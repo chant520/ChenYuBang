@@ -24,6 +24,15 @@ public enum ChenYuBangDatabase {
             try db.create(index: "idx_idiom_word", on: "idiom", columns: ["word"])
             try db.create(index: "idx_idiom_initials", on: "idiom", columns: ["initials"])
 
+            // FTS5 全文检索虚表（规范 §4.2），属 v1 基线。独立表（非 external-content），
+            // 导入时由 IdiomSearch.rebuildIdiomFts 整表重建（§4.6），不触碰用户表。
+            // idiomid UNINDEXED 只用于 JOIN 回 idiom；pinyin 列存去空格连写规范化值。
+            try db.execute(sql: """
+                CREATE VIRTUAL TABLE idiom_fts USING fts5(
+                    idiomid UNINDEXED, word, pinyin, initials, sense
+                )
+                """)
+
             try db.create(table: "exam_scope") { t in
                 t.primaryKey("id", .text)
                 t.column("type", .text).notNull()

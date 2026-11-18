@@ -18,7 +18,11 @@ targets:
     platform: iOS
     sources:
       - path: Sources/App
+        excludes:
+          - Resources
       - path: Sources/Features
+      - path: Sources/App/Resources
+        buildPhase: resources
     info:
       path: Sources/App/Info.plist
       properties: {}
@@ -44,10 +48,16 @@ targets:
     platform: iOS
     sources:
       - path: Tests
+        excludes:
+          - Fixtures
+      - path: Tests/Fixtures/pack/pack-v1.0.0.zip
+        buildPhase: resources
     dependencies:
       - target: ChenYuBang
       - package: ChenYuBangKit
         product: CangyuTokens
+      - package: ChenYuBangKit
+        product: CangyuData
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.chenyubang.app.tests
