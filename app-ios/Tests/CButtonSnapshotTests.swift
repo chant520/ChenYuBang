@@ -1,3 +1,4 @@
+import XCTest
 import SnapshotTesting
 import SwiftUI
 import CangyuDesignSystem

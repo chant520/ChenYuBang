@@ -33,6 +33,7 @@
 		A00000000000000000000040 /* PackSchemaTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000147 /* PackSchemaTests.swift */; };
 		A00000000000000000000041 /* PackScopeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000148 /* PackScopeTests.swift */; };
 		A00000000000000000000042 /* PackTestSupportTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000149 /* PackTestSupportTests.swift */; };
+		A00000000000000000000048 /* CButtonSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000014A /* CButtonSnapshotTests.swift */; };
 		A00000000000000000000043 /* pack-v1.0.0.zip in Resources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000151 /* pack-v1.0.0.zip */; };
 		A00000000000000000000044 /* pack fixture in Resources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000152 /* pack fixture */; };
 		A00000000000000000000045 /* GRDB in Frameworks */ = {isa = PBXBuildFile; productRef = A00000000000000000000660 /* GRDB */; };
@@ -75,6 +76,7 @@
 		A00000000000000000000147 /* PackSchemaTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackSchemaTests.swift; sourceTree = "<group>"; };
 		A00000000000000000000148 /* PackScopeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackScopeTests.swift; sourceTree = "<group>"; };
 		A00000000000000000000149 /* PackTestSupportTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackTestSupportTests.swift; sourceTree = "<group>"; };
+		A0000000000000000000014A /* CButtonSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CButtonSnapshotTests.swift; sourceTree = "<group>"; };
 		A00000000000000000000151 /* pack-v1.0.0.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = Resources/pack-v1.0.0.zip; sourceTree = "<group>"; };
 		A00000000000000000000152 /* pack fixture */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = Fixtures/pack/pack-v1.0.0.zip; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -203,6 +205,7 @@
 				A00000000000000000000147 /* PackSchemaTests.swift */,
 				A00000000000000000000148 /* PackScopeTests.swift */,
 				A00000000000000000000149 /* PackTestSupportTests.swift */,
+				A0000000000000000000014A /* CButtonSnapshotTests.swift */,
 				A00000000000000000000152 /* pack fixture */,
 			);
 			path = Tests;
@@ -361,6 +364,7 @@
 				A00000000000000000000040 /* PackSchemaTests.swift in Sources */,
 				A00000000000000000000041 /* PackScopeTests.swift in Sources */,
 				A00000000000000000000042 /* PackTestSupportTests.swift in Sources */,
+				A00000000000000000000048 /* CButtonSnapshotTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
