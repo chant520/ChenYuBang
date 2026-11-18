@@ -47,6 +47,8 @@ jobs:
     runs-on: macos-15-intel
     steps:
       - uses: actions/checkout@v4
+      - name: 探测可用模拟器运行时（评估 iOS15 最低运行时验证可行性）
+        run: xcrun simctl list runtimes
       - name: 静态检查（SwiftLint，零 error 阻断；规范 §2.1 / §13.1）
         run: |
           brew install swiftlint
@@ -68,3 +70,10 @@ jobs:
           xcodebuild -project ChenYuBang.xcodeproj -scheme ChenYuBang \
             -destination 'platform=iOS Simulator,name=iPhone 16' \
             test CODE_SIGNING_ALLOWED=NO
+      - name: 上传快照基线产物（首次录制引导 / 失败时取回审阅；规范 §11.1）
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-snapshots
+          path: app-ios/Tests/__Snapshots__
+          if-no-files-found: ignore

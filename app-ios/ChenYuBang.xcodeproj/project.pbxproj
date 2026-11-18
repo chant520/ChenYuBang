@@ -37,6 +37,7 @@
 		A00000000000000000000044 /* pack fixture in Resources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000152 /* pack fixture */; };
 		A00000000000000000000045 /* GRDB in Frameworks */ = {isa = PBXBuildFile; productRef = A00000000000000000000660 /* GRDB */; };
 		A00000000000000000000046 /* GRDB in Frameworks */ = {isa = PBXBuildFile; productRef = A00000000000000000000680 /* GRDB */; };
+		A00000000000000000000047 /* SnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = A00000000000000000000700 /* SnapshotTesting */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -97,6 +98,7 @@
 				A00000000000000000000032 /* CangyuData in Frameworks */,
 				A00000000000000000000033 /* CangyuTokens in Frameworks */,
 				A00000000000000000000045 /* GRDB in Frameworks */,
+				A00000000000000000000047 /* SnapshotTesting in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -262,6 +264,7 @@
 				A00000000000000000000640 /* CangyuTokens */,
 				A00000000000000000000650 /* CangyuData */,
 				A00000000000000000000660 /* GRDB */,
+				A00000000000000000000700 /* SnapshotTesting */,
 			);
 			productName = ChenYuBangTests;
 			productReference = A00000000000000000000150 /* ChenYuBangTests.xctest */;
@@ -294,6 +297,7 @@
 			packageReferences = (
 				A00000000000000000000600 /* XCLocalSwiftPackageReference "." */,
 				A00000000000000000000670 /* XCRemoteSwiftPackageReference "GRDB.swift" */,
+				A00000000000000000000690 /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */,
 			);
 			productRefGroup = A00000000000000000000320 /* Products */;
 			projectDirPath = "";
@@ -603,6 +607,14 @@
 				minimumVersion = 6.29.0;
 			};
 		};
+		A00000000000000000000690 /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pointfreeco/swift-snapshot-testing.git";
+			requirement = {
+				kind = exactVersion;
+				version = 1.17.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCLocalSwiftPackageReference section */
@@ -647,6 +659,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = A00000000000000000000670 /* XCRemoteSwiftPackageReference "GRDB.swift" */;
 			productName = GRDB;
+		};
+		A00000000000000000000700 /* SnapshotTesting */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A00000000000000000000690 /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
+			productName = SnapshotTesting;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
