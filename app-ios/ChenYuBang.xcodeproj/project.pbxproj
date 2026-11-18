@@ -36,6 +36,7 @@
 		A00000000000000000000043 /* pack-v1.0.0.zip in Resources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000151 /* pack-v1.0.0.zip */; };
 		A00000000000000000000044 /* pack fixture in Resources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000152 /* pack fixture */; };
 		A00000000000000000000045 /* GRDB in Frameworks */ = {isa = PBXBuildFile; productRef = A00000000000000000000660 /* GRDB */; };
+		A00000000000000000000046 /* GRDB in Frameworks */ = {isa = PBXBuildFile; productRef = A00000000000000000000680 /* GRDB */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -85,6 +86,7 @@
 				A00000000000000000000034 /* CangyuDesignSystem in Frameworks */,
 				A00000000000000000000035 /* CangyuData in Frameworks */,
 				A00000000000000000000036 /* CangyuTokens in Frameworks */,
+				A00000000000000000000046 /* GRDB in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -235,6 +237,7 @@
 				A00000000000000000000610 /* CangyuDesignSystem */,
 				A00000000000000000000620 /* CangyuData */,
 				A00000000000000000000630 /* CangyuTokens */,
+				A00000000000000000000680 /* GRDB */,
 			);
 			productName = ChenYuBang;
 			productReference = A00000000000000000000120 /* ChenYuBang.app */;
@@ -636,6 +639,11 @@
 			productName = CangyuData;
 		};
 		A00000000000000000000660 /* GRDB */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A00000000000000000000670 /* XCRemoteSwiftPackageReference "GRDB.swift" */;
+			productName = GRDB;
+		};
+		A00000000000000000000680 /* GRDB */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = A00000000000000000000670 /* XCRemoteSwiftPackageReference "GRDB.swift" */;
 			productName = GRDB;

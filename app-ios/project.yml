@@ -36,6 +36,8 @@ targets:
         product: CangyuData
       - package: ChenYuBangKit
         product: CangyuTokens
+      - package: GRDB.swift
+        product: GRDB
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.chenyubang.app
