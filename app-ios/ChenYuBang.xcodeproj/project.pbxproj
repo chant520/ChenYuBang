@@ -35,6 +35,7 @@
 		A00000000000000000000042 /* PackTestSupportTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000149 /* PackTestSupportTests.swift */; };
 		A00000000000000000000043 /* pack-v1.0.0.zip in Resources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000151 /* pack-v1.0.0.zip */; };
 		A00000000000000000000044 /* pack fixture in Resources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000152 /* pack fixture */; };
+		A00000000000000000000045 /* GRDB in Frameworks */ = {isa = PBXBuildFile; productRef = A00000000000000000000660 /* GRDB */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -93,6 +94,7 @@
 			files = (
 				A00000000000000000000032 /* CangyuData in Frameworks */,
 				A00000000000000000000033 /* CangyuTokens in Frameworks */,
+				A00000000000000000000045 /* GRDB in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -256,6 +258,7 @@
 			packageProductDependencies = (
 				A00000000000000000000640 /* CangyuTokens */,
 				A00000000000000000000650 /* CangyuData */,
+				A00000000000000000000660 /* GRDB */,
 			);
 			productName = ChenYuBangTests;
 			productReference = A00000000000000000000150 /* ChenYuBangTests.xctest */;
@@ -287,6 +290,7 @@
 			mainGroup = A00000000000000000000300;
 			packageReferences = (
 				A00000000000000000000600 /* XCLocalSwiftPackageReference "." */,
+				A00000000000000000000670 /* XCRemoteSwiftPackageReference "GRDB.swift" */,
 			);
 			productRefGroup = A00000000000000000000320 /* Products */;
 			projectDirPath = "";
@@ -587,6 +591,17 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		A00000000000000000000670 /* XCRemoteSwiftPackageReference "GRDB.swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/groue/GRDB.swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.29.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCLocalSwiftPackageReference section */
 		A00000000000000000000600 /* XCLocalSwiftPackageReference "." */ = {
 			isa = XCLocalSwiftPackageReference;
@@ -619,6 +634,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = A00000000000000000000600 /* XCLocalSwiftPackageReference "." */;
 			productName = CangyuData;
+		};
+		A00000000000000000000660 /* GRDB */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A00000000000000000000670 /* XCRemoteSwiftPackageReference "GRDB.swift" */;
+			productName = GRDB;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
