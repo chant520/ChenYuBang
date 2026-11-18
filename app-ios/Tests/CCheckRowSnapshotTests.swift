@@ -6,7 +6,6 @@ import CangyuTokens
 
 // 构件黄金快照（规范 §11.1 / §7）：CI 设 SNAPSHOT_RECORD=1 录制，默认 verify 比对。
 // 基线目录为 __Snapshots__/<本文件名去扩展名>/，每个构件独立存放。
-// 注入浅/深 colorScheme 与 accessibilityReduceMotion=true，保证动画构件帧确定性。
 
 /// 勾选行快照（规范 5.15）：勾选 / 未勾选 / 禁用 / 带警示 × 浅/深。
 @MainActor
@@ -32,7 +31,6 @@ final class CCheckRowSnapshotTests: XCTestCase {
             warningText: warningText
         )
         .environment(\.colorScheme, dark ? .dark : .light)
-        .environment(\.accessibilityReduceMotion, true)
         assertSnapshot(
             of: view,
             as: .image(layout: .fixed(width: 320, height: 60)),

@@ -6,7 +6,6 @@ import CangyuTokens
 
 // 构件黄金快照（规范 §11.1 / §7）：CI 设 SNAPSHOT_RECORD=1 录制，默认 verify 比对。
 // 基线目录为 __Snapshots__/<本文件名去扩展名>/，每个构件独立存放。
-// 注入浅/深 colorScheme 与 accessibilityReduceMotion=true，保证动画构件帧确定性。
 
 /// 输入框快照（规范 5.3）：默认 / 聚焦 / 校验错误 / 禁用 × 浅/深。
 /// 聚焦态 iOS 可参数化（state: .focus）；错误提示仅 .error 态渲染于框下。
@@ -31,7 +30,6 @@ final class CInputSnapshotTests: XCTestCase {
             errorHint: state == .error ? "错误提示" : nil
         )
         .environment(\.colorScheme, dark ? .dark : .light)
-        .environment(\.accessibilityReduceMotion, true)
         assertSnapshot(
             of: view,
             as: .image(layout: .fixed(width: 320, height: 80)),

@@ -6,7 +6,6 @@ import CangyuTokens
 
 // 构件黄金快照（规范 §11.1 / §7）：CI 设 SNAPSHOT_RECORD=1 录制，默认 verify 比对。
 // 基线目录为 __Snapshots__/<本文件名去扩展名>/，每个构件独立存放。
-// 注入浅/深 colorScheme 与 accessibilityReduceMotion=true，保证动画构件帧确定性。
 
 /// 悬浮拍照按钮快照（规范 5.8）：默认 / 禁用 / 带徽标 × 浅/深。按下态不可注入，iOS 按下态截图尚未覆盖（规范 §11.2）。
 /// 画布留足投影外扩（浅色 blur 18 + y 8、深色 blur 24 + spread 1）与徽标组合宽度，避免裁切。
@@ -27,7 +26,6 @@ final class CFabSnapshotTests: XCTestCase {
     ) {
         let view = CFab(enabled: enabled, badgeText: badgeText) {}
             .environment(\.colorScheme, dark ? .dark : .light)
-            .environment(\.accessibilityReduceMotion, true)
         assertSnapshot(
             of: view,
             as: .image(layout: .fixed(width: badgeText == nil ? 120 : 160, height: 120)),

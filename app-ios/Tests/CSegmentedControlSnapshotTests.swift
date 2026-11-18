@@ -6,7 +6,6 @@ import CangyuTokens
 
 // 构件黄金快照（规范 §11.1 / §7）：CI 设 SNAPSHOT_RECORD=1 录制，默认 verify 比对。
 // 基线目录为 __Snapshots__/<本文件名去扩展名>/，每个构件独立存放。
-// 注入浅/深 colorScheme 与 accessibilityReduceMotion=true，保证动画构件帧确定性。
 
 /// 分段控件快照（规范 5.14）：首段选中 / 换段选中 / 含禁用项 / 两段 × 浅/深。
 @MainActor
@@ -31,7 +30,6 @@ final class CSegmentedControlSnapshotTests: XCTestCase {
             disabledIndices: disabledIndices
         )
         .environment(\.colorScheme, dark ? .dark : .light)
-        .environment(\.accessibilityReduceMotion, true)
         assertSnapshot(
             of: view,
             as: .image(layout: .fixed(width: 320, height: 50)),

@@ -8,7 +8,7 @@ import CangyuDesignSystem
 /// 全矩阵：5 变体 × 默认/禁用/加载 × 浅/深（规范 5.1）。
 /// 按下态不可注入（ButtonStyleConfiguration.isPressed 无法在视图快照中模拟），
 /// iOS 按下态截图尚未覆盖（规范 §11.2）；Android 快照不能替代 iOS 验证。
-/// reduceMotion 置 true：加载态 CSpinner 静止（角度 0），保证帧确定性（开发规范 §9.3）。
+/// 事务禁用动画仅用于静态外观快照，不覆盖系统 reduce-motion。
 @MainActor
 final class CButtonSnapshotTests: XCTestCase {
     override func setUp() {
@@ -27,7 +27,10 @@ final class CButtonSnapshotTests: XCTestCase {
     ) {
         let view = CButton(text: "按钮", variant: variant, enabled: enabled, loading: loading) {}
             .environment(\.colorScheme, dark ? .dark : .light)
-            .environment(\.accessibilityReduceMotion, true)
+            .transaction { transaction in
+                transaction.animation = nil
+                transaction.disablesAnimations = true
+            }
         assertSnapshot(
             of: view,
             as: .image(layout: .fixed(width: 320, height: 60)),
@@ -69,7 +72,7 @@ final class CButtonSnapshotTests: XCTestCase {
         assertButton(variant: .ghost, enabled: false, dark: true)
     }
 
-    // MARK: - 加载态（规范 5.0 / 5.11：默认样式 + spinner，reduceMotion 下静止）
+    // MARK: - 加载态（规范 5.0 / 5.11：默认样式 + spinner）
 
     func testPrimaryLoadingLight() {
         assertButton(variant: .primary, enabled: true, loading: true, dark: false)

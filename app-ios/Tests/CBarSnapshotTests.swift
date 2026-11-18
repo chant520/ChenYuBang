@@ -6,7 +6,6 @@ import CangyuTokens
 
 // 构件黄金快照（规范 §11.1 / §7）：CI 设 SNAPSHOT_RECORD=1 录制，默认 verify 比对。
 // 基线目录为 __Snapshots__/<本文件名去扩展名>/，每个构件独立存放。
-// 注入浅/深 colorScheme 与 accessibilityReduceMotion=true，保证动画构件帧确定性。
 
 /// 提示条快照（规范 5.4 / 5.5）：3 类别 × 浅/深，另含行内警示 / 行内错误 × 浅/深。
 @MainActor
@@ -25,7 +24,6 @@ final class CBarSnapshotTests: XCTestCase {
     ) {
         let view = CBar(kind: kind, title: "提示", subtitle: "说明", actionTitle: "操作", onAction: {})
             .environment(\.colorScheme, dark ? .dark : .light)
-            .environment(\.accessibilityReduceMotion, true)
         assertSnapshot(
             of: view,
             as: .image(layout: .fixed(width: 320, height: 90)),
@@ -50,7 +48,6 @@ final class CBarSnapshotTests: XCTestCase {
             }
         }
         .environment(\.colorScheme, dark ? .dark : .light)
-        .environment(\.accessibilityReduceMotion, true)
         assertSnapshot(
             of: view,
             as: .image(layout: .fixed(width: 320, height: 40)),

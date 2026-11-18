@@ -10,6 +10,13 @@ on:
         description: "快照基线录制引导（true=record 并上传产物；默认 false=verify 门禁）"
         type: boolean
         default: false
+      ios_snapshot_scope:
+        description: "iOS 测试范围（representative 仅验证按钮/转圈/图片占位，不代表完整门禁）"
+        type: choice
+        options:
+          - all
+          - representative
+        default: all
 
 jobs:
   tokens-and-schema:
@@ -84,11 +91,30 @@ jobs:
       - name: 单测 + 快照比对（swift-snapshot-testing 作为 test 的一部分；规范 §13 / §13.1）
         env:
           TEST_RUNNER_SNAPSHOT_RECORD: ${{ github.event.inputs.record == 'true' && '1' || '' }}
+          IOS_SNAPSHOT_SCOPE: ${{ github.event.inputs.ios_snapshot_scope || 'all' }}
         run: |
           cd app-ios
+          test_args=()
+          case "$IOS_SNAPSHOT_SCOPE" in
+            all) ;;
+            representative)
+              test_args+=(
+                -only-testing:ChenYuBangTests/CButtonSnapshotTests
+                -only-testing:ChenYuBangTests/CSpinnerSnapshotTests
+                -only-testing:ChenYuBangTests/CImagePlaceholderSnapshotTests
+              )
+              ;;
+            *) exit 2 ;;
+          esac
           xcodebuild -project ChenYuBang.xcodeproj -scheme ChenYuBang \
             -destination 'platform=iOS Simulator,name=iPhone 16' \
-            test CODE_SIGNING_ALLOWED=NO
+            "${test_args[@]}" test CODE_SIGNING_ALLOWED=NO
+          if [[ "$IOS_SNAPSHOT_SCOPE" == representative && "$TEST_RUNNER_SNAPSHOT_RECORD" == 1 ]]; then
+            TEST_RUNNER_SNAPSHOT_RECORD=0 xcodebuild \
+              -project ChenYuBang.xcodeproj -scheme ChenYuBang \
+              -destination 'platform=iOS Simulator,name=iPhone 16' \
+              "${test_args[@]}" test CODE_SIGNING_ALLOWED=NO
+          fi
       - name: 上传快照基线产物（首次录制引导 / 失败时取回审阅；规范 §11.1）
         if: always()
         uses: actions/upload-artifact@v4

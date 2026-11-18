@@ -6,7 +6,6 @@ import CangyuTokens
 
 // 构件黄金快照（规范 §11.1 / §7）：CI 设 SNAPSHOT_RECORD=1 录制，默认 verify 比对。
 // 基线目录为 __Snapshots__/<本文件名去扩展名>/，每个构件独立存放。
-// 注入浅/深 colorScheme 与 accessibilityReduceMotion=true，保证动画构件帧确定性。
 
 /// 内联矢量图标快照（规范 §6）：5 语义 × 浅/深。
 /// 18pt 档描边 1.8（尺寸-描边表）；色取 token 文字色（图标与文字同色，不另取第二种强调色）。
@@ -32,7 +31,6 @@ final class CIconSnapshotTests: XCTestCase {
             color: CangyuTheme.colors(for: scheme).text
         )
         .environment(\.colorScheme, scheme)
-        .environment(\.accessibilityReduceMotion, true)
         assertSnapshot(
             of: view,
             as: .image(layout: .fixed(width: 40, height: 40)),
