@@ -45,6 +45,15 @@ dependencies {
     // Roborazzi 快照接入（规范 §2.1 / §13 / §13.1），版本与根 plugins 块一致
     testImplementation("io.github.takahirom.roborazzi:roborazzi:1.13.0")
     testImplementation("io.github.takahirom.roborazzi:roborazzi-junit-rule:1.13.0")
+    testImplementation("io.github.takahirom.roborazzi:roborazzi-compose:1.13.0")
     testImplementation("androidx.compose.ui:ui-test-junit4")
-    debugImplementation("androidx.compose.ui:ui-test-manifest")
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.robolectric:robolectric:4.13")
+    testImplementation("androidx.test:core:1.6.1")
+    testImplementation("androidx.compose.ui:ui-test-manifest")
+}
+
+// 构件黄金快照基线入库（规范 §11.1 / §13）：record 写入此目录、verify 与此目录比对。
+roborazzi {
+    outputDir.set(file("src/test/snapshots"))
 }
