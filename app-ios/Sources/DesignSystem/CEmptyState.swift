@@ -1,6 +1,4 @@
 import SwiftUI
-import CangyuData
-import CangyuDesignSystem
 import CangyuTokens
 
 /// 空态（D 稿 44 屏同一结构）：标题 15pt text2、说明 12pt text3、可选幽灵动作。
