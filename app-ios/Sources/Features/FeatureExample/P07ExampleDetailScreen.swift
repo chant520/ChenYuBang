@@ -5,7 +5,7 @@ import CangyuTokens
 
 /// P07 详情只读查询口子：页面只依赖协议，读库实现由 app 注入。
 public protocol ExampleDetailReading {
-    func example(id: String) throws -> ExampleRecord?
+    func detail(id: String) throws -> ExampleRecord?
     func relatedIdiomIDs(exampleID: String) throws -> [String]
     func idiomWords() throws -> [IdiomWordRef]
 }
@@ -47,7 +47,7 @@ public final class ExampleDetailViewModel: ObservableObject {
         failed = false
         loading = true
         do {
-            if let record = try reader.example(id: id) {
+            if let record = try reader.detail(id: id) {
                 let words = try reader.idiomWords()
                 let index = Dictionary(words.map { ($0.id, $0.word) }, uniquingKeysWith: { first, _ in first })
                 detail = ExampleDetail.view(of: record)

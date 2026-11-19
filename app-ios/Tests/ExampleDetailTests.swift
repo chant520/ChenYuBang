@@ -1,6 +1,7 @@
 import CangyuData
 import GRDB
 import XCTest
+@testable import ChenYuBang
 
 /// P07 例题详情（工作包 1.5，验收 5/7）：取值口径、成语高亮匹配、关联成语读库与视图模型。
 /// 口径与 Android ExampleDetail / IdiomHighlight / ExampleDao 对齐；macOS CI 的 xcodebuild test 执行。
