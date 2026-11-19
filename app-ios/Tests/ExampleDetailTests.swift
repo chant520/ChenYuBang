@@ -111,7 +111,7 @@ final class ExampleDetailTests: XCTestCase {
     func testViewModelLoadsRelatedWordsWithPlaceholderForUnknown() async throws {
         try insertIdiom(id: "idiom-anbu", word: "按部就班")
         _ = try insertExample(id: "ex-20", year: 2023, region: "国考", examType: "言语理解", questionType: "逻辑填空")
-        insertLinks(exampleID: "ex-20", idiomIDs: ["idiom-anbu", "idiom-ghost"])
+        try insertLinks(exampleID: "ex-20", idiomIDs: ["idiom-anbu", "idiom-ghost"])
         let model = ExampleDetailViewModel(reader: ExampleLibraryReader(queue: queue))
         await model.load("ex-20")
         XCTAssertEqual(model.detail?.id, "ex-20")
