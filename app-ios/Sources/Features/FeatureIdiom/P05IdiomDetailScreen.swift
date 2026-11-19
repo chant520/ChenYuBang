@@ -93,7 +93,7 @@ public struct P05IdiomDetailScreen: View {
                 .font(.system(size: Tokens.Font.n15, weight: .semibold))
                 .foregroundStyle(colors.head)
             Spacer(minLength: 0)
-            CTag("收藏（预留）", style: .ghost)
+            CTag(text: "收藏（预留）", style: .ghost)
         }
     }
 
@@ -134,7 +134,7 @@ public struct P05IdiomDetailScreen: View {
                 .accessibilityHidden(true)
         }
         HStack {
-            CTag(detail.color)
+            CTag(text: detail.color)
             Spacer(minLength: 0)
         }
 

@@ -208,7 +208,7 @@ public struct P07ExampleDetailScreen: View {
                             Button {
                                 onOpenIdiom(item.id)
                             } label: {
-                                CTag(item.word)
+                                CTag(text: item.word)
                             }
                             .buttonStyle(CPressDimStyle())
                         }
