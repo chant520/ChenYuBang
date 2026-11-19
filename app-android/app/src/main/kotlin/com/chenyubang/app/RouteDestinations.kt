@@ -3,6 +3,7 @@ package com.chenyubang.app
 import androidx.compose.runtime.Composable
 import com.chenyubang.core.data.AppDatabase
 import com.chenyubang.core.data.ExamScopeSelection
+import com.chenyubang.feature.example.P07ExampleDetailRoute
 import com.chenyubang.feature.idiom.P03LibraryRoute
 import com.chenyubang.feature.idiom.P04SearchRoute
 import com.chenyubang.feature.idiom.P05IdiomDetailRoute
@@ -71,5 +72,20 @@ internal fun IdiomDestination(
         database = database,
         onBack = onBack,
         onOpenMistakes = onOpenMistakes,
+    )
+}
+
+@Composable
+internal fun ExampleDestination(
+    exampleId: String,
+    database: AppDatabase,
+    onBack: () -> Unit,
+    onOpenIdiom: (String) -> Unit,
+) {
+    P07ExampleDetailRoute(
+        exampleId = exampleId,
+        database = database,
+        onBack = onBack,
+        onOpenIdiom = onOpenIdiom,
     )
 }

@@ -12,6 +12,9 @@ import androidx.room.Transaction
 import androidx.room.TypeConverters
 import kotlinx.coroutines.flow.Flow
 
+/** 成语 id + 词（P07 例题文本高亮扫描用：全量词表，普通 POJO，非 Room 实体）。 */
+data class IdiomWord(val id: String, val word: String)
+
 /**
  * 成语 DAO。A3 搜索走 FTS4 虚表 idiom_fts（规范 §4.2），支持四种输入：
  * 完整成语 / 单字 / 全拼 / 首字母。单字走「前缀 LIKE + FTS 组合」，不做分词库。
@@ -20,6 +23,7 @@ import kotlinx.coroutines.flow.Flow
  * 结果 JOIN 回 idiom，ORDER BY word，分页 50（§4.2）。查无结果返回空列表，文案由上层给。
  * MATCH 串里的用户输入一律用双引号包裹成 FTS phrase（内部双引号翻倍），防注入。
  */
+
 @Dao
 abstract class IdiomDao {
     companion object {
@@ -136,6 +140,36 @@ private fun mergeById(
     return seen.values.sortedBy { it.word }.take(limit)
 }
 
+/** 成语词表只读查询（P07 例题文本高亮扫描用；独立 DAO 避免 IdiomDao 函数数越过 detekt 阈值）。 */
+@Dao
+interface IdiomWordDao {
+    @Query("SELECT id, word FROM idiom")
+    suspend fun allWords(): List<IdiomWord>
+}
+
+/**
+ * 例题 DAO（规范 §4.1 `example` / `example_idiom`，只读查询，不加表不迁移）。
+ *
+ * 工作包 1.5 / 1.6 三处查询：
+ *  - [byId]：P07 例题详情取单条（缺行返回 null，页面按「没有找到这道例题」空态处理）。
+ *  - [listByExample]：一个例题的关联成语 id 列表（B3 一题多成语，供 P07 关联成语区）。
+ *  - [listByIdiom]：某成语关联的全部系统真题（A4，供 P05 真题区），按年份倒序、id 作次级排序保证稳定。
+ */
+@Dao
+interface ExampleDao {
+    @Query("SELECT * FROM example WHERE id = :id")
+    suspend fun byId(id: String): ExampleEntity?
+
+    @Query("SELECT * FROM example_idiom WHERE exampleId = :exampleId ORDER BY idiomId")
+    suspend fun listByExample(exampleId: String): List<ExampleIdiomEntity>
+
+    @Query(
+        "SELECT example.* FROM example JOIN example_idiom ON example.id = example_idiom.exampleId " +
+            "WHERE example_idiom.idiomId = :idiomId ORDER BY example.year DESC, example.id",
+    )
+    suspend fun listByIdiom(idiomId: String): List<ExampleEntity>
+}
+
 @Dao
 interface MistakeDao {
     @Query("SELECT * FROM mistake ORDER BY createdAt DESC LIMIT :limit OFFSET :offset")
@@ -177,6 +211,10 @@ interface MistakeDao {
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun idiomDao(): IdiomDao
+
+    abstract fun idiomWordDao(): IdiomWordDao
+
+    abstract fun exampleDao(): ExampleDao
 
     abstract fun mistakeDao(): MistakeDao
 
