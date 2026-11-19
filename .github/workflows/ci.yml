@@ -40,8 +40,19 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
-      - name: 探测可用模拟器运行时（评估 iOS15 最低运行时验证可行性）
-        run: xcrun simctl list runtimes
+      - name: 部署目标守卫（iOS 15.0；规范 §13.1）
+        run: |
+          set -euo pipefail
+          cd app-ios
+          grep -q '\.iOS(\.v15)' Package.swift
+          total=$(grep -c 'IPHONEOS_DEPLOYMENT_TARGET' ChenYuBang.xcodeproj/project.pbxproj || true)
+          ok=$(grep -c 'IPHONEOS_DEPLOYMENT_TARGET = 15.0;' ChenYuBang.xcodeproj/project.pbxproj || true)
+          echo "pbxproj 部署目标：$ok/$total 处为 15.0"
+          if [ "$total" -eq 0 ] || [ "$ok" -ne "$total" ]; then
+            grep 'IPHONEOS_DEPLOYMENT_TARGET' ChenYuBang.xcodeproj/project.pbxproj || true
+            echo "::error::部署目标必须全部为 15.0；宿主 runner 无 iOS 15 运行时，实跑验证后置本机（规范 §13.1）"
+            exit 1
+          fi
       - name: 静态检查（SwiftLint，零 error 阻断；规范 §2.1 / §13.1）
         run: |
           brew install swiftlint
