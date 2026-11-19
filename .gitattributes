@@ -1,0 +1,2 @@
+# Swift 源码统一 LF：macOS CI 的 SwiftLint 对 CRLF 会误报 comma / colon / closing_brace 并翻倍行数
+*.swift text eol=lf

@@ -25,7 +25,9 @@ public struct CLetterIndex: View {
         let colors = CangyuTheme.colors(for: colorScheme)
         return VStack(spacing: 0) {
             ForEach(letters, id: \.self) { letter in
-                Button(action: { onSelect(letter) }) {
+                Button {
+                    onSelect(letter)
+                } label: {
                     Text(letter)
                         .font(.system(size: Tokens.Font.n10, weight: letter == selected ? .bold : .regular))
                         .foregroundStyle(letter == selected ? colors.accent : colors.text3)

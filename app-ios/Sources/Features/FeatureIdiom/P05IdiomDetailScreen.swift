@@ -162,7 +162,7 @@ public struct P05IdiomDetailScreen: View {
         myExamplesPlaceholder(colors)
 
         // D1 单成语复习入口：MVP 内容只有错题，待阶段 3 接入真实待复习数据；无内容置灰。
-        // TODO(阶段3): P05 → P11 单成语模式，按该成语待复习错题判定可点性。
+        // 阶段3：P05 → P11 单成语模式，按该成语待复习错题判定可点性。
         CButton(text: "复习这个成语", variant: .primary, enabled: false, action: {})
         Text("这个成语下还没有待复习的错题")
             .font(.system(size: Tokens.Font.n12))
@@ -192,7 +192,7 @@ public struct P05IdiomDetailScreen: View {
             .fixedSize(horizontal: false, vertical: true)
     }
 
-    /// A4「相关题目」双来源占位。TODO(1.6) 系统真题接 example_idiom；TODO(阶段2) 我录入的题接 user_example。
+    /// A4「相关题目」双来源占位。1.6 系统真题接 example_idiom；阶段2 我录入的题接 user_example。
     private func relatedPlaceholder(_ colors: TokenColors) -> some View {
         CCard {
             CLabel("相关题目")
@@ -210,7 +210,7 @@ public struct P05IdiomDetailScreen: View {
             .padding(.top, Tokens.Space.lmetaTop)
     }
 
-    /// A5「我的录入题 N」数字入口占位。TODO(阶段2): N 接 user_example 计数，N>0 可点进 P09。
+    /// A5「我的录入题 N」数字入口占位。阶段2：N 接 user_example 计数，N>0 可点进 P09。
     private func myExamplesPlaceholder(_ colors: TokenColors) -> some View {
         CCard {
             HStack {

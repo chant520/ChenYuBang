@@ -31,7 +31,18 @@ public enum CIcons {
     }
 
     /// viewBox 24 原始路径（坐标即 SVG d 属性的落地值）。
+    /// 按图标族拆成两组，避免单函数分支过多（SwiftLint cyclomatic_complexity）。
     private static func basePath(_ kind: Kind) -> Path {
+        switch kind {
+        case .plus, .check, .warn, .err, .info, .search:
+            return glyphPath(kind)
+        case .chevron, .book, .close, .back, .sound:
+            return navPath(kind)
+        }
+    }
+
+    /// 基础语义图标（加号 / 勾选 / 警示 / 错误 / 信息 / 搜索）。
+    private static func glyphPath(_ kind: Kind) -> Path {
         var path = Path()
         switch kind {
         case .plus:
@@ -74,6 +85,16 @@ public enum CIcons {
             path.addEllipse(in: CGRect(x: 4.5, y: 4.5, width: 13, height: 13))
             path.move(to: CGPoint(x: 20, y: 20))
             path.addLine(to: CGPoint(x: 15.4, y: 15.4))
+        default:
+            break
+        }
+        return path
+    }
+
+    /// 导航类图标（右尖角 / 书本 / 关闭 / 返回 / 读音）。
+    private static func navPath(_ kind: Kind) -> Path {
+        var path = Path()
+        switch kind {
         case .chevron:
             // M9 5l7 7-7 7（范围卡「改范围」的右尖角）
             path.move(to: CGPoint(x: 9, y: 5))
@@ -115,6 +136,8 @@ public enum CIcons {
             path.closeSubpath()
             path.move(to: CGPoint(x: 9, y: 5))
             path.addLine(to: CGPoint(x: 15, y: 11))
+        default:
+            break
         }
         return path
     }
