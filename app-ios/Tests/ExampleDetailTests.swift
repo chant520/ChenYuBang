@@ -111,10 +111,7 @@ final class ExampleDetailTests: XCTestCase {
     func testViewModelLoadsRelatedWordsWithPlaceholderForUnknown() async throws {
         try insertIdiom(id: "idiom-anbu", word: "按部就班")
         _ = try insertExample(id: "ex-20", year: 2023, region: "国考", examType: "言语理解", questionType: "逻辑填空")
-        try queue.write { db in
-            try db.execute(sql: "INSERT INTO example_idiom (exampleId, idiomId) VALUES ('ex-20', 'idiom-anbu')")
-            try db.execute(sql: "INSERT INTO example_idiom (exampleId, idiomId) VALUES ('ex-20', 'idiom-ghost')")
-        }
+        insertLinks(exampleID: "ex-20", idiomIDs: ["idiom-anbu", "idiom-ghost"])
         let model = ExampleDetailViewModel(reader: ExampleLibraryReader(queue: queue))
         await model.load("ex-20")
         XCTAssertEqual(model.detail?.id, "ex-20")
@@ -132,6 +129,17 @@ final class ExampleDetailTests: XCTestCase {
     }
 
     // MARK: - Fixtures
+
+    private func insertLinks(exampleID: String, idiomIDs: [String]) throws {
+        try queue.write { db in
+            for idiomID in idiomIDs {
+                try db.execute(
+                    sql: "INSERT INTO example_idiom (exampleId, idiomId) VALUES (?, ?)",
+                    arguments: [exampleID, idiomID]
+                )
+            }
+        }
+    }
 
     @discardableResult
     private func insertIdiom(id: String, word: String) throws -> IdiomWordRef {
