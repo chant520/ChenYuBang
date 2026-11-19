@@ -34,9 +34,13 @@ internal fun RouteContent(
                 onRoute(router.push(Route.Idiom, it))
             }
         Route.Idiom ->
-            IdiomDestination(requireNotNull(entry.id), deps.database, { onRoute(router.back()) }) {
-                onRoute(router.goToMistakes())
-            }
+            IdiomDestination(
+                idiomId = requireNotNull(entry.id),
+                database = deps.database,
+                onBack = { onRoute(router.back()) },
+                onOpenMistakes = { onRoute(router.goToMistakes()) },
+                onOpenExample = { id -> onRoute(router.push(Route.Example, id)) },
+            )
         Route.Example ->
             ExampleDestination(requireNotNull(entry.id), deps.database, { onRoute(router.back()) }) { id ->
                 onRoute(router.push(Route.Idiom, id))

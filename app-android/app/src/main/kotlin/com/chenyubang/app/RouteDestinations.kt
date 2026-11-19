@@ -66,12 +66,14 @@ internal fun IdiomDestination(
     database: AppDatabase,
     onBack: () -> Unit,
     onOpenMistakes: () -> Unit,
+    onOpenExample: (String) -> Unit,
 ) {
     P05IdiomDetailRoute(
         idiomId = idiomId,
         database = database,
         onBack = onBack,
         onOpenMistakes = onOpenMistakes,
+        onOpenExample = onOpenExample,
     )
 }
 

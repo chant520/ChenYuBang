@@ -21,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -47,12 +48,16 @@ fun P05IdiomDetailRoute(
     database: AppDatabase,
     onBack: () -> Unit,
     onOpenMistakes: () -> Unit,
+    onOpenExample: (String) -> Unit,
 ) {
     val factory =
         remember(database) {
             viewModelFactory {
                 initializer {
-                    P05IdiomDetailViewModel(loadIdiom = { id -> database.idiomDao().byId(id) })
+                    P05IdiomDetailViewModel(
+                        loadIdiom = { id -> database.idiomDao().byId(id) },
+                        loadExamples = { id -> database.exampleDao().listByIdiom(id) },
+                    )
                 }
             }
         }
@@ -63,21 +68,24 @@ fun P05IdiomDetailRoute(
         state = state,
         onBack = onBack,
         onOpenMistakes = onOpenMistakes,
+        onOpenExample = onOpenExample,
         onRetry = { model.load(idiomId) },
     )
 }
 
 /**
- * P05 成语详情长页（信息架构 v1.3 P05 ①–⑪）。
+ * P05 成语详情长页（信息架构 v1.4 P05 ①–⑪）。
  *
  * 五项齐全：读音 / 释义 / 感情色彩 / 易错点 / 近反义辨析；出处一并展示。缺字段一律「暂无」。
- * 相关题目（双来源）与「我的录入题 N」为本期占位：数据分别待 1.6 关联真题、阶段 2 user_example 接入。
+ * 相关题目（系统题库）列出该成语关联真题，点击进 P07（1.6）；「我的录入题 N」为本期占位，
+ * 数据待阶段 2 user_example 接入。
  */
 @Composable
 fun P05IdiomDetailContent(
     state: P05IdiomDetailUiState,
     onBack: () -> Unit = {},
     onOpenMistakes: () -> Unit = {},
+    onOpenExample: (String) -> Unit = {},
     onRetry: () -> Unit = {},
 ) {
     val colors = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
@@ -109,7 +117,14 @@ fun P05IdiomDetailContent(
                     actionText = "重试",
                     onAction = onRetry,
                 )
-            state.detail != null -> DetailBody(detail = state.detail, colors = colors, onOpenMistakes = onOpenMistakes)
+            state.detail != null ->
+                DetailBody(
+                    detail = state.detail,
+                    examples = state.examples,
+                    colors = colors,
+                    onOpenMistakes = onOpenMistakes,
+                    onOpenExample = onOpenExample,
+                )
         }
     }
 }
@@ -144,8 +159,10 @@ private fun DetailHeader(
 @Composable
 private fun DetailBody(
     detail: IdiomDetailView,
+    examples: List<IdiomExampleView>,
     colors: Tokens.ColorSet,
     onOpenMistakes: () -> Unit,
+    onOpenExample: (String) -> Unit,
 ) {
     // 成语名 + 拼音 + 读音（朗读是未来项，这里只展示图标与拼音，不触发播放）。
     Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -187,7 +204,7 @@ private fun DetailBody(
         BodyText(text = "反义：${IdiomDetail.presentList(detail.antonyms)}", colors = colors)
     }
 
-    RelatedPlaceholder(colors = colors)
+    RelatedExamplesCard(examples = examples, colors = colors, onOpenExample = onOpenExample)
     MyExamplesPlaceholder(onOpenMistakes = onOpenMistakes, colors = colors)
 
     // D1 单成语复习入口：MVP 复习内容只有错题，待阶段 3 接入真实待复习数据；无内容时置灰。
@@ -232,19 +249,59 @@ private fun BodyText(
 }
 
 /**
- * A4「相关题目」双来源占位（高保真稿 A P05 v2.1：区块标题「相关题目」）。
- * TODO(1.6): 系统题库列表接 example_idiom 关联真题；暂无时保留「暂无真题，后续补充」不隐藏。
+ * A4「相关题目」双来源（信息架构 v1.4 P05 ⑧、高保真稿 A P05 v2.1）。
+ * 系统题库：按 example_idiom 列出关联真题，每条题干摘要 + 年份 · 地区 · 考试类型 + 题型，点击进 P07；
+ * 暂无时保留「暂无真题，后续补充」不隐藏。
  * TODO(阶段2): 我录入的题接 user_example；暂无时保留「还没在这个成语下录入题」不隐藏。
- * 本期只占位、不生成任何题目内容。
  */
 @Composable
-private fun RelatedPlaceholder(colors: Tokens.ColorSet) {
+private fun RelatedExamplesCard(
+    examples: List<IdiomExampleView>,
+    colors: Tokens.ColorSet,
+    onOpenExample: (String) -> Unit,
+) {
     CCard {
         CLabel(text = "相关题目")
         SectionCaption(text = "系统题库", colors = colors)
-        BodyText(text = "暂无真题，后续补充", colors = colors)
+        if (examples.isEmpty()) {
+            BodyText(text = "暂无真题，后续补充", colors = colors)
+        } else {
+            examples.forEach { example ->
+                RelatedExampleRow(example = example, colors = colors, onOpenExample = onOpenExample)
+            }
+        }
         SectionCaption(text = "我录入的题（标错才进错题本）", colors = colors)
         BodyText(text = "还没在这个成语下录入题", colors = colors)
+    }
+}
+
+@Composable
+private fun RelatedExampleRow(
+    example: IdiomExampleView,
+    colors: Tokens.ColorSet,
+    onOpenExample: (String) -> Unit,
+) {
+    Column(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable { onOpenExample(example.id) }
+                .padding(top = Tokens.Space.lmetaTop.dp),
+    ) {
+        Text(
+            text = example.stem,
+            color = colors.text2,
+            fontSize = Tokens.Font.n13.sp,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+        )
+        Row(
+            modifier = Modifier.padding(top = Tokens.Space.lsubTop.dp),
+            horizontalArrangement = Arrangement.spacedBy(Tokens.Space.lmetaGap.dp),
+        ) {
+            Text(text = example.sourceLine, color = colors.text3, fontSize = Tokens.Font.n12.sp)
+            Text(text = example.questionType, color = colors.text3, fontSize = Tokens.Font.n12.sp)
+        }
     }
 }
 
