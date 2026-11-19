@@ -50,6 +50,21 @@ public enum ExampleLibrary {
     public static func idiomWords(_ db: Database) throws -> [IdiomWordRef] {
         try IdiomWordRef.fetchAll(db, sql: "SELECT id, word FROM idiom")
     }
+
+    /// 某成语关联的全部系统真题（A4，供 P05 真题区），按年份倒序、id 次级排序保证稳定
+    /// （与 Android ExampleDao.listByIdiom 同口径）。
+    public static func examples(ofIdiom db: Database, idiomID: String) throws -> [ExampleRecord] {
+        try ExampleRecord.fetchAll(
+            db,
+            sql: """
+                SELECT example.* FROM example
+                JOIN example_idiom ON example.id = example_idiom.exampleId
+                WHERE example_idiom.idiomId = ?
+                ORDER BY example.year DESC, example.id
+                """,
+            arguments: [idiomID]
+        )
+    }
 }
 
 /// 读库入口：P07 通过协议注入，不直接持有 DatabaseQueue。
@@ -70,5 +85,9 @@ public final class ExampleLibraryReader {
 
     public func idiomWords() throws -> [IdiomWordRef] {
         try queue.read { db in try ExampleLibrary.idiomWords(db) }
+    }
+
+    public func examples(idiomID: String) throws -> [ExampleRecord] {
+        try queue.read { db in try ExampleLibrary.examples(ofIdiom: db, idiomID: idiomID) }
     }
 }

@@ -129,12 +129,15 @@ private struct AppRoutePage: View {
             )
         } else if entry.route == .idiomDetail,
                   let reader = launch.libraryReader,
+                  let exampleReader = launch.exampleReader,
                   let idiomID = entry.recordID {
             P05IdiomDetailScreen(
                 id: idiomID,
                 reader: reader,
+                examplesReader: exampleReader,
                 onBack: { router.back() },
-                onOpenMistakes: { router.goToMistakes() }
+                onOpenMistakes: { router.goToMistakes() },
+                onOpenExample: { id in _ = router.push(.exampleDetail, recordID: id) }
             )
         } else if entry.route == .exampleDetail,
                   let reader = launch.exampleReader,

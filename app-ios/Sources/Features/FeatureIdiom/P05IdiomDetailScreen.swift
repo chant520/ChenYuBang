@@ -10,28 +10,83 @@ public protocol IdiomDetailReading {
 
 extension IdiomLibraryReader: IdiomDetailReading {}
 
+/// P05「相关题目 · 系统题库」只读查询口子（工作包 1.6）：页面只依赖协议，读库实现由 app 注入。
+public protocol IdiomExamplesReading {
+    func examples(idiomID: String) throws -> [ExampleRecord]
+}
+
+extension ExampleLibraryReader: IdiomExamplesReading {}
+
+/// P05「相关题目 · 系统题库」单行展示模型（与 Android IdiomExampleView 同口径）：
+/// 题干摘要 + 「年份 · 地区 · 考试类型」+ 题型，缺字段已在 `IdiomExamples.view(of:)` 归到「暂无」。
+public struct IdiomExampleView: Identifiable, Equatable, Sendable {
+    public let id: String
+    public let stem: String
+    public let sourceLine: String
+    public let questionType: String
+
+    public init(id: String, stem: String, sourceLine: String, questionType: String) {
+        self.id = id
+        self.stem = stem
+        self.sourceLine = sourceLine
+        self.questionType = questionType
+    }
+}
+
+/// 系统真题行取值（纯函数，与 Android IdiomExamples 同口径）：只做字段呈现，不改写题目内容。
+public enum IdiomExamples {
+    public static func view(of record: ExampleRecord) -> IdiomExampleView {
+        IdiomExampleView(
+            id: record.id,
+            stem: IdiomDetail.present(record.stem),
+            sourceLine: sourceLine(record),
+            questionType: IdiomDetail.present(record.questionType)
+        )
+    }
+
+    /// 年份 · 地区 · 考试类型；缺项跳过，全缺归「暂无」。
+    public static func sourceLine(_ record: ExampleRecord) -> String {
+        let parts = [
+            record.year > 0 ? String(record.year) : nil,
+            presentOrNil(record.region),
+            presentOrNil(record.examType)
+        ].compactMap { $0 }
+        return parts.isEmpty ? IdiomDetail.placeholder : parts.joined(separator: " · ")
+    }
+
+    private static func presentOrNil(_ value: String) -> String? {
+        let present = IdiomDetail.present(value)
+        return present == IdiomDetail.placeholder ? nil : present
+    }
+}
+
 /// P05 页面状态与行为（文案与状态语义与 Android P05IdiomDetailViewModel 一致）。
 @MainActor
 public final class IdiomDetailViewModel: ObservableObject {
     @Published public private(set) var detail: IdiomDetailView?
+    @Published public private(set) var examples: [IdiomExampleView] = []
     @Published public private(set) var loading = true
     @Published public private(set) var missing = false
     @Published public private(set) var failed = false
 
     private let reader: IdiomDetailReading
+    private let examplesReader: IdiomExamplesReading
 
-    public init(reader: IdiomDetailReading) {
+    public init(reader: IdiomDetailReading, examplesReader: IdiomExamplesReading) {
         self.reader = reader
+        self.examplesReader = examplesReader
     }
 
     public func load(_ id: String) async {
         detail = nil
+        examples = []
         missing = false
         failed = false
         loading = true
         do {
             if let record = try reader.detail(id: id) {
                 detail = IdiomDetail.view(of: record)
+                examples = try examplesReader.examples(idiomID: id).map(IdiomExamples.view(of:))
             } else {
                 missing = true
             }
@@ -51,18 +106,22 @@ public struct P05IdiomDetailScreen: View {
     private let idiomID: String
     private let onBack: () -> Void
     private let onOpenMistakes: () -> Void
+    private let onOpenExample: (String) -> Void
 
     @MainActor
     public init(
         id: String,
         reader: IdiomDetailReading,
+        examplesReader: IdiomExamplesReading,
         onBack: @escaping () -> Void,
-        onOpenMistakes: @escaping () -> Void
+        onOpenMistakes: @escaping () -> Void,
+        onOpenExample: @escaping (String) -> Void
     ) {
-        _model = StateObject(wrappedValue: IdiomDetailViewModel(reader: reader))
+        _model = StateObject(wrappedValue: IdiomDetailViewModel(reader: reader, examplesReader: examplesReader))
         self.idiomID = id
         self.onBack = onBack
         self.onOpenMistakes = onOpenMistakes
+        self.onOpenExample = onOpenExample
     }
 
     public var body: some View {
@@ -158,7 +217,7 @@ public struct P05IdiomDetailScreen: View {
             bodyText("反义：\(IdiomDetail.presentList(detail.antonyms))", colors)
         }
 
-        relatedPlaceholder(colors)
+        relatedExamplesCard(colors)
         myExamplesPlaceholder(colors)
 
         // D1 单成语复习入口：MVP 内容只有错题，待阶段 3 接入真实待复习数据；无内容置灰。
@@ -192,15 +251,50 @@ public struct P05IdiomDetailScreen: View {
             .fixedSize(horizontal: false, vertical: true)
     }
 
-    /// A4「相关题目」双来源占位。1.6 系统真题接 example_idiom；阶段2 我录入的题接 user_example。
-    private func relatedPlaceholder(_ colors: TokenColors) -> some View {
+    /// A4「相关题目」双来源（信息架构 v1.4 P05 ⑧）：系统题库按 example_idiom 列出关联真题（1.6），
+    /// 每条题干摘要 + 年份 · 地区 · 考试类型 + 题型，点击进 P07；暂无时保留文案不隐藏。
+    /// 阶段2：我录入的题接 user_example，暂无时保留「还没在这个成语下录入题」不隐藏。
+    private func relatedExamplesCard(_ colors: TokenColors) -> some View {
         CCard {
             CLabel("相关题目")
             sectionCaption("系统题库", colors)
-            bodyText("暂无真题，后续补充", colors)
+            if model.examples.isEmpty {
+                bodyText("暂无真题，后续补充", colors)
+            } else {
+                ForEach(model.examples) { example in
+                    relatedExampleRow(example, colors)
+                }
+            }
             sectionCaption("我录入的题（标错才进错题本）", colors)
             bodyText("还没在这个成语下录入题", colors)
         }
+    }
+
+    private func relatedExampleRow(_ example: IdiomExampleView, _ colors: TokenColors) -> some View {
+        Button {
+            onOpenExample(example.id)
+        } label: {
+            VStack(alignment: .leading, spacing: 0) {
+                Text(example.stem)
+                    .font(.system(size: Tokens.Font.n13))
+                    .foregroundStyle(colors.text2)
+                    .lineLimit(2)
+                    .multilineTextAlignment(.leading)
+                HStack(spacing: Tokens.Space.lmetaGap) {
+                    Text(example.sourceLine)
+                        .font(.system(size: Tokens.Font.n12))
+                        .foregroundStyle(colors.text3)
+                    Text(example.questionType)
+                        .font(.system(size: Tokens.Font.n12))
+                        .foregroundStyle(colors.text3)
+                }
+                .padding(.top, Tokens.Space.lsubTop)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .contentShape(Rectangle())
+            .padding(.top, Tokens.Space.lmetaTop)
+        }
+        .buttonStyle(CPressDimStyle())
     }
 
     private func sectionCaption(_ text: String, _ colors: TokenColors) -> some View {

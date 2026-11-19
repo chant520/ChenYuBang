@@ -128,6 +128,77 @@ final class ExampleDetailTests: XCTestCase {
         XCTAssertNil(model.detail)
     }
 
+    // MARK: - P05 相关题目（1.6）
+
+    func testExamplesOfIdiomReturnsLinkedExamplesNewestFirst() throws {
+        try insertIdiom(id: "idiom-anbu", word: "按部就班")
+        _ = try insertExample(id: "ex-a", year: 2021, region: "国考", examType: "言语理解", questionType: "逻辑填空")
+        _ = try insertExample(id: "ex-b", year: 2023, region: "省考", examType: "言语理解", questionType: "逻辑填空")
+        _ = try insertExample(id: "ex-c", year: 2023, region: "国考", examType: "判断推理", questionType: "定义判断")
+        for id in ["ex-a", "ex-b", "ex-c"] {
+            try insertLinks(exampleID: id, idiomIDs: ["idiom-anbu"])
+        }
+        let rows = try ExampleLibraryReader(queue: queue).examples(idiomID: "idiom-anbu")
+        XCTAssertEqual(rows.map { $0.id }, ["ex-b", "ex-c", "ex-a"])
+    }
+
+    func testExamplesOfIdiomEmptyWhenNotLinked() throws {
+        try insertIdiom(id: "idiom-anbu", word: "按部就班")
+        _ = try insertExample(id: "ex-30", year: 2023, region: "国考", examType: "言语理解", questionType: "逻辑填空")
+        let rows = try ExampleLibraryReader(queue: queue).examples(idiomID: "idiom-anbu")
+        XCTAssertTrue(rows.isEmpty)
+    }
+
+    func testIdiomExampleViewJoinsAllMetaParts() throws {
+        let record = try insertExample(id: "ex-31", year: 2023, region: "国考", examType: "言语理解", questionType: "逻辑填空")
+        let view = IdiomExamples.view(of: record)
+        XCTAssertEqual(view.id, "ex-31")
+        XCTAssertEqual(view.stem, ExampleDetail.placeholder)
+        XCTAssertEqual(view.sourceLine, "2023 · 国考 · 言语理解")
+        XCTAssertEqual(view.questionType, "逻辑填空")
+    }
+
+    func testIdiomExampleSourceLineSkipsMissingParts() throws {
+        let noRegion = try insertExample(id: "ex-32", year: 2023, region: " ", examType: "言语理解", questionType: "")
+        XCTAssertEqual(IdiomExamples.sourceLine(noRegion), "2023 · 言语理解")
+        let noYear = try insertExample(id: "ex-33", year: 0, region: "国考", examType: "言语理解", questionType: "")
+        XCTAssertEqual(IdiomExamples.sourceLine(noYear), "国考 · 言语理解")
+    }
+
+    func testIdiomExampleSourceLineAllMissingFallsBackToPlaceholder() throws {
+        let record = try insertExample(id: "ex-34", year: 0, region: "", examType: "", questionType: " ")
+        let view = IdiomExamples.view(of: record)
+        XCTAssertEqual(view.sourceLine, ExampleDetail.placeholder)
+        XCTAssertEqual(view.questionType, ExampleDetail.placeholder)
+    }
+
+    @MainActor
+    func testIdiomDetailViewModelLoadsRelatedExamples() async throws {
+        try insertIdiom(id: "idiom-anbu", word: "按部就班")
+        _ = try insertExample(id: "ex-40", year: 2022, region: "国考", examType: "言语理解", questionType: "逻辑填空")
+        try insertLinks(exampleID: "ex-40", idiomIDs: ["idiom-anbu"])
+        let model = IdiomDetailViewModel(
+            reader: IdiomLibraryReader(queue: queue),
+            examplesReader: ExampleLibraryReader(queue: queue)
+        )
+        await model.load("idiom-anbu")
+        XCTAssertEqual(model.detail?.word, "按部就班")
+        XCTAssertEqual(model.examples.map { $0.id }, ["ex-40"])
+        XCTAssertFalse(model.missing)
+        XCTAssertFalse(model.failed)
+    }
+
+    @MainActor
+    func testIdiomDetailViewModelMissingHasNoExamples() async {
+        let model = IdiomDetailViewModel(
+            reader: IdiomLibraryReader(queue: queue),
+            examplesReader: ExampleLibraryReader(queue: queue)
+        )
+        await model.load("idiom-absent")
+        XCTAssertTrue(model.missing)
+        XCTAssertTrue(model.examples.isEmpty)
+    }
+
     // MARK: - Fixtures
 
     private func insertLinks(exampleID: String, idiomIDs: [String]) throws {
