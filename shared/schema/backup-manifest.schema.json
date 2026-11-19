@@ -16,6 +16,7 @@
       "required": ["mistakes", "reviews", "idiomStates", "scopes"],
       "properties": {
         "mistakes": { "type": "integer", "minimum": 0 },
+        "userExamples": { "type": "integer", "minimum": 0 },
         "reviews": { "type": "integer", "minimum": 0 },
         "idiomStates": { "type": "integer", "minimum": 0 },
         "scopes": { "type": "integer", "minimum": 0 }

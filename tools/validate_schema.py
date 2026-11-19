@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""校验 shared/schema 下 5 个交换 schema 与 shared/fixtures 的样例数据。
+"""校验 shared/schema 下 6 个交换 schema 与 shared/fixtures 的样例数据。
 
 本机没有 jsonschema 库，这里自带一个够用的 draft-07 子集校验器：
   支持 type（含类型数组）、required、properties、additionalProperties:false、
@@ -168,7 +168,7 @@ def main(argv):
 
     update = "--update" in argv
 
-    schema_files = ["pack-manifest", "idioms", "examples", "backup-manifest", "backup-data"]
+    schema_files = ["pack-manifest", "idioms", "examples", "user-examples", "backup-manifest", "backup-data"]
     schemas = {}
     for name in schema_files:
         p = SCHEMA / (name + ".schema.json")
@@ -294,7 +294,7 @@ def main(argv):
         for e in errors:
             print("  - " + e)
         return 1
-    print("schema ok: 5 个 schema、%d 条成语、%d 条例题、备份包 counts 与 sha256 全部通过"
+    print("schema ok: 6 个 schema、%d 条成语、%d 条例题、备份包 counts 与 sha256 全部通过"
           % (len(idioms), len(examples)))
     return 0
 
