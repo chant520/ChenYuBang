@@ -136,6 +136,15 @@ private struct AppRoutePage: View {
                 onBack: { router.back() },
                 onOpenMistakes: { router.goToMistakes() }
             )
+        } else if entry.route == .exampleDetail,
+                  let reader = launch.exampleReader,
+                  let exampleID = entry.recordID {
+            P07ExampleDetailScreen(
+                id: exampleID,
+                reader: reader,
+                onBack: { router.back() },
+                onOpenIdiom: { id in _ = router.push(.idiomDetail, recordID: id) }
+            )
         } else if entry.route == .search,
                   let reader = launch.libraryReader {
             P04SearchScreen(

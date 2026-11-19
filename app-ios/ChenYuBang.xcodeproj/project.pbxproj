@@ -59,6 +59,9 @@
 		A0000000000000000000008E /* P05IdiomDetailScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000018E /* P05IdiomDetailScreen.swift */; };
 		A0000000000000000000008F /* IdiomSearchUi.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000018F /* IdiomSearchUi.swift */; };
 		A00000000000000000000090 /* P04SearchScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000190 /* P04SearchScreen.swift */; };
+		A00000000000000000000091 /* ExampleDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000191 /* ExampleDetail.swift */; };
+		A00000000000000000000092 /* P07ExampleDetailScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000192 /* P07ExampleDetailScreen.swift */; };
+		A00000000000000000000093 /* ExampleDetailTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000193 /* ExampleDetailTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -119,6 +122,9 @@
 		A0000000000000000000018E /* P05IdiomDetailScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P05IdiomDetailScreen.swift; sourceTree = "<group>"; };
 		A0000000000000000000018F /* IdiomSearchUi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdiomSearchUi.swift; sourceTree = "<group>"; };
 		A00000000000000000000190 /* P04SearchScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P04SearchScreen.swift; sourceTree = "<group>"; };
+		A00000000000000000000191 /* ExampleDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleDetail.swift; sourceTree = "<group>"; };
+		A00000000000000000000192 /* P07ExampleDetailScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P07ExampleDetailScreen.swift; sourceTree = "<group>"; };
+		A00000000000000000000193 /* ExampleDetailTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleDetailTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -202,6 +208,8 @@
 			isa = PBXGroup;
 			children = (
 				A00000000000000000000131 /* ExampleFeature.swift */,
+				A00000000000000000000191 /* ExampleDetail.swift */,
+				A00000000000000000000192 /* P07ExampleDetailScreen.swift */,
 			);
 			path = FeatureExample;
 			sourceTree = "<group>";
@@ -266,6 +274,7 @@
 				A0000000000000000000018A /* CCheckRowSnapshotTests.swift */,
 				A0000000000000000000018B /* CSpinnerSnapshotTests.swift */,
 				A0000000000000000000018C /* CIconSnapshotTests.swift */,
+				A00000000000000000000193 /* ExampleDetailTests.swift */,
 				A00000000000000000000152 /* pack fixture */,
 			);
 			path = Tests;
@@ -409,6 +418,8 @@
 				A0000000000000000000008F /* IdiomSearchUi.swift in Sources */,
 				A00000000000000000000090 /* P04SearchScreen.swift in Sources */,
 				A00000000000000000000021 /* ExampleFeature.swift in Sources */,
+				A00000000000000000000091 /* ExampleDetail.swift in Sources */,
+				A00000000000000000000092 /* P07ExampleDetailScreen.swift in Sources */,
 				A00000000000000000000022 /* MistakeFeature.swift in Sources */,
 				A00000000000000000000023 /* ReviewFeature.swift in Sources */,
 				A00000000000000000000024 /* MeFeature.swift in Sources */,
@@ -445,6 +456,7 @@
 				A0000000000000000000008A /* CCheckRowSnapshotTests.swift in Sources */,
 				A0000000000000000000008B /* CSpinnerSnapshotTests.swift in Sources */,
 				A0000000000000000000008C /* CIconSnapshotTests.swift in Sources */,
+				A00000000000000000000093 /* ExampleDetailTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

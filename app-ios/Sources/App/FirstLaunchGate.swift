@@ -13,6 +13,8 @@ final class FirstLaunchState: ObservableObject {
     @Published private(set) var contentError = false
     /// P03 读库入口：初始化成功后才有值，页面据此决定是否可浏览。
     @Published private(set) var libraryReader: IdiomLibraryReader?
+    /// P07 例题详情读库入口：与 libraryReader 同时就绪。
+    @Published private(set) var exampleReader: ExampleLibraryReader?
     private var store: ExamScopeStore?
     private var importer: PackImporter?
     private var currentPack: ValidatedPack?
@@ -51,6 +53,7 @@ final class FirstLaunchState: ObservableObject {
             currentPack = pack
             availableProvinces = provinces
             libraryReader = IdiomLibraryReader(queue: queue)
+            exampleReader = ExampleLibraryReader(queue: queue)
             preferences = loaded
         } catch is PackError {
             contentError = true
