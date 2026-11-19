@@ -22,7 +22,8 @@ public struct CImagePlaceholder: View {
     }
 
     @Environment(\.colorScheme) private var colorScheme
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
+    @Environment(\.cangyuReduceMotionOverride) private var reduceMotionOverride
 
     private let kind: Kind
     private let height: CGFloat
@@ -49,6 +50,9 @@ public struct CImagePlaceholder: View {
         self.subtitle = subtitle
         self.cutText = cutText
     }
+
+    /// 系统 reduce-motion 或覆盖开关任一为真即降级为静态色块（系统键只读，见 Theme.swift）。
+    private var reduceMotion: Bool { reduceMotionOverride || systemReduceMotion }
 
     public var body: some View {
         let colors = CangyuTheme.colors(for: colorScheme)

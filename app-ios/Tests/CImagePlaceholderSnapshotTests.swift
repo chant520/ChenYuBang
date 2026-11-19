@@ -41,7 +41,7 @@ final class CImagePlaceholderSnapshotTests: XCTestCase {
     ) {
         let view = placeholder(kind)
             .environment(\.colorScheme, dark ? .dark : .light)
-            .environment(\.accessibilityReduceMotion, reduceMotion)
+            .environment(\.cangyuReduceMotionOverride, reduceMotion)
             .transaction { transaction in
                 transaction.animation = nil
                 transaction.disablesAnimations = true

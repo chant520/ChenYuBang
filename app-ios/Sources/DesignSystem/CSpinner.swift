@@ -6,10 +6,14 @@ import CangyuTokens
 /// 颜色随当前文字色（继承 foregroundStyle，等价 CSS currentColor）。
 /// 系统 reduce motion 开启时静止（开发规范 §9.3）。
 public struct CSpinner: View {
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
+    @Environment(\.cangyuReduceMotionOverride) private var reduceMotionOverride
     @State private var angle: Double = 0
 
     public init() {}
+
+    /// 系统 reduce-motion 或覆盖开关任一为真即静止（系统键只读，见 Theme.swift）。
+    private var reduceMotion: Bool { reduceMotionOverride || systemReduceMotion }
 
     public var body: some View {
         Circle()

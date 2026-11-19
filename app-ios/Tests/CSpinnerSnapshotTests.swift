@@ -29,7 +29,7 @@ final class CSpinnerSnapshotTests: XCTestCase {
         let view = CSpinner()
             .foregroundStyle(CangyuTheme.colors(for: scheme).text)
             .environment(\.colorScheme, scheme)
-            .environment(\.accessibilityReduceMotion, reduceMotion)
+            .environment(\.cangyuReduceMotionOverride, reduceMotion)
             .transaction { transaction in
                 transaction.animation = nil
                 transaction.disablesAnimations = true
