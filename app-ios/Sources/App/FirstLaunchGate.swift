@@ -11,6 +11,8 @@ final class FirstLaunchState: ObservableObject {
     @Published private(set) var initializationError: String?
     @Published private(set) var availableProvinces: [String] = []
     @Published private(set) var contentError = false
+    /// P03 读库入口：初始化成功后才有值，页面据此决定是否可浏览。
+    @Published private(set) var libraryReader: IdiomLibraryReader?
     private var store: ExamScopeStore?
     private var importer: PackImporter?
     private var currentPack: ValidatedPack?
@@ -36,10 +38,19 @@ final class FirstLaunchState: ObservableObject {
             let initializedStore = ExamScopeStore(queue: queue)
             let loaded = try initializedStore.load()
             let provinces = try initializedStore.availableProvinces()
+            if !loaded.complete {
+                // P01 首次启动即按产品默认写入 exam_scope（国考 + 省考 + 事业编，省考省份默认全选）；
+                // 库中已有范围行时 loaded.scope 就是既有值，原样写回，不覆盖用户设置。
+                var scope = loaded.scope
+                if scope == ExamScopeSelection() { scope.provinces = Set(provinces) }
+                try initializedStore.save(scope: scope, complete: false)
+                try initializedImporter.refreshScopeLinks(pack)
+            }
             store = initializedStore
             importer = initializedImporter
             currentPack = pack
             availableProvinces = provinces
+            libraryReader = IdiomLibraryReader(queue: queue)
             preferences = loaded
         } catch is PackError {
             contentError = true
@@ -59,125 +70,24 @@ final class FirstLaunchState: ObservableObject {
     private enum LaunchError: Error { case notInitialized }
 }
 
+/// P01 启动页（首次引导）。与 P14 设置页共用 `FeatureMe` 的同一控件、同一份数据
+/// （信息架构 v1.4 决策 F / 1.9）：省考勾选且省份默认全选，省份仅为筛选维度；
+/// 「进入」与「跳过」同效，都写 `exam_scope` 后进 P02。
 struct FirstLaunchGate: View {
     @ObservedObject var launch: FirstLaunchState
     @ObservedObject var router: RouterState
 
     var body: some View {
         if let preferences = launch.preferences {
-            ExamScopeEditor(initial: preferences.scope, availableProvinces: launch.availableProvinces,
-                            firstLaunch: true, onSave: { scope in
-                try launch.save(scope: scope, complete: true)
-                router.completeFirstLaunch()
-            })
-        }
-    }
-}
-
-/// P01/P14 同一个编辑器；进入与跳过均提交当前选择，失败不重置。
-struct ExamScopeEditor: View {
-    @Environment(\.colorScheme) private var colorScheme
-    @State private var selection: ExamScopeSelection
-    @State private var showsProvinces = false
-    @State private var saving = false
-    @State private var errorMessage: String?
-    private let firstLaunch: Bool
-    private let onSave: (ExamScopeSelection) throws -> Void
-    private let onCancel: (() -> Void)?
-    private let provinces: [String]
-
-    init(
-        initial: ExamScopeSelection,
-        availableProvinces: [String],
-        firstLaunch: Bool,
-        onSave: @escaping (ExamScopeSelection) throws -> Void,
-        onCancel: (() -> Void)? = nil
-    ) {
-        _selection = State(initialValue: initial)
-        self.firstLaunch = firstLaunch
-        self.provinces = availableProvinces
-        self.onSave = onSave
-        self.onCancel = onCancel
-    }
-
-    var body: some View {
-        let colors = CangyuTheme.colors(for: colorScheme)
-        ScrollView {
-            VStack(alignment: .leading, spacing: Tokens.Space.block) {
-                Text(firstLaunch ? "考试范围" : "考试范围设置")
-                    .font(.system(size: Tokens.Font.n20, weight: .semibold))
-                    .foregroundStyle(colors.text)
-                    .accessibilityAddTraits(.isHeader)
-                Text("选择适合你的考试范围，也可以全部取消。")
-                    .font(.system(size: Tokens.Font.n13))
-                    .foregroundStyle(colors.text2)
-                scopeRows
-                if selection.provincial {
-                    CButton(text: showsProvinces ? "收起省份" : "选择省份（可多选）", variant: .ghost, enabled: !saving) {
-                        showsProvinces.toggle()
-                    }
-                    if showsProvinces { provinceRows }
+            ExamScopeScreen(
+                mode: .onboarding,
+                initial: preferences.scope,
+                availableProvinces: launch.availableProvinces,
+                onSave: { scope, complete in
+                    try launch.save(scope: scope, complete: complete)
+                    router.completeFirstLaunch()
                 }
-                Text(selection.description)
-                    .font(.system(size: Tokens.Font.n13))
-                    .foregroundStyle(colors.text2)
-                if let errorMessage {
-                    Text(errorMessage)
-                        .font(.system(size: Tokens.Font.n13))
-                        .foregroundStyle(colors.errfg)
-                        .accessibilityLabel(errorMessage)
-                }
-                CButton(text: saving ? "正在保存…" : (firstLaunch ? "进入" : "保存"), loading: saving, action: save)
-                if firstLaunch {
-                    CButton(text: "跳过", variant: .ghost, enabled: !saving, action: save)
-                } else if let onCancel {
-                    CButton(text: "取消", variant: .ghost, enabled: !saving, action: onCancel)
-                }
-            }
-            .padding(.horizontal, Tokens.Space.pageX)
-            .padding(.vertical, Tokens.Space.contentTop)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(colors.page)
-    }
-
-    private var scopeRows: some View {
-        VStack(spacing: 0) {
-            CCheckRow(label: "国考", isOn: $selection.national, enabled: !saving)
-            CCheckRow(label: "省考", isOn: $selection.provincial, enabled: !saving,
-                      warningText: selection.provinceMissing ? "未选省份" : nil)
-            CCheckRow(label: "事业编", isOn: $selection.institution, enabled: !saving)
-            CCheckRow(label: "教师编", isOn: .constant(false), enabled: false,
-                      trailingText: "暂不支持", showsDivider: false)
-        }
-    }
-
-    private var provinceRows: some View {
-        VStack(spacing: 0) {
-            ForEach(provinces, id: \.self) { province in
-                CCheckRow(label: province, isOn: Binding(
-                    get: { selection.provinces.contains(province) },
-                    set: { selected in
-                        if selected {
-                            selection.provinces.insert(province)
-                        } else {
-                            selection.provinces.remove(province)
-                        }
-                    }
-                ), enabled: !saving, showsDivider: province != provinces.last)
-            }
-        }
-    }
-
-    private func save() {
-        guard !saving else { return }
-        saving = true
-        errorMessage = nil
-        defer { saving = false }
-        do {
-            try onSave(selection)
-        } catch {
-            errorMessage = "保存失败，请重试。当前选择已保留。"
+            )
         }
     }
 }

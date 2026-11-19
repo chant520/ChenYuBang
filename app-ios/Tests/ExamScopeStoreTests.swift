@@ -24,7 +24,7 @@ final class ExamScopeStoreTests: XCTestCase {
         XCTAssertTrue(preferences.scope.provincial)
         XCTAssertTrue(preferences.scope.institution)
         XCTAssertTrue(preferences.scope.provinces.isEmpty)
-        XCTAssertTrue(preferences.scope.provinceMissing)
+        XCTAssertEqual(preferences.scope.description, "国考 · 省考 · 事业编")
     }
 
     func testEnterOrSkipPersistsCurrentSelectionIncludingAllCancelled() throws {

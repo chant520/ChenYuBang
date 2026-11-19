@@ -2,6 +2,7 @@ plugins {
     id("com.android.library")
     kotlin("android")
     kotlin("plugin.compose")
+    id("io.github.takahirom.roborazzi")
 }
 
 android {
@@ -24,6 +25,13 @@ android {
     buildFeatures {
         compose = true
     }
+
+    // 页面快照（Roborazzi）需要读取 Android 资源，规范 §11.1 / §13
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
 }
 
 // 依赖方向硬规则（规范 §3 / §4.4）：
@@ -33,4 +41,21 @@ android {
 dependencies {
     api(project(":core-ui"))
     implementation(project(":core-data"))
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
+    // BackHandler：本页有未保存改动时先问是否放弃（IA 4.2 / 5.2）
+    implementation("androidx.activity:activity-compose:1.9.3")
+
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("io.github.takahirom.roborazzi:roborazzi:1.13.0")
+    testImplementation("io.github.takahirom.roborazzi:roborazzi-junit-rule:1.13.0")
+    testImplementation("io.github.takahirom.roborazzi:roborazzi-compose:1.13.0")
+    testImplementation("androidx.compose.ui:ui-test-junit4")
+    testImplementation("org.robolectric:robolectric:4.13")
+    testImplementation("androidx.test:core:1.6.1")
+    testImplementation("androidx.compose.ui:ui-test-manifest")
+}
+
+// 页面快照基线入库（规范 §11.1）：record 写入此目录、verify 与此目录比对。
+roborazzi {
+    outputDir.set(file("src/test/snapshots"))
 }

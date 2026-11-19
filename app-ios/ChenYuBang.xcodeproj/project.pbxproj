@@ -13,6 +13,9 @@
 		A00000000000000000000022 /* MistakeFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000132 /* MistakeFeature.swift */; };
 		A00000000000000000000023 /* ReviewFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000133 /* ReviewFeature.swift */; };
 		A00000000000000000000024 /* MeFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000134 /* MeFeature.swift */; };
+		A00000000000000000000026 /* LibraryBrowse.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000136 /* LibraryBrowse.swift */; };
+		A00000000000000000000027 /* LibraryScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000137 /* LibraryScreen.swift */; };
+		A00000000000000000000028 /* ExamScopeScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000138 /* ExamScopeScreen.swift */; };
 		A00000000000000000000025 /* CaptureFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000135 /* CaptureFeature.swift */; };
 		A00000000000000000000030 /* ChenYuBangTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000140 /* ChenYuBangTests.swift */; };
 		A00000000000000000000031 /* IdiomSearchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000141 /* IdiomSearchTests.swift */; };
@@ -52,6 +55,10 @@
 		A0000000000000000000008A /* CCheckRowSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000018A /* CCheckRowSnapshotTests.swift */; };
 		A0000000000000000000008B /* CSpinnerSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000018B /* CSpinnerSnapshotTests.swift */; };
 		A0000000000000000000008C /* CIconSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000018C /* CIconSnapshotTests.swift */; };
+		A0000000000000000000008D /* IdiomDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000018D /* IdiomDetail.swift */; };
+		A0000000000000000000008E /* P05IdiomDetailScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000018E /* P05IdiomDetailScreen.swift */; };
+		A0000000000000000000008F /* IdiomSearchUi.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000018F /* IdiomSearchUi.swift */; };
+		A00000000000000000000090 /* P04SearchScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000190 /* P04SearchScreen.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -74,6 +81,9 @@
 		A00000000000000000000133 /* ReviewFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewFeature.swift; sourceTree = "<group>"; };
 		A00000000000000000000134 /* MeFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeFeature.swift; sourceTree = "<group>"; };
 		A00000000000000000000135 /* CaptureFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureFeature.swift; sourceTree = "<group>"; };
+		A00000000000000000000136 /* LibraryBrowse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryBrowse.swift; sourceTree = "<group>"; };
+		A00000000000000000000137 /* LibraryScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryScreen.swift; sourceTree = "<group>"; };
+		A00000000000000000000138 /* ExamScopeScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExamScopeScreen.swift; sourceTree = "<group>"; };
 		A00000000000000000000140 /* ChenYuBangTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChenYuBangTests.swift; sourceTree = "<group>"; };
 		A00000000000000000000141 /* IdiomSearchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdiomSearchTests.swift; sourceTree = "<group>"; };
 		A00000000000000000000150 /* ChenYuBangTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ChenYuBangTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -105,6 +115,10 @@
 		A0000000000000000000018A /* CCheckRowSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CCheckRowSnapshotTests.swift; sourceTree = "<group>"; };
 		A0000000000000000000018B /* CSpinnerSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSpinnerSnapshotTests.swift; sourceTree = "<group>"; };
 		A0000000000000000000018C /* CIconSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CIconSnapshotTests.swift; sourceTree = "<group>"; };
+		A0000000000000000000018D /* IdiomDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdiomDetail.swift; sourceTree = "<group>"; };
+		A0000000000000000000018E /* P05IdiomDetailScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P05IdiomDetailScreen.swift; sourceTree = "<group>"; };
+		A0000000000000000000018F /* IdiomSearchUi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdiomSearchUi.swift; sourceTree = "<group>"; };
+		A00000000000000000000190 /* P04SearchScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P04SearchScreen.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -174,6 +188,12 @@
 			isa = PBXGroup;
 			children = (
 				A00000000000000000000130 /* IdiomFeature.swift */,
+				A00000000000000000000136 /* LibraryBrowse.swift */,
+				A00000000000000000000137 /* LibraryScreen.swift */,
+				A0000000000000000000018D /* IdiomDetail.swift */,
+				A0000000000000000000018E /* P05IdiomDetailScreen.swift */,
+				A0000000000000000000018F /* IdiomSearchUi.swift */,
+				A00000000000000000000190 /* P04SearchScreen.swift */,
 			);
 			path = FeatureIdiom;
 			sourceTree = "<group>";
@@ -206,6 +226,7 @@
 			isa = PBXGroup;
 			children = (
 				A00000000000000000000134 /* MeFeature.swift */,
+				A00000000000000000000138 /* ExamScopeScreen.swift */,
 			);
 			path = FeatureMe;
 			sourceTree = "<group>";
@@ -381,10 +402,17 @@
 				A00000000000000000000039 /* AppRouteHost.swift in Sources */,
 				A0000000000000000000003A /* FirstLaunchGate.swift in Sources */,
 				A00000000000000000000020 /* IdiomFeature.swift in Sources */,
+				A00000000000000000000026 /* LibraryBrowse.swift in Sources */,
+				A00000000000000000000027 /* LibraryScreen.swift in Sources */,
+				A0000000000000000000008D /* IdiomDetail.swift in Sources */,
+				A0000000000000000000008E /* P05IdiomDetailScreen.swift in Sources */,
+				A0000000000000000000008F /* IdiomSearchUi.swift in Sources */,
+				A00000000000000000000090 /* P04SearchScreen.swift in Sources */,
 				A00000000000000000000021 /* ExampleFeature.swift in Sources */,
 				A00000000000000000000022 /* MistakeFeature.swift in Sources */,
 				A00000000000000000000023 /* ReviewFeature.swift in Sources */,
 				A00000000000000000000024 /* MeFeature.swift in Sources */,
+				A00000000000000000000028 /* ExamScopeScreen.swift in Sources */,
 				A00000000000000000000025 /* CaptureFeature.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

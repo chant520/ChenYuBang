@@ -20,13 +20,13 @@ public struct ExamScopeSelection: Equatable, Sendable {
     }
 
     public var isEmpty: Bool { !national && !provincial && !institution }
-    public var provinceMissing: Bool { provincial && provinces.isEmpty }
+
+    /// 范围行文字（信息架构 v1.4 §5.4）：只列国考 / 省考 / 事业编三段；
+    /// 省考勾选时省份默认全选、省考内容正常显示，省份仅为筛选维度，不在范围行里展开省份清单。
     public var description: String {
         var labels: [String] = []
         if national { labels.append("国考") }
-        if provincial {
-            labels.append(provinceMissing ? "省考（未选省份）" : "省考 · " + provinces.sorted().joined(separator: "、"))
-        }
+        if provincial { labels.append("省考") }
         if institution { labels.append("事业编") }
         return labels.isEmpty ? "未选考试范围" : labels.joined(separator: " · ")
     }

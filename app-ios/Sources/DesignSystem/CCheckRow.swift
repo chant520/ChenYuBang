@@ -6,7 +6,7 @@ import CangyuTokens
 /// 行：gap 10pt、padding 12pt 0、13pt text、行底 1px line2 分隔（末行由容器置 showsDivider = false）；
 /// 勾选框 18×18pt、圆角 4pt：选中 accent 底 + accent 描边 + 对勾 12pt stroke 2 chkfg；
 /// 未选透明底 + line 描边；禁用 disbg 底 + disline 描边、无对勾，行文字 disfg。
-/// 右侧可选挂行内警示（规范 5.4，如 P01「未选省份」）或纯文字（规范 5.15 `.r`，11pt text3），
+/// 右侧可选挂行内警示（规范 5.4）或纯文字（规范 5.15 `.r`，11pt text3），
 /// 警示优先。整行可点切换，按下按规范 5.0 亮度 ×0.9。
 /// 加载 / 错误态不适用。
 public struct CCheckRow: View {

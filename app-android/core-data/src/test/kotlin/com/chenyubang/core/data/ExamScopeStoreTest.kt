@@ -36,7 +36,7 @@ class ExamScopeStoreTest {
             val preferences = store.load()
             assertFalse(preferences.complete)
             assertEquals(ExamScopeSelection(), preferences.scope)
-            assertTrue(preferences.scope.provinceMissing)
+            assertEquals("国考 · 省考 · 事业编", preferences.scope.description)
             assertTrue(store.availableProvinces().isEmpty())
         }
 

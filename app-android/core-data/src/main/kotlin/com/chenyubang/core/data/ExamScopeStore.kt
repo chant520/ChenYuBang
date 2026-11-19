@@ -14,12 +14,15 @@ data class ExamScopeSelection(
     val provinces: Set<String> = emptySet(),
 ) {
     val isEmpty: Boolean get() = !national && !provincial && !institution
-    val provinceMissing: Boolean get() = provincial && provinces.isEmpty()
+
+    /**
+     * 范围行文字（IA v1.4 §5.4）：只列国考 / 省考 / 事业编三段；
+     * 省考勾选时省份默认全选、省考内容正常显示，省份仅为筛选维度，不在范围行里展开省份清单。
+     */
     val description: String get() =
         listOfNotNull(
             "国考".takeIf { national },
-            (if (provinceMissing) "省考（未选省份）" else "省考 · ${provinces.sorted().joinToString("、")}")
-                .takeIf { provincial },
+            "省考".takeIf { provincial },
             "事业编".takeIf { institution },
         ).joinToString(" · ").ifEmpty { "未选考试范围" }
 }

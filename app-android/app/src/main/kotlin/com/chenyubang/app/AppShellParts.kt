@@ -1,0 +1,54 @@
+package com.chenyubang.app
+
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.chenyubang.core.ui.CButton
+import com.chenyubang.core.ui.CButtonVariant
+import com.chenyubang.core.ui.COverlay
+import com.chenyubang.core.ui.CTabBar
+import com.chenyubang.core.ui.tokens.Tokens
+
+/** 路由外壳的固定部件（初始化态 / 退出确认 / 底部标签栏），从 RouterShell 拆出以保持可读。 */
+
+@Composable
+internal fun InitializingScreen(
+    failed: Boolean,
+    onRetry: () -> Unit,
+) {
+    val colors = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
+    Column(Modifier.padding(Tokens.Space.pageX.dp)) {
+        Text(
+            if (failed) "本机数据或内置题库初始化失败，请重试" else "正在初始化本机数据与内置题库",
+            color = if (failed) colors.warnfg else colors.text2,
+            fontSize = Tokens.Font.n13.sp,
+        )
+        if (failed) CButton("重试初始化", onRetry)
+    }
+}
+
+@Composable
+internal fun AppTabs(
+    selectedIndex: Int,
+    onSelect: (Int) -> Unit,
+) {
+    CTabBar(AppTab.entries.map { it.label }, selectedIndex, onSelect = onSelect)
+}
+
+@Composable
+internal fun ExitReviewOverlay(
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit,
+) {
+    val colors = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
+    COverlay("放弃本轮复习？", true, onDismiss) {
+        Text("退出会丢弃本轮进度。", color = colors.text2, fontSize = Tokens.Font.n12.sp)
+        CButton("确认退出", onConfirm)
+        CButton("继续复习", onDismiss, variant = CButtonVariant.Ghost)
+    }
+}

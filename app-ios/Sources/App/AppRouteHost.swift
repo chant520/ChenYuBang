@@ -106,11 +106,43 @@ private struct AppRoutePage: View {
 
     var body: some View {
         if entry.route == .scope, let preferences = launch.preferences {
-            ExamScopeEditor(initial: preferences.scope, availableProvinces: launch.availableProvinces,
-                            firstLaunch: false, onSave: { scope in
-                try launch.save(scope: scope, complete: false)
-                router.back()
-            }, onCancel: router.back)
+            ExamScopeScreen(
+                mode: .settings,
+                initial: preferences.scope,
+                availableProvinces: launch.availableProvinces,
+                onSave: { scope, complete in
+                    try launch.save(scope: scope, complete: complete)
+                    router.back()
+                },
+                onCancel: { router.back() }
+            )
+        } else if entry.route == .library,
+                  let preferences = launch.preferences,
+                  let reader = launch.libraryReader {
+            LibraryScreen(
+                scope: preferences.scope,
+                reader: reader,
+                onOpenScope: { _ = router.push(.scope) },
+                onOpenIdiom: { id in _ = router.push(.idiomDetail, recordID: id) },
+                onSearch: { _ = router.openSearch() },
+                onBack: router.canGoBack ? { router.back() } : nil
+            )
+        } else if entry.route == .idiomDetail,
+                  let reader = launch.libraryReader,
+                  let idiomID = entry.recordID {
+            P05IdiomDetailScreen(
+                id: idiomID,
+                reader: reader,
+                onBack: { router.back() },
+                onOpenMistakes: { router.goToMistakes() }
+            )
+        } else if entry.route == .search,
+                  let reader = launch.libraryReader {
+            P04SearchScreen(
+                reader: reader,
+                onClose: { router.back() },
+                onOpenIdiom: { id in _ = router.push(.idiomDetail, recordID: id) }
+            )
         } else {
             RoutePlaceholderPage(router: router, launch: launch, entry: entry, tab: tab)
         }
@@ -159,8 +191,6 @@ private struct RoutePlaceholderPage: View {
             CButton(text: "成语库", variant: .ghost) { router.push(.library) }
             CButton(text: "搜索", variant: .ghost) { router.openSearch() }
             CButton(text: "去错题本", variant: .ghost, action: router.goToMistakes)
-        case .library:
-            CButton(text: "搜索", variant: .ghost) { router.openSearch() }
         case .profile:
             CButton(text: "考试范围", variant: .ghost) { router.push(.scope) }
             CButton(text: "备份与恢复", variant: .ghost) { router.push(.backup) }

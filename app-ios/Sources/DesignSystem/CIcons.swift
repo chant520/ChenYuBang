@@ -13,6 +13,15 @@ public enum CIcons {
         case warn
         case err
         case info
+        case search
+        case chevron
+        case book
+        /// P04 顶部关闭 / 输入框清空（高保真稿 A P04 顶部 X）。
+        case close
+        /// P05 详情返回（高保真稿 A P05 顶部返回）。
+        case back
+        /// P05 读音播放预留位（高保真稿 A P05 成语名右侧图标）。
+        case sound
     }
 
     /// 生成按 size 缩放后的路径（viewBox 24 → size，规范 §6）。
@@ -60,6 +69,52 @@ public enum CIcons {
             path.addLine(to: CGPoint(x: 12, y: 16))
             path.move(to: CGPoint(x: 12, y: 8))
             path.addLine(to: CGPoint(x: 12, y: 8.5))
+        case .search:
+            // circle cx11 cy11 r6.5 + M20 20l-4.6-4.6（P03 顶栏搜索）
+            path.addEllipse(in: CGRect(x: 4.5, y: 4.5, width: 13, height: 13))
+            path.move(to: CGPoint(x: 20, y: 20))
+            path.addLine(to: CGPoint(x: 15.4, y: 15.4))
+        case .chevron:
+            // M9 5l7 7-7 7（范围卡「改范围」的右尖角）
+            path.move(to: CGPoint(x: 9, y: 5))
+            path.addLine(to: CGPoint(x: 16, y: 12))
+            path.addLine(to: CGPoint(x: 9, y: 19))
+        case .book:
+            // M4 4h6l2 2 2-2h6v16h-6l-2 2-2-2H4z + M12 6v16（P01 品牌块书本）
+            path.move(to: CGPoint(x: 4, y: 4))
+            path.addLine(to: CGPoint(x: 10, y: 4))
+            path.addLine(to: CGPoint(x: 12, y: 6))
+            path.addLine(to: CGPoint(x: 14, y: 4))
+            path.addLine(to: CGPoint(x: 20, y: 4))
+            path.addLine(to: CGPoint(x: 20, y: 20))
+            path.addLine(to: CGPoint(x: 14, y: 20))
+            path.addLine(to: CGPoint(x: 12, y: 22))
+            path.addLine(to: CGPoint(x: 10, y: 20))
+            path.addLine(to: CGPoint(x: 4, y: 20))
+            path.closeSubpath()
+            path.move(to: CGPoint(x: 12, y: 6))
+            path.addLine(to: CGPoint(x: 12, y: 22))
+        case .close:
+            // M6 6l12 12M18 6l-12 12（P04 关闭 / 清空）
+            path.move(to: CGPoint(x: 6, y: 6))
+            path.addLine(to: CGPoint(x: 18, y: 18))
+            path.move(to: CGPoint(x: 18, y: 6))
+            path.addLine(to: CGPoint(x: 6, y: 18))
+        case .back:
+            // M15 5l-7 7 7 7（P05 返回）
+            path.move(to: CGPoint(x: 15, y: 5))
+            path.addLine(to: CGPoint(x: 8, y: 12))
+            path.addLine(to: CGPoint(x: 15, y: 19))
+        case .sound:
+            // M4 13v6h6l10-10-6-6z + M9 5l6 6（P05 读音预留）
+            path.move(to: CGPoint(x: 4, y: 13))
+            path.addLine(to: CGPoint(x: 4, y: 19))
+            path.addLine(to: CGPoint(x: 10, y: 19))
+            path.addLine(to: CGPoint(x: 20, y: 9))
+            path.addLine(to: CGPoint(x: 14, y: 3))
+            path.closeSubpath()
+            path.move(to: CGPoint(x: 9, y: 5))
+            path.addLine(to: CGPoint(x: 15, y: 11))
         }
         return path
     }

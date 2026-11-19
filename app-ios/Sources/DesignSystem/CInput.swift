@@ -24,22 +24,30 @@ public struct CInput: View {
     private let state: CInputState
     private let placeholder: String?
     private let errorHint: String?
+    private let autoFocus: Bool
+    private let clearAction: (() -> Void)?
 
     /// - Parameters:
     ///   - text: 文本绑定。
     ///   - state: 外部状态；.focus 也可由真实聚焦自动触发，.disabled / .error 以外部为准。
     ///   - placeholder: 占位文案（色 text3，规范 5.3）。
     ///   - errorHint: 校验错误提示，仅 .error 态渲染于框下（11.5px/1.55 errfg）。
+    ///   - autoFocus: P04 搜索进页自动聚焦（信息架构 v1.3 P04 ①）。
+    ///   - clearAction: 非空时显示输入框内清空按钮（P04 顶部清空）。
     public init(
         text: Binding<String>,
         state: CInputState = .default,
         placeholder: String? = nil,
-        errorHint: String? = nil
+        errorHint: String? = nil,
+        autoFocus: Bool = false,
+        clearAction: (() -> Void)? = nil
     ) {
         self._text = text
         self.state = state
         self.placeholder = placeholder
         self.errorHint = errorHint
+        self.autoFocus = autoFocus
+        self.clearAction = clearAction
     }
 
     public var body: some View {
@@ -93,6 +101,22 @@ public struct CInput: View {
             RoundedRectangle(cornerRadius: Tokens.Radius.r5)
                 .strokeBorder(border(colors), lineWidth: 1)
         )
+        .overlay(alignment: .trailing) {
+            if let clearAction, !text.isEmpty, state != .disabled {
+                Button(action: clearAction) {
+                    CIcon(.close, size: Tokens.Icon.n14, strokeWidth: 1.6, color: colors.text3)
+                        .frame(width: Tokens.Space.hitMin, height: Tokens.Space.hitMin)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(CPressDimStyle())
+                .accessibilityLabel("清空")
+            }
+        }
+        .onAppear {
+            if autoFocus {
+                isFocused = true
+            }
+        }
     }
 
     /// 外部状态与真实聚焦的合成：禁用 / 错误以外部为准，聚焦由 @FocusState 自动呈现。

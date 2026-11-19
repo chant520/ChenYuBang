@@ -53,6 +53,19 @@ abstract class IdiomDao {
     @Query("SELECT * FROM idiom WHERE id = :id")
     abstract suspend fun byId(id: String): IdiomEntity?
 
+    /**
+     * 成语库一次取全量（A1；§4.2「1,286 条一次性进内存做分组」，不分页）。
+     *
+     * 只返回已挂到启用范围上的成语：`idiom_scope` 由启用的 `exam_scope` 行重建（§4.6），
+     * 省考勾选时省份默认全选、省考内容正常显示（信息架构 v1.4，推翻决策 I）。
+     * 只读查询，不改表结构、不加迁移、不改既有方法签名。
+     */
+    @Query(
+        "SELECT idiom.* FROM idiom JOIN (SELECT DISTINCT idiomId FROM idiom_scope) AS scope " +
+            "ON idiom.id = scope.idiomId ORDER BY idiom.initials, idiom.word",
+    )
+    abstract suspend fun libraryIdioms(): List<IdiomEntity>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun upsertAll(idioms: List<IdiomEntity>)
 

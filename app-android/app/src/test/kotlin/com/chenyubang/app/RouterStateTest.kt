@@ -137,14 +137,13 @@ class RouterStateTest {
     }
 
     @Test
-    fun firstLaunchAllCancelledIsValidAndProvinceDefaultsEmpty() {
+    fun firstLaunchDefaultsShowPlainThreePartScope() {
         val defaults = ExamScopeSelection()
         assertTrue(defaults.national && defaults.provincial && defaults.institution)
         assertTrue(defaults.provinces.isEmpty())
-        assertTrue(defaults.provinceMissing)
+        assertEquals("国考 · 省考 · 事业编", defaults.description)
         val cancelled = defaults.copy(national = false, provincial = false, institution = false)
         assertTrue(cancelled.isEmpty)
-        assertFalse(cancelled.provinceMissing)
         assertEquals("未选考试范围", cancelled.description)
     }
 }

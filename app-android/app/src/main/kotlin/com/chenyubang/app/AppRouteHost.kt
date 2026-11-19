@@ -44,8 +44,8 @@ import com.chenyubang.core.ui.CChromeIcon
 import com.chenyubang.core.ui.CFab
 import com.chenyubang.core.ui.CInput
 import com.chenyubang.core.ui.COverlay
-import com.chenyubang.core.ui.CTabBar
 import com.chenyubang.core.ui.tokens.Tokens
+import com.chenyubang.feature.me.ExamScopeSaver
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -61,7 +61,6 @@ fun AppRouteHost(database: AppDatabase) {
     var loadError by remember { mutableStateOf(false) }
     var loadAttempt by remember { mutableStateOf(0) }
     var availableProvinces by remember { mutableStateOf(emptyList<String>()) }
-    val colors = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
     LaunchedEffect(database, loadAttempt) {
         loadError = false
         try {
@@ -72,7 +71,20 @@ fun AppRouteHost(database: AppDatabase) {
             importer.import(pack)
             currentPack = pack
             availableProvinces = scopeStore.availableProvinces()
-            preferences = scopeStore.load()
+            val loaded = scopeStore.load()
+            if (!loaded.complete) {
+                // P01 首次启动即按产品默认写入 exam_scope（国考 + 省考 + 事业编，省考省份默认全选）；
+                // 库中已有范围行时 loaded.scope 就是既有值，原样写回，不覆盖用户设置。
+                val scope =
+                    if (loaded.scope == ExamScopeSelection()) {
+                        loaded.scope.copy(provinces = availableProvinces.toSet())
+                    } else {
+                        loaded.scope
+                    }
+                scopeStore.save(scope, complete = false)
+                importer.refreshScopeLinks(pack)
+            }
+            preferences = loaded
         } catch (cancelled: CancellationException) {
             throw cancelled
         } catch (_: Exception) {
@@ -81,28 +93,22 @@ fun AppRouteHost(database: AppDatabase) {
     }
     val loaded = preferences
     if (loaded == null) {
-        Column(Modifier.padding(Tokens.Space.pageX.dp)) {
-            Text(
-                if (loadError) "本机数据或内置题库初始化失败，请重试" else "正在初始化本机数据与内置题库",
-                color = if (loadError) colors.warnfg else colors.text2,
-                fontSize = Tokens.Font.n13.sp,
-            )
-            if (loadError) CButton("重试初始化", { loadAttempt++ })
-        }
+        InitializingScreen(loadError) { loadAttempt++ }
         return
     }
     val pack = requireNotNull(currentPack)
-    val save: suspend (ExamScopeSelection, Boolean) -> Unit = { scope, complete ->
-        scopeStore.save(scope, complete = complete)
-        importer.refreshScopeLinks(pack)
-    }
+    val saver =
+        ExamScopeSaver { scope, complete ->
+            scopeStore.save(scope, complete = complete)
+            importer.refreshScopeLinks(pack)
+        }
     if (!loaded.complete) {
-        FirstLaunchGate(loaded.scope, availableProvinces, { save(it, true) }) {
+        FirstLaunchGate(loaded.scope, availableProvinces, saver) {
             preferences = LaunchPreferences(true, it)
         }
         return
     }
-    RouterShell(loaded.scope, availableProvinces, { save(it, false) }) {
+    RouterShell(loaded.scope, availableProvinces, saver, database) {
         preferences = loaded.copy(scope = it)
     }
 }
@@ -111,52 +117,42 @@ fun AppRouteHost(database: AppDatabase) {
 private fun RouterShell(
     scope: ExamScopeSelection,
     availableProvinces: List<String>,
-    onSaveScope: suspend (ExamScopeSelection) -> Unit,
+    scopeSaver: ExamScopeSaver,
+    database: AppDatabase,
     onScopeSaved: (ExamScopeSelection) -> Unit,
 ) {
     var router by rememberSaveable { mutableStateOf(RouterState()) }
     var confirmExit by remember { mutableStateOf(false) }
     val holder = rememberSaveableStateHolder()
     val colors = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
-    val back = {
-        if (router.current.route == Route.Queue) confirmExit = true else router = router.back()
-    }
+    val back = { if (router.current.route == Route.Queue) confirmExit = true else router = router.back() }
     BackHandler(enabled = router.stack.size > 1 || router.modal != null, onBack = back)
+    val onSearch: (() -> Unit)? =
+        if (router.current.route == Route.Library) ({ router = router.push(Route.Search) }) else null
     Box(Modifier.fillMaxSize().background(colors.page)) {
         Column(Modifier.fillMaxSize()) {
-            RouteHeader(router, back) { router = router.cancelCapture() }
+            RouteHeader(router = router, back = back, onSearch = onSearch)
             Box(Modifier.weight(1f)) {
                 val entry = router.current
                 holder.SaveableStateProvider("${router.tab.name}:${entry.instance}") {
-                    if (entry.route == Route.Scope) {
-                        ExamScopeEditor(scope, availableProvinces, false, onSaveScope) {
-                            onScopeSaved(it)
-                            router = router.back()
-                        }
-                    } else {
-                        RoutePlaceholder(router, scope, { router = it })
-                    }
+                    val deps = RouteDeps(scope, database, availableProvinces, scopeSaver, onScopeSaved)
+                    RouteContent(entry, router, deps) { router = it }
                 }
             }
             if (router.showTabs) {
-                CTabBar(
-                    AppTab.entries.map { it.label },
-                    router.tab.ordinal,
-                    onSelect = { router = router.selectTab(AppTab.entries[it]) },
-                )
+                AppTabs(router.tab.ordinal) { router = router.selectTab(AppTab.entries[it]) }
             }
         }
         if (router.showFab) CaptureShortcut { router = router.startCapture() }
         RouterModal(router, { router = router.dismissModal() })
         if (confirmExit) {
-            COverlay("放弃本轮复习？", true, { confirmExit = false }) {
-                Text("退出会丢弃本轮进度。", color = colors.text2, fontSize = Tokens.Font.n12.sp)
-                CButton("确认退出", {
+            ExitReviewOverlay(
+                onDismiss = { confirmExit = false },
+                onConfirm = {
                     confirmExit = false
                     router = router.back()
-                })
-                CButton("继续复习", { confirmExit = false }, variant = CButtonVariant.Ghost)
-            }
+                },
+            )
         }
     }
 }
@@ -180,7 +176,7 @@ private fun BoxScope.CaptureShortcut(onClick: () -> Unit) {
 }
 
 @Composable
-private fun RoutePlaceholder(
+internal fun RoutePlaceholder(
     router: RouterState,
     scope: ExamScopeSelection,
     update: (RouterState) -> Unit,
@@ -226,12 +222,6 @@ private fun PlaceholderLinks(
             CButton("进入成语库", { update(router.push(Route.Library)) })
             CButton("搜索", { update(router.push(Route.Search)) }, variant = CButtonVariant.Ghost)
             CButton("去错题本", { update(router.goToMistakes()) }, variant = CButtonVariant.Ghost)
-        }
-        Route.Library -> {
-            RouteScopeLine(scope)
-            CButton("考试范围", { update(router.push(Route.Scope)) }, variant = CButtonVariant.Ghost)
-            CButton("搜索", { update(router.push(Route.Search)) })
-            PlaceholderFilters(listOf("考试范围", "首字母", "考频"))
         }
         Route.Search -> SearchPlaceholder()
         Route.Examples -> CButton("考试范围", { update(router.push(Route.Scope)) }, variant = CButtonVariant.Ghost)
@@ -298,7 +288,9 @@ private fun PlaceholderFilters(labels: List<String>) {
 private fun RouteScopeLine(scope: ExamScopeSelection) {
     val colors = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
     Text(scope.description, color = colors.text2, fontSize = Tokens.Font.n13.sp)
-    if (scope.provinceMissing) Text("省考内容暂不显示，选好省份即可看到", color = colors.warnfg, fontSize = Tokens.Font.n12.sp)
+    if (scope.provincial) {
+        Text("省份用于筛选省考内容，可自行增减", color = colors.text3, fontSize = Tokens.Font.n12.sp)
+    }
     if (scope.isEmpty) Text("不选范围时成语库和例题库会是空的，可以稍后在『我的』里改", color = colors.text3, fontSize = Tokens.Font.n12.sp)
 }
 
