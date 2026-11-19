@@ -375,6 +375,10 @@
 
 <p><b>v2 变更说明</b>：字号收敛至 v1.1 的 11 档（文档标题 22→23px、次级页名 17→15px）；修复 .lmeta 规则中的字面换行符；弹层圆角统一 6px；P08「拍照录题」按钮图标由 home 更正为相机。--modal 遮罩色保留原值，其余数值与 v1 一致。</p>
 
+<p><b>v2.1 变更说明</b>（2026-11-19，语义修正同步）：P08 明确只显示标记为错题的题；P09 由「某成语下的错题列表」改为「某成语下的录入题」，标错的题挂「错题」徽标按错题展示，未标错的照常列出。仅文案与措辞同步，颜色/字号/圆角/间距/图标数值不变。</p>
+
+<p><b>v2.2 变更说明</b>（2026-11-19，省份口径同步）：省考勾选时省份默认全选、省份仅作筛选维度，取消「未选省份」异常态与橙警示。P13「我的」页考试范围行的「省考（未选省份）」改普通「省考」。仅文案与措辞同步，颜色/字号/圆角/间距/图标数值不变。</p>
+
   <p>第二批 P06–P13：例题两条、错题三条、复习两条、我的。同上批一致，全部取自规范第 2–4 章；深色按页底口径。</p>
   <p>两处按规范做了取舍：P10 顶部「删除」改中性色，把红留给底部「删除这道错题」（一处红规则）；P11 判错不铺红——判错不是状态错误，红只归破坏性动作与硬错误。</p>
 
@@ -573,7 +577,7 @@
 
 </div>
 
-<p class="grphd">P08 · 错题列表<span>一级页；顶部主按钮与悬浮按钮是同一入口，按决策D 都保留</span></p>
+<p class="grphd">P08 · 错题列表<span>一级页；只显示标记为错题的题；顶部主按钮「拍照录题」与悬浮按钮是同一录入入口，按决策D 都保留</span></p>
 
 <div class="row">
 
@@ -689,12 +693,12 @@
 
 </div>
 
-<p class="grphd">P09 · 某成语下的错题列表<span>二级页；页名即成语名，释义行可回 P05</span></p>
+<p class="grphd">P09 · 某成语下的录入题<span>二级页；展示我录入的题，标错的挂「错题」徽标按错题展示；页名即成语名，释义行可回 P05</span></p>
 
 <div class="row">
 
   <div class="col">
-    <p class="vname">浅色模式 · 某成语下的错题列表<em>P09</em></p>
+    <p class="vname">浅色模式 · 某成语下的录入题<em>P09</em></p>
 
     <div class="phone h812 lt">
 <div class="top"><svg class="ic" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>
@@ -707,18 +711,19 @@
     </div>
   </div>
 
+  <p class="lbl">我录入的题（标错的按错题展示）</p>
   <div class="list">
     <div class="lrow">
       <p class="lsub" style="margin:0">下列各句中，加点的成语使用不恰当的一项是</p>
-      <div class="lmeta"><span>2026-11-14 录入</span><span class="tag">待复习</span><span>望文生义</span></div>
+      <div class="lmeta"><span class="badgerr">错题</span><span>2026-11-14 录入</span><span class="tag">待复习</span><span>望文生义</span></div>
     </div>
     <div class="lrow">
       <p class="lsub" style="margin:0">填入横线处最恰当的一项：改革不能______</p>
-      <div class="lmeta"><span>2026-11-09 录入</span><span class="tag ghost">已掌握</span><span>对象误用</span></div>
+      <div class="lmeta"><span class="badgerr">错题</span><span>2026-11-09 录入</span><span class="tag ghost">已掌握</span><span>对象误用</span></div>
     </div>
     <div class="lrow">
       <p class="lsub" style="margin:0">文段中三处成语使用，哪一处不当</p>
-      <div class="lmeta"><span>2026-10-28 录入</span><span class="tag">待复习</span><span>望文生义</span></div>
+      <div class="lmeta"><span class="tag">我录入</span><span>2026-10-28 录入</span><span>未标错</span></div>
     </div>
   </div>
   <p class="listfoot">3 道 · 已到末尾</p>
@@ -727,7 +732,7 @@
   </div>
 
   <div class="col">
-    <p class="vname">深色模式 · 某成语下的错题列表<em>P09</em></p>
+    <p class="vname">深色模式 · 某成语下的录入题<em>P09</em></p>
 
     <div class="phone h812 dk">
 <div class="top"><svg class="ic" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>
@@ -740,18 +745,19 @@
     </div>
   </div>
 
+  <p class="lbl">我录入的题（标错的按错题展示）</p>
   <div class="list">
     <div class="lrow">
       <p class="lsub" style="margin:0">下列各句中，加点的成语使用不恰当的一项是</p>
-      <div class="lmeta"><span>2026-11-14 录入</span><span class="tag">待复习</span><span>望文生义</span></div>
+      <div class="lmeta"><span class="badgerr">错题</span><span>2026-11-14 录入</span><span class="tag">待复习</span><span>望文生义</span></div>
     </div>
     <div class="lrow">
       <p class="lsub" style="margin:0">填入横线处最恰当的一项：改革不能______</p>
-      <div class="lmeta"><span>2026-11-09 录入</span><span class="tag ghost">已掌握</span><span>对象误用</span></div>
+      <div class="lmeta"><span class="badgerr">错题</span><span>2026-11-09 录入</span><span class="tag ghost">已掌握</span><span>对象误用</span></div>
     </div>
     <div class="lrow">
       <p class="lsub" style="margin:0">文段中三处成语使用，哪一处不当</p>
-      <div class="lmeta"><span>2026-10-28 录入</span><span class="tag">待复习</span><span>望文生义</span></div>
+      <div class="lmeta"><span class="tag">我录入</span><span>2026-10-28 录入</span><span>未标错</span></div>
     </div>
   </div>
   <p class="listfoot">3 道 · 已到末尾</p>
@@ -1073,7 +1079,7 @@
 <div class="body">
   <div class="card" style="padding:12px 16px;margin-bottom:14px">
     <div class="row1">
-      <span class="range" style="margin:0">考试范围：<b>国考 · <span class="warn">省考（未选省份）</span> · 事业编</b></span>
+      <span class="range" style="margin:0">考试范围：<b>国考 · 省考 · 事业编</b></span>
       <svg class="ic sm ac" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
     </div>
   </div>
@@ -1129,7 +1135,7 @@
 <div class="body">
   <div class="card" style="padding:12px 16px;margin-bottom:14px">
     <div class="row1">
-      <span class="range" style="margin:0">考试范围：<b>国考 · <span class="warn">省考（未选省份）</span> · 事业编</b></span>
+      <span class="range" style="margin:0">考试范围：<b>国考 · 省考 · 事业编</b></span>
       <svg class="ic sm ac" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
     </div>
   </div>

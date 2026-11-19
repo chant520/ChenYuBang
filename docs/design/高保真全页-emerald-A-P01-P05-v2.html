@@ -375,11 +375,15 @@
 
 <p><b>v2 变更说明</b>：字号收敛至 v1.1 的 11 档（品牌名/成语名 26→20px、文档标题 22→23px、字母索引 8.5→10px、次级页名 17→15px）；修复 .lmeta 规则中的字面换行符；弹层圆角统一 6px；P05 收藏改「收藏（预留）」幽灵标签（线框 v0.2 标注预留）。--modal 遮罩色保留原值，其余数值与 v1 一致。</p>
 
+<p><b>v2.1 变更说明</b>（2026-11-19，语义修正同步）：P05「相关真题」区扩展为双来源——「系统题库」+「我录入的题」，区块标题改「相关题目」并分组标注来源；标错的录入题挂「做错」徽标；P05 底部卡片「我在这个成语上错过 3 道题 / 点数字看这 3 道题」改「我在这个成语下录入了 N 道题 / 点数字看这些录入题」（N 为全部录入题数，含未标错，示意值 3）。仅文案与措辞同步，颜色/字号/圆角/间距/图标数值不变。</p>
+
+<p><b>v2.2 变更说明</b>（2026-11-19，省份口径同步）：省考勾选时省份默认全选、省份仅作筛选维度，取消「未选省份」异常态与整套橙警示。P01 启动引导省考项改中性「省份全选」并去橙字与警示行；P02 推荐首页范围行「省考（未选省份）」改普通「省考」、删警示行；P03 范围卡按已拍板的方案 A 同排布局（范围文字与「调整省份」链接同排，下方说明行改中性筛选说明）。仅文案、措辞与同排结构同步，颜色/字号/圆角/间距/图标数值不变，P01–P05 编号不变。</p>
+
   <p>按《设计规范 v1.1》铺全 23 页，本文件是第一批 P01–P05。色值、字号、圆角、间距全部取自规范第 2–4 章，未新增规范外数值；深色按<b>页底 #101E17 口径</b>。</p>
-    <p>规则落地要点：P10 顶部「删除」改中性色以守一处红（见文件 C）；P19 识别失败、P10 原图丢失沿用警示橙；P01 三项默认勾选、省考只勾选不选省份，橙提示落在这一处。</p>
+    <p>规则落地要点：P10 顶部「删除」改中性色以守一处红（见文件 C）；P19 识别失败、P10 原图丢失沿用警示橙；P01 三项默认勾选、省考勾选时省份默认全选，省份仅作筛选，不设橙提示。</p>
 
 </header>
-<p class="grphd">P01 · 启动页<span>全屏浮层，无标签栏；三项默认已勾选，省考勾选但未选省份</span></p>
+<p class="grphd">P01 · 启动页<span>全屏浮层，无标签栏；三项默认已勾选，省考勾选时省份默认全选</span></p>
 
 <div class="row">
 
@@ -404,14 +408,11 @@
     <div class="chkrow" style="border-bottom:0">
       <span class="chk"><svg viewBox="0 0 24 24"><path d="M5 12l4.5 4.5L19 7"/></svg></span>
       <span>省考</span>
-      <span class="winline" style="margin-left:auto">
-        <svg viewBox="0 0 24 24"><path d="M12 4l8 15H4z"/><path d="M12 9v4"/><path d="M12 16.5v.5"/></svg>
-        未选省份
-      </span>
+      <span class="r">省份全选</span>
     </div>
     <div class="hintrow" style="padding:0 0 4px">
-      <p class="hint">省考内容暂不显示，选好省份即可看到</p>
-      <span class="linkbtn">去选省份</span>
+      <p class="hint">省份用于筛选省考内容，可自行增减</p>
+      <span class="linkbtn">调整省份</span>
     </div>
     <div class="chkrow" style="border-bottom:0;margin-top:4px">
       <span class="chk"><svg viewBox="0 0 24 24"><path d="M5 12l4.5 4.5L19 7"/></svg></span>
@@ -448,14 +449,11 @@
     <div class="chkrow" style="border-bottom:0">
       <span class="chk"><svg viewBox="0 0 24 24"><path d="M5 12l4.5 4.5L19 7"/></svg></span>
       <span>省考</span>
-      <span class="winline" style="margin-left:auto">
-        <svg viewBox="0 0 24 24"><path d="M12 4l8 15H4z"/><path d="M12 9v4"/><path d="M12 16.5v.5"/></svg>
-        未选省份
-      </span>
+      <span class="r">省份全选</span>
     </div>
     <div class="hintrow" style="padding:0 0 4px">
-      <p class="hint">省考内容暂不显示，选好省份即可看到</p>
-      <span class="linkbtn">去选省份</span>
+      <p class="hint">省份用于筛选省考内容，可自行增减</p>
+      <span class="linkbtn">调整省份</span>
     </div>
     <div class="chkrow" style="border-bottom:0;margin-top:4px">
       <span class="chk"><svg viewBox="0 0 24 24"><path d="M5 12l4.5 4.5L19 7"/></svg></span>
@@ -493,13 +491,10 @@
       <div class="ctitle">进入成语库</div>
       <svg class="ic sm ac" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
     </div>
-    <p class="range">当前考试范围：<b>国考 · <span class="warn">省考（未选省份）</span> · 事业编</b></p>
+    <p class="range">当前考试范围：<b>国考 · 省考 · 事业编</b></p>
     <div class="hintrow">
-      <span class="winline">
-        <svg viewBox="0 0 24 24"><path d="M12 4l8 15H4z"/><path d="M12 9v4"/><path d="M12 16.5v.5"/></svg>
-        省考内容暂不显示，选好省份即可看到
-      </span>
-      <span class="linkbtn">去选省份</span>
+      <p class="hint">省份用于筛选省考内容，可自行增减</p>
+      <span class="linkbtn">调整省份</span>
     </div>
     <p class="dims">浏览维度：按范围 / 按首字母 / 按考频</p>
   </div>
@@ -543,13 +538,10 @@
       <div class="ctitle">进入成语库</div>
       <svg class="ic sm ac" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
     </div>
-    <p class="range">当前考试范围：<b>国考 · <span class="warn">省考（未选省份）</span> · 事业编</b></p>
+    <p class="range">当前考试范围：<b>国考 · 省考 · 事业编</b></p>
     <div class="hintrow">
-      <span class="winline">
-        <svg viewBox="0 0 24 24"><path d="M12 4l8 15H4z"/><path d="M12 9v4"/><path d="M12 16.5v.5"/></svg>
-        省考内容暂不显示，选好省份即可看到
-      </span>
-      <span class="linkbtn">去选省份</span>
+      <p class="hint">省份用于筛选省考内容，可自行增减</p>
+      <span class="linkbtn">调整省份</span>
     </div>
     <p class="dims">浏览维度：按范围 / 按首字母 / 按考频</p>
   </div>
@@ -593,9 +585,10 @@
 <div class="body" style="padding-right:20px">
   <div class="card" style="padding:11px 16px;margin-bottom:12px">
     <div class="row1">
-      <span class="range" style="margin:0">范围：<b>国考 · 事业编</b></span>
-      <span class="more">改范围<svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></span>
+      <span class="range" style="margin:0">范围：<b>国考 · 省考 · 事业编</b></span>
+      <span class="linkbtn">调整省份</span>
     </div>
+    <p class="hint" style="margin-top:8px">省份用于筛选省考内容，可自行增减</p>
   </div>
 
   <div class="seg">
@@ -650,9 +643,10 @@
 <div class="body" style="padding-right:20px">
   <div class="card" style="padding:11px 16px;margin-bottom:12px">
     <div class="row1">
-      <span class="range" style="margin:0">范围：<b>国考 · 事业编</b></span>
-      <span class="more">改范围<svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></span>
+      <span class="range" style="margin:0">范围：<b>国考 · 省考 · 事业编</b></span>
+      <span class="linkbtn">调整省份</span>
     </div>
+    <p class="hint" style="margin-top:8px">省份用于筛选省考内容，可自行增减</p>
   </div>
 
   <div class="seg">
@@ -777,7 +771,7 @@
 
 </div>
 
-<p class="grphd">P05 · 成语详情<span>二级页，长页；错题只给数字不给条目，复习按钮在页尾</span></p>
+<p class="grphd">P05 · 成语详情<span>二级页，长页；关联题目分「系统题库 / 我录入的题」两来源，错题只给数字不给条目，复习按钮在页尾</span></p>
 
 <div class="row">
 
@@ -825,7 +819,8 @@
   </div>
 
   <div class="card">
-    <p class="lbl">相关真题</p>
+    <p class="lbl">相关题目</p>
+    <p class="dims">系统题库</p>
     <div class="lrow" style="padding:0 0 10px;border-bottom:1px solid var(--line2)">
       <p class="lsub" style="margin:0">下列各句中，加点的成语使用不恰当的一项是</p>
       <div class="lmeta"><span>2023 · 国考</span><span>言语理解</span></div>
@@ -834,14 +829,19 @@
       <p class="lsub" style="margin:0">填入横线处最恰当的一项（节选）</p>
       <div class="lmeta"><span>2022 · 湖北省考</span><span>逻辑填空</span></div>
     </div>
+    <p class="dims">我录入的题（标错才进错题本）</p>
+    <div class="lrow" style="padding:10px 0 0;border-bottom:0">
+      <p class="lsub" style="margin:0">「按部就班」语境判断（我拍照录入）</p>
+      <div class="lmeta"><span>我录入</span><span class="badgerr">做错</span></div>
+    </div>
   </div>
 
   <div class="card">
     <div class="row1">
-      <span class="lbl" style="margin:0">我在这个成语上错过</span>
+      <span class="lbl" style="margin:0">我在这个成语下录入了</span>
       <span style="font-size:20px;font-weight:700;color:var(--hot)">3 道题</span>
     </div>
-    <div class="hintrow"><p class="hint">点数字看这 3 道题</p><span class="linkbtn">去错题本</span></div>
+    <div class="hintrow"><p class="hint">点数字看这些录入题</p><span class="linkbtn">去错题本</span></div>
   </div>
 
   <div class="btn">复习这个成语</div>
@@ -895,7 +895,8 @@
   </div>
 
   <div class="card">
-    <p class="lbl">相关真题</p>
+    <p class="lbl">相关题目</p>
+    <p class="dims">系统题库</p>
     <div class="lrow" style="padding:0 0 10px;border-bottom:1px solid var(--line2)">
       <p class="lsub" style="margin:0">下列各句中，加点的成语使用不恰当的一项是</p>
       <div class="lmeta"><span>2023 · 国考</span><span>言语理解</span></div>
@@ -904,14 +905,19 @@
       <p class="lsub" style="margin:0">填入横线处最恰当的一项（节选）</p>
       <div class="lmeta"><span>2022 · 湖北省考</span><span>逻辑填空</span></div>
     </div>
+    <p class="dims">我录入的题（标错才进错题本）</p>
+    <div class="lrow" style="padding:10px 0 0;border-bottom:0">
+      <p class="lsub" style="margin:0">「按部就班」语境判断（我拍照录入）</p>
+      <div class="lmeta"><span>我录入</span><span class="badgerr">做错</span></div>
+    </div>
   </div>
 
   <div class="card">
     <div class="row1">
-      <span class="lbl" style="margin:0">我在这个成语上错过</span>
+      <span class="lbl" style="margin:0">我在这个成语下录入了</span>
       <span style="font-size:20px;font-weight:700;color:var(--hot)">3 道题</span>
     </div>
-    <div class="hintrow"><p class="hint">点数字看这 3 道题</p><span class="linkbtn">去错题本</span></div>
+    <div class="hintrow"><p class="hint">点数字看这些录入题</p><span class="linkbtn">去错题本</span></div>
   </div>
 
   <div class="btn">复习这个成语</div>

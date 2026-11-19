@@ -393,11 +393,15 @@
 
 <p><b>v2 变更说明（2026-11-17）</b>：本次为已拍板方案与已确认缺陷的直接落地，原 D 稿（v1）一字不改、保留历史。两项拍板：① P16「题库检查失败 / 下载中断」由红错误条改为橙警示条（可恢复异常），同步修正页首色语义说明与覆盖表第 19 行；② 覆盖表第 4 行措辞改为不声称 P02 主态已覆盖，P02 两屏范围行「国考 · 事业编」保持不动、不新增屏。四类回潮缺陷：CSS 中混入的字面换行转义符（反斜杠加 n）已还原为正常规则；字号收敛（次级页名 17→15px、品牌名 26→20px、P05 成语名 24→20px；文档标题 22→23px，非 App UI 构件）；弹层圆角统一回归 6px。顺带补齐 .steptxt 定义、E08 成语名避开 E13 分组。其余数值与 v1 一致。</p>
 
+<p><b>v2.1 变更说明</b>（2026-11-19，语义修正同步）：P08 空态保留「还没有错题」，引导语改「拍照录入题目并标记为错题」口径；P05 错过 0 题引导语同口径同步，P05 各态「相关真题」标签对齐为「相关题目」并标注「系统题库」来源，汇总标签「我在这个成语上错过」→「我在这个成语下录入了」、空态引导语「还没在这个成语上错过题」→「还没在这个成语下录入题」（N=0 灰显不可点口径保留）；P20 异常态同步「是否做错」字段与「保存到我的题库」按钮文案。仅文案与措辞同步，颜色/字号/圆角/间距/图标数值不变。</p>
+
+<p><b>v2.2 变更说明</b>（2026-11-19，省份口径同步）：取消「未选省份」异常态与整套橙警示——省考勾选时省份默认全选、省份仅作筛选维度。页首色语义说明删去「未选省份」；P03 原「省考未选省份」屏改为中性「省份筛选后无匹配」空态（范围行去橙字、链接改「调整省份」，下方中性筛选说明，空态主按钮「调整省份筛选」）；P01 启动页副标题去掉对决策 I 橙提示的引用；覆盖表第 4 行同步改口径。仅文案、措辞与状态展示同步，颜色/字号/圆角/间距/图标数值不变。</p>
+
   <p>这一批把 IA v1.1 · 5.4 空态与异常态清单落成可见屏：清单共 25 行，其中 <b>22 行</b>在这里单独出稿（浅/深各一屏，共 44 屏），另 <b>3 行</b>按规范处理 — 见文末覆盖表。</p>
-  <p>色语义沿用定稿口径：<b>中性</b>＝空、无数据、纯信息；<b>橙</b>＝可恢复异常（权限、识别失败、未选省份、检查失败 / 下载中断）；<b>红</b>＝硬错误（删除、清空）。红永不作主按钮，空态里的主按钮一律是绿。</p>
+  <p>色语义沿用定稿口径：<b>中性</b>＝空、无数据、纯信息；<b>橙</b>＝可恢复异常（权限、识别失败、检查失败 / 下载中断）；<b>红</b>＝硬错误（删除、清空）。红永不作主按钮，空态里的主按钮一律是绿。省份仅作筛选维度，不再属于异常态，不设橙警示。</p>
 
 </header>
-<p class="grphd">P01 · 启动页 · 三项全取消<span>不阻断进入；软提示走中性色，不与决策I 的橙提示抢注意力</span></p>
+<p class="grphd">P01 · 启动页 · 三项全取消<span>不阻断进入；软提示走中性色</span></p>
 
 <div class="row">
 
@@ -617,76 +621,64 @@
 
 </div>
 
-<p class="grphd">P03 · 成语库 · 省考未选省份<span>范围行写明未选省份，橙色警示只此一处</span></p>
+<p class="grphd">P03 · 成语库 · 省份筛选后无匹配<span>省份仅作筛选；筛选后无匹配走中性空态，橙色警示取消</span></p>
 
 <div class="row">
 
   <div class="col">
-    <p class="vname">浅色模式 · 成语库 · 省考未选省份<em>P03</em></p>
+    <p class="vname">浅色模式 · 成语库 · 省份筛选后无匹配<em>P03</em></p>
 
     <div class="phone h812 lt">
 <div class="top"><svg class="ic" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg><div class="pname">成语库</div><svg class="ic ac" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.6-4.6"/></svg></div>
 <div class="body" style="padding-top:16px">
   <div class="card" style="padding:12px 16px;margin-bottom:12px">
     <div class="row1">
-      <span class="range" style="margin:0">范围：<b>国考 · 省考<span style="color:var(--warnfg)">（未选省份）</span> · 事业编</b></span>
-      <span class="linkbtn">去选省份</span>
+      <span class="range" style="margin:0">范围：<b>国考 · 省考 · 事业编</b></span>
+      <span class="linkbtn">调整省份</span>
     </div>
-    <p class="hint" style="margin-top:6px">省考内容暂不显示，选好省份即可看到；国考与事业编的成语照常可用。</p>
+    <p class="hint" style="margin-top:6px">省份用于筛选省考内容，可自行增减。</p>
   </div>
 
   <div class="seg"><i class="on">按考试范围</i><i>按首字母</i><i>按考频</i></div>
 
-  <div class="list" style="margin-top:12px">
-    <div class="lrow">
-      <div class="lt1"><span class="lname">按部就班</span><span class="lpy">àn bù jiù bān</span></div>
-      <div class="lmeta"><span class="tag">高频</span><span class="distag">未学</span></div>
-    </div>
-    <div class="lrow">
-      <div class="lt1"><span class="lname">别出心裁</span><span class="lpy">bié chū xīn cái</span></div>
-      <div class="lmeta"><span class="tag">高频</span><span class="distag">未学</span></div>
-    </div>
-    <div class="lrow">
-      <div class="lt1"><span class="lname">墨守成规</span><span class="lpy">mò shǒu chéng guī</span></div>
-      <div class="lmeta"><span class="distag">未学</span></div>
+  <div class="empty">
+    <div class="eic"><svg viewBox="0 0 24 24"><path d="M4 4h6.5v16H4z"/><path d="M13.5 4H20v16h-6.5z"/></svg></div>
+    <p class="et1">当前省份筛选下没有成语</p>
+    <p class="et2">已选省份里没有收录符合条件的成语。省份只用于筛选省考内容，调整后可立即看到结果；国考与事业编的成语照常可用。</p>
+    <div class="eact">
+      <div class="btn" style="margin-top:0">调整省份筛选</div>
     </div>
   </div>
-  <p class="listfoot">共 1,286 条 · 已到末尾</p>
+  <p class="listfoot">共 0 条</p>
 </div>
 </div>
   </div>
 
   <div class="col">
-    <p class="vname">深色模式 · 成语库 · 省考未选省份<em>P03</em></p>
+    <p class="vname">深色模式 · 成语库 · 省份筛选后无匹配<em>P03</em></p>
 
     <div class="phone h812 dk">
 <div class="top"><svg class="ic" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg><div class="pname">成语库</div><svg class="ic ac" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.6-4.6"/></svg></div>
 <div class="body" style="padding-top:16px">
   <div class="card" style="padding:12px 16px;margin-bottom:12px">
     <div class="row1">
-      <span class="range" style="margin:0">范围：<b>国考 · 省考<span style="color:var(--warnfg)">（未选省份）</span> · 事业编</b></span>
-      <span class="linkbtn">去选省份</span>
+      <span class="range" style="margin:0">范围：<b>国考 · 省考 · 事业编</b></span>
+      <span class="linkbtn">调整省份</span>
     </div>
-    <p class="hint" style="margin-top:6px">省考内容暂不显示，选好省份即可看到；国考与事业编的成语照常可用。</p>
+    <p class="hint" style="margin-top:6px">省份用于筛选省考内容，可自行增减。</p>
   </div>
 
   <div class="seg"><i class="on">按考试范围</i><i>按首字母</i><i>按考频</i></div>
 
-  <div class="list" style="margin-top:12px">
-    <div class="lrow">
-      <div class="lt1"><span class="lname">按部就班</span><span class="lpy">àn bù jiù bān</span></div>
-      <div class="lmeta"><span class="tag">高频</span><span class="distag">未学</span></div>
-    </div>
-    <div class="lrow">
-      <div class="lt1"><span class="lname">别出心裁</span><span class="lpy">bié chū xīn cái</span></div>
-      <div class="lmeta"><span class="tag">高频</span><span class="distag">未学</span></div>
-    </div>
-    <div class="lrow">
-      <div class="lt1"><span class="lname">墨守成规</span><span class="lpy">mò shǒu chéng guī</span></div>
-      <div class="lmeta"><span class="distag">未学</span></div>
+  <div class="empty">
+    <div class="eic"><svg viewBox="0 0 24 24"><path d="M4 4h6.5v16H4z"/><path d="M13.5 4H20v16h-6.5z"/></svg></div>
+    <p class="et1">当前省份筛选下没有成语</p>
+    <p class="et2">已选省份里没有收录符合条件的成语。省份只用于筛选省考内容，调整后可立即看到结果；国考与事业编的成语照常可用。</p>
+    <div class="eact">
+      <div class="btn" style="margin-top:0">调整省份筛选</div>
     </div>
   </div>
-  <p class="listfoot">共 1,286 条 · 已到末尾</p>
+  <p class="listfoot">共 0 条</p>
 </div>
 </div>
   </div>
@@ -825,16 +817,16 @@
   </div>
 
   <div class="card">
-    <p class="lbl">相关真题</p>
+    <p class="lbl">相关题目</p>
     <div class="eb">
       <svg viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/></svg>
-      <p class="et1">暂无真题，后续补充</p>
+      <p class="et1">系统题库暂无真题，后续补充</p>
       <p class="et2">这一格留在原位，不隐藏也不给入口。</p>
     </div>
   </div>
 
   <div class="card" style="padding:12px 16px">
-    <div class="row1"><span class="hint" style="margin:0">我在这个成语上错过</span><span class="more">3 道题 <svg class="ic sm ac" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></span></div>
+    <div class="row1"><span class="hint" style="margin:0">我在这个成语下录入了</span><span class="more">3 道题 <svg class="ic sm ac" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></span></div>
   </div>
   <div class="btn">复习这个成语</div>
 </div>
@@ -857,16 +849,16 @@
   </div>
 
   <div class="card">
-    <p class="lbl">相关真题</p>
+    <p class="lbl">相关题目</p>
     <div class="eb">
       <svg viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/></svg>
-      <p class="et1">暂无真题，后续补充</p>
+      <p class="et1">系统题库暂无真题，后续补充</p>
       <p class="et2">这一格留在原位，不隐藏也不给入口。</p>
     </div>
   </div>
 
   <div class="card" style="padding:12px 16px">
-    <div class="row1"><span class="hint" style="margin:0">我在这个成语上错过</span><span class="more">3 道题 <svg class="ic sm ac" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></span></div>
+    <div class="row1"><span class="hint" style="margin:0">我在这个成语下录入了</span><span class="more">3 道题 <svg class="ic sm ac" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></span></div>
   </div>
   <div class="btn">复习这个成语</div>
 </div>
@@ -890,19 +882,19 @@
   <div class="tagrow" style="margin-bottom:14px"><span class="tag">褒义</span></div>
 
   <div class="card">
-    <p class="lbl">相关真题</p>
+    <p class="lbl">相关题目</p>
     <p class="txt k" style="margin:0 0 4px">下列各句中，加点的成语使用不恰当的一项是</p>
-    <p class="txt dim" style="margin:0">2023 · 国考 · 言语理解 · 单选题</p>
+    <p class="txt dim" style="margin:0">系统题库 · 2023 · 国考 · 言语理解 · 单选题</p>
   </div>
 
   <div class="card" style="padding:14px 16px">
     <div class="row1">
-      <span class="hint" style="margin:0">我在这个成语上错过</span>
+      <span class="hint" style="margin:0">我在这个成语下录入了</span>
       <span style="font-size:20px;font-weight:700;color:var(--text3);letter-spacing:.01em">0 <span style="font-size:12px;font-weight:400">道题</span></span>
     </div>
-    <p class="hint" style="margin-top:8px">还没在这个成语上错过题</p>
+    <p class="hint" style="margin-top:8px">还没在这个成语下录入题</p>
     <div class="ghostbtn" style="flex:none;width:100%;display:block;margin-top:12px">去错题本</div>
-    <p class="hint" style="margin-top:8px">在错题页拍一张卷子上的错题，就会归到这个成语下。</p>
+    <p class="hint" style="margin-top:8px">拍照录入题目并标记为错题，就会归到这个成语下。</p>
   </div>
 </div>
 </div>
@@ -919,19 +911,19 @@
   <div class="tagrow" style="margin-bottom:14px"><span class="tag">褒义</span></div>
 
   <div class="card">
-    <p class="lbl">相关真题</p>
+    <p class="lbl">相关题目</p>
     <p class="txt k" style="margin:0 0 4px">下列各句中，加点的成语使用不恰当的一项是</p>
-    <p class="txt dim" style="margin:0">2023 · 国考 · 言语理解 · 单选题</p>
+    <p class="txt dim" style="margin:0">系统题库 · 2023 · 国考 · 言语理解 · 单选题</p>
   </div>
 
   <div class="card" style="padding:14px 16px">
     <div class="row1">
-      <span class="hint" style="margin:0">我在这个成语上错过</span>
+      <span class="hint" style="margin:0">我在这个成语下录入了</span>
       <span style="font-size:20px;font-weight:700;color:var(--text3);letter-spacing:.01em">0 <span style="font-size:12px;font-weight:400">道题</span></span>
     </div>
-    <p class="hint" style="margin-top:8px">还没在这个成语上错过题</p>
+    <p class="hint" style="margin-top:8px">还没在这个成语下录入题</p>
     <div class="ghostbtn" style="flex:none;width:100%;display:block;margin-top:12px">去错题本</div>
-    <p class="hint" style="margin-top:8px">在错题页拍一张卷子上的错题，就会归到这个成语下。</p>
+    <p class="hint" style="margin-top:8px">拍照录入题目并标记为错题，就会归到这个成语下。</p>
   </div>
 </div>
 </div>
@@ -955,7 +947,7 @@
 
   <div class="card" style="padding:14px 16px">
     <div class="row1">
-      <span class="hint" style="margin:0">我在这个成语上错过</span>
+      <span class="hint" style="margin:0">我在这个成语下录入了</span>
       <span class="more">2 道题 <svg class="ic sm ac" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></span>
     </div>
   </div>
@@ -978,7 +970,7 @@
 
   <div class="card" style="padding:14px 16px">
     <div class="row1">
-      <span class="hint" style="margin:0">我在这个成语上错过</span>
+      <span class="hint" style="margin:0">我在这个成语下录入了</span>
       <span class="more">2 道题 <svg class="ic sm ac" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></span>
     </div>
   </div>
@@ -1125,7 +1117,7 @@
 
 </div>
 
-<p class="grphd">P08 · 错题列表 · 还没有错题<span>插画位 + 一句来源说明 + 拍照录入第一道题</span></p>
+<p class="grphd">P08 · 错题列表 · 还没有错题<span>插画位 + 引导语（拍照录入并标记为错题）+ 拍照录入第一道题</span></p>
 
 <div class="row">
 
@@ -1147,7 +1139,7 @@
   <div class="empty">
     <div class="eic"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13"/><circle cx="12" cy="13.5" r="3.6"/><path d="M8.5 7l1.4-3h4.2l1.4 3"/></svg></div>
     <p class="et1">还没有错题</p>
-    <p class="et2">拍一张卷子上的错题，就会归到对应成语下。</p>
+    <p class="et2">拍照录入题目并标记为错题，就会归到对应成语下。</p>
     <div class="eact"><div class="btn" style="margin-top:0">拍照录入第一道题</div></div>
   </div>
 </div>
@@ -1181,7 +1173,7 @@
   <div class="empty">
     <div class="eic"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13"/><circle cx="12" cy="13.5" r="3.6"/><path d="M8.5 7l1.4-3h4.2l1.4 3"/></svg></div>
     <p class="et1">还没有错题</p>
-    <p class="et2">拍一张卷子上的错题，就会归到对应成语下。</p>
+    <p class="et2">拍照录入题目并标记为错题，就会归到对应成语下。</p>
     <div class="eact"><div class="btn" style="margin-top:0">拍照录入第一道题</div></div>
   </div>
 </div>
@@ -1713,8 +1705,8 @@
     <p class="hint" style="margin:10px 0 0;text-align:center">会开一个搜索浮层（同 P04），挑完回到这一页</p>
   </div>
 
-  <p class="hint" style="margin-top:2px">我的答案、错因、标签、来源照常可填；成语没选中时「保存」不可用。</p>
-  <div class="disbtn" style="margin-top:10px">保存这道错题</div>
+  <p class="hint" style="margin-top:2px">我的答案、是否做错、错因、标签、来源照常可填；成语没选中时「保存」不可用。</p>
+  <div class="disbtn" style="margin-top:10px">保存到我的题库</div>
 </div>
 </div>
   </div>
@@ -1741,8 +1733,8 @@
     <p class="hint" style="margin:10px 0 0;text-align:center">会开一个搜索浮层（同 P04），挑完回到这一页</p>
   </div>
 
-  <p class="hint" style="margin-top:2px">我的答案、错因、标签、来源照常可填；成语没选中时「保存」不可用。</p>
-  <div class="disbtn" style="margin-top:10px">保存这道错题</div>
+  <p class="hint" style="margin-top:2px">我的答案、是否做错、错因、标签、来源照常可填；成语没选中时「保存」不可用。</p>
+  <div class="disbtn" style="margin-top:10px">保存到我的题库</div>
 </div>
 </div>
   </div>
@@ -1829,7 +1821,7 @@
 <tr><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#5c6369;width:34px">1</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6">P02 推荐区没有内容</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#22262a">E02 单独出稿</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#4a5157">中性占位，无按钮</td></tr>
 <tr><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#5c6369;width:34px">2</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6">P02 新装错题数 0</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#22262a">E03 单独出稿</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#4a5157">中性；数字写 0</td></tr>
 <tr><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#5c6369;width:34px">3</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6">P03 该范围+首字母下没有成语</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#22262a">E05 单独出稿</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#4a5157">中性；主按钮绿（清除条件）</td></tr>
-<tr><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#5c6369;width:34px">4</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6">P02 / P03 省考未选省份</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#22262a">E04 出 P03 视角；P02 省考未选省份提示见全页 A v2 推荐首页主态范围行，本稿不重复出屏</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#4a5157">橙一处 + 绿链接</td></tr>
+<tr><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#5c6369;width:34px">4</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6">P03 省份筛选后无匹配（原「省考未选省份」口径已废）</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#22262a">E04 出 P03 视角；省份默认全选、仅作筛选，原橙警示取消，本稿改中性空态</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#4a5157">中性无橙；主按钮绿（调整省份筛选）</td></tr>
 <tr><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#5c6369;width:34px">5</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6">P04 输入无匹配</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#22262a">E06 单独出稿</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#4a5157">中性；不清空输入</td></tr>
 <tr><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#5c6369;width:34px">6</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6">P05 暂无关联真题</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#22262a">E07 单独出稿</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#4a5157">中性；区块不隐藏、无按钮</td></tr>
 <tr><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#5c6369;width:34px">7</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6">P05 错过 0 题</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#22262a">E08 单独出稿</td><td style="padding:9px 10px;border-bottom:1px solid #dfe3e6;font-size:12px;line-height:1.6;color:#4a5157">中性；数字灰不可点，给导航按钮</td></tr>
