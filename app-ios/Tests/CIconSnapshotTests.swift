@@ -7,7 +7,7 @@ import CangyuTokens
 // 构件黄金快照（规范 §11.1 / §7）：CI 设 SNAPSHOT_RECORD=1 录制，默认 verify 比对。
 // 基线目录为 __Snapshots__/<本文件名去扩展名>/，每个构件独立存放。
 
-/// 内联矢量图标快照（规范 §6）：5 语义 × 浅/深。
+/// 内联矢量图标快照（规范 §6）：11 语义 × 浅/深。
 /// 18pt 档描边 1.8（尺寸-描边表）；色取 token 文字色（图标与文字同色，不另取第二种强调色）。
 @MainActor
 final class CIconSnapshotTests: XCTestCase {
@@ -78,5 +78,53 @@ final class CIconSnapshotTests: XCTestCase {
 
     func testIconInfoDark() {
         assertIcon(kind: .info, dark: true)
+    }
+
+    func testIconSearchLight() {
+        assertIcon(kind: .search, dark: false)
+    }
+
+    func testIconSearchDark() {
+        assertIcon(kind: .search, dark: true)
+    }
+
+    func testIconChevronLight() {
+        assertIcon(kind: .chevron, dark: false)
+    }
+
+    func testIconChevronDark() {
+        assertIcon(kind: .chevron, dark: true)
+    }
+
+    func testIconBookLight() {
+        assertIcon(kind: .book, dark: false)
+    }
+
+    func testIconBookDark() {
+        assertIcon(kind: .book, dark: true)
+    }
+
+    func testIconCloseLight() {
+        assertIcon(kind: .close, dark: false)
+    }
+
+    func testIconCloseDark() {
+        assertIcon(kind: .close, dark: true)
+    }
+
+    func testIconBackLight() {
+        assertIcon(kind: .back, dark: false)
+    }
+
+    func testIconBackDark() {
+        assertIcon(kind: .back, dark: true)
+    }
+
+    func testIconSoundLight() {
+        assertIcon(kind: .sound, dark: false)
+    }
+
+    func testIconSoundDark() {
+        assertIcon(kind: .sound, dark: true)
     }
 }

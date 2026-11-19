@@ -7,8 +7,9 @@ import CangyuTokens
 // 构件黄金快照（规范 §11.1 / §7）：CI 设 SNAPSHOT_RECORD=1 录制，默认 verify 比对。
 // 基线目录为 __Snapshots__/<本文件名去扩展名>/，每个构件独立存放。
 
-/// 图片占位快照（规范 5.7 / 5.10）：中性 / 警示 / 骨架 / 截断 × 浅/深。
-/// 事务禁用动画仅用于静态外观快照，不覆盖系统 reduce-motion。
+/// 图片占位快照（规范 5.7 / 5.10）：中性 / 警示 / 骨架 / 截断 × 浅/深，另加骨架 reduce-motion 静态 × 浅/深。
+/// 骨架 reduce-motion 通过公开 environment 打开，覆盖「降级为静态色块、不渲染流光」生产分支（开发规范 §9.3）。
+/// 事务禁用动画仅用于静态外观快照，不改系统值。
 /// 截断态含下方标线，画布加高避免裁切。
 @MainActor
 final class CImagePlaceholderSnapshotTests: XCTestCase {
@@ -33,12 +34,14 @@ final class CImagePlaceholderSnapshotTests: XCTestCase {
     private func assertPlaceholder(
         kind: CImagePlaceholder.Kind,
         dark: Bool,
+        reduceMotion: Bool = false,
         file: StaticString = #filePath,
         testName: String = #function,
         line: UInt = #line
     ) {
         let view = placeholder(kind)
             .environment(\.colorScheme, dark ? .dark : .light)
+            .environment(\.accessibilityReduceMotion, reduceMotion)
             .transaction { transaction in
                 transaction.animation = nil
                 transaction.disablesAnimations = true
@@ -82,5 +85,13 @@ final class CImagePlaceholderSnapshotTests: XCTestCase {
 
     func testImagePlaceholderTruncatedDark() {
         assertPlaceholder(kind: .truncated, dark: true)
+    }
+
+    func testImagePlaceholderSkeletonStaticLight() {
+        assertPlaceholder(kind: .skeleton, dark: false, reduceMotion: true)
+    }
+
+    func testImagePlaceholderSkeletonStaticDark() {
+        assertPlaceholder(kind: .skeleton, dark: true, reduceMotion: true)
     }
 }

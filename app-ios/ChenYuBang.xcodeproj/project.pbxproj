@@ -62,6 +62,11 @@
 		A00000000000000000000091 /* ExampleDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000191 /* ExampleDetail.swift */; };
 		A00000000000000000000092 /* P07ExampleDetailScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000192 /* P07ExampleDetailScreen.swift */; };
 		A00000000000000000000093 /* ExampleDetailTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000193 /* ExampleDetailTests.swift */; };
+		A00000000000000000000094 /* CCardSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000194 /* CCardSnapshotTests.swift */; };
+		A00000000000000000000095 /* CEmptyStateSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000195 /* CEmptyStateSnapshotTests.swift */; };
+		A00000000000000000000096 /* CLabelSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000196 /* CLabelSnapshotTests.swift */; };
+		A00000000000000000000097 /* CLetterIndexSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000197 /* CLetterIndexSnapshotTests.swift */; };
+		A00000000000000000000098 /* CLinkSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000198 /* CLinkSnapshotTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -125,6 +130,11 @@
 		A00000000000000000000191 /* ExampleDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleDetail.swift; sourceTree = "<group>"; };
 		A00000000000000000000192 /* P07ExampleDetailScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P07ExampleDetailScreen.swift; sourceTree = "<group>"; };
 		A00000000000000000000193 /* ExampleDetailTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleDetailTests.swift; sourceTree = "<group>"; };
+		A00000000000000000000194 /* CCardSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CCardSnapshotTests.swift; sourceTree = "<group>"; };
+		A00000000000000000000195 /* CEmptyStateSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CEmptyStateSnapshotTests.swift; sourceTree = "<group>"; };
+		A00000000000000000000196 /* CLabelSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLabelSnapshotTests.swift; sourceTree = "<group>"; };
+		A00000000000000000000197 /* CLetterIndexSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLetterIndexSnapshotTests.swift; sourceTree = "<group>"; };
+		A00000000000000000000198 /* CLinkSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLinkSnapshotTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -275,6 +285,11 @@
 				A0000000000000000000018B /* CSpinnerSnapshotTests.swift */,
 				A0000000000000000000018C /* CIconSnapshotTests.swift */,
 				A00000000000000000000193 /* ExampleDetailTests.swift */,
+				A00000000000000000000194 /* CCardSnapshotTests.swift */,
+				A00000000000000000000195 /* CEmptyStateSnapshotTests.swift */,
+				A00000000000000000000196 /* CLabelSnapshotTests.swift */,
+				A00000000000000000000197 /* CLetterIndexSnapshotTests.swift */,
+				A00000000000000000000198 /* CLinkSnapshotTests.swift */,
 				A00000000000000000000152 /* pack fixture */,
 			);
 			path = Tests;
@@ -457,6 +472,11 @@
 				A0000000000000000000008B /* CSpinnerSnapshotTests.swift in Sources */,
 				A0000000000000000000008C /* CIconSnapshotTests.swift in Sources */,
 				A00000000000000000000093 /* ExampleDetailTests.swift in Sources */,
+				A00000000000000000000094 /* CCardSnapshotTests.swift in Sources */,
+				A00000000000000000000095 /* CEmptyStateSnapshotTests.swift in Sources */,
+				A00000000000000000000096 /* CLabelSnapshotTests.swift in Sources */,
+				A00000000000000000000097 /* CLetterIndexSnapshotTests.swift in Sources */,
+				A00000000000000000000098 /* CLinkSnapshotTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
