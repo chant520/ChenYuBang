@@ -12,11 +12,11 @@ extension IdiomLibraryReader: IdiomLibraryReading {}
 
 /// 进页拉取触发点。阶段 1 只留接口、不联网；阶段 5 接入题库获取
 /// （两段式 latest.json + 整包校验 + 原子切换），失败回落内置包、不阻断浏览。
-public protocol LibraryRefreshTrigger {
+public protocol LibraryRefreshTrigger: Sendable {
     func onEnterLibrary() async
 }
 
-public struct NoLibraryRefreshTrigger: LibraryRefreshTrigger {
+public struct NoLibraryRefreshTrigger: LibraryRefreshTrigger, Sendable {
     public init() {}
     public func onEnterLibrary() async {}
 }
