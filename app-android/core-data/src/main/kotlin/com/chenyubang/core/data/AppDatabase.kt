@@ -203,9 +203,10 @@ interface MistakeDao {
         ReviewLogEntity::class,
         IdiomStateEntity::class,
         SettingEntity::class,
+        UserExampleEntity::class,
         IdiomFtsEntity::class,
     ],
-    version = 1,
+    version = 2,
     exportSchema = true,
 )
 @TypeConverters(Converters::class)

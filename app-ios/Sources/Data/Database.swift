@@ -117,6 +117,30 @@ public enum ChenYuBangDatabase {
             }
         }
 
+        migrator.registerMigration("v2") { db in
+            // v2（v1.5 口径，规范 §4.5）：用户拍照录入题（用户数据，绝不随题库包替换）
+            try db.create(table: "user_example") { t in
+                t.primaryKey("id", .text)
+                t.column("imagePath", .text)
+                t.column("ocrText", .text)
+                t.column("stem", .text).notNull()
+                t.column("optionA", .text)
+                t.column("optionB", .text)
+                t.column("optionC", .text)
+                t.column("optionD", .text)
+                t.column("myAnswer", .text)
+                t.column("isMistake", .boolean).notNull().defaults(to: false)
+                t.column("examType", .text)
+                t.column("year", .integer)
+                t.column("region", .text)
+                t.column("createdAt", .text).notNull()
+            }
+            // 错题行指向录入题；历史行保持 NULL，删除错题不删录入题
+            try db.alter(table: "mistake") { t in
+                t.add(column: "userExampleId", .text)
+            }
+        }
+
         return migrator
     }
 }

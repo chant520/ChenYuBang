@@ -1,7 +1,7 @@
 {
   "$comment": "数据库迁移版本表。口径写在 docs/开发规范-v1.6.md §4.5。两端各有一份实现，但版本号与表结构必须一致。",
-  "schemaVersion": 1,
-  "currentVersion": 1,
+  "schemaVersion": 2,
+  "currentVersion": 2,
   "rules": [
     "只增：新版本只能新增表或新增可空列，不删除、不改名、不改类型。",
     "每版必须同时提交 forward 迁移与回读校验（Android Room TestMigration、iOS GRDB DatabaseMigrator），校验内容：目标表行数、关键索引存在、外键可解析。",
@@ -21,6 +21,17 @@
       "fts": ["idiom_fts"],
       "android": "AppDatabase(version = 1)，schema 导出到 app-android/core-data/schemas/",
       "ios": "GRDB DatabaseMigrator.registerMigration(\"v1\") { db in … }"
+    },
+    {
+      "version": 2,
+      "status": "shipped",
+      "description": "v1.5 拍照链路语义修正的数据层：新增 user_example（用户拍照录入题，用户数据，绝不随题库包替换）；mistake 增 userExampleId 可空列（指向 user_example.id，历史行与旧备份导入保持 NULL）；只增不改不删",
+      "tables": ["user_example"],
+      "columns": [
+        { "table": "mistake", "column": "userExampleId", "type": "TEXT", "nullable": true }
+      ],
+      "android": "DbMigrations.MIGRATION_1_2（AppDatabase version = 2，schema 导出 2.json）；单测 UserExampleMigrationTest：正常路径 + 中断回滚",
+      "ios": "GRDB DatabaseMigrator.registerMigration(\"v2\")；单测 DatabaseMigrationTests：正常路径 + 中断回滚"
     }
   ]
 }

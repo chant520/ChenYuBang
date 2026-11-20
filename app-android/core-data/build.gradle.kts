@@ -28,6 +28,18 @@ android {
             isIncludeAndroidResources = true
         }
     }
+
+    // 迁移测试用 MigrationTestHelper 读导出的 schema JSON（规范 §4.5：迁移单测对齐导出 schema）
+    sourceSets {
+        getByName("test").assets.srcDir("$projectDir/schemas")
+    }
+}
+
+// schema JSON 由 KSP 在同一轮构建里生成；显式依赖，避免 assets 合并早于 schema 导出
+tasks.configureEach {
+    if (name.endsWith("UnitTestAssets")) {
+        dependsOn(tasks.matching { it.name.startsWith("ksp") && it.name.endsWith("Kotlin") })
+    }
 }
 
 // Room schema 导出目录：版本演进要能 diff，见规范 §4.5.3
@@ -47,4 +59,5 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     testImplementation("androidx.test:core:1.6.1")
     testImplementation("org.robolectric:robolectric:4.13")
+    testImplementation("androidx.room:room-testing:2.6.1")
 }

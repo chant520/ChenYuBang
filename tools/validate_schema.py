@@ -184,6 +184,11 @@ def main(argv):
     migrations = load(SCHEMA / "migrations.json")
     if migrations.get("currentVersion") != migrations.get("schemaVersion"):
         err("migrations.json: currentVersion 与 schemaVersion 不一致")
+    versions = [m.get("version") for m in migrations.get("migrations", [])]
+    if versions != list(range(1, len(versions) + 1)):
+        err("migrations.json: 版本号必须从 1 起连续递增，实际 %s" % versions)
+    elif versions and migrations.get("currentVersion") != versions[-1]:
+        err("migrations.json: currentVersion 应等于最新迁移版本 %s" % versions[-1])
 
     idioms = load(FIX / "idioms.sample.json")
     examples = load(FIX / "examples.sample.json")

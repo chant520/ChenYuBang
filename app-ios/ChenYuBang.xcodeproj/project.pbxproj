@@ -62,6 +62,7 @@
 		A00000000000000000000091 /* ExampleDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000191 /* ExampleDetail.swift */; };
 		A00000000000000000000092 /* P07ExampleDetailScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000192 /* P07ExampleDetailScreen.swift */; };
 		A00000000000000000000093 /* ExampleDetailTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000193 /* ExampleDetailTests.swift */; };
+		A00000000000000000000099 /* DatabaseMigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000199 /* DatabaseMigrationTests.swift */; };
 		A00000000000000000000094 /* CCardSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000194 /* CCardSnapshotTests.swift */; };
 		A00000000000000000000095 /* CEmptyStateSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000195 /* CEmptyStateSnapshotTests.swift */; };
 		A00000000000000000000096 /* CLabelSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000196 /* CLabelSnapshotTests.swift */; };
@@ -130,6 +131,7 @@
 		A00000000000000000000191 /* ExampleDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleDetail.swift; sourceTree = "<group>"; };
 		A00000000000000000000192 /* P07ExampleDetailScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P07ExampleDetailScreen.swift; sourceTree = "<group>"; };
 		A00000000000000000000193 /* ExampleDetailTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleDetailTests.swift; sourceTree = "<group>"; };
+		A00000000000000000000199 /* DatabaseMigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseMigrationTests.swift; sourceTree = "<group>"; };
 		A00000000000000000000194 /* CCardSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CCardSnapshotTests.swift; sourceTree = "<group>"; };
 		A00000000000000000000195 /* CEmptyStateSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CEmptyStateSnapshotTests.swift; sourceTree = "<group>"; };
 		A00000000000000000000196 /* CLabelSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLabelSnapshotTests.swift; sourceTree = "<group>"; };
@@ -285,6 +287,7 @@
 				A0000000000000000000018B /* CSpinnerSnapshotTests.swift */,
 				A0000000000000000000018C /* CIconSnapshotTests.swift */,
 				A00000000000000000000193 /* ExampleDetailTests.swift */,
+				A00000000000000000000199 /* DatabaseMigrationTests.swift */,
 				A00000000000000000000194 /* CCardSnapshotTests.swift */,
 				A00000000000000000000195 /* CEmptyStateSnapshotTests.swift */,
 				A00000000000000000000196 /* CLabelSnapshotTests.swift */,
@@ -472,6 +475,7 @@
 				A0000000000000000000008B /* CSpinnerSnapshotTests.swift in Sources */,
 				A0000000000000000000008C /* CIconSnapshotTests.swift in Sources */,
 				A00000000000000000000093 /* ExampleDetailTests.swift in Sources */,
+				A00000000000000000000099 /* DatabaseMigrationTests.swift in Sources */,
 				A00000000000000000000094 /* CCardSnapshotTests.swift in Sources */,
 				A00000000000000000000095 /* CEmptyStateSnapshotTests.swift in Sources */,
 				A00000000000000000000096 /* CLabelSnapshotTests.swift in Sources */,
