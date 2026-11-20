@@ -19,6 +19,8 @@ struct CameraPreview: UIViewRepresentable {
 }
 
 final class CameraPreviewUIView: UIView {
+    // 覆写 UIKit 的 class var 只能用 class（static 不可覆写），不是可改 static 的场景。
+    // swiftlint:disable:next static_over_final_class
     override class var layerClass: AnyClass { AVCaptureVideoPreviewLayer.self }
 
     var previewLayer: AVCaptureVideoPreviewLayer? { layer as? AVCaptureVideoPreviewLayer }
