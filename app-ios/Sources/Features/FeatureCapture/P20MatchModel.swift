@@ -65,7 +65,27 @@ public struct P20MatchState: Equatable {
     public var info: String?
     public var loading = true
 
-    public init() {}
+    /// 显式写全 memberwise init（带默认值）：一旦自定义 init，编译器不再合成 memberwise init，
+    /// 故必须覆盖 bootstrap / pickManual 的带参调用，同时保留 P20MatchState() 无参用法。
+    public init(
+        reviewText: String = "",
+        candidates: [MatchCandidate] = [],
+        checkedId: String? = nil,
+        poolSize: Int = 0,
+        deleteMode: Bool = false,
+        showManualPicker: Bool = false,
+        info: String? = nil,
+        loading: Bool = true
+    ) {
+        self.reviewText = reviewText
+        self.candidates = candidates
+        self.checkedId = checkedId
+        self.poolSize = poolSize
+        self.deleteMode = deleteMode
+        self.showManualPicker = showManualPicker
+        self.info = info
+        self.loading = loading
+    }
 
     /// 空态仅两种来源：有文字但零命中、用户删光；加载中不算空态。OCR 无文字由 P19 失败态处理。
     public var empty: Bool { !loading && candidates.isEmpty }

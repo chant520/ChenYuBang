@@ -78,7 +78,7 @@ public struct P20MatchActions {
     public let onManualPick: (String) -> Void
     public let onSave: () -> Void
     public let onDismissInfo: () -> Void
-    public let manualPicker: ((String) -> Void, () -> Void) -> AnyView
+    public let manualPicker: (@escaping (String) -> Void, @escaping () -> Void) -> AnyView
 
     public init(
         onEdit: @escaping () -> Void,
@@ -92,7 +92,7 @@ public struct P20MatchActions {
         onManualPick: @escaping (String) -> Void,
         onSave: @escaping () -> Void,
         onDismissInfo: @escaping () -> Void,
-        manualPicker: @escaping ((String) -> Void, () -> Void) -> AnyView
+        manualPicker: @escaping (@escaping (String) -> Void, @escaping () -> Void) -> AnyView
     ) {
         self.onEdit = onEdit
         self.onSelect = onSelect
