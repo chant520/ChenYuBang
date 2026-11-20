@@ -384,4 +384,3 @@ extension RouterStateTests {
         XCTAssertEqual(router.currentEntry.route, .recommend)
     }
 }
-
