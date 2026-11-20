@@ -22,6 +22,10 @@ public enum CIcons {
         case back
         /// P05 读音播放预留位（高保真稿 A P05 成语名右侧图标）。
         case sound
+        /// P17 相册入口（全页稿 C v2 P17）。
+        case gallery
+        /// P17 权限被拒态相机 + 斜杠（全页稿 D v2 P17）。
+        case cameraOff
     }
 
     /// 生成按 size 缩放后的路径（viewBox 24 → size，规范 §6）。
@@ -38,6 +42,8 @@ public enum CIcons {
             return glyphPath(kind)
         case .chevron, .book, .close, .back, .sound:
             return navPath(kind)
+        case .gallery, .cameraOff:
+            return capturePath(kind)
         }
     }
 
@@ -136,6 +142,38 @@ public enum CIcons {
             path.closeSubpath()
             path.move(to: CGPoint(x: 9, y: 5))
             path.addLine(to: CGPoint(x: 15, y: 11))
+        default:
+            break
+        }
+        return path
+    }
+
+    /// P17 拍照页图标（相册 / 相机 + 斜杠），路径与 Android CChromeIcon 同名项一致。
+    private static func capturePath(_ kind: Kind) -> Path {
+        var path = Path()
+        switch kind {
+        case .gallery:
+            // M3 5h18v14H3z + circle cx12.6 cy12 r3.4
+            path.move(to: CGPoint(x: 3, y: 5))
+            path.addLine(to: CGPoint(x: 21, y: 5))
+            path.addLine(to: CGPoint(x: 21, y: 19))
+            path.addLine(to: CGPoint(x: 3, y: 19))
+            path.closeSubpath()
+            path.addEllipse(in: CGRect(x: 9.2, y: 8.6, width: 6.8, height: 6.8))
+        case .cameraOff:
+            // M3 7h4l2-3h6l2 3h4v13H3z + circle cx12 cy13 r4 + M3 21l18-18
+            path.move(to: CGPoint(x: 3, y: 7))
+            path.addLine(to: CGPoint(x: 7, y: 7))
+            path.addLine(to: CGPoint(x: 9, y: 4))
+            path.addLine(to: CGPoint(x: 15, y: 4))
+            path.addLine(to: CGPoint(x: 17, y: 7))
+            path.addLine(to: CGPoint(x: 21, y: 7))
+            path.addLine(to: CGPoint(x: 21, y: 20))
+            path.addLine(to: CGPoint(x: 3, y: 20))
+            path.closeSubpath()
+            path.addEllipse(in: CGRect(x: 8, y: 9, width: 8, height: 8))
+            path.move(to: CGPoint(x: 3, y: 21))
+            path.addLine(to: CGPoint(x: 21, y: 3))
         default:
             break
         }

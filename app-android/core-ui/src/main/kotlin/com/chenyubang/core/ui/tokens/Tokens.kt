@@ -16,6 +16,13 @@ object Tokens {
         val btnbg: Color
         val btnfg: Color
         val btnline: Color
+        val cam: Color
+        val camdim: Color
+        val camfg: Color
+        val camfill: Color
+        val camghostline: Color
+        val camhint: Color
+        val camstroke: Color
         val chkfg: Color
         val cut: Color
         val disbg: Color
@@ -65,6 +72,13 @@ object Tokens {
         override val btnbg = Color(0xFF008000)
         override val btnfg = Color(0xFFFFFFFF)
         override val btnline = Color(0xFF008000)
+        override val cam = Color(0xFF0B1410)
+        override val camdim = Color(0xBFFFFFFF)
+        override val camfg = Color(0xD9FFFFFF)
+        override val camfill = Color(0xE6FFFFFF)
+        override val camghostline = Color(0x4CFFFFFF)
+        override val camhint = Color(0x99FFFFFF)
+        override val camstroke = Color(0x80FFFFFF)
         override val chkfg = Color(0xFFFFFFFF)
         override val cut = Color(0xFFBBDCC9)
         override val disbg = Color(0xFFE6EFE9)
@@ -114,6 +128,13 @@ object Tokens {
         override val btnbg = Color(0xFF50C878)
         override val btnfg = Color(0xFF0C1A12)
         override val btnline = Color(0xFF50C878)
+        override val cam = Color(0xFF0B1410)
+        override val camdim = Color(0xBFFFFFFF)
+        override val camfg = Color(0xD9FFFFFF)
+        override val camfill = Color(0xE6FFFFFF)
+        override val camghostline = Color(0x4CFFFFFF)
+        override val camhint = Color(0x99FFFFFF)
+        override val camstroke = Color(0x80FFFFFF)
         override val chkfg = Color(0xFF0C1A12)
         override val cut = Color(0xFF2E4A39)
         override val disbg = Color(0xFF1E3327)
@@ -223,13 +244,31 @@ object Tokens {
         val tabIconGap = 5
         val tabIndicator = 2
         val modalWidth = 315
+        val camTopY = 12
+        val camTopGap = 10
+        val camRowX = 26
+        val camRowTop = 16
+        val camRowBottom = 22
+        val camShutter = 58
+        val camRing = 3
+        val camShutterIn = 44
+        val camGallery = 40
+        val camDenyW = 290
+        val camDenyPadX = 18
+        val camDenyPadY = 20
+        val camDenyIcon = 30
+        val camDenyGap = 10
+        val camDenyHint = 12
+        val camDenyTextGap = 6
     }
 
     /** 图标尺寸（规范 6），单位 dp */
     object Icon {
+        val n30 = 30
         val n26 = 26
         val n24 = 24
         val n21 = 21
+        val n20 = 20
         val n18 = 18
         val n15 = 15
         val n14 = 14

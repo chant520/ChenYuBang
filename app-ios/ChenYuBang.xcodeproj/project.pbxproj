@@ -63,6 +63,13 @@
 		A00000000000000000000092 /* P07ExampleDetailScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000192 /* P07ExampleDetailScreen.swift */; };
 		A00000000000000000000093 /* ExampleDetailTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000193 /* ExampleDetailTests.swift */; };
 		A00000000000000000000099 /* DatabaseMigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000199 /* DatabaseMigrationTests.swift */; };
+		A000000000000000000000A0 /* P17CaptureScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001A0 /* P17CaptureScreen.swift */; };
+		A000000000000000000000A1 /* CaptureCameraModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001A1 /* CaptureCameraModel.swift */; };
+		A000000000000000000000A2 /* CaptureCameraSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001A2 /* CaptureCameraSession.swift */; };
+		A000000000000000000000A3 /* CameraPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001A3 /* CameraPreview.swift */; };
+		A000000000000000000000A4 /* PhotoPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001A4 /* PhotoPicker.swift */; };
+		A000000000000000000000A5 /* CaptureImageStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001A5 /* CaptureImageStore.swift */; };
+		A000000000000000000000A6 /* P17CaptureChrome.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001A6 /* P17CaptureChrome.swift */; };
 		A00000000000000000000094 /* CCardSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000194 /* CCardSnapshotTests.swift */; };
 		A00000000000000000000095 /* CEmptyStateSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000195 /* CEmptyStateSnapshotTests.swift */; };
 		A00000000000000000000096 /* CLabelSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000196 /* CLabelSnapshotTests.swift */; };
@@ -132,6 +139,13 @@
 		A00000000000000000000192 /* P07ExampleDetailScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P07ExampleDetailScreen.swift; sourceTree = "<group>"; };
 		A00000000000000000000193 /* ExampleDetailTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleDetailTests.swift; sourceTree = "<group>"; };
 		A00000000000000000000199 /* DatabaseMigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseMigrationTests.swift; sourceTree = "<group>"; };
+		A000000000000000000001A0 /* P17CaptureScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P17CaptureScreen.swift; sourceTree = "<group>"; };
+		A000000000000000000001A1 /* CaptureCameraModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureCameraModel.swift; sourceTree = "<group>"; };
+		A000000000000000000001A2 /* CaptureCameraSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureCameraSession.swift; sourceTree = "<group>"; };
+		A000000000000000000001A3 /* CameraPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPreview.swift; sourceTree = "<group>"; };
+		A000000000000000000001A4 /* PhotoPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoPicker.swift; sourceTree = "<group>"; };
+		A000000000000000000001A5 /* CaptureImageStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureImageStore.swift; sourceTree = "<group>"; };
+		A000000000000000000001A6 /* P17CaptureChrome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P17CaptureChrome.swift; sourceTree = "<group>"; };
 		A00000000000000000000194 /* CCardSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CCardSnapshotTests.swift; sourceTree = "<group>"; };
 		A00000000000000000000195 /* CEmptyStateSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CEmptyStateSnapshotTests.swift; sourceTree = "<group>"; };
 		A00000000000000000000196 /* CLabelSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLabelSnapshotTests.swift; sourceTree = "<group>"; };
@@ -255,6 +269,13 @@
 			isa = PBXGroup;
 			children = (
 				A00000000000000000000135 /* CaptureFeature.swift */,
+				A000000000000000000001A0 /* P17CaptureScreen.swift */,
+				A000000000000000000001A6 /* P17CaptureChrome.swift */,
+				A000000000000000000001A1 /* CaptureCameraModel.swift */,
+				A000000000000000000001A2 /* CaptureCameraSession.swift */,
+				A000000000000000000001A3 /* CameraPreview.swift */,
+				A000000000000000000001A4 /* PhotoPicker.swift */,
+				A000000000000000000001A5 /* CaptureImageStore.swift */,
 			);
 			path = FeatureCapture;
 			sourceTree = "<group>";
@@ -443,6 +464,13 @@
 				A00000000000000000000024 /* MeFeature.swift in Sources */,
 				A00000000000000000000028 /* ExamScopeScreen.swift in Sources */,
 				A00000000000000000000025 /* CaptureFeature.swift in Sources */,
+				A000000000000000000000A0 /* P17CaptureScreen.swift in Sources */,
+				A000000000000000000000A6 /* P17CaptureChrome.swift in Sources */,
+				A000000000000000000000A1 /* CaptureCameraModel.swift in Sources */,
+				A000000000000000000000A2 /* CaptureCameraSession.swift in Sources */,
+				A000000000000000000000A3 /* CameraPreview.swift in Sources */,
+				A000000000000000000000A4 /* PhotoPicker.swift in Sources */,
+				A000000000000000000000A5 /* CaptureImageStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

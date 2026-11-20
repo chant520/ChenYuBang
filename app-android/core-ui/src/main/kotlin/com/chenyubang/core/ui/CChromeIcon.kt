@@ -26,6 +26,12 @@ enum class CChromeIcon(val path: String) {
 
     // P05 读音播放预留位图标（高保真稿 A P05 成语名右侧笔形图标；朗读属未来项，本期只展示）。
     Sound("M4 13v6h6l10-10-6-6zM9 5l6 6"),
+
+    // P17 相册入口（高保真稿 C v2 P17 内联 SVG：矩形 + 圆）。
+    Gallery("M3 5h18v14H3zM16 12a3.4 3.4 0 1 1-6.8 0a3.4 3.4 0 1 1 6.8 0"),
+
+    // P17 权限被拒态相机图标（高保真稿 D v2 P17：相机 + 斜杠）。
+    CameraOff("M3 7h4l2-3h6l2 3h4v13H3zM16 13a4 4 0 1 1-8 0a4 4 0 1 1 8 0M3 21l18-18"),
 }
 
 @Composable

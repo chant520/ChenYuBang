@@ -12,6 +12,12 @@ fun RouterState.nextCapture(): RouterState {
     return append(RouteEntry(RouteRegistry.captureSteps[step + 1], instance = sequence))
 }
 
+/** P17 → P18：先记下本机图片路径再推进；P18 起各步只读这份路径。 */
+fun RouterState.attachCaptureImage(path: String): RouterState {
+    require(captureBaseDepth != null && current.route == Route.Camera && path.isNotBlank())
+    return copy(captureImagePath = path)
+}
+
 fun RouterState.captureSaved(idiomId: String): RouterState {
     require(captureBaseDepth != null && current.route == Route.Match && idiomId.isNotBlank())
     val base = stack.take(requireNotNull(captureBaseDepth))
@@ -20,7 +26,8 @@ fun RouterState.captureSaved(idiomId: String): RouterState {
 
 fun RouterState.cancelCapture(): RouterState {
     val depth = captureBaseDepth ?: return this
-    return withStack(stack.take(depth)).copy(captureBaseDepth = null, capturedIdiomId = null)
+    return withStack(stack.take(depth))
+        .copy(captureBaseDepth = null, capturedIdiomId = null, captureImagePath = null)
 }
 
 fun RouterState.captureDestination(destination: Route): RouterState {

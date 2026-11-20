@@ -1,6 +1,7 @@
 package com.chenyubang.app
 
 import androidx.compose.runtime.Composable
+import com.chenyubang.feature.capture.CaptureCameraScreen
 
 /** 按当前路由渲染目标页；P04/P05 的返回与跳转与其余路由同口径。 */
 @Composable
@@ -45,6 +46,11 @@ internal fun RouteContent(
             ExampleDestination(requireNotNull(entry.id), deps.database, { onRoute(router.back()) }) { id ->
                 onRoute(router.push(Route.Idiom, id))
             }
+        Route.Camera ->
+            CaptureCameraScreen(
+                onCancel = { onRoute(router.back()) },
+                onImageReady = { path -> onRoute(router.attachCaptureImage(path).nextCapture()) },
+            )
         else -> RoutePlaceholder(router, deps.scope, onRoute)
     }
 }

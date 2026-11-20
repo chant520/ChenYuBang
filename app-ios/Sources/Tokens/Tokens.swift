@@ -11,6 +11,13 @@ public struct TokenColors: Sendable {
     public let btnbg: Color
     public let btnfg: Color
     public let btnline: Color
+    public let cam: Color
+    public let camdim: Color
+    public let camfg: Color
+    public let camfill: Color
+    public let camghostline: Color
+    public let camhint: Color
+    public let camstroke: Color
     public let chkfg: Color
     public let cut: Color
     public let disbg: Color
@@ -58,6 +65,13 @@ public struct TokenColors: Sendable {
         btnbg: Color,
         btnfg: Color,
         btnline: Color,
+        cam: Color,
+        camdim: Color,
+        camfg: Color,
+        camfill: Color,
+        camghostline: Color,
+        camhint: Color,
+        camstroke: Color,
         chkfg: Color,
         cut: Color,
         disbg: Color,
@@ -104,6 +118,13 @@ public struct TokenColors: Sendable {
         self.btnbg = btnbg
         self.btnfg = btnfg
         self.btnline = btnline
+        self.cam = cam
+        self.camdim = camdim
+        self.camfg = camfg
+        self.camfill = camfill
+        self.camghostline = camghostline
+        self.camhint = camhint
+        self.camstroke = camstroke
         self.chkfg = chkfg
         self.cut = cut
         self.disbg = disbg
@@ -171,6 +192,13 @@ public enum Tokens {
         btnbg: Color(red: 0.0000, green: 0.5020, blue: 0.0000, opacity: 1.0000),
         btnfg: Color(red: 1.0000, green: 1.0000, blue: 1.0000, opacity: 1.0000),
         btnline: Color(red: 0.0000, green: 0.5020, blue: 0.0000, opacity: 1.0000),
+        cam: Color(red: 0.0431, green: 0.0784, blue: 0.0627, opacity: 1.0000),
+        camdim: Color(red: 1.0000, green: 1.0000, blue: 1.0000, opacity: 0.7490),
+        camfg: Color(red: 1.0000, green: 1.0000, blue: 1.0000, opacity: 0.8510),
+        camfill: Color(red: 1.0000, green: 1.0000, blue: 1.0000, opacity: 0.9020),
+        camghostline: Color(red: 1.0000, green: 1.0000, blue: 1.0000, opacity: 0.2980),
+        camhint: Color(red: 1.0000, green: 1.0000, blue: 1.0000, opacity: 0.6000),
+        camstroke: Color(red: 1.0000, green: 1.0000, blue: 1.0000, opacity: 0.5020),
         chkfg: Color(red: 1.0000, green: 1.0000, blue: 1.0000, opacity: 1.0000),
         cut: Color(red: 0.7333, green: 0.8627, blue: 0.7882, opacity: 1.0000),
         disbg: Color(red: 0.9020, green: 0.9373, blue: 0.9137, opacity: 1.0000),
@@ -218,6 +246,13 @@ public enum Tokens {
         btnbg: Color(red: 0.3137, green: 0.7843, blue: 0.4706, opacity: 1.0000),
         btnfg: Color(red: 0.0471, green: 0.1020, blue: 0.0706, opacity: 1.0000),
         btnline: Color(red: 0.3137, green: 0.7843, blue: 0.4706, opacity: 1.0000),
+        cam: Color(red: 0.0431, green: 0.0784, blue: 0.0627, opacity: 1.0000),
+        camdim: Color(red: 1.0000, green: 1.0000, blue: 1.0000, opacity: 0.7490),
+        camfg: Color(red: 1.0000, green: 1.0000, blue: 1.0000, opacity: 0.8510),
+        camfill: Color(red: 1.0000, green: 1.0000, blue: 1.0000, opacity: 0.9020),
+        camghostline: Color(red: 1.0000, green: 1.0000, blue: 1.0000, opacity: 0.2980),
+        camhint: Color(red: 1.0000, green: 1.0000, blue: 1.0000, opacity: 0.6000),
+        camstroke: Color(red: 1.0000, green: 1.0000, blue: 1.0000, opacity: 0.5020),
         chkfg: Color(red: 0.0471, green: 0.1020, blue: 0.0706, opacity: 1.0000),
         cut: Color(red: 0.1804, green: 0.2902, blue: 0.2235, opacity: 1.0000),
         disbg: Color(red: 0.1176, green: 0.2000, blue: 0.1529, opacity: 1.0000),
@@ -324,12 +359,30 @@ public enum Tokens {
         public static let tabIconGap: CGFloat = 5
         public static let tabIndicator: CGFloat = 2
         public static let modalWidth: CGFloat = 315
+        public static let camTopY: CGFloat = 12
+        public static let camTopGap: CGFloat = 10
+        public static let camRowX: CGFloat = 26
+        public static let camRowTop: CGFloat = 16
+        public static let camRowBottom: CGFloat = 22
+        public static let camShutter: CGFloat = 58
+        public static let camRing: CGFloat = 3
+        public static let camShutterIn: CGFloat = 44
+        public static let camGallery: CGFloat = 40
+        public static let camDenyW: CGFloat = 290
+        public static let camDenyPadX: CGFloat = 18
+        public static let camDenyPadY: CGFloat = 20
+        public static let camDenyIcon: CGFloat = 30
+        public static let camDenyGap: CGFloat = 10
+        public static let camDenyHint: CGFloat = 12
+        public static let camDenyTextGap: CGFloat = 6
     }
 
     public enum Icon {
+        public static let n30: CGFloat = 30
         public static let n26: CGFloat = 26
         public static let n24: CGFloat = 24
         public static let n21: CGFloat = 21
+        public static let n20: CGFloat = 20
         public static let n18: CGFloat = 18
         public static let n15: CGFloat = 15
         public static let n14: CGFloat = 14

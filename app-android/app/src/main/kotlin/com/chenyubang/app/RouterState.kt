@@ -21,6 +21,8 @@ data class RouterState(
     val review: ReviewSession? = null,
     val captureBaseDepth: Int? = null,
     val capturedIdiomId: String? = null,
+    /** P17 拍下/选中的本机图片路径；取消或保存完成后清空（信息架构 v1.4 §4.3）。 */
+    val captureImagePath: String? = null,
     val sequence: Long = 1,
     val rootTopEpoch: Map<AppTab, Int> = AppTab.entries.associateWith { 0 },
 ) : Serializable {

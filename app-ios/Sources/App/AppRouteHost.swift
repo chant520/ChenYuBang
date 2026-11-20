@@ -88,7 +88,8 @@ private struct RetainedRouteStack: View {
     var body: some View {
         ZStack {
             ForEach(entries) { entry in
-                AppRoutePage(router: router, launch: launch, entry: entry, tab: tab)
+                AppRoutePage(router: router, launch: launch, entry: entry, tab: tab,
+                             isActive: entries.last?.id == entry.id)
                     .opacity(entries.last?.id == entry.id ? 1 : 0)
                     .allowsHitTesting(entries.last?.id == entry.id)
                     .accessibilityHidden(entries.last?.id != entry.id)
@@ -103,6 +104,7 @@ private struct AppRoutePage: View {
     @ObservedObject var launch: FirstLaunchState
     let entry: RouteEntry
     let tab: AppTab
+    let isActive: Bool
 
     var body: some View {
         if entry.route == .scope, let preferences = launch.preferences {
@@ -154,6 +156,12 @@ private struct AppRoutePage: View {
                 reader: reader,
                 onClose: { router.back() },
                 onOpenIdiom: { id in _ = router.push(.idiomDetail, recordID: id) }
+            )
+        } else if entry.route == .camera, let workflowID = router.captureWorkflow?.id {
+            P17CaptureScreen(
+                isActive: isActive,
+                onCancel: router.cancelCapture,
+                onImageReady: { url in _ = router.captured(workflowID: workflowID, imageURL: url) }
             )
         } else {
             RoutePlaceholderPage(router: router, launch: launch, entry: entry, tab: tab)
@@ -218,11 +226,9 @@ private struct RoutePlaceholderPage: View {
         case .queue, .summary:
             PendingPageText(text: "复习业务待接入；仅业务完成回调推进，不生成成绩或重试队列。")
             CButton(text: "结束复习", variant: .ghost, action: router.dismissFullScreen)
-        case .camera, .crop, .ocr, .match:
+        case .crop, .ocr, .match:
             PendingPageText(text: "拍照业务待接入；仅真实拍摄、裁切、识别、匹配及保存回调推进。")
-            if entry.route != .camera {
-                CButton(text: "取消拍照", variant: .ghost, action: router.cancelCapture)
-            }
+            CButton(text: "取消拍照", variant: .ghost, action: router.cancelCapture)
         case .done:
             CButton(text: "回错题本") { router.finishCapture() }
         default:

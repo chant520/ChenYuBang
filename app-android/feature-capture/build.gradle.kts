@@ -35,4 +35,13 @@ dependencies {
     api(project(":core-ui"))
     implementation(project(":core-data"))
     implementation(project(":ocr"))
+
+    // P17 取景与快门（规范 §13.1：CameraX 1.x）
+    implementation("androidx.camera:camera-core:1.4.1")
+    implementation("androidx.camera:camera-camera2:1.4.1")
+    implementation("androidx.camera:camera-lifecycle:1.4.1")
+    implementation("androidx.camera:camera-view:1.4.1")
+    // 运行时权限与 Photo Picker（系统图库选择器，不申请相册读取权限）
+    implementation("androidx.activity:activity-compose:1.9.3")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")
 }

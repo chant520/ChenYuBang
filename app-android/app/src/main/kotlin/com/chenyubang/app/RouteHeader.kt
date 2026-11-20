@@ -31,8 +31,14 @@ internal fun RouteHeader(
     onSearch: (() -> Unit)? = null,
 ) {
     // P04 搜索（全屏浮层）与 P05 详情（二级页）自带完整顶部区：浮层是关闭 X，详情是返回 + 页名。
-    // 这里跳过外壳头部，避免出现两层返回/页名（信息架构 v1.3 §2）。
-    if (router.current.route == Route.Search || router.current.route == Route.Idiom) return
+    // P17 拍照页自带 X + 页名的深色取景顶栏（高保真稿 C v2）。这里跳过外壳头部，避免两层顶栏。
+    if (
+        router.current.route == Route.Search ||
+        router.current.route == Route.Idiom ||
+        router.current.route == Route.Camera
+    ) {
+        return
+    }
     val colors = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
     Row(
         Modifier.fillMaxWidth().padding(horizontal = Tokens.Space.pageX.dp, vertical = Tokens.Space.contentTop.dp),
