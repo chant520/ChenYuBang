@@ -17,6 +17,10 @@ data class ReviewSession(val source: RouteEntry, val baseDepth: Int, val idiomId
     }
 }
 
+/** P21 只出不回：Done 页禁用系统返回键；其余路由沿用栈深度 / 浮层口径（参照 RouteHeader）。 */
+internal fun systemBackEnabled(router: RouterState): Boolean =
+    router.current.route != Route.Done && (router.stack.size > 1 || router.modal != null)
+
 data class RouterState(
     val tab: AppTab = AppTab.Idiom,
     val stacks: Map<AppTab, List<RouteEntry>> = AppTab.entries.associateWith { listOf(RouteEntry(it.root)) },

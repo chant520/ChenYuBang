@@ -133,6 +133,7 @@ private fun MatchRoute(
     router.captureDraft?.let { draft ->
         P20FormScreen(
             draft = draft,
+            instance = router.current.instance,
             deps =
                 P20FormDeps(
                     database = deps.database,

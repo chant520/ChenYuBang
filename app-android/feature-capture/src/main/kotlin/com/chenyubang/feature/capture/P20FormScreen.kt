@@ -25,6 +25,18 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+/** ViewModelStore key 按本次 capture 实例隔离：同文本二次录入不复用表单状态，同实例重组 key 稳定。 */
+internal fun p20FormViewModelKey(
+    instance: Long,
+    text: String,
+): String = "p20-form/$instance/$text"
+
+@Composable
+internal fun rememberP20FormViewModel(
+    instance: Long,
+    text: String,
+): P20FormViewModel = viewModel(key = p20FormViewModelKey(instance, text))
+
 /**
  * P20 成语匹配与修正（信息架构 v1.4 P20 / 开发规范 v1.7）：
  * 候选可多选（≥1）、手动挑成语追加到已选末尾、答案 / 错因 / 标签 / 是否做错 / 来源信息可填；
@@ -33,13 +45,14 @@ import kotlinx.coroutines.withContext
 @Composable
 fun P20FormScreen(
     draft: OcrDraft,
+    instance: Long,
     deps: P20FormDeps,
     onBack: () -> Unit,
     onSaved: (String, List<IdiomRef>) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val text = P20Matcher.mergedText(draft)
-    val model: P20FormViewModel = viewModel(key = "p20-form/$text")
+    val model = rememberP20FormViewModel(instance, text)
     val state by model.state.collectAsState()
 
     LaunchedEffect(text) {

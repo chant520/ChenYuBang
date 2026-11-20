@@ -115,7 +115,7 @@ private fun RouterShell(deps: RouteDeps) {
     val holder = rememberSaveableStateHolder()
     val colors = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
     val back = { if (router.current.route == Route.Queue) confirmExit = true else router = router.back() }
-    BackHandler(enabled = router.stack.size > 1 || router.modal != null, onBack = back)
+    BackHandler(enabled = systemBackEnabled(router), onBack = back)
     val onSearch: (() -> Unit)? =
         if (router.current.route == Route.Library) ({ router = router.push(Route.Search) }) else null
     Box(Modifier.fillMaxSize().background(colors.page)) {
