@@ -61,7 +61,7 @@ struct OcrThumbRow: View {
             )
             .contentShape(Rectangle())
             .onTapGesture { if thumbnail != nil { onZoom() } }
-            .accessibilityElement()
+            .accessibilityElement(children: .ignore)
             .accessibilityLabel("裁切图，可点开放大")
             .accessibilityAddTraits(.isButton)
             Text("裁切图 · 可点开放大")
