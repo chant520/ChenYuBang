@@ -30,3 +30,15 @@
 
 - 工作日志 append-only 追加到 `.workbuddy/memory/YYYY-MM-DD.md`（本项目已有 2026-11-19 卷）。
 - 角色派发、拍板留痕、并行规则遵循 `.codebuddy/AGENT-SPEC.md`。
+
+## Git 产出标识（向前看 · 自 2026-11-20 起）
+
+- 适用范围：以提交 `67eba25`（2026-11-20）为界，仅对其后的提交生效。`67eba25` 及此前所有 2.4 提交一律不追溯、不补标、不 amend。
+- 加什么：每条提交在 message 末尾追加一行 trailer，按实际产出者取值——
+  - WorkBuddy 主控或其派发角色（dev-super / designer-ui / product-dog 等）产出 → `Generated-by: WorkBuddy`
+  - qoder 产出 → `Generated-by: Qoder`
+  - 每个 commit 只加一行，取实际执行者；双方协作的提交按主执行方归属。
+- 由谁加：执行该次编辑并提交的角色在 commit message 中追加；主控在审查产出环节核验 trailer 存在且取值正确，缺失或错误则要求补齐后再上报用户。
+- 与现有风格共存：沿用 Conventional Commits 标题（`fix(P20): 中文概述`）+ 空行 + `- ` bullet 详述；trailer 位于全文最末，与最后一条 bullet 空一行，不改标题与正文体例。
+- 身份口径：不得通过改 git author / committer（全局或 local）或 .mailmap 来标识——全局身份由双方共用，改 local 会误标对方提交；身份保持现状，产出者一律以 trailer 为准。
+- 检索：`git log --format='%(trailers:key=Generated-by)'` 可筛出全部标识提交。
