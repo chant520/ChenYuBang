@@ -6,6 +6,7 @@ import com.chenyubang.feature.capture.CaptureCropScreen
 import com.chenyubang.feature.capture.CaptureOcrScreen
 import com.chenyubang.feature.capture.OcrDraft
 import com.chenyubang.feature.capture.OcrScreenActions
+import com.chenyubang.feature.capture.P20MatchScreen
 
 /** 按当前路由渲染目标页；P04/P05 的返回与跳转与其余路由同口径。 */
 @Composable
@@ -90,6 +91,22 @@ private fun CaptureRouteContent(
                             onManual = { onRoute(router.attachOcrText(OcrDraft(stem = "", options = emptyList()))) },
                             onNext = { draft -> onRoute(router.attachOcrText(draft)) },
                         ),
+                )
+            } ?: RoutePlaceholder(router, deps.scope, onRoute)
+        Route.Match ->
+            router.captureDraft?.let { draft ->
+                P20MatchScreen(
+                    draft = draft,
+                    database = deps.database,
+                    onBack = { onRoute(router.back()) },
+                    // P04 搜索内容以局部浮层复用：选中回填后关闭，不 push(Route.Search)、不写 router 栈。
+                    manualPicker = { onPick, onDismiss ->
+                        SearchDestination(
+                            database = deps.database,
+                            onClose = onDismiss,
+                            onOpenIdiom = onPick,
+                        )
+                    },
                 )
             } ?: RoutePlaceholder(router, deps.scope, onRoute)
         else -> RoutePlaceholder(router, deps.scope, onRoute)

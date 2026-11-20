@@ -187,6 +187,13 @@ private struct AppRoutePage: View {
                     }
                 }
             )
+        } else if entry.route == .match,
+                  let reader = launch.libraryReader {
+            P20MatchScreen(
+                text: router.captureWorkflow?.recognizedText ?? "",
+                reader: reader,
+                onBack: { router.back() }
+            )
         } else {
             RoutePlaceholderPage(router: router, launch: launch, entry: entry, tab: tab)
         }

@@ -52,6 +52,14 @@ public final class IdiomLibraryReader {
         try queue.read { db in try IdiomLibrary.load(db) }
     }
 
+    /// P20 匹配候选专用：全库成语（含 synonyms / frequency），不按考试范围过滤。
+    /// 只读；synonyms 列是 JSON 字符串，解析在应用层完成，失败降级空数组。
+    public func allIdiomsForMatch() throws -> [IdiomRecord] {
+        try queue.read { db in
+            try IdiomRecord.fetchAll(db, sql: "SELECT * FROM idiom ORDER BY word")
+        }
+    }
+
     /// P05 详情只读查询（开发规范 §4.2）：按 uuid 取完整成语行，缺行返回 nil。
     public func detail(id: String) throws -> IdiomRecord? {
         try queue.read { db in
