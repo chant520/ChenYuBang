@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """素材入库脚本：把「获取真实素材」的全流程脚本化，但绝不生成虚构内容。
 
-职责（口径见 docs/开发规范-v1.4.md §2.3 / §4.4 / §4.5 / §11.3、content/README.md）：
+职责（口径见 docs/开发规范-v1.6.md §2.3 / §4.4 / §4.5 / §11.3、content/README.md）：
   1. 扫描 incoming 目录里的真实卷面照片（jpg/jpeg/png/heic），按文件名排序占用 P01…P20，
      把相对路径写入 样张登记表.csv 的「来源」列（其余维度留给人工）；
      并生成 results.json 模板（id + stem/A/B/C/D/durationMs 全 null），绝不代填识别结果。

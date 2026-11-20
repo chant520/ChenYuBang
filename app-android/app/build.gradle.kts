@@ -47,7 +47,7 @@ dependencies {
     implementation(project(":core-data"))
     implementation(project(":ocr"))
 
-    // 六个 feature 页面簇（页面归属见 docs/开发规范-v1.4.md §3）。
+    // 六个 feature 页面簇（页面归属见 docs/开发规范-v1.6.md §3）。
     // app 只做路由接线与依赖注入，不承载页面业务逻辑。
     implementation(project(":feature-idiom"))
     implementation(project(":feature-example"))

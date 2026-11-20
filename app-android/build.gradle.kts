@@ -1,4 +1,4 @@
-// 版本口径见 docs/开发规范-v1.4.md §2.2 / §13.1
+// 版本口径见 docs/开发规范-v1.6.md §2.2 / §13.1
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.extensions.DetektExtension
 import org.jlleitschuh.gradle.ktlint.KtlintExtension

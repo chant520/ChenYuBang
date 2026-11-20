@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 权限口径见 docs/开发规范-v1.4.md §2.3、§13.1：端侧离线 OCR，不允许为 OCR 引入联网 -->
+<!-- 权限口径见 docs/开发规范-v1.6.md §2.3、§13.1：端侧离线 OCR，不允许为 OCR 引入联网 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- 拍照/裁切（P17–P20） -->

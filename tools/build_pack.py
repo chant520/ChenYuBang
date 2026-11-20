@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""题库包打包（口径见 docs/开发规范-v1.4.md §4.4 / §4.5）。
+"""题库包打包（口径见 docs/开发规范-v1.6.md §4.4 / §4.5）。
 
 输入：content/idioms/idioms.json + content/examples/examples.json（由 ingest_content.py 生成）
 输出：content/dist/pack-vX.Y.Z.zip

@@ -42,7 +42,7 @@
 4. `python tools/ocr_passrate.py shared/fixtures/ocr/results.json --target 0.9`
    输出：逐张是否完整、完整率、耗时 P50/P90。
 
-5. 数字回填两处：产品文档验收第 9 条、`docs/开发规范-v1.5.md` §11.3 第 9 行。
+5. 数字回填两处：产品文档验收第 9 条、`docs/开发规范-v1.6.md` §11.3 第 9 行。
 
 ## 四、判据与不达标处置
 

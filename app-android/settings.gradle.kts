@@ -16,7 +16,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "ChenYuBang"
 
-// 骨架与页面归属见 docs/开发规范-v1.4.md §3：
+// 骨架与页面归属见 docs/开发规范-v1.6.md §3：
 // feature 按页面簇切，feature 之间不得互相依赖（规范 §3 硬规则）。
 include(
     ":app",

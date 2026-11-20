@@ -166,7 +166,7 @@ private fun RangeCard(
 ) {
     val colors = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
     CCard {
-        // 方案 A 同排（docs/design/P03范围卡同排方案-v0.1.html）：范围文字与「调整省份」链接同一行；
+        // 方案 A 同排（用户 2026-11-19 拍板；草图 P03范围卡同排方案-v0.1.html 已于 2026-11-20 清理）：范围文字与「调整省份」链接同一行；
         // 空间不足时范围文字折行、链接保持右对齐单行不换行。
         Row(
             Modifier.fillMaxWidth(),
