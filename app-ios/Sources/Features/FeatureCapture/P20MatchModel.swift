@@ -121,21 +121,18 @@ public final class P20MatchModel: ObservableObject {
         state.info = nil
     }
 
-    /// 加一个：全库排除候选池已有词，frequency DESC / word ASC 取一条追加末尾；满 50 禁用。
+    /// 加一个：全库排除当前展示窗口里已有的词，frequency DESC / word ASC 取一条追加末尾；满 50 禁用。
     public func add() {
         guard state.candidates.count < P20Matcher.maxCandidates else {
             state.info = P20Matcher.candidateLimit
             return
         }
-        let known = Set(pool.map { $0.id })
-        guard let pick = allIdioms.first(where: { !known.contains($0.id) }) else {
+        let shown = Set(state.candidates.map { $0.id })
+        guard let pick = allIdioms.first(where: { !shown.contains($0.id) }) else {
             state.info = P20Matcher.noMoreCandidates
             return
         }
-        let candidate = P20Matcher.addedCandidate(pick)
-        pool.append(candidate)
-        state.candidates.append(candidate)
-        state.poolSize = pool.count
+        state.candidates.append(P20Matcher.addedCandidate(pick))
         state.info = nil
     }
 

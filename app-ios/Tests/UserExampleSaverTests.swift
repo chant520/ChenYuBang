@@ -19,7 +19,7 @@ final class UserExampleSaverTests: XCTestCase {
         XCTAssertNotNil(UUID(uuidString: saved.userExampleID))
         XCTAssertNil(saved.mistakeID)
         XCTAssertEqual(saved.idioms, idioms)
-        let target = images.appendingPathComponent("images/\(saved.userExampleID).jpg")
+        let target = images.appendingPathComponent("\(saved.userExampleID).jpg")
         XCTAssertTrue(FileManager.default.fileExists(atPath: target.path))
         try queue.read { db in
             XCTAssertEqual(try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM user_example"), 1)
@@ -113,7 +113,7 @@ final class UserExampleSaverTests: XCTestCase {
             XCTAssertEqual(try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM user_example"), 0)
             XCTAssertEqual(try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM user_example_idiom"), 0)
         }
-        let imageDirectory = images.appendingPathComponent("images").path
+        let imageDirectory = images.path
         let savedImages = try FileManager.default.contentsOfDirectory(atPath: imageDirectory)
         XCTAssertTrue(savedImages.isEmpty)
     }
@@ -143,7 +143,7 @@ final class UserExampleSaverTests: XCTestCase {
         XCTAssertThrowsError(try saver.save(oversize)) { error in
             XCTAssertEqual(error as? CaptureSaveError, .invalidTag)
         }
-        XCTAssertFalse(FileManager.default.fileExists(atPath: images.appendingPathComponent("images").path))
+        XCTAssertFalse(FileManager.default.fileExists(atPath: images.path))
     }
 
     private func makeQueue() throws -> DatabaseQueue {
@@ -163,16 +163,19 @@ final class UserExampleSaverTests: XCTestCase {
         }
     }
 
+    /// 与 App 传参一致：返回 `images` 目录路径，父临时目录随用例结束删除。
+    /// `images` 目录本身由保存器在复制时创建，入口校验失败的用例可据此断言未落盘。
     private func makeImagesDirectory() throws -> URL {
-        let directory = FileManager.default.temporaryDirectory
+        let root = FileManager.default.temporaryDirectory
             .appendingPathComponent("chenyubang-images-\(UUID().uuidString)", isDirectory: true)
-        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-        addTeardownBlock { try? FileManager.default.removeItem(at: directory) }
-        return directory
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        addTeardownBlock { try? FileManager.default.removeItem(at: root) }
+        return root.appendingPathComponent("images", isDirectory: true)
     }
 
-    private func makeImageFile(in directory: URL) throws -> URL {
-        let url = directory.appendingPathComponent("source-\(UUID().uuidString).jpg")
+    private func makeImageFile(in imagesDirectory: URL) throws -> URL {
+        let url = imagesDirectory.deletingLastPathComponent()
+            .appendingPathComponent("source-\(UUID().uuidString).jpg")
         try Data([0xFF, 0xD8, 0xFF, 0xD9]).write(to: url)
         return url
     }
