@@ -140,15 +140,41 @@ final class P20MatchModelTests: XCTestCase {
         XCTAssertEqual(state.checked, before)
     }
 
-    func testAddAtFullWindowShowsLimit() {
+    func testAddAtFullPoolShowsLimit() {
         let many = (0..<50).map { idiom("id-\($0)", "词\($0)", 3) }
         let text = many.map(\.word).joined(separator: " ")
         let model = P20MatchModel()
         model.bootstrap(text: text, idioms: many)
-        for _ in 0..<50 { model.add() }
-        XCTAssertEqual(model.state.candidates.count, 50)
-        XCTAssertFalse(model.state.canAdd)
+        // 命中即占满 50 池：加一个只提示上限，不再追加，池与窗口都不变。
+        model.add()
+        XCTAssertEqual(model.state.poolSize, 50)
+        XCTAssertEqual(model.state.candidates.count, P20Matcher.windowSize)
         XCTAssertEqual(model.state.info, P20Matcher.candidateLimit)
+    }
+
+    func testAddSkipsPoolMembersAndSurvivesCycle() {
+        // 四条命中（窗口 K=3，第四条在窗口外）+ 一条未命中的高频词：
+        // 加一个必须跳过池内已有词（含窗口外），且加入的词进池，换一组后不丢。
+        let biao = idiom("id-biao", "标新立异", 3)
+        let extra = idiom("id-extra", "额外词", 10)
+        let model = P20MatchModel()
+        model.bootstrap(text: "按部就班 墨守成规 别出心裁 标新立异", idioms: sampleIdioms + [biao, extra])
+        XCTAssertEqual(model.state.poolSize, 4)
+        XCTAssertEqual(model.state.candidates.count, P20Matcher.windowSize)
+
+        model.add()
+        XCTAssertEqual(model.state.poolSize, 5)
+        XCTAssertEqual(model.state.candidates.last?.id, "id-extra")
+        XCTAssertEqual(Set(model.state.candidates.map(\.id)).count, model.state.candidates.count)
+
+        // 池内（含窗口外）已无空位可加：不得重复挑到窗口外的池内词。
+        model.add()
+        XCTAssertEqual(model.state.poolSize, 5)
+        XCTAssertEqual(model.state.info, P20Matcher.noMoreCandidates)
+
+        // 换一组用池重建窗口：手动加的词仍在，不会被冲掉。
+        model.cycle()
+        XCTAssertTrue(model.state.candidates.contains { $0.id == "id-extra" })
     }
 
     func testDeleteCheckedEntryRemovesItWithoutAutoReselect() {
