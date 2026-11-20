@@ -1,5 +1,6 @@
 package com.chenyubang.feature.capture
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.RectF
 import androidx.compose.foundation.background
@@ -25,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.chenyubang.core.ui.CButton
 import com.chenyubang.core.ui.tokens.Tokens
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -32,51 +34,30 @@ import kotlinx.coroutines.withContext
 /**
  * P18 裁切与摆正（信息架构 v1.4 §3，第 2 步）：读取 P17 的图片，给一次内容边界建议框，
  * 四角可拖，支持 90° 旋转与 ±15° 摆正微调；「下一步」只导出框内内容，框外不参与识别。
+ * [initialCrop] 来自路由：P19 返回时还原上次的框选与摆正（IA 第 29 条）。
  */
 @Composable
 fun CaptureCropScreen(
     imagePath: String,
+    initialCrop: CropFrame?,
     onRetake: () -> Unit,
-    onNext: (String) -> Unit,
+    onNext: (CropSelection) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val colors = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    var bitmap by remember(imagePath) { mutableStateOf<Bitmap?>(null) }
-    var crop by remember(imagePath) { mutableStateOf<RectF?>(null) }
-    var quarterTurns by remember(imagePath) { mutableStateOf(0) }
-    var fineDegrees by remember(imagePath) { mutableStateOf(0f) }
-    var showAdjust by remember(imagePath) { mutableStateOf(false) }
-    var failed by remember(imagePath) { mutableStateOf(false) }
-    var exporting by remember(imagePath) { mutableStateOf(false) }
-    var exportFailed by remember { mutableStateOf(false) }
-    var canvasSize by remember { mutableStateOf(IntSize.Zero) }
-
+    val state = remember(imagePath) { CropState(initialCrop) }
     LaunchedEffect(imagePath) {
-        val loaded = withContext(Dispatchers.IO) { CropImage.load(imagePath) }
-        bitmap = loaded
-        crop = loaded?.let { CropImage.suggest(it) }
-        failed = loaded == null
+        state.applyLoaded(withContext(Dispatchers.IO) { CropImage.load(imagePath) })
     }
-
     Column(modifier.fillMaxSize().background(colors.page)) {
         CropHeader(onBack = onRetake, colors = colors)
         Column(
             Modifier.fillMaxWidth().weight(1f)
                 .padding(start = Tokens.Space.pageX.dp, end = Tokens.Space.pageX.dp, top = Tokens.Space.cropTop.dp),
         ) {
-            CropCanvasBox(
-                bitmap = bitmap,
-                crop = crop,
-                quarterTurns = quarterTurns,
-                fineDegrees = fineDegrees,
-                colors = colors,
-                failed = failed,
-                onCropChange = { crop = it },
-                onSizeChange = { canvasSize = it },
-                modifier = Modifier.fillMaxWidth().weight(1f),
-            )
+            CropPreview(state, colors, Modifier.fillMaxWidth().weight(1f))
             Text(
                 "已自动给出题目边界，拖动四角可调整；只留这一道题，邻题去掉识别更准。",
                 color = colors.text3,
@@ -88,17 +69,17 @@ fun CaptureCropScreen(
                     ),
             )
             CropActionRow(
-                enabled = bitmap != null && !exporting,
-                onRotate = { quarterTurns = (quarterTurns + 1) % ROTATION_QUARTERS },
-                onAdjust = { showAdjust = !showAdjust },
+                enabled = state.bitmap != null && !state.exporting,
+                onRotate = state::rotate,
+                onAdjust = state::toggleAdjust,
                 onRetake = onRetake,
                 colors = colors,
             )
-            if (showAdjust) {
-                AdjustPanel(fineDegrees, colors, onReset = { fineDegrees = 0f }) { fineDegrees = it }
+            if (state.showAdjust) {
+                AdjustPanel(state.fineDegrees, colors, onReset = state::resetAngle, onFineChange = state::setAngle)
             }
             Spacer(Modifier.height(Tokens.Space.cropRowBottom.dp))
-            if (exportFailed) {
+            if (state.exportFailed) {
                 Text(
                     "裁切失败，请重试或重拍",
                     color = colors.warnfg,
@@ -107,40 +88,93 @@ fun CaptureCropScreen(
                 )
             }
             CButton(
-                text = if (exporting) "正在裁切…" else "下一步 · 识别",
-                onClick = {
-                    val source = bitmap
-                    val current = crop
-                    if (source != null && current != null && !exporting) {
-                        exportFailed = false
-                        exporting = true
-                        val containerWidth = canvasSize.width.toFloat()
-                        val containerHeight = canvasSize.height.toFloat()
-                        scope.launch {
-                            val path =
-                                withContext(Dispatchers.IO) {
-                                    val target = CaptureImageStore.newCaptureFile(context)
-                                    val exported =
-                                        CropImage.export(
-                                            source,
-                                            quarterTurns,
-                                            fineDegrees,
-                                            RectF(current),
-                                            containerWidth,
-                                            containerHeight,
-                                            target,
-                                        )
-                                    if (exported) target.absolutePath else null
-                                }
-                            exporting = false
-                            if (path == null) exportFailed = true else onNext(path)
-                        }
-                    }
-                },
-                enabled = bitmap != null && canvasSize.width > 0 && canvasSize.height > 0,
-                loading = exporting,
+                text = if (state.exporting) "正在裁切…" else "下一步 · 识别",
+                onClick = { state.beginExport(context, scope, onNext) },
+                enabled = state.bitmap != null && state.canvasSize.width > 0 && state.canvasSize.height > 0,
+                loading = state.exporting,
                 modifier = Modifier.fillMaxWidth().padding(bottom = Tokens.Space.pageX.dp),
             )
+        }
+    }
+}
+
+@Composable
+private fun CropPreview(
+    state: CropState,
+    colors: Tokens.ColorSet,
+    modifier: Modifier,
+) {
+    CropCanvasBox(
+        view = state.view,
+        colors = colors,
+        onCropChange = state::applyCrop,
+        onSizeChange = { state.canvasSize = it },
+        modifier = modifier,
+    )
+}
+
+/** P18 的图片、框选与导出进度；换图（新拍照）时随 remember(imagePath) 重建。 */
+private class CropState(initialCrop: CropFrame?) {
+    var bitmap by mutableStateOf<Bitmap?>(null)
+    var crop by mutableStateOf(initialCrop?.toRectF())
+    var quarterTurns by mutableStateOf(initialCrop?.quarterTurns ?: 0)
+    var fineDegrees by mutableStateOf(initialCrop?.fineDegrees ?: 0f)
+    var showAdjust by mutableStateOf(false)
+    var failed by mutableStateOf(false)
+    var exporting by mutableStateOf(false)
+    var exportFailed by mutableStateOf(false)
+    var canvasSize by mutableStateOf(IntSize.Zero)
+
+    val view: CropView get() = CropView(bitmap, crop, quarterTurns, fineDegrees, failed)
+
+    fun applyLoaded(loaded: Bitmap?) {
+        bitmap = loaded
+        if (crop == null) crop = loaded?.let { CropImage.suggest(it) }
+        failed = loaded == null
+    }
+
+    fun applyCrop(rect: RectF) {
+        crop = rect
+    }
+
+    fun rotate() {
+        quarterTurns = (quarterTurns + 1) % ROTATION_QUARTERS
+    }
+
+    fun toggleAdjust() {
+        showAdjust = !showAdjust
+    }
+
+    fun resetAngle() {
+        fineDegrees = 0f
+    }
+
+    fun setAngle(value: Float) {
+        fineDegrees = value
+    }
+
+    fun beginExport(
+        context: Context,
+        scope: CoroutineScope,
+        onNext: (CropSelection) -> Unit,
+    ) {
+        val source = bitmap
+        val current = crop
+        if (source == null || current == null || exporting) return
+        exportFailed = false
+        exporting = true
+        val frame = CropFrame.of(RectF(current), quarterTurns, fineDegrees)
+        val containerWidth = canvasSize.width.toFloat()
+        val containerHeight = canvasSize.height.toFloat()
+        scope.launch {
+            val path =
+                withContext(Dispatchers.IO) {
+                    val target = CaptureImageStore.newCaptureFile(context)
+                    val request = CropExport(source, frame, containerWidth, containerHeight, target)
+                    if (CropImage.export(request)) target.absolutePath else null
+                }
+            exporting = false
+            if (path == null) exportFailed = true else onNext(CropSelection(path, frame))
         }
     }
 }

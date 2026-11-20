@@ -276,6 +276,16 @@ object Tokens {
         val cropRowBottom = 14
         val cropAdjustTop = 10
         val cropAdjustBottom = 4
+        val ocrTop = 16
+        val ocrThumb = 44
+        val ocrThumbGap = 8
+        val ocrRowBottom = 12
+        val ocrInputGap = 12
+        val ocrHintBottom = 14
+        val ocrGhostTop = 11
+        val ocrGhostBottom = 12
+        val ocrFailGap = 16
+        val ocrNoteTop = 6
     }
 
     /** 图标尺寸（规范 6），单位 dp */

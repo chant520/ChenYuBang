@@ -1,6 +1,8 @@
 package com.chenyubang.app
 
 import com.chenyubang.core.data.ExamScopeSelection
+import com.chenyubang.feature.capture.CropFrame
+import com.chenyubang.feature.capture.OcrDraft
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -122,16 +124,56 @@ class RouterStateTest {
             RouterState(tab = AppTab.Example).startCapture()
                 .attachCaptureImage("/tmp/capture-a.jpg").nextCapture()
         assertEquals(Route.Crop, flow.current.route)
-        val cropped = flow.attachCropImage("/tmp/crop-b.jpg")
+        val cropped = flow.attachCropImage("/tmp/crop-b.jpg", frame())
         assertEquals(Route.Ocr, cropped.current.route)
         assertEquals("/tmp/capture-a.jpg", cropped.captureImagePath)
         assertEquals("/tmp/crop-b.jpg", cropped.captureCropPath)
+        assertEquals(frame(), cropped.captureCrop)
         val back = flow.back()
         assertEquals(Route.Camera, back.current.route)
         assertEquals(null, back.captureImagePath)
         assertEquals(null, back.captureCropPath)
         assertTrue(back.captureBaseDepth != null)
     }
+
+    @Test
+    fun ocrBackKeepsCropAndNewCropClearsDraft() {
+        val crop = frame()
+        val ocr = cropFlow().attachCropImage("/tmp/crop-b.jpg", crop)
+        val backToCrop = ocr.back()
+        assertEquals(Route.Crop, backToCrop.current.route)
+        assertEquals(crop, backToCrop.captureCrop)
+        assertEquals("/tmp/crop-b.jpg", backToCrop.captureCropPath)
+
+        val draft = OcrDraft(stem = "题干", options = listOf("甲", "乙", "丙", "丁"))
+        val match = ocr.attachOcrText(draft)
+        assertEquals(Route.Match, match.current.route)
+        val backToOcr = match.back()
+        assertEquals(Route.Ocr, backToOcr.current.route)
+        assertEquals(draft, backToOcr.captureDraft)
+        val recropped = backToOcr.back().attachCropImage("/tmp/crop-c.jpg", crop)
+        assertEquals(null, recropped.captureDraft)
+    }
+
+    @Test
+    fun retakeFromOcrRestartsAtCameraWithNothingKept() {
+        val ocr = cropFlow().attachCropImage("/tmp/crop-b.jpg", frame())
+        val retake = ocr.retakeFromOcr()
+        assertEquals(Route.Camera, retake.current.route)
+        assertEquals(2, retake.stack.size)
+        assertEquals(1, retake.captureBaseDepth)
+        assertEquals(null, retake.captureImagePath)
+        assertEquals(null, retake.captureCropPath)
+        assertEquals(null, retake.captureCrop)
+        assertEquals(null, retake.captureDraft)
+    }
+
+    private fun cropFlow(): RouterState =
+        RouterState(tab = AppTab.Example).startCapture()
+            .attachCaptureImage("/tmp/capture-a.jpg").nextCapture()
+
+    private fun frame(): CropFrame =
+        CropFrame(left = 0.05f, top = 0.1f, right = 0.95f, bottom = 0.8f, quarterTurns = 2, fineDegrees = -3f)
 
     @Test
     fun goToMistakesAlwaysReturnsToRootAndTop() {

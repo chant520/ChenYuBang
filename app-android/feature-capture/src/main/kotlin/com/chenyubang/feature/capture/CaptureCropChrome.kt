@@ -52,7 +52,6 @@ import androidx.compose.ui.unit.sp
 import com.chenyubang.core.ui.CChromeGlyph
 import com.chenyubang.core.ui.CChromeIcon
 import com.chenyubang.core.ui.tokens.Tokens
-import kotlin.math.hypot
 import kotlin.math.roundToInt
 
 internal const val ROTATION_QUARTERS = 4
@@ -60,10 +59,22 @@ private const val QUARTER_DEGREES = 90f
 private const val ANGLE_LIMIT = 15f
 private const val ANGLE_STEP_DIVISIONS = 2f
 private const val ANGLE_SLIDER_STEPS = 59
-private const val CORNER_LEFT_TOP = 0
-private const val CORNER_RIGHT_TOP = 1
-private const val CORNER_LEFT_BOTTOM = 2
-private const val CORNER_RIGHT_BOTTOM = 3
+
+/** 画布入参：图片、框选、摆正与失败标记一次传入，避免逐项长参数表。 */
+internal data class CropView(
+    val bitmap: Bitmap?,
+    val crop: RectF?,
+    val quarterTurns: Int,
+    val fineDegrees: Float,
+    val failed: Boolean,
+)
+
+/** 四角标记的笔形（长度、线宽、颜色）。 */
+private class CornerPen(
+    val length: Float,
+    val stroke: Float,
+    val color: Color,
+)
 
 @Composable
 internal fun CropHeader(
@@ -104,12 +115,8 @@ internal fun CropHeader(
 
 @Composable
 internal fun CropCanvasBox(
-    bitmap: Bitmap?,
-    crop: RectF?,
-    quarterTurns: Int,
-    fineDegrees: Float,
+    view: CropView,
     colors: Tokens.ColorSet,
-    failed: Boolean,
     onCropChange: (RectF) -> Unit,
     onSizeChange: (IntSize) -> Unit,
     modifier: Modifier,
@@ -119,28 +126,29 @@ internal fun CropCanvasBox(
             .onSizeChanged(onSizeChange),
         contentAlignment = Alignment.Center,
     ) {
+        val bitmap = view.bitmap
+        val crop = view.crop
         when {
-            failed -> Text("图片读取失败，请返回重拍", color = Tokens.Dark.warnfg, fontSize = Tokens.Font.n12.sp)
+            view.failed -> Text("图片读取失败，请返回重拍", color = Tokens.Dark.warnfg, fontSize = Tokens.Font.n12.sp)
             bitmap == null || crop == null ->
                 Text(
                     "正在读取图片…",
                     color = Tokens.Dark.camhint,
                     fontSize = Tokens.Font.n12.sp,
                 )
-            else -> CropCanvas(bitmap, crop, quarterTurns, fineDegrees, colors, onCropChange)
+            else -> CropCanvas(view, colors, onCropChange)
         }
     }
 }
 
 @Composable
 private fun CropCanvas(
-    bitmap: Bitmap,
-    crop: RectF,
-    quarterTurns: Int,
-    fineDegrees: Float,
+    view: CropView,
     colors: Tokens.ColorSet,
     onCropChange: (RectF) -> Unit,
 ) {
+    val bitmap = requireNotNull(view.bitmap)
+    val crop = requireNotNull(view.crop)
     val density = LocalDensity.current
     val image = remember(bitmap) { bitmap.asImageBitmap() }
     val latestCrop by rememberUpdatedState(crop)
@@ -148,7 +156,7 @@ private fun CropCanvas(
     val minSizePx = with(density) { Tokens.Space.cropMin.dp.toPx() }
     val hitRadius = with(density) { Tokens.Space.hitMin.dp.toPx() }
     Canvas(
-        Modifier.fillMaxSize().pointerInput(quarterTurns) {
+        Modifier.fillMaxSize().pointerInput(view.quarterTurns) {
             detectDragGestures(
                 onDragStart = { offset -> corner = nearestCorner(latestCrop, size, offset, hitRadius) },
                 onDragEnd = { corner = null },
@@ -160,10 +168,11 @@ private fun CropCanvas(
             }
         },
     ) {
-        val scale = CropImage.fitScale(bitmap.width, bitmap.height, size.width, size.height, quarterTurns)
+        val scale =
+            CropImage.fitScale(bitmap.width, bitmap.height, size.width, size.height, view.quarterTurns)
         withTransform({
             translate(size.width / 2f, size.height / 2f)
-            rotate(quarterTurns * QUARTER_DEGREES + fineDegrees)
+            rotate(view.quarterTurns * QUARTER_DEGREES + view.fineDegrees)
             scale(scale, scale)
             translate(-bitmap.width / 2f, -bitmap.height / 2f)
         }) {
@@ -187,12 +196,16 @@ private fun DrawScope.drawCropOverlay(
         size = Size(width, height),
         style = Stroke(width = Tokens.Space.cropEdge.dp.toPx()),
     )
-    val handle = Tokens.Space.cropHandle.dp.toPx()
-    val stroke = Tokens.Space.cropHandleStroke.dp.toPx()
-    drawCorner(left, top, 1f, 1f, handle, stroke, colors.warnfg)
-    drawCorner(left + width, top, -1f, 1f, handle, stroke, colors.warnfg)
-    drawCorner(left, top + height, 1f, -1f, handle, stroke, colors.warnfg)
-    drawCorner(left + width, top + height, -1f, -1f, handle, stroke, colors.warnfg)
+    val pen =
+        CornerPen(
+            length = Tokens.Space.cropHandle.dp.toPx(),
+            stroke = Tokens.Space.cropHandleStroke.dp.toPx(),
+            color = colors.warnfg,
+        )
+    drawCorner(left, top, 1f, 1f, pen)
+    drawCorner(left + width, top, -1f, 1f, pen)
+    drawCorner(left, top + height, 1f, -1f, pen)
+    drawCorner(left + width, top + height, -1f, -1f, pen)
 }
 
 private fun DrawScope.drawCorner(
@@ -200,12 +213,10 @@ private fun DrawScope.drawCorner(
     y: Float,
     dx: Float,
     dy: Float,
-    length: Float,
-    stroke: Float,
-    color: Color,
+    pen: CornerPen,
 ) {
-    drawLine(color, Offset(x, y), Offset(x + dx * length, y), stroke, cap = StrokeCap.Square)
-    drawLine(color, Offset(x, y), Offset(x, y + dy * length), stroke, cap = StrokeCap.Square)
+    drawLine(pen.color, Offset(x, y), Offset(x + dx * pen.length, y), pen.stroke, cap = StrokeCap.Square)
+    drawLine(pen.color, Offset(x, y), Offset(x, y + dy * pen.length), pen.stroke, cap = StrokeCap.Square)
 }
 
 @Composable
@@ -285,67 +296,4 @@ internal fun AdjustPanel(
             modifier = Modifier.clickable(onClick = onReset),
         )
     }
-}
-
-private fun angleLabel(fineDegrees: Float): String = if (fineDegrees > 0f) "+$fineDegrees°" else "$fineDegrees°"
-
-private fun cornerPoints(
-    crop: RectF,
-    size: IntSize,
-): List<Offset> {
-    val left = crop.left * size.width
-    val right = crop.right * size.width
-    val top = crop.top * size.height
-    val bottom = crop.bottom * size.height
-    return listOf(
-        Offset(left, top),
-        Offset(right, top),
-        Offset(left, bottom),
-        Offset(right, bottom),
-    )
-}
-
-private fun nearestCorner(
-    crop: RectF,
-    size: IntSize,
-    point: Offset,
-    hitRadius: Float,
-): Int? {
-    val distances = cornerPoints(crop, size).map { hypot(it.x - point.x, it.y - point.y) }
-    val best = distances.indices.minByOrNull { distances[it] } ?: return null
-    return if (distances[best] <= hitRadius) best else null
-}
-
-private fun moveCorner(
-    crop: RectF,
-    corner: Int,
-    drag: Offset,
-    size: IntSize,
-    minSizePx: Float,
-): RectF {
-    val minWidth = (minSizePx / size.width).coerceAtMost(1f)
-    val minHeight = (minSizePx / size.height).coerceAtMost(1f)
-    val dx = drag.x / size.width
-    val dy = drag.y / size.height
-    val moved = RectF(crop)
-    when (corner) {
-        CORNER_LEFT_TOP -> {
-            moved.left = (crop.left + dx).coerceIn(0f, crop.right - minWidth)
-            moved.top = (crop.top + dy).coerceIn(0f, crop.bottom - minHeight)
-        }
-        CORNER_RIGHT_TOP -> {
-            moved.right = (crop.right + dx).coerceIn(crop.left + minWidth, 1f)
-            moved.top = (crop.top + dy).coerceIn(0f, crop.bottom - minHeight)
-        }
-        CORNER_LEFT_BOTTOM -> {
-            moved.left = (crop.left + dx).coerceIn(0f, crop.right - minWidth)
-            moved.bottom = (crop.bottom + dy).coerceIn(crop.top + minHeight, 1f)
-        }
-        CORNER_RIGHT_BOTTOM -> {
-            moved.right = (crop.right + dx).coerceIn(crop.left + minWidth, 1f)
-            moved.bottom = (crop.bottom + dy).coerceIn(crop.top + minHeight, 1f)
-        }
-        else -> Unit
-    }
-    return moved
 }

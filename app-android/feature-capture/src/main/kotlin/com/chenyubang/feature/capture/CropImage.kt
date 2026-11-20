@@ -13,6 +13,15 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
 
+/** 一次导出所需输入：源图、框选与摆正、预览容器尺寸、目标文件。 */
+internal data class CropExport(
+    val source: Bitmap,
+    val crop: CropFrame,
+    val containerWidth: Float,
+    val containerHeight: Float,
+    val target: File,
+)
+
 /**
  * P18 图片管线（纯本机，零联网）：读取 P17 交来的 JPEG、按内容给一次初始框、
  * 按旋转/微调/框选导出裁切图。导出图只保留框内内容，交给 P19 识别。
@@ -31,6 +40,8 @@ internal object CropImage {
     private const val JPEG_QUALITY = 90
     private const val MAX_OUTPUT_DIM = 4096
     private const val STRAIGHT_ANGLE = 90f
+    private const val UPSIDE_DOWN_ANGLE = 180f
+    private const val TURNED_ANGLE = 270f
     private const val BORDER_SAMPLES = 40
     private const val LUMINANCE_RED = 0.299f
     private const val LUMINANCE_GREEN = 0.587f
@@ -78,33 +89,32 @@ internal object CropImage {
     }
 
     /** 导出框内画面；quarterTurns 为 90° 整转，fineDegrees 为「摆正」微调。 */
-    fun export(
-        source: Bitmap,
-        quarterTurns: Int,
-        fineDegrees: Float,
-        crop: RectF,
-        containerWidth: Float,
-        containerHeight: Float,
-        target: File,
-    ): Boolean {
-        if (crop.width() <= 0f || crop.height() <= 0f || containerWidth <= 0f || containerHeight <= 0f) {
+    fun export(request: CropExport): Boolean {
+        val crop = request.crop.toRectF()
+        if (cropIsEmpty(crop) || request.containerWidth <= 0f || request.containerHeight <= 0f) {
             return false
         }
-        val scale = fitScale(source.width, source.height, containerWidth, containerHeight, quarterTurns)
-        val cropWidth = crop.width() * containerWidth * scale
-        val cropHeight = crop.height() * containerHeight * scale
+        val source = request.source
+        val scale =
+            fitScale(
+                source.width,
+                source.height,
+                request.containerWidth,
+                request.containerHeight,
+                request.crop.quarterTurns,
+            )
+        val cropWidth = crop.width() * request.containerWidth * scale
+        val cropHeight = crop.height() * request.containerHeight * scale
         val shrink = min(1f, MAX_OUTPUT_DIM / max(cropWidth, cropHeight))
         val outputWidth = (cropWidth * shrink).roundToInt().coerceAtLeast(1)
         val outputHeight = (cropHeight * shrink).roundToInt().coerceAtLeast(1)
-        val outputScale = scale * shrink
         val output = Bitmap.createBitmap(outputWidth, outputHeight, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(output)
         canvas.drawColor(Color.WHITE)
-        val matrix = exportMatrix(crop, containerWidth, containerHeight, source, quarterTurns, fineDegrees, outputScale)
-        canvas.drawBitmap(source, matrix, null)
+        canvas.drawBitmap(source, exportMatrix(request, scale * shrink), null)
         val written =
             try {
-                target.outputStream().use { output.compress(Bitmap.CompressFormat.JPEG, JPEG_QUALITY, it) }
+                request.target.outputStream().use { output.compress(Bitmap.CompressFormat.JPEG, JPEG_QUALITY, it) }
             } catch (_: IOException) {
                 false
             }
@@ -113,20 +123,17 @@ internal object CropImage {
     }
 
     private fun exportMatrix(
-        crop: RectF,
-        containerWidth: Float,
-        containerHeight: Float,
-        source: Bitmap,
-        quarterTurns: Int,
-        fineDegrees: Float,
+        request: CropExport,
         scale: Float,
     ): Matrix =
         Matrix().apply {
+            val source = request.source
+            val crop = request.crop
             postTranslate(-source.width / 2f, -source.height / 2f)
             postScale(scale, scale)
-            postRotate(quarterTurns * STRAIGHT_ANGLE + fineDegrees)
-            postTranslate(containerWidth / 2f * scale, containerHeight / 2f * scale)
-            postTranslate(-crop.left * containerWidth * scale, -crop.top * containerHeight * scale)
+            postRotate(crop.quarterTurns * STRAIGHT_ANGLE + crop.fineDegrees)
+            postTranslate(request.containerWidth / 2f * scale, request.containerHeight / 2f * scale)
+            postTranslate(-crop.left * request.containerWidth * scale, -crop.top * request.containerHeight * scale)
         }
 
     private fun applyExifOrientation(
@@ -143,8 +150,8 @@ internal object CropImage {
             Matrix().apply {
                 when (orientation) {
                     ExifInterface.ORIENTATION_ROTATE_90 -> postRotate(STRAIGHT_ANGLE)
-                    ExifInterface.ORIENTATION_ROTATE_180 -> postRotate(STRAIGHT_ANGLE * 2)
-                    ExifInterface.ORIENTATION_ROTATE_270 -> postRotate(STRAIGHT_ANGLE * 3)
+                    ExifInterface.ORIENTATION_ROTATE_180 -> postRotate(UPSIDE_DOWN_ANGLE)
+                    ExifInterface.ORIENTATION_ROTATE_270 -> postRotate(TURNED_ANGLE)
                     ExifInterface.ORIENTATION_FLIP_HORIZONTAL -> postScale(-1f, 1f)
                     ExifInterface.ORIENTATION_FLIP_VERTICAL -> postScale(1f, -1f)
                     ExifInterface.ORIENTATION_TRANSPOSE -> {
@@ -205,15 +212,17 @@ internal object CropImage {
         val right = columns.indexOfLast { it > columnMin }
         val top = rows.indexOfFirst { it > rowMin }
         val bottom = rows.indexOfLast { it > rowMin }
-        return if (left < 0 || top < 0 || right <= left || bottom <= top) {
-            RectF(EDGE_INSET, EDGE_INSET, 1f - EDGE_INSET, 1f - EDGE_INSET)
-        } else {
+        val hasColumns = left >= 0 && right > left
+        val hasRows = top >= 0 && bottom > top
+        return if (hasColumns && hasRows) {
             RectF(
                 left.toFloat() / width,
                 top.toFloat() / height,
                 (right + 1).toFloat() / width,
                 (bottom + 1).toFloat() / height,
             )
+        } else {
+            RectF(EDGE_INSET, EDGE_INSET, 1f - EDGE_INSET, 1f - EDGE_INSET)
         }
     }
 

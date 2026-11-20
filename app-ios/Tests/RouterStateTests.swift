@@ -325,6 +325,50 @@ extension RouterStateTests {
         XCTAssertNotNil(router.topRequests[.mistake])
     }
 
+    func testOcrRetakeRestartsAtCameraAndDropsArtifacts() throws {
+        let router = RouterState()
+        router.beginCapture()
+        let workflowID = try XCTUnwrap(router.captureWorkflow?.id)
+        let image = URL(fileURLWithPath: "/test-fixture/image.jpg")
+        router.captured(workflowID: workflowID, imageURL: image)
+        router.cropped(workflowID: workflowID, imageURL: image)
+        XCTAssertTrue(router.recognized(
+            workflowID: workflowID, entryID: router.currentEntry.id, text: "ocr-text"
+        ))
+        router.back()
+        XCTAssertEqual(router.currentEntry.route, .ocr)
+        XCTAssertTrue(router.retakeFromOcr(workflowID: workflowID))
+        XCTAssertEqual(router.fullScreenEntries.map(\.route), [.camera])
+        XCTAssertNotNil(router.captureWorkflow)
+        XCTAssertNil(router.captureWorkflow?.imageURL)
+        XCTAssertNil(router.captureWorkflow?.croppedURL)
+        XCTAssertNil(router.captureWorkflow?.recognizedText)
+        XCTAssertFalse(router.retakeFromOcr(workflowID: workflowID))
+        XCTAssertFalse(router.retakeFromOcr(workflowID: UUID()))
+    }
+
+    func testOcrManualEntryAdvancesWithEmptyTextAndKeepsEditsOnReturn() throws {
+        let router = RouterState()
+        router.beginCapture()
+        let workflowID = try XCTUnwrap(router.captureWorkflow?.id)
+        let image = URL(fileURLWithPath: "/test-fixture/image.jpg")
+        router.captured(workflowID: workflowID, imageURL: image)
+        router.cropped(workflowID: workflowID, imageURL: image)
+        let ocrEntryID = router.currentEntry.id
+        XCTAssertFalse(router.recognizedManually(workflowID: workflowID, entryID: UUID()))
+        XCTAssertTrue(router.recognizedManually(workflowID: workflowID, entryID: ocrEntryID))
+        XCTAssertEqual(router.currentEntry.route, .match)
+        XCTAssertNil(router.captureWorkflow?.recognizedText)
+        router.back()
+        XCTAssertEqual(router.currentEntry.route, .ocr)
+        XCTAssertEqual(router.currentEntry.id, ocrEntryID)
+        XCTAssertTrue(router.recognized(workflowID: workflowID, entryID: ocrEntryID, text: "A. 补上的字"))
+        XCTAssertEqual(router.captureWorkflow?.recognizedText, "A. 补上的字")
+        router.back()
+        XCTAssertEqual(router.currentEntry.route, .ocr)
+        XCTAssertEqual(router.captureWorkflow?.recognizedText, "A. 补上的字")
+    }
+
     func testFirstLaunchBlocksChromeAndNavigationUntilSaved() {
         let router = RouterState(needsFirstLaunch: true)
         XCTAssertEqual(router.currentEntry.route, .onboarding)
@@ -340,3 +384,4 @@ extension RouterStateTests {
         XCTAssertEqual(router.currentEntry.route, .recommend)
     }
 }
+

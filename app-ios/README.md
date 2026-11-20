@@ -46,7 +46,7 @@ xcodebuild -project ChenYuBang.xcodeproj -scheme ChenYuBang \
 - ❌ **未编译验证 / 需 Xcode 复核**：本机是 Windows，没有 Xcode / Swift 工具链。Swift 源码与 `project.pbxproj` 是静态骨架；pbxproj 仅做过括号平衡 / ID 引用完整性静态自检，**未经 Xcode 打开验证**（能否被 Xcode 正确识别需在 macOS + Xcode 16 上复核）。
 - ❌ 快照测试 target 与基线图片尚未入库：CI 的 `xcodebuild test` 已接入 swift-snapshot-testing 依赖，但需后续补测试代码与基线后才会产生实际快照断言。
 - ❌ GRDB 需首次 `swift package resolve` 联网拉取（CI 上跑；本机断网）。
-- ❌ Vision OCR 适配器未写（等 OCR 实测口径确定后接入，规范 §2.3）。
+- ✅ Vision OCR 适配器已写（`Sources/Features/FeatureCapture/VisionOcrEngine.swift`：`zh-Hans` / `.accurate` / 短边 ≥1400 上采样，零联网）；Windows 只做语法解析，编译与 XCTest 由 macOS CI 验证，真机识别精度复测后置（B1）。
 - ❌ 备份包 zip 的读写、图片目录约定尚未实现（§4.3）。
 
 ## OCR 口径（勿改）

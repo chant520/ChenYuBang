@@ -1,5 +1,7 @@
 package com.chenyubang.app
 
+import com.chenyubang.feature.capture.CropFrame
+import com.chenyubang.feature.capture.OcrDraft
 import java.io.Serializable
 
 data class RouteEntry(val route: Route, val id: String? = null, val instance: Long = 0) : Serializable {
@@ -25,6 +27,10 @@ data class RouterState(
     val captureImagePath: String? = null,
     /** P18 导出的裁切图路径；P19 起只读这份图，框外内容不参与识别。 */
     val captureCropPath: String? = null,
+    /** P18 交出的框选与摆正参数；P19 返回 P18 时据此还原（信息架构 v1.4 第 29 条）。 */
+    val captureCrop: CropFrame? = null,
+    /** P19「下一步」带出的题干与选项草稿；P20 返回时回填（信息架构 v1.4 第 30 条）。 */
+    val captureDraft: OcrDraft? = null,
     val sequence: Long = 1,
     val rootTopEpoch: Map<AppTab, Int> = AppTab.entries.associateWith { 0 },
 ) : Serializable {
@@ -84,6 +90,7 @@ data class RouterState(
                 withStack(stack.dropLast(1)).copy(
                     captureImagePath = null,
                     captureCropPath = null,
+                    captureCrop = null,
                 )
             current.route == Route.Done -> cancelCapture()
             stack.size > 1 -> withStack(stack.dropLast(1))

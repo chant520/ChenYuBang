@@ -171,6 +171,22 @@ private struct AppRoutePage: View {
                 onRetake: { router.back() },
                 onImageReady: { url in _ = router.cropped(workflowID: workflowID, imageURL: url) }
             )
+        } else if entry.route == .ocr,
+                  let workflowID = router.captureWorkflow?.id,
+                  let imageURL = router.captureWorkflow?.croppedURL {
+            P19OcrScreen(
+                imageURL: imageURL,
+                onBack: { router.back() },
+                onRetake: { _ = router.retakeFromOcr(workflowID: workflowID) },
+                onManual: { _ = router.recognizedManually(workflowID: workflowID, entryID: entry.id) },
+                onNext: { text in
+                    if text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                        _ = router.recognizedManually(workflowID: workflowID, entryID: entry.id)
+                    } else {
+                        _ = router.recognized(workflowID: workflowID, entryID: entry.id, text: text)
+                    }
+                }
+            )
         } else {
             RoutePlaceholderPage(router: router, launch: launch, entry: entry, tab: tab)
         }

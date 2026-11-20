@@ -204,6 +204,27 @@ final class RouterState: ObservableObject {
         return true
     }
 
+    /// P19 失败态「手动补字」：以空文本进入修正页（IA §4.3 链路 27 第三条退路）。
+    @discardableResult
+    func recognizedManually(workflowID: UUID, entryID: UUID) -> Bool {
+        guard accepts(workflowID, step: .ocr), currentEntry.id == entryID else { return false }
+        captureWorkflow?.recognizedText = nil
+        fullScreenEntries.append(RouteEntry(route: .match))
+        return true
+    }
+
+    /// P19 失败态「重拍这张」：回 P17 重拍，原图 / 裁切图 / 识别文本全部作废。
+    @discardableResult
+    func retakeFromOcr(workflowID: UUID) -> Bool {
+        guard accepts(workflowID, step: .ocr) else { return false }
+        captureWorkflow?.imageURL = nil
+        captureWorkflow?.croppedURL = nil
+        captureWorkflow?.recognizedText = nil
+        captureWorkflow?.draftID = nil
+        fullScreenEntries = [RouteEntry(route: .camera)]
+        return true
+    }
+
     /// 匹配业务保留真实草稿引用；保存成功回调之前仍停留在 Match。
     @discardableResult
     func matched(workflowID: UUID, draftID: String) -> Bool {

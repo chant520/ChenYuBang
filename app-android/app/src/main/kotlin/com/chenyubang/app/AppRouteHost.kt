@@ -46,9 +46,8 @@ import com.chenyubang.core.ui.CInput
 import com.chenyubang.core.ui.COverlay
 import com.chenyubang.core.ui.tokens.Tokens
 import com.chenyubang.feature.me.ExamScopeSaver
+import com.chenyubang.ocr.PaddleOcrEngine
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 /** app只编排路由、生命周期和Data注入；目的地不产生题目/统计/成功结果。 */
 @Composable
@@ -56,6 +55,7 @@ fun AppRouteHost(database: AppDatabase) {
     val context = LocalContext.current.applicationContext
     val scopeStore = remember(database) { ExamScopeStore(database) }
     val importer = remember(database) { PackImporter(database, context) }
+    val ocrEngine = remember { PaddleOcrEngine(context) }
     var currentPack by remember { mutableStateOf<ValidatedPack?>(null) }
     var preferences by remember { mutableStateOf<LaunchPreferences?>(null) }
     var loadError by remember { mutableStateOf(false) }
@@ -64,27 +64,10 @@ fun AppRouteHost(database: AppDatabase) {
     LaunchedEffect(database, loadAttempt) {
         loadError = false
         try {
-            val pack =
-                withContext(Dispatchers.IO) {
-                    context.assets.open("pack-v1.0.0.zip").use(importer::validate)
-                }
-            importer.import(pack)
-            currentPack = pack
-            availableProvinces = scopeStore.availableProvinces()
-            val loaded = scopeStore.load()
-            if (!loaded.complete) {
-                // P01 首次启动即按产品默认写入 exam_scope（国考 + 省考 + 事业编，省考省份默认全选）；
-                // 库中已有范围行时 loaded.scope 就是既有值，原样写回，不覆盖用户设置。
-                val scope =
-                    if (loaded.scope == ExamScopeSelection()) {
-                        loaded.scope.copy(provinces = availableProvinces.toSet())
-                    } else {
-                        loaded.scope
-                    }
-                scopeStore.save(scope, complete = false)
-                importer.refreshScopeLinks(pack)
-            }
-            preferences = loaded
+            val launch = loadInitialLaunch(context, importer, scopeStore)
+            currentPack = launch.pack
+            availableProvinces = launch.provinces
+            preferences = launch.preferences
         } catch (cancelled: CancellationException) {
             throw cancelled
         } catch (_: Exception) {
@@ -108,19 +91,20 @@ fun AppRouteHost(database: AppDatabase) {
         }
         return
     }
-    RouterShell(loaded.scope, availableProvinces, saver, database) {
-        preferences = loaded.copy(scope = it)
-    }
+    RouterShell(
+        RouteDeps(
+            scope = loaded.scope,
+            database = database,
+            availableProvinces = availableProvinces,
+            scopeSaver = saver,
+            onScopeSaved = { preferences = loaded.copy(scope = it) },
+            ocrEngine = ocrEngine,
+        ),
+    )
 }
 
 @Composable
-private fun RouterShell(
-    scope: ExamScopeSelection,
-    availableProvinces: List<String>,
-    scopeSaver: ExamScopeSaver,
-    database: AppDatabase,
-    onScopeSaved: (ExamScopeSelection) -> Unit,
-) {
+private fun RouterShell(deps: RouteDeps) {
     var router by rememberSaveable { mutableStateOf(RouterState()) }
     var confirmExit by remember { mutableStateOf(false) }
     val holder = rememberSaveableStateHolder()
@@ -135,7 +119,6 @@ private fun RouterShell(
             Box(Modifier.weight(1f)) {
                 val entry = router.current
                 holder.SaveableStateProvider("${router.tab.name}:${entry.instance}") {
-                    val deps = RouteDeps(scope, database, availableProvinces, scopeSaver, onScopeSaved)
                     RouteContent(entry, router, deps) { router = it }
                 }
             }
