@@ -85,6 +85,10 @@
 		A00000000000000000000096 /* CLabelSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000196 /* CLabelSnapshotTests.swift */; };
 		A00000000000000000000097 /* CLetterIndexSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000197 /* CLetterIndexSnapshotTests.swift */; };
 		A00000000000000000000098 /* CLinkSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000198 /* CLinkSnapshotTests.swift */; };
+		A000000000000000000000B1 /* P20MatchModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001B1 /* P20MatchModel.swift */; };
+		A000000000000000000000B2 /* P20MatchScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001B2 /* P20MatchScreen.swift */; };
+		A000000000000000000000B3 /* P20MatchModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001B3 /* P20MatchModelTests.swift */; };
+		A000000000000000000000B4 /* P20MatchSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001B4 /* P20MatchSnapshotTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -171,6 +175,10 @@
 		A00000000000000000000196 /* CLabelSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLabelSnapshotTests.swift; sourceTree = "<group>"; };
 		A00000000000000000000197 /* CLetterIndexSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLetterIndexSnapshotTests.swift; sourceTree = "<group>"; };
 		A00000000000000000000198 /* CLinkSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLinkSnapshotTests.swift; sourceTree = "<group>"; };
+		A000000000000000000001B1 /* P20MatchModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P20MatchModel.swift; sourceTree = "<group>"; };
+		A000000000000000000001B2 /* P20MatchScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P20MatchScreen.swift; sourceTree = "<group>"; };
+		A000000000000000000001B3 /* P20MatchModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P20MatchModelTests.swift; sourceTree = "<group>"; };
+		A000000000000000000001B4 /* P20MatchSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P20MatchSnapshotTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -305,6 +313,8 @@
 				A000000000000000000001AD /* P19OcrModel.swift */,
 				A000000000000000000001AE /* P19OcrChrome.swift */,
 				A000000000000000000001AF /* P19OcrScreen.swift */,
+				A000000000000000000001B1 /* P20MatchModel.swift */,
+				A000000000000000000001B2 /* P20MatchScreen.swift */,
 			);
 			path = FeatureCapture;
 			sourceTree = "<group>";
@@ -344,6 +354,8 @@
 				A00000000000000000000197 /* CLetterIndexSnapshotTests.swift */,
 				A00000000000000000000198 /* CLinkSnapshotTests.swift */,
 				A000000000000000000001B0 /* OcrTextLayoutTests.swift */,
+				A000000000000000000001B3 /* P20MatchModelTests.swift */,
+				A000000000000000000001B4 /* P20MatchSnapshotTests.swift */,
 				A00000000000000000000152 /* pack fixture */,
 			);
 			path = Tests;
@@ -510,6 +522,8 @@
 				A000000000000000000000AD /* P19OcrModel.swift in Sources */,
 				A000000000000000000000AE /* P19OcrChrome.swift in Sources */,
 				A000000000000000000000AF /* P19OcrScreen.swift in Sources */,
+				A000000000000000000000B1 /* P20MatchModel.swift in Sources */,
+				A000000000000000000000B2 /* P20MatchScreen.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -549,6 +563,8 @@
 				A00000000000000000000097 /* CLetterIndexSnapshotTests.swift in Sources */,
 				A00000000000000000000098 /* CLinkSnapshotTests.swift in Sources */,
 				A000000000000000000000B0 /* OcrTextLayoutTests.swift in Sources */,
+				A000000000000000000000B3 /* P20MatchModelTests.swift in Sources */,
+				A000000000000000000000B4 /* P20MatchSnapshotTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

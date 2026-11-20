@@ -148,6 +148,16 @@ interface IdiomWordDao {
 }
 
 /**
+ * P20 候选生成的全库只读查询（工作包 2.4）。与 [IdiomDao.libraryIdioms] 的考试范围过滤区分：
+ * 这里全量取词，调用方只做文本命中判定；独立 DAO 避免 IdiomDao 函数数越过 detekt 阈值。
+ */
+@Dao
+interface IdiomMatchDao {
+    @Query("SELECT * FROM idiom ORDER BY word")
+    suspend fun allIdioms(): List<IdiomEntity>
+}
+
+/**
  * 例题 DAO（规范 §4.1 `example` / `example_idiom`，只读查询，不加表不迁移）。
  *
  * 工作包 1.5 / 1.6 三处查询：
@@ -214,6 +224,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun idiomDao(): IdiomDao
 
     abstract fun idiomWordDao(): IdiomWordDao
+
+    abstract fun idiomMatchDao(): IdiomMatchDao
 
     abstract fun exampleDao(): ExampleDao
 
