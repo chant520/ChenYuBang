@@ -3,6 +3,9 @@ package com.chenyubang.app
 import androidx.compose.runtime.Composable
 import com.chenyubang.feature.capture.CaptureCameraScreen
 import com.chenyubang.feature.capture.CaptureCropScreen
+import com.chenyubang.feature.capture.CaptureOcrScreen
+import com.chenyubang.feature.capture.OcrDraft
+import com.chenyubang.feature.capture.OcrScreenActions
 
 /** 按当前路由渲染目标页；P04/P05 的返回与跳转与其余路由同口径。 */
 @Composable
@@ -47,6 +50,19 @@ internal fun RouteContent(
             ExampleDestination(requireNotNull(entry.id), deps.database, { onRoute(router.back()) }) { id ->
                 onRoute(router.push(Route.Idiom, id))
             }
+        else -> CaptureRouteContent(entry, router, deps, onRoute)
+    }
+}
+
+/** P17–P19 五个录题步骤的落点；未拿到上一步产物时退回占位页。 */
+@Composable
+private fun CaptureRouteContent(
+    entry: RouteEntry,
+    router: RouterState,
+    deps: RouteDeps,
+    onRoute: (RouterState) -> Unit,
+) {
+    when (entry.route) {
         Route.Camera ->
             CaptureCameraScreen(
                 onCancel = { onRoute(router.back()) },
@@ -56,8 +72,24 @@ internal fun RouteContent(
             router.captureImagePath?.let { path ->
                 CaptureCropScreen(
                     imagePath = path,
+                    initialCrop = router.captureCrop,
                     onRetake = { onRoute(router.back()) },
-                    onNext = { cropped -> onRoute(router.attachCropImage(cropped)) },
+                    onNext = { selection -> onRoute(router.attachCropImage(selection.path, selection.frame)) },
+                )
+            } ?: RoutePlaceholder(router, deps.scope, onRoute)
+        Route.Ocr ->
+            router.captureCropPath?.let { path ->
+                CaptureOcrScreen(
+                    cropPath = path,
+                    engine = deps.ocrEngine,
+                    initialDraft = router.captureDraft,
+                    actions =
+                        OcrScreenActions(
+                            onBack = { onRoute(router.back()) },
+                            onRetake = { onRoute(router.retakeFromOcr()) },
+                            onManual = { onRoute(router.attachOcrText(OcrDraft(stem = "", options = emptyList()))) },
+                            onNext = { draft -> onRoute(router.attachOcrText(draft)) },
+                        ),
                 )
             } ?: RoutePlaceholder(router, deps.scope, onRoute)
         else -> RoutePlaceholder(router, deps.scope, onRoute)

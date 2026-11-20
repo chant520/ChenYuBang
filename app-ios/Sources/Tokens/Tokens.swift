@@ -393,6 +393,16 @@ public enum Tokens {
         public static let cropRowBottom: CGFloat = 14
         public static let cropAdjustTop: CGFloat = 10
         public static let cropAdjustBottom: CGFloat = 4
+        public static let ocrTop: CGFloat = 16
+        public static let ocrThumb: CGFloat = 44
+        public static let ocrThumbGap: CGFloat = 8
+        public static let ocrRowBottom: CGFloat = 12
+        public static let ocrInputGap: CGFloat = 12
+        public static let ocrHintBottom: CGFloat = 14
+        public static let ocrGhostTop: CGFloat = 11
+        public static let ocrGhostBottom: CGFloat = 12
+        public static let ocrFailGap: CGFloat = 16
+        public static let ocrNoteTop: CGFloat = 6
     }
 
     public enum Icon {

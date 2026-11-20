@@ -23,5 +23,7 @@ android {
 
 dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
-    // 端侧 OCR 引擎（PaddleOCR mobile）未接入：模型与 AAR 需在 OCR 实测通过后落地，见规范 §2.3、§15
+    // Paddle-Lite 2.10 Java 源码随包（src/main/java/com/baidu/paddle/lite），JNI .so 在 jniLibs/arm64-v8a；
+    // 模型 PP-OCRv3 slim det/rec 在 assets/ocr。版本口径见 docs/开发规范-v1.6.md §13。
+    testImplementation("junit:junit:4.13.2")
 }

@@ -74,6 +74,12 @@
 		A000000000000000000000A8 /* P18CropModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001A8 /* P18CropModel.swift */; };
 		A000000000000000000000A9 /* P18CropChrome.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001A9 /* P18CropChrome.swift */; };
 		A000000000000000000000AA /* P18CropScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001AA /* P18CropScreen.swift */; };
+		A000000000000000000000AB /* OcrTextLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001AB /* OcrTextLayout.swift */; };
+		A000000000000000000000AC /* VisionOcrEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001AC /* VisionOcrEngine.swift */; };
+		A000000000000000000000AD /* P19OcrModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001AD /* P19OcrModel.swift */; };
+		A000000000000000000000AE /* P19OcrChrome.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001AE /* P19OcrChrome.swift */; };
+		A000000000000000000000AF /* P19OcrScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001AF /* P19OcrScreen.swift */; };
+		A000000000000000000000B0 /* OcrTextLayoutTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001B0 /* OcrTextLayoutTests.swift */; };
 		A00000000000000000000094 /* CCardSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000194 /* CCardSnapshotTests.swift */; };
 		A00000000000000000000095 /* CEmptyStateSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000195 /* CEmptyStateSnapshotTests.swift */; };
 		A00000000000000000000096 /* CLabelSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000196 /* CLabelSnapshotTests.swift */; };
@@ -154,6 +160,12 @@
 		A000000000000000000001A8 /* P18CropModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P18CropModel.swift; sourceTree = "<group>"; };
 		A000000000000000000001A9 /* P18CropChrome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P18CropChrome.swift; sourceTree = "<group>"; };
 		A000000000000000000001AA /* P18CropScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P18CropScreen.swift; sourceTree = "<group>"; };
+		A000000000000000000001AB /* OcrTextLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OcrTextLayout.swift; sourceTree = "<group>"; };
+		A000000000000000000001AC /* VisionOcrEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionOcrEngine.swift; sourceTree = "<group>"; };
+		A000000000000000000001AD /* P19OcrModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P19OcrModel.swift; sourceTree = "<group>"; };
+		A000000000000000000001AE /* P19OcrChrome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P19OcrChrome.swift; sourceTree = "<group>"; };
+		A000000000000000000001AF /* P19OcrScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P19OcrScreen.swift; sourceTree = "<group>"; };
+		A000000000000000000001B0 /* OcrTextLayoutTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OcrTextLayoutTests.swift; sourceTree = "<group>"; };
 		A00000000000000000000194 /* CCardSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CCardSnapshotTests.swift; sourceTree = "<group>"; };
 		A00000000000000000000195 /* CEmptyStateSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CEmptyStateSnapshotTests.swift; sourceTree = "<group>"; };
 		A00000000000000000000196 /* CLabelSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLabelSnapshotTests.swift; sourceTree = "<group>"; };
@@ -288,6 +300,11 @@
 				A000000000000000000001A8 /* P18CropModel.swift */,
 				A000000000000000000001A9 /* P18CropChrome.swift */,
 				A000000000000000000001AA /* P18CropScreen.swift */,
+				A000000000000000000001AB /* OcrTextLayout.swift */,
+				A000000000000000000001AC /* VisionOcrEngine.swift */,
+				A000000000000000000001AD /* P19OcrModel.swift */,
+				A000000000000000000001AE /* P19OcrChrome.swift */,
+				A000000000000000000001AF /* P19OcrScreen.swift */,
 			);
 			path = FeatureCapture;
 			sourceTree = "<group>";
@@ -326,6 +343,7 @@
 				A00000000000000000000196 /* CLabelSnapshotTests.swift */,
 				A00000000000000000000197 /* CLetterIndexSnapshotTests.swift */,
 				A00000000000000000000198 /* CLinkSnapshotTests.swift */,
+				A000000000000000000001B0 /* OcrTextLayoutTests.swift */,
 				A00000000000000000000152 /* pack fixture */,
 			);
 			path = Tests;
@@ -487,6 +505,11 @@
 				A000000000000000000000A8 /* P18CropModel.swift in Sources */,
 				A000000000000000000000A9 /* P18CropChrome.swift in Sources */,
 				A000000000000000000000AA /* P18CropScreen.swift in Sources */,
+				A000000000000000000000AB /* OcrTextLayout.swift in Sources */,
+				A000000000000000000000AC /* VisionOcrEngine.swift in Sources */,
+				A000000000000000000000AD /* P19OcrModel.swift in Sources */,
+				A000000000000000000000AE /* P19OcrChrome.swift in Sources */,
+				A000000000000000000000AF /* P19OcrScreen.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -525,6 +548,7 @@
 				A00000000000000000000096 /* CLabelSnapshotTests.swift in Sources */,
 				A00000000000000000000097 /* CLetterIndexSnapshotTests.swift in Sources */,
 				A00000000000000000000098 /* CLinkSnapshotTests.swift in Sources */,
+				A000000000000000000000B0 /* OcrTextLayoutTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
