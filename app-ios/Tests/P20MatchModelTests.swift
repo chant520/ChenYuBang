@@ -31,10 +31,10 @@ final class P20MatchModelTests: XCTestCase {
     }
 
     func testBestTieBrokenByFrequencyThenWord() {
-        let yi = idiom("id-y", "乙成语", 4)
+        let yiWord = idiom("id-y", "乙成语", 4)
         let jia = idiom("id-j", "甲成语", 4)
         let model = P20MatchModel()
-        model.bootstrap(text: "乙成语 和 甲成语", idioms: [yi, jia])
+        model.bootstrap(text: "乙成语 和 甲成语", idioms: [yiWord, jia])
         let state = model.state
         XCTAssertEqual(state.checkedId, "id-y") // 乙(U+4E59) < 甲(U+7532)
         XCTAssertTrue(tier(of: "id-y", in: state) == .best)

@@ -42,7 +42,7 @@ final class P20MatchSnapshotTests: XCTestCase {
         state.candidates = [
             MatchCandidate(id: idAnbu, word: "按部就班", frequency: 5, tier: .best),
             MatchCandidate(id: idMoshou, word: "墨守成规", frequency: 4, tier: .sameQuestion),
-            MatchCandidate(id: idBiechu, word: "别出心裁", frequency: 4, tier: .semantic),
+            MatchCandidate(id: idBiechu, word: "别出心裁", frequency: 4, tier: .semantic)
         ]
         state.checkedId = idAnbu
         state.poolSize = 3

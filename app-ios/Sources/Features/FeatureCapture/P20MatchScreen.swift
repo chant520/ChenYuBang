@@ -259,11 +259,14 @@ public struct P20MatchContent: View {
                 showsDivider: !isLast && !state.deleteMode
             )
             if state.deleteMode {
-                Button(action: { actions.onDelete(candidate.id) }) {
-                    CIcon(.close, size: Tokens.Icon.n18, strokeWidth: 1.6, color: colors.text2)
-                        .frame(width: Tokens.Space.hitMin, height: Tokens.Space.hitMin)
-                        .contentShape(Rectangle())
-                }
+                Button(
+                    action: { actions.onDelete(candidate.id) },
+                    label: {
+                        CIcon(.close, size: Tokens.Icon.n18, strokeWidth: 1.6, color: colors.text2)
+                            .frame(width: Tokens.Space.hitMin, height: Tokens.Space.hitMin)
+                            .contentShape(Rectangle())
+                    }
+                )
                 .buttonStyle(CPressDimStyle())
                 .accessibilityLabel("删除\(candidate.word)")
             }
