@@ -47,9 +47,14 @@ public struct P20MatchScreen: View {
         )
         P20MatchContent(state: model.state, actions: actions, colors: colors)
             .task {
-                let idioms = (try? reader.allIdiomsForMatch()) ?? []
-                let matches = idioms.map(MatchIdiom.init(record:))
-                await MainActor.run { model.bootstrap(text: text, idioms: matches) }
+                let library = reader
+                let matches = await Task.detached(priority: .userInitiated) {
+                    (try? library.allIdiomsForMatch())?.map(MatchIdiom.init(record:))
+                }.value
+                await MainActor.run {
+                    model.bootstrap(text: text, idioms: matches ?? [])
+                    if matches == nil { model.showInfo(P20Matcher.readFailed) }
+                }
             }
     }
 }
@@ -142,10 +147,8 @@ public struct P20MatchContent: View {
             }
             .background(colors.page)
             if state.showManualPicker {
-                COverlay(style: .sheet, title: P20Matcher.manualAction, onDismiss: actions.onDismissManual) {
-                    actions.manualPicker(actions.onManualPick, actions.onDismissManual)
-                        .frame(height: Tokens.Space.imgphH * 3.5)
-                }
+                // 浮层套用 P04 搜索（信息架构 v1.4 跳转 45）：整屏复用 P04 自带头部，不另加标题与高度。
+                actions.manualPicker(actions.onManualPick, actions.onDismissManual)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -186,7 +189,7 @@ public struct P20MatchContent: View {
                 Spacer(minLength: 0)
                 CLink("改文字", action: actions.onEdit)
             }
-            Text(state.reviewText.isEmpty ? "（无识别文字）" : state.reviewText)
+            Text(state.reviewText.isEmpty ? P20Matcher.noText : state.reviewText)
                 .font(.system(size: Tokens.Font.n13))
                 .foregroundStyle(colors.text)
                 .frame(maxWidth: .infinity, alignment: .leading)

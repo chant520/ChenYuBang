@@ -145,6 +145,36 @@ final class P20MatchModelTests: XCTestCase {
         XCTAssertFalse(model.state.deleteMode)
     }
 
+    func testDeleteOtherRowKeepsUserCheckAndRepromotesBest() {
+        let model = P20MatchModel()
+        model.bootstrap(text: "按部就班 墨守成规 标新立异", idioms: sampleIdioms)
+        model.select(id: idMoshou)
+        model.toggleDeleteMode()
+
+        // 删语义相近行：不动用户勾选。
+        model.remove(id: idBiechu)
+        XCTAssertEqual(model.state.checkedId, idMoshou)
+
+        // 删掉原最匹配：勾选项仍是墨守成规，且升为最匹配。
+        model.remove(id: idAnbu)
+        XCTAssertEqual(model.state.checkedId, idMoshou)
+        XCTAssertTrue(tier(of: idMoshou, in: model.state) == .best)
+    }
+
+    func testBestSurvivesCandidateTruncation() {
+        // 61 条词命中，最匹配按 word 升序排在第 51 位之后，不能被 prefix(50) 截掉。
+        let filler = (0..<60).map { idiom("id-f\($0)", String(format: "阿%02d", $0), 1) }
+        let best = idiom("id-best", "词最末", 99)
+        let all = filler + [best]
+        let model = P20MatchModel()
+        model.bootstrap(text: all.map(\.word).joined(separator: " "), idioms: all)
+        let state = model.state
+        XCTAssertEqual(state.poolSize, 50)
+        XCTAssertTrue(state.candidates.contains { $0.id == "id-best" })
+        XCTAssertEqual(state.checkedId, "id-best")
+        XCTAssertTrue(tier(of: "id-best", in: state) == .best)
+    }
+
     func testSelectAlwaysKeepsExactlyOne() {
         let model = P20MatchModel()
         model.bootstrap(text: "按部就班 墨守成规", idioms: [anbu, moshou])

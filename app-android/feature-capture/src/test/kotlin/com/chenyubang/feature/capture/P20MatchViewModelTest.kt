@@ -154,6 +154,37 @@ class P20MatchViewModelTest {
     }
 
     @Test
+    fun deleteOtherRowKeepsUserCheckAndRepromotesBest() {
+        val model = P20MatchViewModel().also { it.bootstrap("按部就班 墨守成规 标新立异", sampleIdioms) }
+        model.select(ID_MOSHOU)
+        model.toggleDeleteMode()
+
+        // 删语义相近行：不动用户勾选。
+        model.remove(ID_BIECHU)
+        assertEquals(ID_MOSHOU, model.state.value.checkedId)
+
+        // 删掉原最匹配：勾选项仍是墨守成规，且升为最匹配。
+        model.remove(ID_ANBU)
+        assertEquals(ID_MOSHOU, model.state.value.checkedId)
+        assertEquals(MatchTier.Best, tierOf(model.state.value, ID_MOSHOU))
+    }
+
+    @Test
+    fun bestSurvivesCandidateTruncation() {
+        // 61 条词命中，最匹配按 word 升序排在第 51 位之后，不能被 take(50) 截掉。
+        val filler = (0 until 60).map { index -> idiom("id-f$index", "阿%02d".format(index), 1) }
+        val best = idiom("id-best", "词最末", 99)
+        val all = filler + best
+        val text = all.joinToString(" ") { it.word }
+        val model = P20MatchViewModel().also { it.bootstrap(text, all) }
+        val state = model.state.value
+        assertEquals(50, state.poolSize)
+        assertTrue(state.candidates.any { it.id == "id-best" })
+        assertEquals("id-best", state.checkedId)
+        assertEquals(MatchTier.Best, tierOf(state, "id-best"))
+    }
+
+    @Test
     fun selectAlwaysKeepsExactlyOne() {
         val model = P20MatchViewModel().also { it.bootstrap("按部就班 墨守成规", listOf(anbu, moshou)) }
         model.select(ID_MOSHOU)

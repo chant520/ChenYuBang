@@ -89,6 +89,8 @@ object P20Matcher {
     const val NO_MORE_CANDIDATES = "没有更多候选"
     const val CANDIDATE_LIMIT = "候选最多 50 条"
     const val SAVE_INFO = "保存功能下一步开放"
+    const val NO_TEXT = "（无识别文字）"
+    const val READ_FAILED = "题库读取失败，请重试"
 
     private val json = Json { ignoreUnknownKeys = true }
 
@@ -113,7 +115,8 @@ object P20Matcher {
         }
 
     /**
-     * 命中 → 去重 → 按 word 升序取前 50；bestId 在 word 命中词里 frequency 高优先、同频 word 升序取第一条。
+     * 命中 → 去重 → 按 word 升序取前 50；bestId 在全部 word 命中词里 frequency 高优先、同频 word 升序取一条。
+     * 最匹配落在前 50 之外时用其替换末位并重新按 word 排序，保证展示窗口一定能勾到它。
      * 一个词同时命中 word 与 synonyms 时只按最高档归位。
      */
     fun buildPool(
@@ -128,8 +131,8 @@ object P20Matcher {
                 !wordHit && synonymsOf(idiom.synonyms).any { it.isNotBlank() && text.contains(it) }
             if (wordHit || synonymHit) hits.putIfAbsent(idiom.id, idiom to wordHit)
         }
-        val ordered = hits.values.sortedBy { it.first.word }.take(MAX_CANDIDATES)
-        val bestId =
+        val ordered = hits.values.sortedBy { it.first.word }
+        val best =
             ordered
                 .filter { it.second }
                 .sortedWith(
@@ -137,11 +140,15 @@ object P20Matcher {
                         .thenBy { it.first.word },
                 )
                 .firstOrNull()
-                ?.first
-                ?.id
+        val bestId = best?.first?.id
+        val pool = ordered.take(MAX_CANDIDATES).toMutableList()
+        if (best != null && pool.none { it.first.id == best.first.id }) {
+            pool[pool.lastIndex] = best
+            pool.sortBy { it.first.word }
+        }
         return P20PoolResult(
             candidates =
-                ordered.map { (entity, wordHit) ->
+                pool.map { (entity, wordHit) ->
                     MatchCandidate(
                         id = entity.id,
                         word = entity.word,
@@ -243,24 +250,32 @@ class P20MatchViewModel : ViewModel() {
         _state.value = _state.value.copy(deleteMode = !_state.value.deleteMode, info = null)
     }
 
-    /** 删一个：移除该条（同时从池移除，避免换一个又带回来）；删光进空态并退出删除态。 */
+    /**
+     * 删一个：从展示区和池内一并移除（避免换一个又带回来）。
+     * 用户勾选项仍在则保留；被删的正是勾选项时退回新最匹配。
+     * 档位按池内剩余词命中重算：删掉最匹配后次优词命中升为最匹配。
+     */
     fun remove(id: String) {
-        val next = _state.value.candidates.filterNot { it.id == id }
+        val before = _state.value
         pool = pool.filterNot { it.id == id }
         if (windowStart >= pool.size) windowStart = 0
-        // 删掉当前勾选项时，在剩余 word 命中词里按「最匹配」规则重选。
+        val next = before.candidates.filterNot { it.id == id }
         bestId =
-            next
+            pool
                 .filter { it.tier == MatchTier.Best || it.tier == MatchTier.SameQuestion }
                 .sortedWith(compareByDescending<MatchCandidate> { it.frequency }.thenBy { it.word })
                 .firstOrNull()
                 ?.id
+        pool = pool.map { it.relabeled(bestId) }
+        val relabeled = next.map { it.relabeled(bestId) }
         _state.value =
-            _state.value.copy(
-                candidates = next,
-                checkedId = firstCheck(next, bestId),
+            before.copy(
+                candidates = relabeled,
+                checkedId =
+                    relabeled.firstOrNull { it.id == before.checkedId }?.id
+                        ?: firstCheck(relabeled, bestId),
                 poolSize = pool.size,
-                deleteMode = next.isNotEmpty() && _state.value.deleteMode,
+                deleteMode = relabeled.isNotEmpty() && before.deleteMode,
                 info = null,
             )
     }
@@ -308,3 +323,11 @@ private fun firstCheck(
     if (display.isEmpty()) return null
     return if (bestId != null && display.any { it.id == bestId }) bestId else display.first().id
 }
+
+/** 删后重打档位：词命中的候选按新 bestId 归位，语义相近与加/手选的标签原样保留。 */
+private fun MatchCandidate.relabeled(bestId: String?): MatchCandidate =
+    when (tier) {
+        MatchTier.Semantic, MatchTier.Added, MatchTier.Manual -> this
+        MatchTier.Best, MatchTier.SameQuestion ->
+            copy(tier = if (id == bestId) MatchTier.Best else MatchTier.SameQuestion)
+    }
