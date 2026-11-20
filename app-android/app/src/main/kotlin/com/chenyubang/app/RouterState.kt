@@ -1,6 +1,7 @@
 package com.chenyubang.app
 
 import com.chenyubang.feature.capture.CropFrame
+import com.chenyubang.feature.capture.IdiomRef
 import com.chenyubang.feature.capture.OcrDraft
 import java.io.Serializable
 
@@ -16,13 +17,18 @@ data class ReviewSession(val source: RouteEntry, val baseDepth: Int, val idiomId
     }
 }
 
+/** P21 只出不回：Done 页禁用系统返回键；其余路由沿用栈深度 / 浮层口径（参照 RouteHeader）。 */
+internal fun systemBackEnabled(router: RouterState): Boolean =
+    router.current.route != Route.Done && (router.stack.size > 1 || router.modal != null)
+
 data class RouterState(
     val tab: AppTab = AppTab.Idiom,
     val stacks: Map<AppTab, List<RouteEntry>> = AppTab.entries.associateWith { listOf(RouteEntry(it.root)) },
     val modal: Route? = null,
     val review: ReviewSession? = null,
     val captureBaseDepth: Int? = null,
-    val capturedIdiomId: String? = null,
+    /** P21 归属列表（候选顺序，手动增补排末尾）；去成语详情取第一条。 */
+    val capturedIdioms: List<IdiomRef> = emptyList(),
     /** P17 拍下/选中的本机图片路径；取消或保存完成后清空（信息架构 v1.4 §4.3）。 */
     val captureImagePath: String? = null,
     /** P18 导出的裁切图路径；P19 起只读这份图，框外内容不参与识别。 */

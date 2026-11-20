@@ -214,9 +214,10 @@ interface MistakeDao {
         IdiomStateEntity::class,
         SettingEntity::class,
         UserExampleEntity::class,
+        UserExampleIdiomEntity::class,
         IdiomFtsEntity::class,
     ],
-    version = 2,
+    version = 3,
     exportSchema = true,
 )
 @TypeConverters(Converters::class)
@@ -230,6 +231,10 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun exampleDao(): ExampleDao
 
     abstract fun mistakeDao(): MistakeDao
+
+    abstract fun userExampleDao(): UserExampleDao
+
+    abstract fun userExampleIdiomDao(): UserExampleIdiomDao
 
     companion object {
         const val NAME = "chenyubang.db"

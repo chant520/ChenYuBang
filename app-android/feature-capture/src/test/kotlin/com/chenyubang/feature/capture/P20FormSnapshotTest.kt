@@ -14,18 +14,15 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
-/** P20 黄金快照（规范 §11.1）：浅/深主态 + 浅/深空态，四张新基线，不覆盖基线 C/D 图。 */
+/** P20 多选态快照（规范 §11.1）：新增两选中态基线，不覆盖既有单选态基线。 */
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 @Config(sdk = [34], qualifiers = "w360dp-h812dp-xhdpi")
-class P20MatchSnapshotTest {
+class P20FormSnapshotTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    private fun capture(
-        night: Boolean,
-        empty: Boolean,
-    ) {
+    private fun capture(night: Boolean) {
         composeTestRule.setContent {
             val base = LocalConfiguration.current
             val nightBits = if (night) Configuration.UI_MODE_NIGHT_YES else Configuration.UI_MODE_NIGHT_NO
@@ -33,61 +30,45 @@ class P20MatchSnapshotTest {
             config.uiMode = (config.uiMode and Configuration.UI_MODE_NIGHT_MASK.inv()) or nightBits
             CompositionLocalProvider(LocalConfiguration provides config) {
                 ChenYuBangTheme(darkTheme = night) {
-                    P20MatchContent(
-                        state = if (empty) emptyState() else mainState(),
-                        actions =
-                            P20MatchActions(
-                                onEdit = {},
-                                onSelect = {},
-                                onCycle = {},
-                                onAdd = {},
-                                onToggleDelete = {},
-                                onDelete = {},
-                                onOpenManual = {},
-                                onDismissManual = {},
-                                onManualPick = {},
-                                onSave = {},
-                                onDismissInfo = {},
-                                manualPicker = { _, _ -> },
-                            ),
-                    )
+                    P20FormContent(state = twoSelectedState(), actions = P20CaptureActions())
                 }
             }
         }
         composeTestRule.onRoot().captureRoboImage()
     }
 
-    private fun mainState(): P20MatchUiState =
-        P20MatchUiState(
+    private fun twoSelectedState(): P20CaptureState =
+        P20CaptureState(
             reviewText = "下列各句中，加点的成语使用不恰当的一项是……\nA．新厂长按部就班 B．做事标新立异 C．从不墨守成规",
             candidates =
                 listOf(
+                    MatchCandidate(ID_BIECHU, "别出心裁", 4, MatchTier.SameQuestion),
+                    MatchCandidate(ID_MOSHOU, "墨守成规", 4, MatchTier.Semantic),
                     MatchCandidate(ID_ANBU, "按部就班", 5, MatchTier.Best),
-                    MatchCandidate(ID_MOSHOU, "墨守成规", 4, MatchTier.SameQuestion),
-                    MatchCandidate(ID_BIECHU, "别出心裁", 4, MatchTier.Semantic),
                 ),
-            checkedId = ID_ANBU,
+            checked =
+                listOf(
+                    IdiomRef(ID_BIECHU, "别出心裁"),
+                    IdiomRef(ID_MOSHOU, "墨守成规"),
+                ),
             poolSize = 3,
+            form =
+                P20FormState(
+                    isMistake = true,
+                    answer = "A",
+                    reason = "把贬义词当褒义用了",
+                    tags = listOf("褒贬误用", "望文生义"),
+                    examType = "省考",
+                    yearText = "2025",
+                ),
             loading = false,
         )
 
-    private fun emptyState(): P20MatchUiState =
-        P20MatchUiState(
-            reviewText = "今天天气不错，我们出去散步吧。",
-            loading = false,
-        )
+    @Test
+    fun twoSelectedLight() = capture(night = false)
 
     @Test
-    fun mainLight() = capture(night = false, empty = false)
-
-    @Test
-    fun mainDark() = capture(night = true, empty = false)
-
-    @Test
-    fun emptyLight() = capture(night = false, empty = true)
-
-    @Test
-    fun emptyDark() = capture(night = true, empty = true)
+    fun twoSelectedDark() = capture(night = true)
 
     private companion object {
         const val ID_ANBU = "11111111-1111-4111-8111-111111111111"

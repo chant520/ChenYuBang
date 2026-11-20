@@ -36,6 +36,7 @@ import com.chenyubang.core.data.ExamScopeSelection
 import com.chenyubang.core.data.ExamScopeStore
 import com.chenyubang.core.data.LaunchPreferences
 import com.chenyubang.core.data.PackImporter
+import com.chenyubang.core.data.UserExampleSaver
 import com.chenyubang.core.data.ValidatedPack
 import com.chenyubang.core.ui.CButton
 import com.chenyubang.core.ui.CButtonVariant
@@ -48,6 +49,7 @@ import com.chenyubang.core.ui.tokens.Tokens
 import com.chenyubang.feature.me.ExamScopeSaver
 import com.chenyubang.ocr.PaddleOcrEngine
 import kotlinx.coroutines.CancellationException
+import java.io.File
 
 /** app只编排路由、生命周期和Data注入；目的地不产生题目/统计/成功结果。 */
 @Composable
@@ -56,6 +58,8 @@ fun AppRouteHost(database: AppDatabase) {
     val scopeStore = remember(database) { ExamScopeStore(database) }
     val importer = remember(database) { PackImporter(database, context) }
     val ocrEngine = remember { PaddleOcrEngine(context) }
+    val userExampleSaver =
+        remember(database, context) { UserExampleSaver(database.userExampleDao(), File(context.filesDir, "images")) }
     var currentPack by remember { mutableStateOf<ValidatedPack?>(null) }
     var preferences by remember { mutableStateOf<LaunchPreferences?>(null) }
     var loadError by remember { mutableStateOf(false) }
@@ -99,6 +103,7 @@ fun AppRouteHost(database: AppDatabase) {
             scopeSaver = saver,
             onScopeSaved = { preferences = loaded.copy(scope = it) },
             ocrEngine = ocrEngine,
+            userExampleSaver = userExampleSaver,
         ),
     )
 }
@@ -110,7 +115,7 @@ private fun RouterShell(deps: RouteDeps) {
     val holder = rememberSaveableStateHolder()
     val colors = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
     val back = { if (router.current.route == Route.Queue) confirmExit = true else router = router.back() }
-    BackHandler(enabled = router.stack.size > 1 || router.modal != null, onBack = back)
+    BackHandler(enabled = systemBackEnabled(router), onBack = back)
     val onSearch: (() -> Unit)? =
         if (router.current.route == Route.Library) ({ router = router.push(Route.Search) }) else null
     Box(Modifier.fillMaxSize().background(colors.page)) {

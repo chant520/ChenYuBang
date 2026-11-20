@@ -1,11 +1,7 @@
 package com.chenyubang.feature.capture
 
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.ViewModel
 import com.chenyubang.core.data.IdiomEntity
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
@@ -91,6 +87,11 @@ object P20Matcher {
     const val SAVE_INFO = "保存功能下一步开放"
     const val NO_TEXT = "（无识别文字）"
     const val READ_FAILED = "题库读取失败，请重试"
+    const val AT_LEAST_ONE = "至少保留一条归属"
+    const val TAG_RULE = "标签需为 1–8 个字"
+    const val EMPTY_STEM = "题干为空，请返回识别结果补字后再保存"
+    const val NO_IMAGE = "原图缺失，请返回重拍"
+    const val SAVE_FAILED = "保存失败，请重试"
 
     private val json = Json { ignoreUnknownKeys = true }
 
@@ -173,161 +174,3 @@ object P20Matcher {
     fun manualCandidate(entity: IdiomEntity): MatchCandidate =
         MatchCandidate(entity.id, entity.word, entity.frequency, MatchTier.Manual)
 }
-
-/**
- * P20 ViewModel（纯状态机，无协程、无写库）。
- * 页面加载全库词表后调用 [bootstrap] 生成候选；其余操作均同步，便于单测覆盖三档/勾选/换加删/空态。
- */
-class P20MatchViewModel : ViewModel() {
-    private val _state = MutableStateFlow(P20MatchUiState())
-    val state: StateFlow<P20MatchUiState> = _state.asStateFlow()
-
-    private var allIdioms: List<IdiomEntity> = emptyList()
-    private var pool: List<MatchCandidate> = emptyList()
-    private var bestId: String? = null
-    private var windowStart = 0
-
-    /** 首屏装配：全库词表按 frequency DESC / word ASC 备好供「加一个」，再生成候选池与初始窗口。 */
-    fun bootstrap(
-        text: String,
-        idioms: List<IdiomEntity>,
-    ) {
-        allIdioms = idioms.sortedWith(compareByDescending<IdiomEntity> { it.frequency }.thenBy { it.word })
-        val result = P20Matcher.buildPool(text, idioms)
-        pool = result.candidates
-        bestId = result.bestId
-        windowStart = 0
-        val window = pool.take(P20Matcher.WINDOW_SIZE)
-        _state.value =
-            P20MatchUiState(
-                reviewText = text,
-                candidates = window,
-                checkedId = firstCheck(window, bestId),
-                poolSize = pool.size,
-                loading = false,
-            )
-    }
-
-    /** 用户点选某一行：勾选恒 1 条，点已勾选项不取消。 */
-    fun select(id: String) {
-        if (_state.value.candidates.any { it.id == id }) {
-            _state.value = _state.value.copy(checkedId = id)
-        }
-    }
-
-    /** 换一个：游标前进一批（K=3）取下一批替换展示，到池尾回卷池首；池 ≤K 禁用。 */
-    fun cycle() {
-        if (pool.size <= P20Matcher.WINDOW_SIZE) {
-            _state.value = _state.value.copy(info = P20Matcher.NO_MORE_CANDIDATES)
-            return
-        }
-        windowStart = (windowStart + P20Matcher.WINDOW_SIZE) % pool.size
-        val next = pool.drop(windowStart).take(P20Matcher.WINDOW_SIZE)
-        _state.value = _state.value.copy(candidates = next, checkedId = firstCheck(next, bestId), info = null)
-    }
-
-    /** 加一个：全库排除当前展示词，frequency DESC / word ASC 取一条追加末尾；满 50 禁用。 */
-    fun add() {
-        val current = _state.value.candidates
-        if (current.size >= P20Matcher.MAX_CANDIDATES) {
-            _state.value = _state.value.copy(info = P20Matcher.CANDIDATE_LIMIT)
-            return
-        }
-        val shown = current.map { it.id }.toSet()
-        val pick = allIdioms.firstOrNull { it.id !in shown }
-        if (pick == null) {
-            _state.value = _state.value.copy(info = P20Matcher.NO_MORE_CANDIDATES)
-            return
-        }
-        _state.value =
-            _state.value.copy(
-                candidates = current + P20Matcher.addedCandidate(pick),
-                info = null,
-            )
-    }
-
-    fun toggleDeleteMode() {
-        _state.value = _state.value.copy(deleteMode = !_state.value.deleteMode, info = null)
-    }
-
-    /**
-     * 删一个：从展示区和池内一并移除（避免换一个又带回来）。
-     * 用户勾选项仍在则保留；被删的正是勾选项时退回新最匹配。
-     * 档位按池内剩余词命中重算：删掉最匹配后次优词命中升为最匹配。
-     */
-    fun remove(id: String) {
-        val before = _state.value
-        pool = pool.filterNot { it.id == id }
-        if (windowStart >= pool.size) windowStart = 0
-        val next = before.candidates.filterNot { it.id == id }
-        bestId =
-            pool
-                .filter { it.tier == MatchTier.Best || it.tier == MatchTier.SameQuestion }
-                .sortedWith(compareByDescending<MatchCandidate> { it.frequency }.thenBy { it.word })
-                .firstOrNull()
-                ?.id
-        pool = pool.map { it.relabeled(bestId) }
-        val relabeled = next.map { it.relabeled(bestId) }
-        _state.value =
-            before.copy(
-                candidates = relabeled,
-                checkedId =
-                    relabeled.firstOrNull { it.id == before.checkedId }?.id
-                        ?: firstCheck(relabeled, bestId),
-                poolSize = pool.size,
-                deleteMode = relabeled.isNotEmpty() && before.deleteMode,
-                info = null,
-            )
-    }
-
-    /** 打开/关闭手选浮层；关闭时其余状态不变。 */
-    fun setManualPicker(visible: Boolean) {
-        _state.value = _state.value.copy(showManualPicker = visible)
-    }
-
-    /** 选中回填：覆盖候选区、默认勾该条、标「手动选择」，关闭浮层。 */
-    fun pickManual(id: String) {
-        val entity = allIdioms.firstOrNull { it.id == id }
-        if (entity == null) {
-            setManualPicker(false)
-            return
-        }
-        val candidate = P20Matcher.manualCandidate(entity)
-        pool = listOf(candidate)
-        bestId = null
-        windowStart = 0
-        _state.value =
-            P20MatchUiState(
-                reviewText = _state.value.reviewText,
-                candidates = listOf(candidate),
-                checkedId = candidate.id,
-                poolSize = 1,
-                loading = false,
-            )
-    }
-
-    fun showInfo(message: String) {
-        _state.value = _state.value.copy(info = message)
-    }
-
-    fun dismissInfo() {
-        _state.value = _state.value.copy(info = null)
-    }
-}
-
-/** 勾选跟着最匹配走；最匹配不在本批时退到本批首条，始终保证恰好一条。 */
-private fun firstCheck(
-    display: List<MatchCandidate>,
-    bestId: String?,
-): String? {
-    if (display.isEmpty()) return null
-    return if (bestId != null && display.any { it.id == bestId }) bestId else display.first().id
-}
-
-/** 删后重打档位：词命中的候选按新 bestId 归位，语义相近与加/手选的标签原样保留。 */
-private fun MatchCandidate.relabeled(bestId: String?): MatchCandidate =
-    when (tier) {
-        MatchTier.Semantic, MatchTier.Added, MatchTier.Manual -> this
-        MatchTier.Best, MatchTier.SameQuestion ->
-            copy(tier = if (id == bestId) MatchTier.Best else MatchTier.SameQuestion)
-    }

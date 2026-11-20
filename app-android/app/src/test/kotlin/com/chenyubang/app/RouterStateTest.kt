@@ -2,6 +2,7 @@ package com.chenyubang.app
 
 import com.chenyubang.core.data.ExamScopeSelection
 import com.chenyubang.feature.capture.CropFrame
+import com.chenyubang.feature.capture.IdiomRef
 import com.chenyubang.feature.capture.OcrDraft
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -99,13 +100,45 @@ class RouterStateTest {
                 assertEquals(null, cancelled.captureBaseDepth)
                 if (step < 3) flow = flow.nextCapture()
             }
-            val done = flow.captureSaved("real-saved-idiom-id")
+            val savedIdioms =
+                listOf(
+                    IdiomRef("first-idiom-id", "按部就班"),
+                    IdiomRef("second-idiom-id", "别出心裁"),
+                )
+            val done = flow.captureSaved("saved-ue-id", savedIdioms)
             assertEquals(Route.Done, done.current.route)
             assertEquals(source.stack, done.cancelCapture().stack)
-            assertEquals(Route.Idiom, done.captureDestination(Route.Idiom).current.route)
+            assertEquals(savedIdioms, done.capturedIdioms)
+            val detail = done.captureDestination(Route.Idiom)
+            assertEquals(Route.Idiom, detail.current.route)
+            assertEquals("first-idiom-id", detail.current.id)
             assertEquals(Route.Mistakes, done.captureDestination(Route.Mistakes).current.route)
             assertEquals(Route.Camera, done.captureDestination(Route.Camera).current.route)
+            assertTrue(done.captureDestination(Route.Camera).capturedIdioms.isEmpty())
         }
+    }
+
+    @Test
+    fun doneDisablesSystemBackWhileOtherRoutesKeepIt() {
+        val base = RouterState(tab = AppTab.Mistake)
+        val match =
+            base.startCapture().nextCapture().nextCapture()
+                .attachOcrText(OcrDraft(stem = "题干", options = listOf("甲")))
+        assertEquals(Route.Match, match.current.route)
+        assertTrue(systemBackEnabled(match))
+
+        val done = match.captureSaved("saved-id", listOf(IdiomRef("idiom-id", "按部就班")))
+        assertEquals(Route.Done, done.current.route)
+        assertFalse(systemBackEnabled(done))
+        // P21 只能通过三个去处离开；系统返回键在 Done 不触发 back()。
+        assertEquals(Route.Idiom, done.captureDestination(Route.Idiom).current.route)
+        assertEquals(Route.Mistakes, done.captureDestination(Route.Mistakes).current.route)
+        assertEquals(Route.Camera, done.captureDestination(Route.Camera).current.route)
+
+        // 其它路由返回能力不受影响。
+        assertFalse(systemBackEnabled(base))
+        assertTrue(systemBackEnabled(base.push(Route.Library)))
+        assertTrue(systemBackEnabled(RouterState(tab = AppTab.Me).present(Route.Clear)))
     }
 
     @Test
@@ -114,7 +147,7 @@ class RouterStateTest {
         val returned = source.startCapture().back()
         assertEquals(source.stack, returned.stack)
         assertEquals(null, returned.captureBaseDepth)
-        assertEquals(null, returned.capturedIdiomId)
+        assertTrue(returned.capturedIdioms.isEmpty())
         assertTrue(returned.showFab)
     }
 
@@ -183,7 +216,8 @@ class RouterStateTest {
         assertEquals(Route.Mistakes, returned.current.route)
         assertEquals(1, returned.stack.size)
         assertEquals(1, returned.rootTopEpoch[AppTab.Mistake])
-        val done = otherTab.back().startCapture().nextCapture().nextCapture().nextCapture().captureSaved("saved-id")
+        val flow = otherTab.back().startCapture().nextCapture().nextCapture().nextCapture()
+        val done = flow.captureSaved("saved-id", listOf(IdiomRef("idiom-id", "按部就班")))
         assertEquals(1, done.captureDestination(Route.Mistakes).stack.size)
     }
 
