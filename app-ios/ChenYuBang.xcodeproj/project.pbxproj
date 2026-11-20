@@ -96,6 +96,8 @@
 		A000000000000000000000B9 /* P21DoneSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001B9 /* P21DoneSnapshotTests.swift */; };
 		A000000000000000000000BB /* P20CandidatePool.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001BB /* P20CandidatePool.swift */; };
 		A000000000000000000000BC /* RouterCaptureResultTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001BC /* RouterCaptureResultTests.swift */; };
+		A000000000000000000000BD /* UserExampleSaverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001BD /* UserExampleSaverTests.swift */; };
+		A000000000000000000000BE /* P20FormModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001BE /* P20FormModelTests.swift */; };
 		A000000000000000000000BA /* P20MatchContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001BA /* P20MatchContent.swift */; };
 /* End PBXBuildFile section */
 
@@ -194,6 +196,8 @@
 		A000000000000000000001B9 /* P21DoneSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P21DoneSnapshotTests.swift; sourceTree = "<group>"; };
 		A000000000000000000001BB /* P20CandidatePool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P20CandidatePool.swift; sourceTree = "<group>"; };
 		A000000000000000000001BC /* RouterCaptureResultTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouterCaptureResultTests.swift; sourceTree = "<group>"; };
+		A000000000000000000001BD /* UserExampleSaverTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserExampleSaverTests.swift; sourceTree = "<group>"; };
+		A000000000000000000001BE /* P20FormModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P20FormModelTests.swift; sourceTree = "<group>"; };
 		A000000000000000000001BA /* P20MatchContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P20MatchContent.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -380,6 +384,8 @@
 				A000000000000000000001B4 /* P20MatchSnapshotTests.swift */,
 				A000000000000000000001B9 /* P21DoneSnapshotTests.swift */,
 				A000000000000000000001BC /* RouterCaptureResultTests.swift */,
+				A000000000000000000001BD /* UserExampleSaverTests.swift */,
+				A000000000000000000001BE /* P20FormModelTests.swift */,
 				A00000000000000000000152 /* pack fixture */,
 			);
 			path = Tests;
@@ -597,6 +603,8 @@
 				A000000000000000000000B4 /* P20MatchSnapshotTests.swift in Sources */,
 				A000000000000000000000B9 /* P21DoneSnapshotTests.swift in Sources */,
 				A000000000000000000000BC /* RouterCaptureResultTests.swift in Sources */,
+				A000000000000000000000BD /* UserExampleSaverTests.swift in Sources */,
+				A000000000000000000000BE /* P20FormModelTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

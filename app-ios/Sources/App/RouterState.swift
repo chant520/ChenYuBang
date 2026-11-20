@@ -166,6 +166,65 @@ final class RouterState: ObservableObject {
         return true
     }
 
+    func goToMistakes() {
+        guard !needsFirstLaunch, overlay == nil, captureWorkflow == nil else { return }
+        dismissFullScreen()
+        fullScreenEntries = []
+        selectedTab = .mistake
+        resetToRoot(.mistake)
+    }
+
+    func back() {
+        if overlay != nil { closeOverlay(); return }
+        guard canGoBack else { return }
+        if !fullScreenEntries.isEmpty {
+            if fullScreenEntries.count == 1 { dismissFullScreen() } else {
+                let leaving = fullScreenEntries.removeLast()
+                if leaving.route == .crop {
+                    // 返回/重拍回 P17：原图与裁切图都丢弃，重拍拿新图（IA §4.3 链路 28）。
+                    captureWorkflow?.imageURL = nil
+                    captureWorkflow?.croppedURL = nil
+                }
+                invalidateCaptureResults()
+            }
+        } else if entries(for: selectedTab).count > 1 {
+            tabEntries[selectedTab]?.removeLast()
+        }
+    }
+
+    func dismissFullScreen() {
+        fullScreenEntries = suspendedFullScreenEntries
+        suspendedFullScreenEntries = []
+        reviewSession = nil
+        captureWorkflow = nil
+    }
+
+    private var canStartFullScreen: Bool {
+        canStartWorkflow && fullScreenEntries.isEmpty
+    }
+
+    var canStartWorkflow: Bool {
+        !needsFirstLaunch && overlay == nil && reviewSession == nil && captureWorkflow == nil
+    }
+
+    private func resetToRoot(_ tab: AppTab) {
+        guard var root = entries(for: tab).first else { return }
+        root.viewState.scrollAnchor = nil
+        tabEntries[tab] = [root]
+        topRequests[tab] = UUID()
+    }
+
+    func validID(_ value: String?) -> Bool {
+        guard let value else { return false }
+        return !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    private func validQueue(_ values: [String]) -> Bool {
+        !values.isEmpty && values.allSatisfy { validID($0) }
+    }
+}
+
+extension RouterState {
     @discardableResult
     func beginCapture() -> Bool {
         guard canStartWorkflow else { return false }
@@ -283,68 +342,11 @@ final class RouterState: ObservableObject {
         return true
     }
 
-    func goToMistakes() {
-        guard !needsFirstLaunch, overlay == nil, captureWorkflow == nil else { return }
-        dismissFullScreen()
-        fullScreenEntries = []
-        selectedTab = .mistake
-        resetToRoot(.mistake)
-    }
-
-    func back() {
-        if overlay != nil { closeOverlay(); return }
-        guard canGoBack else { return }
-        if !fullScreenEntries.isEmpty {
-            if fullScreenEntries.count == 1 { dismissFullScreen() } else {
-                let leaving = fullScreenEntries.removeLast()
-                if leaving.route == .crop {
-                    // 返回/重拍回 P17：原图与裁切图都丢弃，重拍拿新图（IA §4.3 链路 28）。
-                    captureWorkflow?.imageURL = nil
-                    captureWorkflow?.croppedURL = nil
-                }
-                invalidateCaptureResults()
-            }
-        } else if entries(for: selectedTab).count > 1 {
-            tabEntries[selectedTab]?.removeLast()
-        }
-    }
-
-    func dismissFullScreen() {
-        fullScreenEntries = suspendedFullScreenEntries
-        suspendedFullScreenEntries = []
-        reviewSession = nil
-        captureWorkflow = nil
-    }
-
-    private var canStartFullScreen: Bool {
-        canStartWorkflow && fullScreenEntries.isEmpty
-    }
-
-    private var canStartWorkflow: Bool {
-        !needsFirstLaunch && overlay == nil && reviewSession == nil && captureWorkflow == nil
-    }
-
-    private func resetToRoot(_ tab: AppTab) {
-        guard var root = entries(for: tab).first else { return }
-        root.viewState.scrollAnchor = nil
-        tabEntries[tab] = [root]
-        topRequests[tab] = UUID()
-    }
-
-    private func validID(_ value: String?) -> Bool {
-        guard let value else { return false }
-        return !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-    }
-
-    private func validQueue(_ values: [String]) -> Bool {
-        !values.isEmpty && values.allSatisfy { validID($0) }
-    }
-
-    private func accepts(_ workflowID: UUID, step: AppRoute) -> Bool {
+    func accepts(_ workflowID: UUID, step: AppRoute) -> Bool {
         captureWorkflow?.id == workflowID && currentEntry.route == step
     }
 
-    private func invalidateCaptureResults() {
+    func invalidateCaptureResults() {
         guard captureWorkflow != nil else { return }
         clearSavedResult()
         if currentEntry.route == .camera || currentEntry.route == .crop {

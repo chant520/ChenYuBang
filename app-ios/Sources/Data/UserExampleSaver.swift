@@ -131,10 +131,7 @@ public final class UserExampleSaver: @unchecked Sendable {
                     )
                 }
                 if let mistakeID {
-                    try insertMistake(
-                        input, id: mistakeID, userExampleID: userExampleID,
-                        imagePath: relativePath, idioms: idioms, in: db
-                    )
+                    try insertMistake(input, id: mistakeID, userExampleID: userExampleID, idioms: idioms, in: db)
                 }
             }
         } catch {
@@ -185,10 +182,10 @@ public final class UserExampleSaver: @unchecked Sendable {
         _ input: CaptureSaveInput,
         id: String,
         userExampleID: String,
-        imagePath: String,
         idioms: [SavedIdiom],
         in db: Database
     ) throws {
+        let imagePath = "images/\(userExampleID).jpg"
         let reason = input.reason.trimmingCharacters(in: .whitespacesAndNewlines)
         let arguments: StatementArguments = [
             id, userExampleID, imagePath, input.ocrText, input.stem,
@@ -213,7 +210,7 @@ public final class UserExampleSaver: @unchecked Sendable {
 
     private func tagJSON(_ tags: [String]) -> String {
         guard let data = try? JSONEncoder().encode(tags) else { return "[]" }
-        return String(decoding: data, as: UTF8.self)
+        return String(data: data, encoding: .utf8) ?? "[]"
     }
 
     /// 与既有备份口径一致：UTC、秒级、无小数。
