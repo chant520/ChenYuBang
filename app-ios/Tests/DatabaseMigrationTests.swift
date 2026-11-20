@@ -61,7 +61,9 @@ final class DatabaseMigrationTests: XCTestCase {
         var failing = DatabaseMigrator()
         failing.registerMigration("v1") { _ in }
         failing.registerMigration("v2-interrupted") { db in
-            try db.create(table: "rollback_probe")
+            try db.create(table: "rollback_probe") { t in
+                t.column("id", .text)
+            }
             throw Interruption.simulated
         }
         XCTAssertThrowsError(try failing.migrate(queue))
