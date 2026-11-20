@@ -1,6 +1,7 @@
 package com.chenyubang.app
 
 import com.chenyubang.feature.capture.CropFrame
+import com.chenyubang.feature.capture.IdiomRef
 import com.chenyubang.feature.capture.OcrDraft
 
 fun RouterState.startCapture(): RouterState {
@@ -46,10 +47,21 @@ fun RouterState.retakeFromOcr(): RouterState {
         .startCapture()
 }
 
-fun RouterState.captureSaved(idiomId: String): RouterState {
-    require(captureBaseDepth != null && current.route == Route.Match && idiomId.isNotBlank())
+/** P20 保存成功：记下 userExampleId 与有序归属，P17–P20 出栈、压入 P21（无返回）。 */
+fun RouterState.captureSaved(
+    userExampleId: String,
+    idioms: List<IdiomRef>,
+): RouterState {
+    require(
+        captureBaseDepth != null &&
+            current.route == Route.Match &&
+            userExampleId.isNotBlank() &&
+            idioms.isNotEmpty(),
+    )
     val base = stack.take(requireNotNull(captureBaseDepth))
-    return withStack(base).append(RouteEntry(Route.Done, idiomId, sequence)).copy(capturedIdiomId = idiomId)
+    return withStack(base)
+        .append(RouteEntry(Route.Done, userExampleId, sequence))
+        .copy(capturedIdioms = idioms)
 }
 
 fun RouterState.cancelCapture(): RouterState {
@@ -57,7 +69,7 @@ fun RouterState.cancelCapture(): RouterState {
     return withStack(stack.take(depth))
         .copy(
             captureBaseDepth = null,
-            capturedIdiomId = null,
+            capturedIdioms = emptyList(),
             captureImagePath = null,
             captureCropPath = null,
             captureCrop = null,
@@ -67,10 +79,10 @@ fun RouterState.cancelCapture(): RouterState {
 
 fun RouterState.captureDestination(destination: Route): RouterState {
     require(current.route == Route.Done)
-    val id = requireNotNull(capturedIdiomId)
+    val first = requireNotNull(capturedIdioms.firstOrNull())
     val cleared = cancelCapture()
     return when (destination) {
-        Route.Idiom -> cleared.push(Route.Idiom, id)
+        Route.Idiom -> cleared.push(Route.Idiom, first.id)
         Route.Mistakes -> cleared.goToMistakes()
         Route.Camera -> cleared.startCapture()
         else -> error("Unsupported capture destination")

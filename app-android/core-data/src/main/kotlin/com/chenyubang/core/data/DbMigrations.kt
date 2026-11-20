@@ -14,6 +14,9 @@ import androidx.sqlite.db.SupportSQLiteDatabase
  * 禁止使用 fallbackToDestructiveMigration / 自动迁移推断。
  */
 object DbMigrations {
+    private const val VERSION_V2 = 2
+    private const val VERSION_V3 = 3
+
     /** v1→v2：新增 user_example（用户录入题）+ mistake.userExampleId 可空列（规范 §4.5 v2 方案）。 */
     val MIGRATION_1_2: Migration =
         object : Migration(1, 2) {
@@ -29,5 +32,34 @@ object DbMigrations {
             }
         }
 
-    val ALL: Array<Migration> = arrayOf(MIGRATION_1_2)
+    /**
+     * v2→v3：新增 user_example_idiom（录入题归属成语，联合主键 + 两列索引），
+     * 并对历史标错题按 mistake.userExampleId + mistake_idiom 防御性回填（已存在跳过、只补不删）。
+     */
+    val MIGRATION_2_3: Migration =
+        object : Migration(VERSION_V2, VERSION_V3) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `user_example_idiom` (" +
+                        "`userExampleId` TEXT NOT NULL, `idiomId` TEXT NOT NULL, " +
+                        "PRIMARY KEY(`userExampleId`,`idiomId`))",
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_user_example_idiom_userExampleId` " +
+                        "ON `user_example_idiom` (`userExampleId`)",
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_user_example_idiom_idiomId` " +
+                        "ON `user_example_idiom` (`idiomId`)",
+                )
+                db.execSQL(
+                    "INSERT OR IGNORE INTO user_example_idiom(userExampleId, idiomId) " +
+                        "SELECT m.userExampleId, mi.idiomId FROM mistake m " +
+                        "JOIN mistake_idiom mi ON mi.mistakeId = m.id " +
+                        "WHERE m.userExampleId IS NOT NULL",
+                )
+            }
+        }
+
+    val ALL: Array<Migration> = arrayOf(MIGRATION_1_2, MIGRATION_2_3)
 }

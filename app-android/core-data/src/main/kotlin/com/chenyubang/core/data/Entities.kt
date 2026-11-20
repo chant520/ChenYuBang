@@ -6,7 +6,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 
 /**
- * 11 张表（v1 十张 + v2 `user_example`），字段名与开发规范 §4.1 一一对应。
+ * 12 张表（v1 十张 + v2 `user_example` + v3 `user_example_idiom`），字段名与开发规范 §4.1 一一对应。
  * 主键一律 uuid 字符串（备份合并靠它去重）。时间一律 UTC ISO-8601 字符串，展示时转本地时区。
  */
 
@@ -134,4 +134,19 @@ data class UserExampleEntity(
     val year: Int? = null,
     val region: String? = null,
     val createdAt: String,
+)
+
+/**
+ * 录入题与成语的多对多关联（v3 新增，规范 §4.1 / §4.5）：一题多成语、P20 可多选、至少一条。
+ * 保存时与 `user_example` 同一事务写入全部勾选；决定录入题归属哪个成语，不进错题列表。
+ * 查询录入题按本表 JOIN 过滤，查询错题仍按 `mistake_idiom`；用户表，绝不随题库包导入替换（§4.6）。
+ */
+@Entity(
+    tableName = "user_example_idiom",
+    primaryKeys = ["userExampleId", "idiomId"],
+    indices = [Index("userExampleId"), Index("idiomId")],
+)
+data class UserExampleIdiomEntity(
+    val userExampleId: String,
+    val idiomId: String,
 )
