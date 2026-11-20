@@ -118,6 +118,8 @@ public enum P20Matcher {
     public static let noMoreCandidates = "没有更多候选"
     public static let candidateLimit = "候选最多 50 条"
     public static let saveInfo = "保存功能下一步开放"
+    public static let noText = "（无识别文字）"
+    public static let readFailed = "题库读取失败，请重试"
 
     /// synonyms 是 JSON 字符串列，解析失败 / 缺失 / 非法一律降级空数组，不抛到 UI。
     public static func synonyms(of raw: String) -> [String] {
@@ -127,7 +129,8 @@ public enum P20Matcher {
         return array
     }
 
-    /// 命中 → 去重 → 按 word 升序取前 50；bestId 在 word 命中词里 frequency 高优先、同频 word 升序取第一条。
+    /// 命中 → 去重 → 按 word 升序取前 50；bestId 在全部 word 命中词里 frequency 高优先、同频 word 升序取一条。
+    /// 最匹配落在前 50 之外时用其替换末位并重新按 word 排序，保证展示窗口一定能勾到它。
     /// 一个词同时命中 word 与 synonyms 时只按最高档归位。
     public static func buildPool(text: String, idioms: [MatchIdiom]) -> P20PoolResult {
         guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty, !idioms.isEmpty else {
@@ -148,8 +151,7 @@ public enum P20Matcher {
         let ordered: [(idiom: MatchIdiom, wordHit: Bool)] = order
             .compactMap { hits[$0] }
             .sorted { $0.idiom.word < $1.idiom.word }
-        let pool = Array(ordered.prefix(maxCandidates))
-        let bestId = pool
+        let best = ordered
             .filter { $0.wordHit }
             .sorted { lhs, rhs in
                 if lhs.idiom.frequency != rhs.idiom.frequency {
@@ -157,8 +159,13 @@ public enum P20Matcher {
                 }
                 return lhs.idiom.word < rhs.idiom.word
             }
-            .first?
-            .idiom.id
+            .first
+        let bestId = best?.idiom.id
+        var pool = Array(ordered.prefix(maxCandidates))
+        if let best, !pool.contains(where: { $0.idiom.id == best.idiom.id }) {
+            pool[pool.count - 1] = best
+            pool.sort { $0.idiom.word < $1.idiom.word }
+        }
         let candidates = pool.map { entry -> MatchCandidate in
             let tier: MatchTier
             if entry.idiom.id == bestId {
@@ -262,13 +269,14 @@ public final class P20MatchModel: ObservableObject {
         state.info = nil
     }
 
-    /// 删一个：移除该条（同时从池移除，避免换一个又带回来）；删光进空态并退出删除态。
-    /// 删掉当前勾选项时，在剩余 word 命中词里按「最匹配」规则重选。
+    /// 删一个：从展示区和池内一并移除。勾选项仍在则保留；被删的正是勾选项时退回新最匹配。
+    /// 档位按池内剩余词命中重算：删掉最匹配后次优词命中升为最匹配。
     public func remove(id: String) {
-        let next = state.candidates.filter { $0.id != id }
+        let before = state
         pool.removeAll { $0.id == id }
         if windowStart >= pool.count { windowStart = 0 }
-        bestId = next
+        let next = before.candidates.filter { $0.id != id }
+        bestId = pool
             .filter { $0.tier == .best || $0.tier == .sameQuestion }
             .sorted { lhs, rhs in
                 if lhs.frequency != rhs.frequency { return lhs.frequency > rhs.frequency }
@@ -276,10 +284,13 @@ public final class P20MatchModel: ObservableObject {
             }
             .first?
             .id
-        state.candidates = next
-        state.checkedId = Self.firstCheck(next, bestId)
+        pool = pool.map { $0.relabeled(bestId) }
+        let relabeled = next.map { $0.relabeled(bestId) }
+        state.candidates = relabeled
+        state.checkedId = relabeled.first(where: { $0.id == before.checkedId })?.id
+            ?? Self.firstCheck(relabeled, bestId)
         state.poolSize = pool.count
-        state.deleteMode = !next.isEmpty && state.deleteMode
+        state.deleteMode = !relabeled.isEmpty && before.deleteMode
         state.info = nil
     }
 
@@ -320,5 +331,22 @@ public final class P20MatchModel: ObservableObject {
         guard !display.isEmpty else { return nil }
         if let bestId, display.contains(where: { $0.id == bestId }) { return bestId }
         return display.first?.id
+    }
+}
+
+/// 删后重打档位：词命中的候选按新 bestId 归位，语义相近与加/手选的标签原样保留。
+private extension MatchCandidate {
+    func relabeled(_ bestId: String?) -> MatchCandidate {
+        switch tier {
+        case .semantic, .added, .manual:
+            return self
+        case .best, .sameQuestion:
+            return MatchCandidate(
+                id: id,
+                word: word,
+                frequency: frequency,
+                tier: id == bestId ? .best : .sameQuestion
+            )
+        }
     }
 }

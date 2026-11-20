@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -50,8 +49,6 @@ import com.chenyubang.core.ui.tokens.Tokens
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-private const val PICKER_HEIGHT_FRACTION = 0.9f
-
 /**
  * P20 成语匹配与修正（工作包 2.4；信息架构 v1.4 P20 / 高保真稿 C P20 864–935 行）。
  *
@@ -74,11 +71,12 @@ fun P20MatchScreen(
     val state by model.state.collectAsState()
 
     LaunchedEffect(text) {
-        val idioms =
+        val result =
             withContext(Dispatchers.IO) {
-                runCatching { database.idiomMatchDao().allIdioms() }.getOrDefault(emptyList())
+                runCatching { database.idiomMatchDao().allIdioms() }
             }
-        model.bootstrap(text, idioms)
+        model.bootstrap(text, result.getOrDefault(emptyList()))
+        if (result.isFailure) model.showInfo(P20Matcher.READ_FAILED)
     }
 
     P20MatchContent(
@@ -161,7 +159,7 @@ private fun ReviewCard(
             CLink("改文字", onEdit)
         }
         Spacer(Modifier.height(Tokens.Space.lt1Gap.dp))
-        Text(text = text, color = colors.text, fontSize = Tokens.Font.n13.sp)
+        Text(text = text.ifEmpty { P20Matcher.NO_TEXT }, color = colors.text, fontSize = Tokens.Font.n13.sp)
     }
 }
 
@@ -348,7 +346,7 @@ private fun PlaceholderBox(
     )
 }
 
-/** 局部浮层：P04 搜索内容由 app 层注入；关闭/选中都只改 P20 内部状态，不 push(Route.Search)。 */
+/** 浮层套用 P04 搜索（信息架构 v1.4 跳转 45）：整屏复用 P04 自带头部，不另加容器标题与高度。 */
 @Composable
 private fun ManualPickerDialog(
     colors: Tokens.ColorSet,
@@ -357,30 +355,8 @@ private fun ManualPickerDialog(
     onPick: (String) -> Unit,
 ) {
     Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
-        Box(
-            Modifier
-                .fillMaxSize()
-                .background(colors.modal)
-                .clickable(onClick = onDismiss),
-        ) {
-            Column(
-                Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(PICKER_HEIGHT_FRACTION)
-                    .background(
-                        colors.surface,
-                        RoundedCornerShape(topStart = Tokens.Radius.r6.dp, topEnd = Tokens.Radius.r6.dp),
-                    )
-                    .clickable(onClick = {})
-                    .padding(
-                        start = Tokens.Space.pageX.dp,
-                        end = Tokens.Space.pageX.dp,
-                        top = Tokens.Space.contentTop.dp,
-                        bottom = Tokens.Space.pageX.dp,
-                    ),
-            ) {
-                manualPicker(onPick, onDismiss)
-            }
+        Column(Modifier.fillMaxSize().background(colors.page)) {
+            manualPicker(onPick, onDismiss)
         }
     }
 }

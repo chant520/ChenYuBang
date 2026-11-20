@@ -41,7 +41,8 @@ public enum IdiomLibrary {
 }
 
 /// 读库入口：feature 层通过协议注入，不直接持有 DatabaseQueue。
-public final class IdiomLibraryReader {
+/// DatabaseQueue 不可变且线程安全，故可在后台线程读库。
+public final class IdiomLibraryReader: @unchecked Sendable {
     private let queue: DatabaseQueue
 
     public init(queue: DatabaseQueue) {
