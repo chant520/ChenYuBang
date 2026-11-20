@@ -117,6 +117,23 @@ class RouterStateTest {
     }
 
     @Test
+    fun cropBackReturnsToCameraAndClearsImages() {
+        val flow =
+            RouterState(tab = AppTab.Example).startCapture()
+                .attachCaptureImage("/tmp/capture-a.jpg").nextCapture()
+        assertEquals(Route.Crop, flow.current.route)
+        val cropped = flow.attachCropImage("/tmp/crop-b.jpg")
+        assertEquals(Route.Ocr, cropped.current.route)
+        assertEquals("/tmp/capture-a.jpg", cropped.captureImagePath)
+        assertEquals("/tmp/crop-b.jpg", cropped.captureCropPath)
+        val back = flow.back()
+        assertEquals(Route.Camera, back.current.route)
+        assertEquals(null, back.captureImagePath)
+        assertEquals(null, back.captureCropPath)
+        assertTrue(back.captureBaseDepth != null)
+    }
+
+    @Test
     fun goToMistakesAlwaysReturnsToRootAndTop() {
         val deep = RouterState(tab = AppTab.Mistake).push(Route.Mistake, "mistake-id")
         val otherTab = deep.selectTab(AppTab.Idiom).push(Route.Idiom, "idiom-id")

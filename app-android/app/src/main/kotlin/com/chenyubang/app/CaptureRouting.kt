@@ -15,7 +15,13 @@ fun RouterState.nextCapture(): RouterState {
 /** P17 → P18：先记下本机图片路径再推进；P18 起各步只读这份路径。 */
 fun RouterState.attachCaptureImage(path: String): RouterState {
     require(captureBaseDepth != null && current.route == Route.Camera && path.isNotBlank())
-    return copy(captureImagePath = path)
+    return copy(captureImagePath = path, captureCropPath = null)
+}
+
+/** P18 → P19：记下导出的裁切图路径；框外内容不参与后续识别。 */
+fun RouterState.attachCropImage(path: String): RouterState {
+    require(captureBaseDepth != null && current.route == Route.Crop && path.isNotBlank())
+    return copy(captureCropPath = path).nextCapture()
 }
 
 fun RouterState.captureSaved(idiomId: String): RouterState {
@@ -27,7 +33,7 @@ fun RouterState.captureSaved(idiomId: String): RouterState {
 fun RouterState.cancelCapture(): RouterState {
     val depth = captureBaseDepth ?: return this
     return withStack(stack.take(depth))
-        .copy(captureBaseDepth = null, capturedIdiomId = null, captureImagePath = null)
+        .copy(captureBaseDepth = null, capturedIdiomId = null, captureImagePath = null, captureCropPath = null)
 }
 
 fun RouterState.captureDestination(destination: Route): RouterState {

@@ -23,6 +23,9 @@ import com.chenyubang.core.ui.CChromeGlyph
 import com.chenyubang.core.ui.CChromeIcon
 import com.chenyubang.core.ui.tokens.Tokens
 
+/** 自带完整顶部区的页面：P04 搜索浮层、P05 详情、P17 拍照、P18 裁切。 */
+private val selfChromedRoutes = setOf(Route.Search, Route.Idiom, Route.Camera, Route.Crop)
+
 /** 顶部区：左返回 / 页名 / 该页上下文操作（信息架构 v1.2 §2）。 */
 @Composable
 internal fun RouteHeader(
@@ -31,14 +34,8 @@ internal fun RouteHeader(
     onSearch: (() -> Unit)? = null,
 ) {
     // P04 搜索（全屏浮层）与 P05 详情（二级页）自带完整顶部区：浮层是关闭 X，详情是返回 + 页名。
-    // P17 拍照页自带 X + 页名的深色取景顶栏（高保真稿 C v2）。这里跳过外壳头部，避免两层顶栏。
-    if (
-        router.current.route == Route.Search ||
-        router.current.route == Route.Idiom ||
-        router.current.route == Route.Camera
-    ) {
-        return
-    }
+    // P17 拍照页与 P18 裁切页自带顶部区（P18 是返回 + 页名 + 步骤文案，高保真稿 C v2）。这里跳过外壳头部，避免两层顶栏。
+    if (router.current.route in selfChromedRoutes) return
     val colors = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
     Row(
         Modifier.fillMaxWidth().padding(horizontal = Tokens.Space.pageX.dp, vertical = Tokens.Space.contentTop.dp),

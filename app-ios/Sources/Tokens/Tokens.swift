@@ -19,6 +19,7 @@ public struct TokenColors: Sendable {
     public let camhint: Color
     public let camstroke: Color
     public let chkfg: Color
+    public let cropedge: Color
     public let cut: Color
     public let disbg: Color
     public let disfg: Color
@@ -73,6 +74,7 @@ public struct TokenColors: Sendable {
         camhint: Color,
         camstroke: Color,
         chkfg: Color,
+        cropedge: Color,
         cut: Color,
         disbg: Color,
         disfg: Color,
@@ -126,6 +128,7 @@ public struct TokenColors: Sendable {
         self.camhint = camhint
         self.camstroke = camstroke
         self.chkfg = chkfg
+        self.cropedge = cropedge
         self.cut = cut
         self.disbg = disbg
         self.disfg = disfg
@@ -200,6 +203,7 @@ public enum Tokens {
         camhint: Color(red: 1.0000, green: 1.0000, blue: 1.0000, opacity: 0.6000),
         camstroke: Color(red: 1.0000, green: 1.0000, blue: 1.0000, opacity: 0.5020),
         chkfg: Color(red: 1.0000, green: 1.0000, blue: 1.0000, opacity: 1.0000),
+        cropedge: Color(red: 1.0000, green: 1.0000, blue: 1.0000, opacity: 0.5490),
         cut: Color(red: 0.7333, green: 0.8627, blue: 0.7882, opacity: 1.0000),
         disbg: Color(red: 0.9020, green: 0.9373, blue: 0.9137, opacity: 1.0000),
         disfg: Color(red: 0.5765, green: 0.6627, blue: 0.6118, opacity: 1.0000),
@@ -254,6 +258,7 @@ public enum Tokens {
         camhint: Color(red: 1.0000, green: 1.0000, blue: 1.0000, opacity: 0.6000),
         camstroke: Color(red: 1.0000, green: 1.0000, blue: 1.0000, opacity: 0.5020),
         chkfg: Color(red: 0.0471, green: 0.1020, blue: 0.0706, opacity: 1.0000),
+        cropedge: Color(red: 1.0000, green: 1.0000, blue: 1.0000, opacity: 0.5490),
         cut: Color(red: 0.1804, green: 0.2902, blue: 0.2235, opacity: 1.0000),
         disbg: Color(red: 0.1176, green: 0.2000, blue: 0.1529, opacity: 1.0000),
         disfg: Color(red: 0.4314, green: 0.5412, blue: 0.4706, opacity: 1.0000),
@@ -375,6 +380,19 @@ public enum Tokens {
         public static let camDenyGap: CGFloat = 10
         public static let camDenyHint: CGFloat = 12
         public static let camDenyTextGap: CGFloat = 6
+        public static let cropHeadTop: CGFloat = 20
+        public static let cropHeadBottom: CGFloat = 12
+        public static let cropTop: CGFloat = 16
+        public static let cropEdge: CGFloat = 1
+        public static let cropHandle: CGFloat = 18
+        public static let cropHandleStroke: CGFloat = 2
+        public static let cropMin: CGFloat = 48
+        public static let cropHintTop: CGFloat = 12
+        public static let cropHintBottom: CGFloat = 14
+        public static let cropRowGap: CGFloat = 8
+        public static let cropRowBottom: CGFloat = 14
+        public static let cropAdjustTop: CGFloat = 10
+        public static let cropAdjustBottom: CGFloat = 4
     }
 
     public enum Icon {

@@ -249,7 +249,12 @@ final class RouterState: ObservableObject {
         guard canGoBack else { return }
         if !fullScreenEntries.isEmpty {
             if fullScreenEntries.count == 1 { dismissFullScreen() } else {
-                fullScreenEntries.removeLast()
+                let leaving = fullScreenEntries.removeLast()
+                if leaving.route == .crop {
+                    // 返回/重拍回 P17：原图与裁切图都丢弃，重拍拿新图（IA §4.3 链路 28）。
+                    captureWorkflow?.imageURL = nil
+                    captureWorkflow?.croppedURL = nil
+                }
                 invalidateCaptureResults()
             }
         } else if entries(for: selectedTab).count > 1 {

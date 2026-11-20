@@ -163,6 +163,14 @@ private struct AppRoutePage: View {
                 onCancel: router.cancelCapture,
                 onImageReady: { url in _ = router.captured(workflowID: workflowID, imageURL: url) }
             )
+        } else if entry.route == .crop,
+                  let workflowID = router.captureWorkflow?.id,
+                  let imageURL = router.captureWorkflow?.imageURL {
+            P18CropScreen(
+                imageURL: imageURL,
+                onRetake: { router.back() },
+                onImageReady: { url in _ = router.cropped(workflowID: workflowID, imageURL: url) }
+            )
         } else {
             RoutePlaceholderPage(router: router, launch: launch, entry: entry, tab: tab)
         }

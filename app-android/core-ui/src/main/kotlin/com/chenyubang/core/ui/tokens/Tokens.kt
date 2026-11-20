@@ -24,6 +24,7 @@ object Tokens {
         val camhint: Color
         val camstroke: Color
         val chkfg: Color
+        val cropedge: Color
         val cut: Color
         val disbg: Color
         val disfg: Color
@@ -80,6 +81,7 @@ object Tokens {
         override val camhint = Color(0x99FFFFFF)
         override val camstroke = Color(0x80FFFFFF)
         override val chkfg = Color(0xFFFFFFFF)
+        override val cropedge = Color(0x8CFFFFFF)
         override val cut = Color(0xFFBBDCC9)
         override val disbg = Color(0xFFE6EFE9)
         override val disfg = Color(0xFF93A99C)
@@ -136,6 +138,7 @@ object Tokens {
         override val camhint = Color(0x99FFFFFF)
         override val camstroke = Color(0x80FFFFFF)
         override val chkfg = Color(0xFF0C1A12)
+        override val cropedge = Color(0x8CFFFFFF)
         override val cut = Color(0xFF2E4A39)
         override val disbg = Color(0xFF1E3327)
         override val disfg = Color(0xFF6E8A78)
@@ -260,6 +263,19 @@ object Tokens {
         val camDenyGap = 10
         val camDenyHint = 12
         val camDenyTextGap = 6
+        val cropHeadTop = 20
+        val cropHeadBottom = 12
+        val cropTop = 16
+        val cropEdge = 1
+        val cropHandle = 18
+        val cropHandleStroke = 2
+        val cropMin = 48
+        val cropHintTop = 12
+        val cropHintBottom = 14
+        val cropRowGap = 8
+        val cropRowBottom = 14
+        val cropAdjustTop = 10
+        val cropAdjustBottom = 4
     }
 
     /** 图标尺寸（规范 6），单位 dp */

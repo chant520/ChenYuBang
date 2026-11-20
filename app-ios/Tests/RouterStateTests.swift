@@ -203,6 +203,20 @@ final class RouterStateTests: XCTestCase {
         XCTAssertTrue(router.fullScreenEntries.isEmpty)
     }
 
+    func testCropBackReturnsToCameraAndClearsImages() throws {
+        let router = RouterState()
+        router.beginCapture()
+        let workflowID = try XCTUnwrap(router.captureWorkflow?.id)
+        let image = URL(fileURLWithPath: "/test-fixture/image.jpg")
+        XCTAssertTrue(router.captured(workflowID: workflowID, imageURL: image))
+        XCTAssertEqual(router.currentEntry.route, .crop)
+        router.back()
+        XCTAssertEqual(router.currentEntry.route, .camera)
+        XCTAssertNotNil(router.captureWorkflow)
+        XCTAssertNil(router.captureWorkflow?.imageURL)
+        XCTAssertNil(router.captureWorkflow?.croppedURL)
+    }
+
     func testWorkflowFromSearchDetailRestoresSameEntriesAndState() throws {
         let router = RouterState()
         router.openSearch()

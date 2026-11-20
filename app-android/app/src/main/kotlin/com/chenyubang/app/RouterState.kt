@@ -23,6 +23,8 @@ data class RouterState(
     val capturedIdiomId: String? = null,
     /** P17 拍下/选中的本机图片路径；取消或保存完成后清空（信息架构 v1.4 §4.3）。 */
     val captureImagePath: String? = null,
+    /** P18 导出的裁切图路径；P19 起只读这份图，框外内容不参与识别。 */
+    val captureCropPath: String? = null,
     val sequence: Long = 1,
     val rootTopEpoch: Map<AppTab, Int> = AppTab.entries.associateWith { 0 },
 ) : Serializable {
@@ -78,6 +80,11 @@ data class RouterState(
                 withStack(stack.dropLast(1))
             current.route == Route.Queue -> exitReview()
             current.route == Route.Camera -> cancelCapture()
+            current.route == Route.Crop ->
+                withStack(stack.dropLast(1)).copy(
+                    captureImagePath = null,
+                    captureCropPath = null,
+                )
             current.route == Route.Done -> cancelCapture()
             stack.size > 1 -> withStack(stack.dropLast(1))
             else -> this

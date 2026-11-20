@@ -70,6 +70,10 @@
 		A000000000000000000000A4 /* PhotoPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001A4 /* PhotoPicker.swift */; };
 		A000000000000000000000A5 /* CaptureImageStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001A5 /* CaptureImageStore.swift */; };
 		A000000000000000000000A6 /* P17CaptureChrome.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001A6 /* P17CaptureChrome.swift */; };
+		A000000000000000000000A7 /* CropImageEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001A7 /* CropImageEngine.swift */; };
+		A000000000000000000000A8 /* P18CropModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001A8 /* P18CropModel.swift */; };
+		A000000000000000000000A9 /* P18CropChrome.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001A9 /* P18CropChrome.swift */; };
+		A000000000000000000000AA /* P18CropScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001AA /* P18CropScreen.swift */; };
 		A00000000000000000000094 /* CCardSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000194 /* CCardSnapshotTests.swift */; };
 		A00000000000000000000095 /* CEmptyStateSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000195 /* CEmptyStateSnapshotTests.swift */; };
 		A00000000000000000000096 /* CLabelSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000196 /* CLabelSnapshotTests.swift */; };
@@ -146,6 +150,10 @@
 		A000000000000000000001A4 /* PhotoPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoPicker.swift; sourceTree = "<group>"; };
 		A000000000000000000001A5 /* CaptureImageStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureImageStore.swift; sourceTree = "<group>"; };
 		A000000000000000000001A6 /* P17CaptureChrome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P17CaptureChrome.swift; sourceTree = "<group>"; };
+		A000000000000000000001A7 /* CropImageEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CropImageEngine.swift; sourceTree = "<group>"; };
+		A000000000000000000001A8 /* P18CropModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P18CropModel.swift; sourceTree = "<group>"; };
+		A000000000000000000001A9 /* P18CropChrome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P18CropChrome.swift; sourceTree = "<group>"; };
+		A000000000000000000001AA /* P18CropScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P18CropScreen.swift; sourceTree = "<group>"; };
 		A00000000000000000000194 /* CCardSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CCardSnapshotTests.swift; sourceTree = "<group>"; };
 		A00000000000000000000195 /* CEmptyStateSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CEmptyStateSnapshotTests.swift; sourceTree = "<group>"; };
 		A00000000000000000000196 /* CLabelSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLabelSnapshotTests.swift; sourceTree = "<group>"; };
@@ -276,6 +284,10 @@
 				A000000000000000000001A3 /* CameraPreview.swift */,
 				A000000000000000000001A4 /* PhotoPicker.swift */,
 				A000000000000000000001A5 /* CaptureImageStore.swift */,
+				A000000000000000000001A7 /* CropImageEngine.swift */,
+				A000000000000000000001A8 /* P18CropModel.swift */,
+				A000000000000000000001A9 /* P18CropChrome.swift */,
+				A000000000000000000001AA /* P18CropScreen.swift */,
 			);
 			path = FeatureCapture;
 			sourceTree = "<group>";
@@ -471,6 +483,10 @@
 				A000000000000000000000A3 /* CameraPreview.swift in Sources */,
 				A000000000000000000000A4 /* PhotoPicker.swift in Sources */,
 				A000000000000000000000A5 /* CaptureImageStore.swift in Sources */,
+				A000000000000000000000A7 /* CropImageEngine.swift in Sources */,
+				A000000000000000000000A8 /* P18CropModel.swift in Sources */,
+				A000000000000000000000A9 /* P18CropChrome.swift in Sources */,
+				A000000000000000000000AA /* P18CropScreen.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

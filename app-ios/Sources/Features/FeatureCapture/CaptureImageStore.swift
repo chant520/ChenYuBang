@@ -18,6 +18,17 @@ enum CaptureImageStore {
         }
     }
 
+    /// P18 导出的裁切 JPEG 落缓存；写盘失败返回 nil，由页面提示重试。
+    static func writeJPEG(_ data: Data) -> URL? {
+        guard let target = try? newCaptureFileURL() else { return nil }
+        do {
+            try data.write(to: target, options: .atomic)
+            return target
+        } catch {
+            return nil
+        }
+    }
+
     private static func captureDirectory() throws -> URL {
         let base = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
         let directory = base.appendingPathComponent("capture", isDirectory: true)

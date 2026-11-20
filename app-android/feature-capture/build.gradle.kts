@@ -44,4 +44,6 @@ dependencies {
     // 运行时权限与 Photo Picker（系统图库选择器，不申请相册读取权限）
     implementation("androidx.activity:activity-compose:1.9.3")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")
+    // P18 读取相册/相机 JPEG 的 EXIF 方向，保证裁切前画面朝向正确
+    implementation("androidx.exifinterface:exifinterface:1.3.7")
 }
