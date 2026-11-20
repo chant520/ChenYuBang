@@ -4,8 +4,8 @@ import SwiftUI
 import CangyuTokens
 @testable import ChenYuBang
 
-/// P20 黄金快照（规范 §11.1）：浅/深主态 + 浅/深空态，四张新基线，不覆盖基线 C/D 图。
-/// 基线目录 __Snapshots__/P20MatchSnapshotTests/，新命名独立存放；CI 先 SNAPSHOT_RECORD=1 录制再默认 verify。
+/// P20 黄金快照（规范 §11.1）：浅/深主态 + 浅/深空态 + 表单区，基线目录 __Snapshots__/P20MatchSnapshotTests/。
+/// 2.5 版式变更后改用新测试名，2.4 的旧基线 PNG 保留不覆盖。
 @MainActor
 final class P20MatchSnapshotTests: XCTestCase {
     override func setUp() {
@@ -35,6 +35,26 @@ final class P20MatchSnapshotTests: XCTestCase {
         )
     }
 
+    private func assertForm(
+        dark: Bool,
+        file: StaticString = #filePath,
+        testName: String = #function,
+        line: UInt = #line
+    ) {
+        let view = P20FormSection(form: filledForm(), actions: formActions())
+            .padding(.horizontal, Tokens.Space.pageX)
+            .padding(.vertical, Tokens.Space.block)
+            .background(dark ? Tokens.dark.page : Tokens.light.page)
+            .environment(\.colorScheme, dark ? .dark : .light)
+        assertSnapshot(
+            of: view,
+            as: .image(layout: .fixed(width: 390, height: 640)),
+            file: file,
+            testName: testName,
+            line: line
+        )
+    }
+
     private func mainState() -> P20MatchState {
         var state = P20MatchState()
         state.reviewText = "下列各句中，加点的成语使用不恰当的一项是……\n"
@@ -44,9 +64,13 @@ final class P20MatchSnapshotTests: XCTestCase {
             MatchCandidate(id: idMoshou, word: "墨守成规", frequency: 4, tier: .sameQuestion),
             MatchCandidate(id: idBiechu, word: "别出心裁", frequency: 4, tier: .semantic)
         ]
-        state.checkedId = idAnbu
+        state.checked = [
+            MatchCandidate(id: idAnbu, word: "按部就班", frequency: 5, tier: .best),
+            MatchCandidate(id: idMoshou, word: "墨守成规", frequency: 4, tier: .sameQuestion)
+        ]
         state.poolSize = 3
         state.loading = false
+        state.form = filledForm()
         return state
     }
 
@@ -55,6 +79,17 @@ final class P20MatchSnapshotTests: XCTestCase {
         state.reviewText = "今天天气不错，我们出去散步吧。"
         state.loading = false
         return state
+    }
+
+    private func filledForm() -> P20FormState {
+        P20FormState(
+            answerText: "B",
+            reason: "望文生义",
+            tags: ["易混词"],
+            isMistake: true,
+            examType: "国考",
+            yearText: "2023"
+        )
     }
 
     private func actions() -> P20MatchActions {
@@ -70,24 +105,46 @@ final class P20MatchSnapshotTests: XCTestCase {
             onManualPick: { _ in },
             onSave: {},
             onDismissInfo: {},
+            form: formActions(),
             manualPicker: { _, _ in AnyView(EmptyView()) }
         )
     }
 
-    func testMainLight() {
+    private func formActions() -> P20FormActions {
+        P20FormActions(
+            onAnswer: { _ in },
+            onReason: { _ in },
+            onAddTag: { _ in false },
+            onRemoveTag: { _ in },
+            onToggleMistake: {},
+            onExamType: { _ in },
+            onYear: { _ in },
+            onDismissSaveError: {}
+        )
+    }
+
+    func testFormMainLight() {
         assertP20(mainState(), dark: false)
     }
 
-    func testMainDark() {
+    func testFormMainDark() {
         assertP20(mainState(), dark: true)
     }
 
-    func testEmptyLight() {
+    func testFormEmptyLight() {
         assertP20(emptyState(), dark: false)
     }
 
-    func testEmptyDark() {
+    func testFormEmptyDark() {
         assertP20(emptyState(), dark: true)
+    }
+
+    func testFormSectionLight() {
+        assertForm(dark: false)
+    }
+
+    func testFormSectionDark() {
+        assertForm(dark: true)
     }
 
     private let idAnbu = "11111111-1111-4111-8111-111111111111"

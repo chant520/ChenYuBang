@@ -141,6 +141,27 @@ public enum ChenYuBangDatabase {
             }
         }
 
+        migrator.registerMigration("v3") { db in
+            // v3（v1.7 口径，规范 §4.5）：一题多成语关联；用户表，绝不随题库包替换。
+            try db.create(table: "user_example_idiom") { t in
+                t.column("userExampleId", .text).notNull()
+                t.column("idiomId", .text).notNull()
+                t.primaryKey(["userExampleId", "idiomId"])
+            }
+            try db.create(index: "idx_user_example_idiom_example",
+                          on: "user_example_idiom", columns: ["userExampleId"])
+            try db.create(index: "idx_user_example_idiom_idiom",
+                          on: "user_example_idiom", columns: ["idiomId"])
+            // 防御性回填：既有标错题从 mistake.userExampleId + mistake_idiom 补关联，只补不删。
+            try db.execute(sql: """
+                INSERT OR IGNORE INTO user_example_idiom(userExampleId, idiomId)
+                SELECT mistake.userExampleId, mistake_idiom.idiomId
+                FROM mistake
+                JOIN mistake_idiom ON mistake_idiom.mistakeId = mistake.id
+                WHERE mistake.userExampleId IS NOT NULL
+                """)
+        }
+
         return migrator
     }
 }

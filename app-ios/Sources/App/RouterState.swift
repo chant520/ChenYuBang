@@ -1,4 +1,5 @@
 import Combine
+import CangyuData
 import Foundation
 
 struct RouteViewState: Equatable {
@@ -33,8 +34,9 @@ struct CaptureWorkflow: Equatable, Identifiable {
     var imageURL: URL?
     var croppedURL: URL?
     var recognizedText: String?
-    var draftID: String?
+    var savedUserExampleID: String?
     var savedMistakeID: String?
+    var savedIdioms: [SavedIdiom] = []
 }
 
 /// iOS 15 的显式 entry 栈；页面状态跟随 UUID，不按路由键去重。
@@ -178,8 +180,7 @@ final class RouterState: ObservableObject {
         guard accepts(workflowID, step: .camera) else { return false }
         captureWorkflow?.imageURL = imageURL
         captureWorkflow?.croppedURL = nil
-        captureWorkflow?.recognizedText = nil
-        captureWorkflow?.draftID = nil
+        clearCaptureResult()
         fullScreenEntries.append(RouteEntry(route: .crop))
         return true
     }
@@ -188,8 +189,7 @@ final class RouterState: ObservableObject {
     func cropped(workflowID: UUID, imageURL: URL) -> Bool {
         guard accepts(workflowID, step: .crop) else { return false }
         captureWorkflow?.croppedURL = imageURL
-        captureWorkflow?.recognizedText = nil
-        captureWorkflow?.draftID = nil
+        clearCaptureResult()
         fullScreenEntries.append(RouteEntry(route: .ocr))
         return true
     }
@@ -219,26 +219,23 @@ final class RouterState: ObservableObject {
         guard accepts(workflowID, step: .ocr) else { return false }
         captureWorkflow?.imageURL = nil
         captureWorkflow?.croppedURL = nil
-        captureWorkflow?.recognizedText = nil
-        captureWorkflow?.draftID = nil
+        clearCaptureResult()
         fullScreenEntries = [RouteEntry(route: .camera)]
         return true
     }
 
-    /// 匹配业务保留真实草稿引用；保存成功回调之前仍停留在 Match。
+    /// P20 保存成功：记下 user_example / 可选 mistake / 全部归属，进 P21。
+    /// 未标错时 mistakeID 为 nil（P21 仍给「去错题本」去处，只是本题不在错题本里）。
     @discardableResult
-    func matched(workflowID: UUID, draftID: String) -> Bool {
-        guard accepts(workflowID, step: .match), validID(draftID) else { return false }
-        captureWorkflow?.draftID = draftID
-        return true
-    }
-
-    @discardableResult
-    func saved(workflowID: UUID, mistakeID: String) -> Bool {
-        guard accepts(workflowID, step: .match), captureWorkflow?.draftID != nil, validID(mistakeID)
+    func saved(workflowID: UUID, userExampleID: String, mistakeID: String?, idioms: [SavedIdiom]) -> Bool {
+        guard accepts(workflowID, step: .match), validID(userExampleID),
+              mistakeID == nil || validID(mistakeID),
+              !idioms.isEmpty, idioms.allSatisfy({ validID($0.id) && !$0.word.isEmpty })
         else { return false }
+        captureWorkflow?.savedUserExampleID = userExampleID
         captureWorkflow?.savedMistakeID = mistakeID
-        fullScreenEntries.append(RouteEntry(route: .done, recordID: mistakeID))
+        captureWorkflow?.savedIdioms = idioms
+        fullScreenEntries.append(RouteEntry(route: .done, recordID: userExampleID))
         return true
     }
 
@@ -247,13 +244,42 @@ final class RouterState: ObservableObject {
         dismissFullScreen()
     }
 
+    /// P21「去错题本」：P17–P21 全部出栈，切到错题标签首屏。
     @discardableResult
     func finishCapture() -> Bool {
-        guard currentEntry.route == .done, captureWorkflow?.savedMistakeID != nil else { return false }
+        guard currentEntry.route == .done, captureWorkflow?.savedUserExampleID != nil else { return false }
         dismissFullScreen()
         fullScreenEntries = []
         selectedTab = .mistake
         resetToRoot(.mistake)
+        return true
+    }
+
+    /// P21「去成语详情」：P17–P21 全部出栈，在拍照来源标签压入 P05（可返回该标签首屏）。
+    /// 录题归属按候选顺序，手动增补排末尾；只接受本次保存过的成语。
+    @discardableResult
+    func finishCaptureToIdiom(_ idiomID: String) -> Bool {
+        guard currentEntry.route == .done,
+              let workflow = captureWorkflow,
+              workflow.savedUserExampleID != nil,
+              workflow.savedIdioms.contains(where: { $0.id == idiomID }),
+              validID(idiomID)
+        else { return false }
+        let tab = workflow.tab
+        dismissFullScreen()
+        selectedTab = tab
+        tabEntries[tab]?.append(RouteEntry(route: .idiomDetail, recordID: idiomID))
+        return true
+    }
+
+    /// P21「继续录下一题」：保留本次来源标签，清掉上一题的图与保存回执，回到 P17。
+    @discardableResult
+    func continueCapture() -> Bool {
+        guard currentEntry.route == .done, captureWorkflow?.savedUserExampleID != nil else { return false }
+        captureWorkflow?.imageURL = nil
+        captureWorkflow?.croppedURL = nil
+        clearCaptureResult()
+        fullScreenEntries = [RouteEntry(route: .camera)]
         return true
     }
 
@@ -320,11 +346,22 @@ final class RouterState: ObservableObject {
 
     private func invalidateCaptureResults() {
         guard captureWorkflow != nil else { return }
-        captureWorkflow?.savedMistakeID = nil
-        captureWorkflow?.draftID = nil
+        clearSavedResult()
         if currentEntry.route == .camera || currentEntry.route == .crop {
             captureWorkflow?.recognizedText = nil
         }
         if currentEntry.route == .camera { captureWorkflow?.croppedURL = nil }
+    }
+
+    /// 上游图或文字一改，上一次保存回执即失效，避免 P21 显示旧归属。
+    private func clearCaptureResult() {
+        captureWorkflow?.recognizedText = nil
+        clearSavedResult()
+    }
+
+    private func clearSavedResult() {
+        captureWorkflow?.savedUserExampleID = nil
+        captureWorkflow?.savedMistakeID = nil
+        captureWorkflow?.savedIdioms = []
     }
 }
