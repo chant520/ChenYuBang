@@ -106,15 +106,14 @@ enum CropImageEngine {
         context.fill(CGRect(x: 0, y: 0, width: outputWidth, height: outputHeight))
         context.translateBy(x: 0, y: CGFloat(outputHeight))
         context.scaleBy(x: 1, y: -1)
-        applyExportTransform(
-            context,
-            sourceSize: CGSize(width: imageWidth, height: imageHeight),
-            containerSize: containerSize,
-            crop: crop,
-            quarterTurns: quarterTurns,
-            fineDegrees: fineDegrees,
+        let degrees = CGFloat(quarterTurns) * quarterDegrees + fineDegrees
+        ExportTransform(
+            origin: CGPoint(x: -crop.minX * containerSize.width * scale, y: -crop.minY * containerSize.height * scale),
+            center: CGPoint(x: containerSize.width / 2 * scale, y: containerSize.height / 2 * scale),
+            halfSource: CGPoint(x: -imageWidth / 2, y: -imageHeight / 2),
+            degrees: degrees,
             scale: scale * shrink
-        )
+        ).apply(to: context)
         context.draw(image, in: CGRect(x: 0, y: 0, width: imageWidth, height: imageHeight))
         guard let output = context.makeImage() else { return nil }
         return UIImage(cgImage: output).jpegData(compressionQuality: jpegQuality)
@@ -127,21 +126,20 @@ enum CropImageEngine {
         return min(container.width / displayWidth, container.height / displayHeight)
     }
 
-    private static func applyExportTransform(
-        _ context: CGContext,
-        sourceSize: CGSize,
-        containerSize: CGSize,
-        crop: CGRect,
-        quarterTurns: Int,
-        fineDegrees: CGFloat,
-        scale: CGFloat
-    ) {
-        context.translateBy(x: -crop.minX * containerSize.width * scale, y: -crop.minY * containerSize.height * scale)
-        context.translateBy(x: containerSize.width / 2 * scale, y: containerSize.height / 2 * scale)
-        let degrees = CGFloat(quarterTurns) * quarterDegrees + fineDegrees
-        context.rotate(by: degrees * .pi / 180)
-        context.scaleBy(x: scale, y: scale)
-        context.translateBy(x: -sourceSize.width / 2, y: -sourceSize.height / 2)
+    private struct ExportTransform {
+        let origin: CGPoint
+        let center: CGPoint
+        let halfSource: CGPoint
+        let degrees: CGFloat
+        let scale: CGFloat
+
+        func apply(to context: CGContext) {
+            context.translateBy(x: origin.x, y: origin.y)
+            context.translateBy(x: center.x, y: center.y)
+            context.rotate(by: degrees * .pi / 180)
+            context.scaleBy(x: scale, y: scale)
+            context.translateBy(x: halfSource.x, y: halfSource.y)
+        }
     }
 
     private static func exifOrientation(_ orientation: UIImage.Orientation) -> Int32 {
