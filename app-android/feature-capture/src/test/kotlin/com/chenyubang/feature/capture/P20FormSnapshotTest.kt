@@ -103,6 +103,53 @@ class P20FormSnapshotTest {
     @Test
     fun noMatchTagFixedDark() = capture(noMatchState(), night = true)
 
+    /**
+     * 池满态（poolSize=50）：候选上限提示落进候选卡内灰字行（followup §5.4b），
+     * 首次落在 812dp 视口内可被整页快照钉住（此前走页面底部 CBar，视口外拍不到）。
+     */
+    private fun poolFullState(): P20CaptureState =
+        P20CaptureState(
+            reviewText = "下列各句中，加点的成语使用不恰当的一项是……\nA．新厂长按部就班 B．做事标新立异",
+            candidates =
+                listOf(
+                    MatchCandidate(ID_BIECHU, "别出心裁", 4, MatchTier.SameQuestion),
+                    MatchCandidate(ID_MOSHOU, "墨守成规", 4, MatchTier.Semantic),
+                    MatchCandidate(ID_ANBU, "按部就班", 5, MatchTier.Best),
+                ),
+            checked = listOf(IdiomRef(ID_BIECHU, "别出心裁")),
+            poolSize = P20Matcher.MAX_CANDIDATES,
+            candidateHint = P20Matcher.CANDIDATE_LIMIT,
+            loading = false,
+        )
+
+    @Test
+    fun poolFullHintLight() = capture(poolFullState(), night = false)
+
+    @Test
+    fun poolFullHintDark() = capture(poolFullState(), night = true)
+
+    /** 无更多候选态（池 ≤K，换一组禁用）：同上限态，提示进候选卡内灰字行。 */
+    private fun noMoreCandidatesState(): P20CaptureState =
+        P20CaptureState(
+            reviewText = "今天天气不错，我们出去散步吧。\nA．新厂长按部就班 B．做事标新立异 C．从不墨守成规",
+            candidates =
+                listOf(
+                    MatchCandidate(ID_BIECHU, "别出心裁", 4, MatchTier.SameQuestion),
+                    MatchCandidate(ID_MOSHOU, "墨守成规", 4, MatchTier.Semantic),
+                    MatchCandidate(ID_ANBU, "按部就班", 5, MatchTier.Best),
+                ),
+            checked = listOf(IdiomRef(ID_ANBU, "按部就班")),
+            poolSize = P20Matcher.WINDOW_SIZE,
+            candidateHint = P20Matcher.NO_MORE_CANDIDATES,
+            loading = false,
+        )
+
+    @Test
+    fun noMoreCandidatesLight() = capture(noMoreCandidatesState(), night = false)
+
+    @Test
+    fun noMoreCandidatesDark() = capture(noMoreCandidatesState(), night = true)
+
     private companion object {
         const val ID_ANBU = "11111111-1111-4111-8111-111111111111"
         const val ID_BIECHU = "22222222-2222-4222-8222-222222222222"

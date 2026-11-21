@@ -49,6 +49,7 @@ data class P20CandidateUiState(
     val deleteMode: Boolean = false,
     val showManualPicker: Boolean = false,
     val info: String? = null,
+    val candidateHint: String? = null,
     val loading: Boolean = true,
 )
 
@@ -64,6 +65,7 @@ data class P20CaptureState(
     val deleteMode: Boolean = false,
     val showManualPicker: Boolean = false,
     val info: String? = null,
+    val candidateHint: String? = null,
     val loading: Boolean = true,
     val form: P20FormState = P20FormState(),
 ) {
