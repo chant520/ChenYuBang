@@ -51,6 +51,7 @@ class CEmptyStateSnapshotTest {
     private fun captureEmptyState(
         withAction: Boolean,
         night: Boolean,
+        withIcon: Boolean = false,
     ) {
         composeTestRule.setContent {
             Themed(night) {
@@ -59,6 +60,8 @@ class CEmptyStateSnapshotTest {
                     description = "拍照录入后，标错的题会出现在这里。",
                     actionText = if (withAction) "去录入" else null,
                     onAction = if (withAction) ({}) else null,
+                    // 「带图标」一态（A8）：D 稿 .eic 插画位，P08 空态即此用法。
+                    icon = if (withIcon) CChromeIcon.Camera else null,
                 )
             }
         }
@@ -76,4 +79,10 @@ class CEmptyStateSnapshotTest {
 
     @Test
     fun emptyStateActionDark() = captureEmptyState(withAction = true, night = true)
+
+    @Test
+    fun emptyStateIconLight() = captureEmptyState(withAction = false, night = false, withIcon = true)
+
+    @Test
+    fun emptyStateIconDark() = captureEmptyState(withAction = false, night = true, withIcon = true)
 }

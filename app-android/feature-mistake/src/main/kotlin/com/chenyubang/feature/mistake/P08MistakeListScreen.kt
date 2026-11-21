@@ -27,6 +27,7 @@ import com.chenyubang.core.ui.CBar
 import com.chenyubang.core.ui.CBarKind
 import com.chenyubang.core.ui.CButton
 import com.chenyubang.core.ui.CButtonVariant
+import com.chenyubang.core.ui.CChromeIcon
 import com.chenyubang.core.ui.CEmptyState
 import com.chenyubang.core.ui.CIconKind
 import com.chenyubang.core.ui.CSegmentedControl
@@ -80,13 +81,23 @@ fun P08MistakeListContent(
         when {
             state.loading -> CBar(CBarKind.Info, "正在读取错题", subtitle = "只读本机题库，不联网。")
             state.failed -> CBar(CBarKind.Warn, "错题读取失败，请重试", subtitle = "再进一次本页会重新读取。")
-            state.total == 0 ->
+            // 空态（IA §5.4 行 547）：②总览行与 ③视图切换仍是常驻区块，⑥空态区在 ③之后、不含 ④「开始复习」。
+            state.total == 0 -> {
+                P08Overview(total = state.total, pending = state.pending)
+                CSegmentedControl(
+                    items = MistakeViewMode.labels,
+                    selectedIndex = MistakeViewMode.entries.indexOf(viewMode),
+                    onSelect = { idx -> actions.onViewModeChange(MistakeViewMode.entries[idx]) },
+                )
                 CEmptyState(
                     title = "还没有错题",
                     description = "拍一张卷子上的题录进题库，标记为做错后就会归到对应成语下",
                     actionText = "拍照录入第一道题",
                     onAction = actions.onCapture,
+                    // 插画位：§5.4 行 547「插画位（此处用 SVG 矢量图标）」，P08 空态帧内嵌相机图形（A8）。
+                    icon = CChromeIcon.Camera,
                 )
+            }
             else -> {
                 P08Overview(total = state.total, pending = state.pending)
                 CSegmentedControl(
