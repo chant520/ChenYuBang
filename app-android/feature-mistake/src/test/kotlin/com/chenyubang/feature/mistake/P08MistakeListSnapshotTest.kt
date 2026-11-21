@@ -14,7 +14,11 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
-/** P08 错题列表黄金快照：三视图 + 无错题空态 + 待复习已清空态，各浅/深一张。 */
+/**
+ * P08 错题列表黄金快照：三视图 + 无错题空态 + 待复习已清空态，各浅/深一张。
+ *
+ * toReviewCleared* 两帧为构造态：pending == 0 需 3.1 的掌握状态切换写入后才会真实可达，本包（2.6）无路径造出该状态。
+ */
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 @Config(sdk = [34], qualifiers = "w360dp-h812dp-xhdpi")
