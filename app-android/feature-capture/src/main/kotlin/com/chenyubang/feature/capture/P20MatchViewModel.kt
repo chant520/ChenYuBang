@@ -88,7 +88,7 @@ object P20Matcher {
     const val NO_TEXT = "（无识别文字）"
     const val READ_FAILED = "题库读取失败，请重试"
     const val AT_LEAST_ONE = "至少保留一条归属"
-    const val TAG_RULE = "标签需为 1–8 个字"
+    const val TAG_RULE = "标签 1–8 个字；仅在标错时保存。"
     const val EMPTY_STEM = "题干为空，请返回识别结果补字后再保存"
     const val NO_IMAGE = "原图缺失，请返回重拍"
     const val SAVE_FAILED = "保存失败，请重试"

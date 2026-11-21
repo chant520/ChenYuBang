@@ -1,13 +1,10 @@
 package com.chenyubang.feature.capture
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -19,11 +16,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import com.chenyubang.core.ui.CButton
 import com.chenyubang.core.ui.CButtonVariant
 import com.chenyubang.core.ui.CCard
@@ -142,7 +136,11 @@ internal fun CandidateRow(
     colors: Tokens.ColorSet,
 ) {
     val candidate = state.candidates[index]
-    Row(verticalAlignment = Alignment.CenterVertically) {
+    // fillMaxWidth 保证行铺满卡片宽，分隔线与点击区在删除模式下也不断在删除按钮前截断。
+    Row(
+        Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
         CCheckRow(
             label = candidate.word,
             checked = candidate.id in state.checkedIds,
@@ -172,7 +170,7 @@ internal fun FormFieldsCard(
     actions: P20CaptureActions,
     colors: Tokens.ColorSet,
 ) {
-    AnswerAndTagsCard(state, actions)
+    AnswerAndTagsCard(state, actions, colors)
     MistakeToggleCard(state, actions, colors)
 }
 
@@ -180,6 +178,7 @@ internal fun FormFieldsCard(
 private fun AnswerAndTagsCard(
     state: P20CaptureState,
     actions: P20CaptureActions,
+    colors: Tokens.ColorSet,
 ) {
     val form = state.form
     CCard {
@@ -197,22 +196,7 @@ private fun AnswerAndTagsCard(
             enabled = form.isMistake,
         )
         CLabel("自定义标签", Modifier.padding(top = Tokens.Space.lmetaTop.dp))
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            CInput(
-                value = form.tagDraft,
-                onValueChange = actions.onTagDraft,
-                placeholder = "1–8 字，标错后可加",
-                enabled = form.isMistake,
-                modifier = Modifier.weight(1f),
-            )
-            Spacer(Modifier.width(Tokens.Space.lmetaGap.dp))
-            CButton(
-                "加标签",
-                onClick = { actions.onAddTag() },
-                variant = CButtonVariant.Ghost,
-                enabled = form.isMistake,
-            )
-        }
+        TagEditor(form, actions, colors)
         if (form.tags.isNotEmpty()) {
             Row(
                 Modifier.fillMaxWidth().padding(top = Tokens.Space.lsubTop.dp),
@@ -230,6 +214,42 @@ private fun AnswerAndTagsCard(
             }
         }
     }
+}
+
+/** 自定义标签编辑区：输入行 + 规则提示（iOS 卡内同区文案）。 */
+@Composable
+private fun TagEditor(
+    form: P20FormState,
+    actions: P20CaptureActions,
+    colors: Tokens.ColorSet,
+) {
+    // fillMaxWidth 必须显式带上（实测）：wrap-content Row 里 weighted 的 CInput 会被
+    // 内部 fillMaxWidth 的「加标签」按钮挤塌到一字宽；Row 拿满可用宽后输入框才分得到剩余宽度。
+    Row(
+        Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        CInput(
+            value = form.tagDraft,
+            onValueChange = actions.onTagDraft,
+            placeholder = "1–8 字，标错后可加",
+            enabled = form.isMistake,
+            modifier = Modifier.weight(1f),
+        )
+        Spacer(Modifier.width(Tokens.Space.lmetaGap.dp))
+        CButton(
+            "加标签",
+            onClick = { actions.onAddTag() },
+            variant = CButtonVariant.Ghost,
+            enabled = form.isMistake,
+        )
+    }
+    Text(
+        P20Matcher.TAG_RULE,
+        color = colors.text3,
+        fontSize = Tokens.Font.n11.sp,
+        modifier = Modifier.padding(top = Tokens.Space.lmetaTop.dp),
+    )
 }
 
 @Composable
@@ -286,59 +306,5 @@ internal fun SourceCard(
             fontSize = Tokens.Font.n11.sp,
             modifier = Modifier.padding(top = Tokens.Space.ghostY.dp),
         )
-    }
-}
-
-@Composable
-internal fun FormHeader(
-    onBack: () -> Unit,
-    colors: Tokens.ColorSet,
-) {
-    Column(Modifier.fillMaxWidth().background(colors.page)) {
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(
-                    start = Tokens.Space.pageX.dp,
-                    end = Tokens.Space.pageX.dp,
-                    top = Tokens.Space.cropHeadTop.dp,
-                    bottom = Tokens.Space.cropHeadBottom.dp,
-                ),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Box(
-                Modifier
-                    .size(Tokens.Space.hitMin.dp)
-                    .clickable(onClick = onBack)
-                    .semantics { contentDescription = "返回识别结果" },
-                contentAlignment = Alignment.Center,
-            ) {
-                CChromeGlyph(CChromeIcon.Back, colors.text2, Modifier.size(Tokens.Icon.n21.dp))
-            }
-            Spacer(Modifier.width(Tokens.Space.camTopGap.dp))
-            Text(
-                "匹配与修正",
-                color = colors.head,
-                fontSize = Tokens.Font.n15.sp,
-                fontWeight = FontWeight.W700,
-                modifier = Modifier.weight(1f),
-            )
-            Text("第 4 步 / 共 5 步", color = colors.text3, fontSize = Tokens.Font.n11.sp)
-        }
-        Box(Modifier.fillMaxWidth().height(Tokens.Space.cropEdge.dp).background(colors.line))
-    }
-}
-
-@Composable
-internal fun P20FormManualPickerDialog(
-    colors: Tokens.ColorSet,
-    onDismiss: () -> Unit,
-    manualPicker: @Composable (onPick: (String) -> Unit, onDismiss: () -> Unit) -> Unit,
-    onPick: (String) -> Unit,
-) {
-    Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
-        Column(Modifier.fillMaxSize().background(colors.page)) {
-            manualPicker(onPick, onDismiss)
-        }
     }
 }
