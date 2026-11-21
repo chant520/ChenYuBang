@@ -202,11 +202,13 @@ public struct P08MistakeContent: View {
         }
     }
 
-    /// ⑥：空态文案取信息架构 v1.4 §5.4（P08 一条错题都没有）。
+    /// ⑥：空态文案与插画位取信息架构 v1.4 §5.4（P08 一条错题都没有：「插画位（此处用 SVG 矢量图标）」）；
+    /// 图形与高保真稿 D P08 空态帧 `.eic` 一致（相机）。
     private var emptyState: some View {
         CEmptyState(
             title: "还没有错题",
             description: "拍一张卷子上的题录进题库，标记为做错后就会归到对应成语下",
+            icon: .camera,
             actionTitle: "拍照录入第一道题",
             onAction: actions.onCapture
         )
