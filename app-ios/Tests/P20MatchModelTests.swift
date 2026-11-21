@@ -67,6 +67,26 @@ final class P20MatchModelTests: XCTestCase {
         XCTAssertTrue(state.canSave)
     }
 
+    /// 信息架构 v1.4 P20 ③：取消勾选即移除且至少保留一条，故候选非空、目标不在候选内时也必须能手选增补。
+    func testPickManualFromNonEmptyAppendsLastWithoutTouchingExistingChecks() {
+        let model = P20MatchModel()
+        model.bootstrap(text: "新厂长按部就班，他做事从不墨守成规", idioms: sampleIdioms)
+        let before = model.state
+        XCTAssertFalse(before.empty)
+        XCTAssertEqual(before.checked.map(\.id), [idAnbu])
+        XCTAssertFalse(before.candidates.contains { $0.id == idBiechu })
+
+        model.setManualPicker(visible: true)
+        model.pickManual(id: idBiechu)
+        let state = model.state
+        XCTAssertFalse(state.showManualPicker)
+        XCTAssertEqual(state.checked.map(\.id), [idAnbu, idBiechu])
+        XCTAssertEqual(state.candidates.last?.id, idBiechu)
+        XCTAssertEqual(state.candidates.last?.tier, .manual)
+        XCTAssertEqual(state.poolSize, before.poolSize + 1)
+        XCTAssertTrue(state.canSave)
+    }
+
     func testSampleC_typoDoesNotFuzzyMatch() {
         let model = P20MatchModel()
         model.bootstrap(text: "新厂长按步就班，提出了一整套方案", idioms: sampleIdioms)

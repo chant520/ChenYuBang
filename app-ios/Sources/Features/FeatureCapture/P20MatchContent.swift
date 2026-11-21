@@ -195,6 +195,9 @@ public struct P20MatchContent: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.top, Tokens.Space.ghostY)
             }
+            // 信息架构 v1.4 P20 ③：取消勾选即移除且至少保留一条，故候选不含目标时也必须能走手选增补。
+            CButton(text: P20Matcher.manualAction, variant: .ghost, action: actions.onOpenManual)
+                .padding(.top, Tokens.Space.ghostY)
         }
         .padding(.top, Tokens.Space.lmetaTop)
     }

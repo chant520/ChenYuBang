@@ -6,6 +6,8 @@ import CangyuTokens
 
 /// P20 黄金快照（规范 §11.1）：浅/深主态 + 浅/深空态 + 表单区，基线目录 __Snapshots__/P20MatchSnapshotTests/。
 /// 2.5 版式变更后改用新测试名，2.4 的旧基线 PNG 保留不覆盖。
+/// 非空候选卡补上「手动挑成语」入口（信息架构 v1.4 P20 ③）后，主态同名会撞到旧基线，
+/// 故改走 testFormMainWithManual*；空态未变，testFormEmpty* 继续用原基线。
 @MainActor
 final class P20MatchSnapshotTests: XCTestCase {
     override func setUp() {
@@ -123,11 +125,11 @@ final class P20MatchSnapshotTests: XCTestCase {
         )
     }
 
-    func testFormMainLight() {
+    func testFormMainWithManualLight() {
         assertP20(mainState(), dark: false)
     }
 
-    func testFormMainDark() {
+    func testFormMainWithManualDark() {
         assertP20(mainState(), dark: true)
     }
 
