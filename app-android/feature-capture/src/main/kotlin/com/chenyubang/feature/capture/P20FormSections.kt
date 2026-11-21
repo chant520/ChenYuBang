@@ -118,13 +118,15 @@ internal fun CandidateRows(
             enabled = state.candidates.isNotEmpty(),
         )
     }
-    // 候选卡内单行灰字提示（iOS disabledHints 同形态）：至少一条 + 上限/无更多候选；
-    // 后两者不再走页面底部 CBar（followup §5.4b），CBar 只留保存失败等需确认信息。
+    // 候选卡内单行灰字提示（iOS disabledHints 同形态，P20MatchContent.swift:267-273）：
+    // 「没有更多候选」按 !canCycle 静态派生（iOS 同口径，池 ≤3 常显）；candidateHint 只承载
+    // 动态可达提示（加一个满 50 上限、全库耗尽）；CBar 只留保存失败等需确认信息。
     val hints =
         buildList {
             if (!state.canSave && !state.loading) add(P20Matcher.AT_LEAST_ONE)
+            if (!state.canCycle) add(P20Matcher.NO_MORE_CANDIDATES)
             state.candidateHint?.let { add(it) }
-        }
+        }.distinct()
     if (hints.isNotEmpty()) {
         Text(
             hints.joinToString("；"),
