@@ -17,7 +17,7 @@ import org.robolectric.annotation.GraphicsMode
 /**
  * P20 快照（规范 §11.1）：基线只增不改。
  * `twoSelected*` 是 2.5 既有基线，对应 iOS `P20MatchSnapshotTests.testFormMain*`；
- * 本轮补候选空态（对应 iOS `testFormEmpty*`）。
+ * `noMatchSingleEntry*` 为候选空态修后基线（对应 iOS `testFormEmpty*`，前代 `noMatch*` 留作修前历史）。
  * iOS 另有 `testFormSection*` 单独渲染表单分区：Android 侧该分区没有 testTag，整页基线已含
  * FormFieldsCard，故不单独镜像——对齐的是状态语义，不是文件名一一对应。
  *
@@ -80,11 +80,11 @@ class P20FormSnapshotTest {
 
     /**
      * 候选空态：有识别文字但零命中，候选区出「手动挑成语」入口（iOS testFormEmpty* 同口径文案）。
-     * 本组基线如实钉住当前渲染，其中两处已知缺陷已写进 `.workbuddy/android-2.5-followup-2026-11-21.md`：
-     * ①`CandidateCard` 底部的 `CButton(MANUAL_ACTION)` 无条件渲染，空态下与 `CEmptyState` 自带的动作
-     * 按钮叠成两个同名入口（iOS 只在空态渲染一个）；②空态版式最短，首次把表单区滚进视口，暴露
-     * 自定义标签行 `Row` 未 `fillMaxWidth` 导致 `CInput` 的 `weight(1f)` 塌成近零宽、占位符逐字断行。
-     * WorkBuddy 修掉后按惯例换新测试名，本组 PNG 不覆盖。
+     * `noMatch*` 旧基线如实钉住修前渲染（双入口缺陷），按惯例不覆盖、留在仓库作历史；
+     * `noMatchSingleEntry*` 钉住修后渲染：底部 Ghost 手选按钮仅在非空态渲染，空态只剩
+     * CEmptyState 一个入口（followup 2026-11-21 §5.1）。钉住语义见 `P20FormManualEntryUiTest`。
+     * 已知遗留：自定义标签行 `Row` 未 `fillMaxWidth` 导致 `CInput` 的 `weight(1f)` 塌成近零宽、
+     * 占位符逐字断行——本组基线会如实拍到，待 followup §5.2 修复后换新测试名重录。
      */
     private fun noMatchState(): P20CaptureState =
         P20CaptureState(
@@ -99,10 +99,10 @@ class P20FormSnapshotTest {
     fun twoSelectedDark() = capture(twoSelectedState(), night = true)
 
     @Test
-    fun noMatchLight() = capture(noMatchState(), night = false)
+    fun noMatchSingleEntryLight() = capture(noMatchState(), night = false)
 
     @Test
-    fun noMatchDark() = capture(noMatchState(), night = true)
+    fun noMatchSingleEntryDark() = capture(noMatchState(), night = true)
 
     private companion object {
         const val ID_ANBU = "11111111-1111-4111-8111-111111111111"
