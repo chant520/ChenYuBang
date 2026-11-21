@@ -77,11 +77,11 @@ class P20FormViewModelTest {
     fun addAtFullPoolShowsLimit() {
         val many = (0 until 50).map { idiom("id-$it", "词$it", 3) }
         val model = newModel().also { it.candidate.bootstrap(many.joinToString(" ") { it.word }, many) }
-        // 命中即占满 50 池：加一个只提示上限，不再追加，池与窗口都不变。
+        // 命中即占满 50 池：加一个只提示上限（候选卡内灰字，不走 CBar），不再追加，池与窗口都不变。
         model.candidate.add()
         assertEquals(50, model.state.value.poolSize)
         assertEquals(P20Matcher.WINDOW_SIZE, model.state.value.candidates.size)
-        assertEquals(P20Matcher.CANDIDATE_LIMIT, model.state.value.info)
+        assertEquals(P20Matcher.CANDIDATE_LIMIT, model.state.value.candidateHint)
     }
 
     @Test
@@ -108,7 +108,7 @@ class P20FormViewModelTest {
         // 池内（含窗口外）已无空位可加：不得重复挑到窗口外的池内词。
         model.candidate.add()
         assertEquals(5, model.state.value.poolSize)
-        assertEquals(P20Matcher.NO_MORE_CANDIDATES, model.state.value.info)
+        assertEquals(P20Matcher.NO_MORE_CANDIDATES, model.state.value.candidateHint)
 
         // 换一组用池重建窗口：手动加的词仍在，不会被冲掉。
         model.candidate.cycle()

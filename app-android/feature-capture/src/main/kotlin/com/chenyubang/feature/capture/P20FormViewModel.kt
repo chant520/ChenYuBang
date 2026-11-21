@@ -33,6 +33,7 @@ class P20FormViewModel(
                 deleteMode = candidate.deleteMode,
                 showManualPicker = candidate.showManualPicker,
                 info = candidate.info,
+                candidateHint = candidate.candidateHint,
                 loading = candidate.loading,
                 form = form,
             )

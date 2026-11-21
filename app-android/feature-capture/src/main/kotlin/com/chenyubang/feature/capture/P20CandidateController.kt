@@ -46,41 +46,47 @@ class P20CandidateController(
         val current = stateFlow.value
         if (pool.none { it.id == id } && current.candidates.none { it.id == id }) return
         if (!checkedIds.add(id)) checkedIds.remove(id)
-        stateFlow.update { it.copy(checked = checkedRefs(), info = null) }
+        stateFlow.update { it.copy(checked = checkedRefs(), info = null, candidateHint = null) }
     }
 
     /** 换一组：仅推进展示窗口（K=3），不改已勾选集合；到池尾回卷。 */
     fun cycle() {
         if (pool.size <= P20Matcher.WINDOW_SIZE) {
-            setInfo(P20Matcher.NO_MORE_CANDIDATES)
+            // 上限/无更多候选走候选卡内灰字（candidateHint），CBar 只留给需确认信息。
+            stateFlow.update { it.copy(candidateHint = P20Matcher.NO_MORE_CANDIDATES) }
             return
         }
         windowStart = (windowStart + P20Matcher.WINDOW_SIZE) % pool.size
         stateFlow.update {
-            it.copy(candidates = pool.drop(windowStart).take(P20Matcher.WINDOW_SIZE), info = null)
+            it.copy(
+                candidates = pool.drop(windowStart).take(P20Matcher.WINDOW_SIZE),
+                info = null,
+                candidateHint = null,
+            )
         }
     }
 
     /** 加一个：全库排除池内词，frequency DESC / word ASC 取一条追加末尾；满 50 禁用；不自动勾选。 */
     fun add() {
         if (pool.size >= P20Matcher.MAX_CANDIDATES) {
-            setInfo(P20Matcher.CANDIDATE_LIMIT)
+            stateFlow.update { it.copy(candidateHint = P20Matcher.CANDIDATE_LIMIT) }
             return
         }
         val inPool = pool.map { it.id }.toSet()
         val pick = allIdioms.firstOrNull { it.id !in inPool }
         if (pick == null) {
-            setInfo(P20Matcher.NO_MORE_CANDIDATES)
+            stateFlow.update { it.copy(candidateHint = P20Matcher.NO_MORE_CANDIDATES) }
             return
         }
         val candidate = P20Matcher.addedCandidate(pick)
         pool = pool + candidate
         stateFlow.update {
-            it.copy(candidates = it.candidates + candidate, poolSize = pool.size, info = null)
+            it.copy(candidates = it.candidates + candidate, poolSize = pool.size, info = null, candidateHint = null)
         }
     }
 
-    fun toggleDeleteMode() = stateFlow.update { it.copy(deleteMode = !it.deleteMode, info = null) }
+    fun toggleDeleteMode() =
+        stateFlow.update { it.copy(deleteMode = !it.deleteMode, info = null, candidateHint = null) }
 
     /** 删一个：从池与窗口一并移除，若正是已选项则同步取消勾选；档位按剩余命中重算。 */
     fun remove(id: String) {
@@ -122,6 +128,7 @@ class P20CandidateController(
                 poolSize = pool.size,
                 deleteMode = next.isNotEmpty() && before.deleteMode,
                 info = null,
+                candidateHint = null,
             )
         }
     }
@@ -142,6 +149,7 @@ class P20CandidateController(
                 poolSize = pool.size,
                 checked = checkedRefs(),
                 info = null,
+                candidateHint = null,
             )
         }
     }

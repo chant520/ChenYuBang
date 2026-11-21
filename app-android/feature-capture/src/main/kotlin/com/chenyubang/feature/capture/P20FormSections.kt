@@ -118,9 +118,16 @@ internal fun CandidateRows(
             enabled = state.candidates.isNotEmpty(),
         )
     }
-    if (!state.canSave && !state.loading) {
+    // 候选卡内单行灰字提示（iOS disabledHints 同形态）：至少一条 + 上限/无更多候选；
+    // 后两者不再走页面底部 CBar（followup §5.4b），CBar 只留保存失败等需确认信息。
+    val hints =
+        buildList {
+            if (!state.canSave && !state.loading) add(P20Matcher.AT_LEAST_ONE)
+            state.candidateHint?.let { add(it) }
+        }
+    if (hints.isNotEmpty()) {
         Text(
-            P20Matcher.AT_LEAST_ONE,
+            hints.joinToString("；"),
             color = colors.text3,
             fontSize = Tokens.Font.n11.sp,
             modifier = Modifier.padding(top = Tokens.Space.ghostY.dp),

@@ -29,7 +29,7 @@ data class MatchCandidate(
 
 /**
  * P20 页面级状态。勾选数恒为 1（[checkedId]），换/加/删只改候选列表：
- * [candidates] 是展示窗口（初始 K=3），[poolSize] 是完整候选池大小（决定「换一个」是否可用）。
+ * [candidates] 是展示窗口（初始 K=3），[poolSize] 是完整候选池大小（决定「换一组」是否可用）。
  * 所有状态只在 ViewModel 内，不进 RouterState、不落 DB。
  */
 data class P20MatchUiState(
