@@ -96,8 +96,12 @@ internal fun CandidateCard(
                 }
             }
         }
-        Spacer(Modifier.height(Tokens.Space.ghostY.dp))
-        CButton(P20Matcher.MANUAL_ACTION, actions.onOpenManual, Modifier.fillMaxWidth(), CButtonVariant.Ghost)
+        // 空态入口由 CEmptyState(actionText = MANUAL_ACTION) 承担，此处仅非空态渲染，
+        // 避免同名双入口（信息架构 v1.4 P20 ③「候选不含目标时用手动挑成语增补」+ iOS 非空分支对齐）。
+        if (state.candidates.isNotEmpty()) {
+            Spacer(Modifier.height(Tokens.Space.ghostY.dp))
+            CButton(P20Matcher.MANUAL_ACTION, actions.onOpenManual, Modifier.fillMaxWidth(), CButtonVariant.Ghost)
+        }
     }
 }
 
