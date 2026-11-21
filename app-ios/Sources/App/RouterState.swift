@@ -1,4 +1,5 @@
 import Combine
+import CangyuData
 import Foundation
 
 struct RouteViewState: Equatable {
@@ -33,8 +34,9 @@ struct CaptureWorkflow: Equatable, Identifiable {
     var imageURL: URL?
     var croppedURL: URL?
     var recognizedText: String?
-    var draftID: String?
+    var savedUserExampleID: String?
     var savedMistakeID: String?
+    var savedIdioms: [SavedIdiom] = []
 }
 
 /// iOS 15 的显式 entry 栈；页面状态跟随 UUID，不按路由键去重。
@@ -164,99 +166,6 @@ final class RouterState: ObservableObject {
         return true
     }
 
-    @discardableResult
-    func beginCapture() -> Bool {
-        guard canStartWorkflow else { return false }
-        captureWorkflow = CaptureWorkflow(tab: selectedTab, originEntryID: currentEntry.id)
-        suspendedFullScreenEntries = fullScreenEntries
-        fullScreenEntries = [RouteEntry(route: .camera)]
-        return true
-    }
-
-    @discardableResult
-    func captured(workflowID: UUID, imageURL: URL) -> Bool {
-        guard accepts(workflowID, step: .camera) else { return false }
-        captureWorkflow?.imageURL = imageURL
-        captureWorkflow?.croppedURL = nil
-        captureWorkflow?.recognizedText = nil
-        captureWorkflow?.draftID = nil
-        fullScreenEntries.append(RouteEntry(route: .crop))
-        return true
-    }
-
-    @discardableResult
-    func cropped(workflowID: UUID, imageURL: URL) -> Bool {
-        guard accepts(workflowID, step: .crop) else { return false }
-        captureWorkflow?.croppedURL = imageURL
-        captureWorkflow?.recognizedText = nil
-        captureWorkflow?.draftID = nil
-        fullScreenEntries.append(RouteEntry(route: .ocr))
-        return true
-    }
-
-    @discardableResult
-    func recognized(workflowID: UUID, entryID: UUID, text: String) -> Bool {
-        guard accepts(workflowID, step: .ocr), currentEntry.id == entryID,
-              !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-        else { return false }
-        captureWorkflow?.recognizedText = text
-        fullScreenEntries.append(RouteEntry(route: .match))
-        return true
-    }
-
-    /// P19 失败态「手动补字」：以空文本进入修正页（IA §4.3 链路 27 第三条退路）。
-    @discardableResult
-    func recognizedManually(workflowID: UUID, entryID: UUID) -> Bool {
-        guard accepts(workflowID, step: .ocr), currentEntry.id == entryID else { return false }
-        captureWorkflow?.recognizedText = nil
-        fullScreenEntries.append(RouteEntry(route: .match))
-        return true
-    }
-
-    /// P19 失败态「重拍这张」：回 P17 重拍，原图 / 裁切图 / 识别文本全部作废。
-    @discardableResult
-    func retakeFromOcr(workflowID: UUID) -> Bool {
-        guard accepts(workflowID, step: .ocr) else { return false }
-        captureWorkflow?.imageURL = nil
-        captureWorkflow?.croppedURL = nil
-        captureWorkflow?.recognizedText = nil
-        captureWorkflow?.draftID = nil
-        fullScreenEntries = [RouteEntry(route: .camera)]
-        return true
-    }
-
-    /// 匹配业务保留真实草稿引用；保存成功回调之前仍停留在 Match。
-    @discardableResult
-    func matched(workflowID: UUID, draftID: String) -> Bool {
-        guard accepts(workflowID, step: .match), validID(draftID) else { return false }
-        captureWorkflow?.draftID = draftID
-        return true
-    }
-
-    @discardableResult
-    func saved(workflowID: UUID, mistakeID: String) -> Bool {
-        guard accepts(workflowID, step: .match), captureWorkflow?.draftID != nil, validID(mistakeID)
-        else { return false }
-        captureWorkflow?.savedMistakeID = mistakeID
-        fullScreenEntries.append(RouteEntry(route: .done, recordID: mistakeID))
-        return true
-    }
-
-    func cancelCapture() {
-        guard captureWorkflow != nil else { return }
-        dismissFullScreen()
-    }
-
-    @discardableResult
-    func finishCapture() -> Bool {
-        guard currentEntry.route == .done, captureWorkflow?.savedMistakeID != nil else { return false }
-        dismissFullScreen()
-        fullScreenEntries = []
-        selectedTab = .mistake
-        resetToRoot(.mistake)
-        return true
-    }
-
     func goToMistakes() {
         guard !needsFirstLaunch, overlay == nil, captureWorkflow == nil else { return }
         dismissFullScreen()
@@ -294,7 +203,7 @@ final class RouterState: ObservableObject {
         canStartWorkflow && fullScreenEntries.isEmpty
     }
 
-    private var canStartWorkflow: Bool {
+    var canStartWorkflow: Bool {
         !needsFirstLaunch && overlay == nil && reviewSession == nil && captureWorkflow == nil
     }
 
@@ -305,7 +214,7 @@ final class RouterState: ObservableObject {
         topRequests[tab] = UUID()
     }
 
-    private func validID(_ value: String?) -> Bool {
+    func validID(_ value: String?) -> Bool {
         guard let value else { return false }
         return !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
@@ -313,18 +222,148 @@ final class RouterState: ObservableObject {
     private func validQueue(_ values: [String]) -> Bool {
         !values.isEmpty && values.allSatisfy { validID($0) }
     }
+}
 
-    private func accepts(_ workflowID: UUID, step: AppRoute) -> Bool {
+extension RouterState {
+    @discardableResult
+    func beginCapture() -> Bool {
+        guard canStartWorkflow else { return false }
+        captureWorkflow = CaptureWorkflow(tab: selectedTab, originEntryID: currentEntry.id)
+        suspendedFullScreenEntries = fullScreenEntries
+        fullScreenEntries = [RouteEntry(route: .camera)]
+        return true
+    }
+
+    @discardableResult
+    func captured(workflowID: UUID, imageURL: URL) -> Bool {
+        guard accepts(workflowID, step: .camera) else { return false }
+        captureWorkflow?.imageURL = imageURL
+        captureWorkflow?.croppedURL = nil
+        clearCaptureResult()
+        fullScreenEntries.append(RouteEntry(route: .crop))
+        return true
+    }
+
+    @discardableResult
+    func cropped(workflowID: UUID, imageURL: URL) -> Bool {
+        guard accepts(workflowID, step: .crop) else { return false }
+        captureWorkflow?.croppedURL = imageURL
+        clearCaptureResult()
+        fullScreenEntries.append(RouteEntry(route: .ocr))
+        return true
+    }
+
+    @discardableResult
+    func recognized(workflowID: UUID, entryID: UUID, text: String) -> Bool {
+        guard accepts(workflowID, step: .ocr), currentEntry.id == entryID,
+              !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        else { return false }
+        captureWorkflow?.recognizedText = text
+        fullScreenEntries.append(RouteEntry(route: .match))
+        return true
+    }
+
+    /// P19 失败态「手动补字」：以空文本进入修正页（IA §4.3 链路 27 第三条退路）。
+    @discardableResult
+    func recognizedManually(workflowID: UUID, entryID: UUID) -> Bool {
+        guard accepts(workflowID, step: .ocr), currentEntry.id == entryID else { return false }
+        captureWorkflow?.recognizedText = nil
+        fullScreenEntries.append(RouteEntry(route: .match))
+        return true
+    }
+
+    /// P19 失败态「重拍这张」：回 P17 重拍，原图 / 裁切图 / 识别文本全部作废。
+    @discardableResult
+    func retakeFromOcr(workflowID: UUID) -> Bool {
+        guard accepts(workflowID, step: .ocr) else { return false }
+        captureWorkflow?.imageURL = nil
+        captureWorkflow?.croppedURL = nil
+        clearCaptureResult()
+        fullScreenEntries = [RouteEntry(route: .camera)]
+        return true
+    }
+
+    /// P20 保存成功：记下 user_example / 可选 mistake / 全部归属，进 P21。
+    /// 未标错时 mistakeID 为 nil（P21 仍给「去错题本」去处，只是本题不在错题本里）。
+    @discardableResult
+    func saved(workflowID: UUID, userExampleID: String, mistakeID: String?, idioms: [SavedIdiom]) -> Bool {
+        guard accepts(workflowID, step: .match), validID(userExampleID),
+              mistakeID == nil || validID(mistakeID),
+              !idioms.isEmpty, idioms.allSatisfy({ validID($0.id) && !$0.word.isEmpty })
+        else { return false }
+        captureWorkflow?.savedUserExampleID = userExampleID
+        captureWorkflow?.savedMistakeID = mistakeID
+        captureWorkflow?.savedIdioms = idioms
+        fullScreenEntries.append(RouteEntry(route: .done, recordID: userExampleID))
+        return true
+    }
+
+    func cancelCapture() {
+        guard captureWorkflow != nil else { return }
+        dismissFullScreen()
+    }
+
+    /// P21「去错题本」：P17–P21 全部出栈，切到错题标签首屏。
+    @discardableResult
+    func finishCapture() -> Bool {
+        guard currentEntry.route == .done, captureWorkflow?.savedUserExampleID != nil else { return false }
+        dismissFullScreen()
+        fullScreenEntries = []
+        selectedTab = .mistake
+        resetToRoot(.mistake)
+        return true
+    }
+
+    /// P21「去成语详情」：P17–P21 全部出栈，在拍照来源标签压入 P05（可返回该标签首屏）。
+    /// 录题归属按候选顺序，手动增补排末尾；只接受本次保存过的成语。
+    @discardableResult
+    func finishCaptureToIdiom(_ idiomID: String) -> Bool {
+        guard currentEntry.route == .done,
+              let workflow = captureWorkflow,
+              workflow.savedUserExampleID != nil,
+              workflow.savedIdioms.contains(where: { $0.id == idiomID }),
+              validID(idiomID)
+        else { return false }
+        let tab = workflow.tab
+        dismissFullScreen()
+        selectedTab = tab
+        tabEntries[tab]?.append(RouteEntry(route: .idiomDetail, recordID: idiomID))
+        return true
+    }
+
+    /// P21「继续录下一题」：保留本次来源标签，清掉上一题的图与保存回执，回到 P17。
+    @discardableResult
+    func continueCapture() -> Bool {
+        guard currentEntry.route == .done, captureWorkflow?.savedUserExampleID != nil else { return false }
+        captureWorkflow?.imageURL = nil
+        captureWorkflow?.croppedURL = nil
+        clearCaptureResult()
+        fullScreenEntries = [RouteEntry(route: .camera)]
+        return true
+    }
+
+    func accepts(_ workflowID: UUID, step: AppRoute) -> Bool {
         captureWorkflow?.id == workflowID && currentEntry.route == step
     }
 
-    private func invalidateCaptureResults() {
+    func invalidateCaptureResults() {
         guard captureWorkflow != nil else { return }
-        captureWorkflow?.savedMistakeID = nil
-        captureWorkflow?.draftID = nil
+        clearSavedResult()
         if currentEntry.route == .camera || currentEntry.route == .crop {
             captureWorkflow?.recognizedText = nil
         }
         if currentEntry.route == .camera { captureWorkflow?.croppedURL = nil }
+    }
+
+    /// 上游图或文字一改，上一次保存回执即失效，避免 P21 显示旧归属。
+    private func clearCaptureResult() {
+        captureWorkflow?.recognizedText = nil
+        clearSavedResult()
+    }
+
+    private func clearSavedResult() {
+        captureWorkflow?.savedUserExampleID = nil
+        captureWorkflow?.savedMistakeID = nil
+        captureWorkflow?.savedIdioms = []
     }
 }

@@ -188,11 +188,33 @@ private struct AppRoutePage: View {
                 }
             )
         } else if entry.route == .match,
-                  let reader = launch.libraryReader {
+                  let workflowID = router.captureWorkflow?.id,
+                  let imageURL = router.captureWorkflow?.croppedURL,
+                  let reader = launch.libraryReader,
+                  let saver = launch.captureSaver {
             P20MatchScreen(
                 text: router.captureWorkflow?.recognizedText ?? "",
+                imageURL: imageURL,
                 reader: reader,
-                onBack: { router.back() }
+                saver: saver,
+                onBack: { router.back() },
+                onSaved: { saved in
+                    _ = router.saved(
+                        workflowID: workflowID,
+                        userExampleID: saved.userExampleID,
+                        mistakeID: saved.mistakeID,
+                        idioms: saved.idioms
+                    )
+                }
+            )
+        } else if entry.route == .done,
+                  let workflow = router.captureWorkflow,
+                  !workflow.savedIdioms.isEmpty {
+            P21DoneScreen(
+                idioms: workflow.savedIdioms,
+                onOpenIdiom: { id in _ = router.finishCaptureToIdiom(id) },
+                onOpenMistakes: { _ = router.finishCapture() },
+                onContinue: { _ = router.continueCapture() }
             )
         } else {
             RoutePlaceholderPage(router: router, launch: launch, entry: entry, tab: tab)

@@ -1,3 +1,4 @@
+import CangyuData
 import Foundation
 import XCTest
 @testable import ChenYuBang
@@ -159,16 +160,22 @@ final class RouterStateTests: XCTestCase {
         XCTAssertTrue(router.beginCapture())
         let workflowID = try XCTUnwrap(router.captureWorkflow?.id)
         let imageURL = URL(fileURLWithPath: "/test-fixture/image.jpg")
-        XCTAssertFalse(router.saved(workflowID: workflowID, mistakeID: "fixture"))
+        let idioms = [SavedIdiom(id: "idiom-anbu", word: "按部就班")]
+        XCTAssertFalse(router.saved(
+            workflowID: workflowID, userExampleID: "saved-fixture", mistakeID: nil, idioms: idioms
+        ))
         XCTAssertFalse(router.captured(workflowID: UUID(), imageURL: imageURL))
         XCTAssertTrue(router.captured(workflowID: workflowID, imageURL: imageURL))
         XCTAssertTrue(router.cropped(workflowID: workflowID, imageURL: imageURL))
         XCTAssertFalse(router.recognized(workflowID: workflowID, entryID: router.currentEntry.id, text: " "))
         XCTAssertTrue(router.recognized(workflowID: workflowID, entryID: router.currentEntry.id, text: "实际业务识别回调的测试输入"))
-        XCTAssertFalse(router.saved(workflowID: workflowID, mistakeID: "fixture"))
-        XCTAssertTrue(router.matched(workflowID: workflowID, draftID: "draft-fixture"))
+        XCTAssertFalse(router.saved(
+            workflowID: workflowID, userExampleID: "saved-fixture", mistakeID: nil, idioms: []
+        ))
         XCTAssertEqual(router.currentEntry.route, .match)
-        XCTAssertTrue(router.saved(workflowID: workflowID, mistakeID: "saved-fixture"))
+        XCTAssertTrue(router.saved(
+            workflowID: workflowID, userExampleID: "saved-fixture", mistakeID: "mistake-fixture", idioms: idioms
+        ))
         XCTAssertEqual(router.fullScreenEntries.map(\.route), RouteRegistry.captureSteps)
         XCTAssertFalse(router.canGoBack)
         router.back()

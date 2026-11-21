@@ -6,7 +6,13 @@ import GRDB
 public enum ChenYuBangDatabase {
     public static func makeMigrator() -> DatabaseMigrator {
         var migrator = DatabaseMigrator()
+        registerV1(&migrator)
+        registerV2(&migrator)
+        registerV3(&migrator)
+        return migrator
+    }
 
+    private static func registerV1(_ migrator: inout DatabaseMigrator) {
         migrator.registerMigration("v1") { db in
             try db.create(table: "idiom") { t in
                 t.primaryKey("id", .text)
@@ -116,7 +122,9 @@ public enum ChenYuBangDatabase {
                 t.column("value", .text).notNull()
             }
         }
+    }
 
+    private static func registerV2(_ migrator: inout DatabaseMigrator) {
         migrator.registerMigration("v2") { db in
             // v2（v1.5 口径，规范 §4.5）：用户拍照录入题（用户数据，绝不随题库包替换）
             try db.create(table: "user_example") { t in
@@ -140,7 +148,28 @@ public enum ChenYuBangDatabase {
                 t.add(column: "userExampleId", .text)
             }
         }
+    }
 
-        return migrator
+    private static func registerV3(_ migrator: inout DatabaseMigrator) {
+        migrator.registerMigration("v3") { db in
+            // v3（v1.7 口径，规范 §4.5）：一题多成语关联；用户表，绝不随题库包替换。
+            try db.create(table: "user_example_idiom") { t in
+                t.column("userExampleId", .text).notNull()
+                t.column("idiomId", .text).notNull()
+                t.primaryKey(["userExampleId", "idiomId"])
+            }
+            try db.create(index: "idx_user_example_idiom_example",
+                          on: "user_example_idiom", columns: ["userExampleId"])
+            try db.create(index: "idx_user_example_idiom_idiom",
+                          on: "user_example_idiom", columns: ["idiomId"])
+            // 防御性回填：既有标错题从 mistake.userExampleId + mistake_idiom 补关联，只补不删。
+            try db.execute(sql: """
+                INSERT OR IGNORE INTO user_example_idiom(userExampleId, idiomId)
+                SELECT mistake.userExampleId, mistake_idiom.idiomId
+                FROM mistake
+                JOIN mistake_idiom ON mistake_idiom.mistakeId = mistake.id
+                WHERE mistake.userExampleId IS NOT NULL
+                """)
+        }
     }
 }

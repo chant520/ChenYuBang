@@ -1,9 +1,11 @@
 import CangyuData
+import Foundation
 import GRDB
 import XCTest
 
-/// v1→v2 迁移（规范 §4.5 v2 方案 / §11.1）：user_example 建表 + mistake.userExampleId 增列，
-/// 覆盖正常路径（旧行与索引保留、外键可解析）与中断回滚（迁移事务未提交则整体撤销）。
+/// v1→v2 / v2→v3 迁移与 P20 保存事务（规范 §4.5 / §8.1 / §11.1）。
+/// 迁移覆盖正常路径、防御性回填与中断回滚；保存覆盖未标错 / 标错两分支、
+/// 多归属全部写入、图片相对路径与 DB 失败后的图片清理。
 final class DatabaseMigrationTests: XCTestCase {
     private enum Interruption: Error {
         case simulated
@@ -21,7 +23,7 @@ final class DatabaseMigrationTests: XCTestCase {
                 """)
         }
 
-        try migrator.migrate(queue)
+        try migrator.migrate(queue, upTo: "v2")
 
         try queue.read { db in
             XCTAssertTrue(try migrator.appliedIdentifiers(db).contains("v2"))
@@ -72,6 +74,78 @@ final class DatabaseMigrationTests: XCTestCase {
             XCTAssertFalse(try failing.appliedIdentifiers(db).contains("v2-interrupted"))
             XCTAssertFalse(try db.tableExists("rollback_probe"))
             XCTAssertFalse(try db.tableExists("user_example"))
+        }
+    }
+
+    func testV2ToV3CreatesAssociationTableAndBackfillsMistakeLinks() throws {
+        let queue = try DatabaseQueue()
+        let migrator = ChenYuBangDatabase.makeMigrator()
+        try migrator.migrate(queue, upTo: "v2")
+        try queue.write { db in
+            try db.execute(sql: """
+                INSERT INTO user_example (id, stem, createdAt)
+                VALUES ('u1', '录入题一', '2026-11-01T00:00:00Z'),
+                       ('u2', '录入题二', '2026-11-02T00:00:00Z')
+                """)
+            try db.execute(sql: """
+                INSERT INTO mistake
+                    (id, userExampleId, stem, optionA, optionB, optionC, optionD,
+                     tagNames, state, createdAt)
+                VALUES ('m1', 'u1', '旧错题一', 'A', 'B', 'C', 'D', '[]', '待复习', '2026-11-01T00:00:00Z'),
+                       ('m2', NULL, '无录入题', 'A', 'B', 'C', 'D', '[]', '待复习', '2026-11-01T00:00:00Z'),
+                       ('m3', 'u2', '旧错题二', 'A', 'B', 'C', 'D', '[]', '待复习', '2026-11-02T00:00:00Z')
+                """)
+            try db.execute(sql: """
+                INSERT INTO mistake_idiom (mistakeId, idiomId)
+                VALUES ('m1', 'i1'), ('m1', 'i2'), ('m2', 'i3'), ('m3', 'i2')
+                """)
+        }
+
+        try migrator.migrate(queue)
+
+        try queue.read { db in
+            XCTAssertTrue(try migrator.appliedIdentifiers(db).contains("v3"))
+            XCTAssertTrue(try db.tableExists("user_example_idiom"))
+            XCTAssertEqual(
+                try String.fetchAll(
+                    db,
+                    sql: "SELECT name FROM pragma_table_info('user_example_idiom') WHERE pk > 0 ORDER BY pk"
+                ),
+                ["userExampleId", "idiomId"]
+            )
+            let indexes = try String.fetchAll(db, sql: "SELECT name FROM pragma_index_list('user_example_idiom')")
+            XCTAssertTrue(indexes.contains("idx_user_example_idiom_example"))
+            XCTAssertTrue(indexes.contains("idx_user_example_idiom_idiom"))
+            XCTAssertEqual(
+                try String.fetchAll(
+                    db,
+                    sql: "SELECT userExampleId || ':' || idiomId FROM user_example_idiom ORDER BY 1"
+                ),
+                ["u1:i1", "u1:i2", "u2:i2"]
+            )
+            XCTAssertEqual(try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM mistake"), 3)
+        }
+    }
+
+    func testInterruptedV3RollsBackAssociationTable() throws {
+        let queue = try DatabaseQueue()
+        try ChenYuBangDatabase.makeMigrator().migrate(queue, upTo: "v2")
+
+        var failing = DatabaseMigrator()
+        failing.registerMigration("v1") { _ in }
+        failing.registerMigration("v2") { _ in }
+        failing.registerMigration("v3-interrupted") { db in
+            try db.create(table: "user_example_idiom") { t in
+                t.column("userExampleId", .text)
+                t.column("idiomId", .text)
+            }
+            throw Interruption.simulated
+        }
+        XCTAssertThrowsError(try failing.migrate(queue))
+
+        try queue.read { db in
+            XCTAssertFalse(try failing.appliedIdentifiers(db).contains("v3-interrupted"))
+            XCTAssertFalse(try db.tableExists("user_example_idiom"))
         }
     }
 }

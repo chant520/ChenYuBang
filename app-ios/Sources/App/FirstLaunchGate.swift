@@ -15,6 +15,8 @@ final class FirstLaunchState: ObservableObject {
     @Published private(set) var libraryReader: IdiomLibraryReader?
     /// P07 例题详情读库入口：与 libraryReader 同时就绪。
     @Published private(set) var exampleReader: ExampleLibraryReader?
+    /// P20 保存入口：初始化成功后才有值；图片目录为 Application Support/ChenYuBang/images。
+    @Published private(set) var captureSaver: UserExampleSaver?
     private var store: ExamScopeStore?
     private var importer: PackImporter?
     private var currentPack: ValidatedPack?
@@ -29,6 +31,8 @@ final class FirstLaunchState: ObservableObject {
             )
             let directory = support.appendingPathComponent("ChenYuBang", isDirectory: true)
             try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+            let imagesDirectory = directory.appendingPathComponent("images", isDirectory: true)
+            try FileManager.default.createDirectory(at: imagesDirectory, withIntermediateDirectories: true)
             let queue = try DatabaseQueue(path: directory.appendingPathComponent("chenyubang.sqlite").path)
             try ChenYuBangDatabase.makeMigrator().migrate(queue)
             let initializedImporter = PackImporter(queue: queue)
@@ -54,6 +58,7 @@ final class FirstLaunchState: ObservableObject {
             availableProvinces = provinces
             libraryReader = IdiomLibraryReader(queue: queue)
             exampleReader = ExampleLibraryReader(queue: queue)
+            captureSaver = UserExampleSaver(queue: queue, imagesDirectory: imagesDirectory)
             preferences = loaded
         } catch is PackError {
             contentError = true
