@@ -16,15 +16,16 @@ import org.robolectric.annotation.GraphicsMode
 
 /**
  * P20 快照（规范 §11.1）：基线只增不改。
- * `twoSelected*` 是 2.5 既有基线，对应 iOS `P20MatchSnapshotTests.testFormMain*`；
+ * `twoSelectedHints*` 对应 iOS `P20MatchSnapshotTests.testFormMain*`（poolSize=3，!canCycle
+ * 派生「没有更多候选」灰字，与 iOS disabledHints 同语义；前代 `twoSelected*` 留作派生前历史）；
  * `noMatchTagFixed*` 为候选空态修后基线（对应 iOS `testFormEmpty*`；前代 `noMatch*`、
  * `noMatchSingleEntry*` 留作修前历史）。
  * iOS 另有 `testFormSection*` 单独渲染表单分区：Android 侧该分区没有 testTag，整页基线已含
  * FormFieldsCard，故不单独镜像——对齐的是状态语义，不是文件名一一对应。
  *
- * 两条 2.5 反馈条（候选上限、保存失败）不做整页快照：它们是 `P20FormContent` 里
- * `verticalScroll` 内容的第五、六个子节点，落在 812dp 视口之外，整页图与 `twoSelected*` 逐字节相同
- * （录出来验过），钉不住任何东西；构件外观已由 `CBarSnapshotTest` 的 barInfo 与 barError 两组基线钉住，
+ * 候选卡内灰字提示（至少一条 / 没有更多候选 / 候选最多 50 条）已落进 812dp 视口，整页快照可钉：
+ * `poolFullHint*` 钉池满上限、`noMoreCandidatesDerived*` 钉池 ≤3 派生句。保存失败反馈条
+ * 不做整页快照：构件外观由 `CBarSnapshotTest` 的 barError 基线钉住，
  * 「哪个状态出哪条」由 `P20FormViewModelTest` 的 info / saveError 断言钉住。
  */
 @RunWith(RobolectricTestRunner::class)
@@ -52,6 +53,7 @@ class P20FormSnapshotTest {
         composeTestRule.onRoot().captureRoboImage()
     }
 
+    /** 池=3（canCycle=false）：「没有更多候选」由 CandidateRows 按 !canCycle 静态派生，对齐 iOS testFormMain 基线。 */
     private fun twoSelectedState(): P20CaptureState =
         P20CaptureState(
             reviewText = "下列各句中，加点的成语使用不恰当的一项是……\nA．新厂长按部就班 B．做事标新立异 C．从不墨守成规",
@@ -92,10 +94,10 @@ class P20FormSnapshotTest {
         )
 
     @Test
-    fun twoSelectedLight() = capture(twoSelectedState(), night = false)
+    fun twoSelectedHintsLight() = capture(twoSelectedState(), night = false)
 
     @Test
-    fun twoSelectedDark() = capture(twoSelectedState(), night = true)
+    fun twoSelectedHintsDark() = capture(twoSelectedState(), night = true)
 
     @Test
     fun noMatchTagFixedLight() = capture(noMatchState(), night = false)
@@ -128,7 +130,11 @@ class P20FormSnapshotTest {
     @Test
     fun poolFullHintDark() = capture(poolFullState(), night = true)
 
-    /** 无更多候选态（池 ≤K，换一组禁用）：同上限态，提示进候选卡内灰字行。 */
+    /**
+     * 无更多候选态（池=K，canCycle=false，换一组禁用）：「没有更多候选」靠 CandidateRows
+     * 按 !canCycle 静态派生（iOS P20MatchContent.swift:270 同口径），fixture 不再注入
+     * candidateHint——前代 `noMoreCandidates*` 钉的注入态在 UI 上不可达，留作历史不覆盖。
+     */
     private fun noMoreCandidatesState(): P20CaptureState =
         P20CaptureState(
             reviewText = "今天天气不错，我们出去散步吧。\nA．新厂长按部就班 B．做事标新立异 C．从不墨守成规",
@@ -140,15 +146,14 @@ class P20FormSnapshotTest {
                 ),
             checked = listOf(IdiomRef(ID_ANBU, "按部就班")),
             poolSize = P20Matcher.WINDOW_SIZE,
-            candidateHint = P20Matcher.NO_MORE_CANDIDATES,
             loading = false,
         )
 
     @Test
-    fun noMoreCandidatesLight() = capture(noMoreCandidatesState(), night = false)
+    fun noMoreCandidatesDerivedLight() = capture(noMoreCandidatesState(), night = false)
 
     @Test
-    fun noMoreCandidatesDark() = capture(noMoreCandidatesState(), night = true)
+    fun noMoreCandidatesDerivedDark() = capture(noMoreCandidatesState(), night = true)
 
     private companion object {
         const val ID_ANBU = "11111111-1111-4111-8111-111111111111"
