@@ -26,6 +26,8 @@ public enum CIcons {
         case gallery
         /// P17 权限被拒态相机 + 斜杠（全页稿 D v2 P17）。
         case cameraOff
+        /// P08 顶部「拍照录入题库」与空态图标（全页稿 B / D v2 P08 `.topbtn`、`.eic`）。
+        case camera
     }
 
     /// 生成按 size 缩放后的路径（viewBox 24 → size，规范 §6）。
@@ -42,7 +44,7 @@ public enum CIcons {
             return glyphPath(kind)
         case .chevron, .book, .close, .back, .sound:
             return navPath(kind)
-        case .gallery, .cameraOff:
+        case .gallery, .cameraOff, .camera:
             return capturePath(kind)
         }
     }
@@ -148,7 +150,8 @@ public enum CIcons {
         return path
     }
 
-    /// P17 拍照页图标（相册 / 相机 + 斜杠），路径与 Android CChromeIcon 同名项一致。
+    /// P17 拍照页与 P08 顶部拍照图标（相册 / 相机 / 相机 + 斜杠），
+    /// 路径与 Android CChromeIcon 同名项一致。
     private static func capturePath(_ kind: Kind) -> Path {
         var path = Path()
         switch kind {
@@ -174,6 +177,14 @@ public enum CIcons {
             path.addEllipse(in: CGRect(x: 8, y: 9, width: 8, height: 8))
             path.move(to: CGPoint(x: 3, y: 21))
             path.addLine(to: CGPoint(x: 21, y: 3))
+        case .camera:
+            // rect x3 y7 18x13 + circle cx12 cy13.5 r3.6 + M8.5 7l1.4-3h4.2l1.4 3（全页稿 B v2 P08 `.topbtn`）
+            path.addRect(CGRect(x: 3, y: 7, width: 18, height: 13))
+            path.addEllipse(in: CGRect(x: 8.4, y: 9.9, width: 7.2, height: 7.2))
+            path.move(to: CGPoint(x: 8.5, y: 7))
+            path.addLine(to: CGPoint(x: 9.9, y: 4))
+            path.addLine(to: CGPoint(x: 14.1, y: 4))
+            path.addLine(to: CGPoint(x: 15.5, y: 7))
         default:
             break
         }
