@@ -43,10 +43,6 @@ public struct MistakeBookState: Equatable, Sendable {
     public var isEmpty: Bool {
         dimension == .grouped ? groups.isEmpty : entries.isEmpty
     }
-
-    public var itemCount: Int {
-        dimension == .grouped ? groups.count : entries.count
-    }
 }
 
 /// P08 回调打包。
@@ -96,9 +92,6 @@ public struct P08MistakeContent: View {
                     )
                 )
                 content
-                if !state.loading && !state.failed && !state.isEmpty {
-                    footer
-                }
             }
             .padding(.horizontal, Tokens.Space.pageX)
             .padding(.top, Tokens.Space.contentTop)
@@ -218,13 +211,6 @@ public struct P08MistakeContent: View {
             onAction: actions.onCapture
         )
         .padding(.vertical, Tokens.Space.block)
-    }
-
-    private var footer: some View {
-        Text(MistakeBrowse.bookFooter(state.itemCount))
-            .font(.system(size: Tokens.Font.n11))
-            .foregroundStyle(colors.text3)
-            .frame(maxWidth: .infinity, alignment: .center)
     }
 }
 

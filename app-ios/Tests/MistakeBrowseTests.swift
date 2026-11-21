@@ -80,10 +80,9 @@ final class MistakeBrowseTests: XCTestCase {
         XCTAssertEqual(MistakeBrowse.senseLine(nil), MistakeBrowse.placeholder)
     }
 
-    func testReviewTitleAndFooters() {
+    func testReviewTitleAndFooter() {
         XCTAssertEqual(MistakeBrowse.reviewTitle(pending: 7), "开始复习 · 7 道待复习")
         XCTAssertEqual(MistakeBrowse.reviewTitle(pending: 0), "开始复习 · 0 道待复习")
-        XCTAssertEqual(MistakeBrowse.bookFooter(12), "共 12 条 · 已到末尾")
         XCTAssertEqual(MistakeBrowse.capturedFooter(3), "3 道 · 已到末尾")
     }
 

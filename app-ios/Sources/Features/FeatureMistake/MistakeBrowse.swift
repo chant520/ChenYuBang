@@ -110,11 +110,7 @@ public enum MistakeBrowse {
         "开始复习 · \(pending) \(unit)待复习"
     }
 
-    /// P08 列表脚注，与 P03 同款式；P09 用「N 道 · 已到末尾」（高保真稿 B P09 `.listfoot`）。
-    public static func bookFooter(_ count: Int) -> String {
-        "共 \(count) 条 · 已到末尾"
-    }
-
+    /// P09 列表脚注（高保真稿 B P09 `.listfoot`）；P08 无脚注（信息架构 v1.4 P08 区块 ①–⑦ 不含脚注，高保真 P08 帧亦无）。
     public static func capturedFooter(_ count: Int) -> String {
         "\(count) \(unit) · 已到末尾"
     }
