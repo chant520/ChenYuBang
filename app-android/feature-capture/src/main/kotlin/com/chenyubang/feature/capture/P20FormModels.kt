@@ -49,6 +49,7 @@ data class P20CandidateUiState(
     val deleteMode: Boolean = false,
     val showManualPicker: Boolean = false,
     val info: String? = null,
+    // 候选卡内动态提示（加一个满 50 / 全库耗尽）；「没有更多候选」常态句由 UI 按 !canCycle 派生，不经此字段。
     val candidateHint: String? = null,
     val loading: Boolean = true,
 )

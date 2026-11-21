@@ -51,11 +51,9 @@ class P20CandidateController(
 
     /** 换一组：仅推进展示窗口（K=3），不改已勾选集合；到池尾回卷。 */
     fun cycle() {
-        if (pool.size <= P20Matcher.WINDOW_SIZE) {
-            // 上限/无更多候选走候选卡内灰字（candidateHint），CBar 只留给需确认信息。
-            stateFlow.update { it.copy(candidateHint = P20Matcher.NO_MORE_CANDIDATES) }
-            return
-        }
+        // 换一组仅在 canCycle（池 > K）时可点：池 ≤ K 时静默返回（防御测试直调除零）。
+        // 「没有更多候选」不在此写入——它由 CandidateRows 按 !canCycle 静态派生，常显可见。
+        if (pool.size <= P20Matcher.WINDOW_SIZE) return
         windowStart = (windowStart + P20Matcher.WINDOW_SIZE) % pool.size
         stateFlow.update {
             it.copy(
