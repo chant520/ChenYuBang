@@ -227,6 +227,24 @@ final class P20MatchModelTests: XCTestCase {
         XCTAssertTrue(tier(of: "id-best", in: state) == .best)
     }
 
+    func testBestOutsideFirstWindowIsPromotedIntoInitialWindow() {
+        // 五条全命中，把最高频词放到按 word 升序的第 5 位：它不在首批 K=3 内，
+        // 必须替换窗口末位挤进首屏并被默认勾上（规范口径「默认勾选最匹配的一项」）。
+        let words = ["甲一", "乙二", "丙三", "丁四", "戊五"]
+        let ordered = words.sorted()
+        let best = ordered[ordered.count - 1]
+        let idioms = words.map {
+            idiom("id-\($0)", $0, $0 == best ? 99 : 1)
+        }
+        let model = P20MatchModel()
+        model.bootstrap(text: words.joined(separator: " "), idioms: idioms)
+        let state = model.state
+        XCTAssertEqual(state.poolSize, 5)
+        XCTAssertEqual(state.candidates.map(\.word), [ordered[0], ordered[1], best])
+        XCTAssertEqual(state.checked.map(\.word), [best])
+        XCTAssertTrue(tier(of: "id-\(best)", in: state) == .best)
+    }
+
     func testSelectTogglesMultipleAndCancelLastDisablesSave() {
         let model = P20MatchModel()
         model.bootstrap(text: "按部就班 墨守成规 标新立异", idioms: sampleIdioms)
