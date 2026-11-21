@@ -55,6 +55,67 @@ class P20FormViewModelTest {
     }
 
     @Test
+    fun addAppendsByFrequencyWithoutChangingCheck() {
+        val extra = idiom("id-extra", "额外词", 9)
+        val low = idiom("id-low", "低频词", 1)
+        val model = newModel().also { it.candidate.bootstrap("按部就班 墨守成规 别出心裁", sample + extra + low) }
+        val before = model.state.value.checked
+
+        // 三条 sample 全命中入池，未命中的高频与低频词各一条：按 frequency DESC 先取高、再取低，勾选集合不动。
+        model.candidate.add()
+        assertEquals("id-extra", model.state.value.candidates.last().id)
+        assertEquals(MatchTier.Added, model.state.value.candidates.last().tier)
+        assertEquals(4, model.state.value.poolSize)
+        assertEquals(before, model.state.value.checked)
+
+        model.candidate.add()
+        assertEquals("id-low", model.state.value.candidates.last().id)
+        assertEquals(before, model.state.value.checked)
+    }
+
+    @Test
+    fun addAtFullPoolShowsLimit() {
+        val many = (0 until 50).map { idiom("id-$it", "词$it", 3) }
+        val model = newModel().also { it.candidate.bootstrap(many.joinToString(" ") { it.word }, many) }
+        // 命中即占满 50 池：加一个只提示上限，不再追加，池与窗口都不变。
+        model.candidate.add()
+        assertEquals(50, model.state.value.poolSize)
+        assertEquals(P20Matcher.WINDOW_SIZE, model.state.value.candidates.size)
+        assertEquals(P20Matcher.CANDIDATE_LIMIT, model.state.value.info)
+    }
+
+    @Test
+    fun addSkipsPoolMembersAndSurvivesCycle() {
+        // 四条命中（窗口 K=3，第四条在窗口外）+ 一条未命中的高频词：
+        // 加一个必须跳过池内已有词（含窗口外），且加入的词进池，换一组后不丢。
+        val biao = idiom("id-biao", "标新立异", 3)
+        val extra = idiom("id-extra", "额外词", 10)
+        val model =
+            newModel().also {
+                it.candidate.bootstrap("按部就班 墨守成规 别出心裁 标新立异", sample + biao + extra)
+            }
+        assertEquals(4, model.state.value.poolSize)
+        assertEquals(P20Matcher.WINDOW_SIZE, model.state.value.candidates.size)
+
+        model.candidate.add()
+        assertEquals(5, model.state.value.poolSize)
+        assertEquals("id-extra", model.state.value.candidates.last().id)
+        assertEquals(
+            model.state.value.candidates.size,
+            model.state.value.candidates.map { it.id }.toSet().size,
+        )
+
+        // 池内（含窗口外）已无空位可加：不得重复挑到窗口外的池内词。
+        model.candidate.add()
+        assertEquals(5, model.state.value.poolSize)
+        assertEquals(P20Matcher.NO_MORE_CANDIDATES, model.state.value.info)
+
+        // 换一组用池重建窗口：手动加的词仍在，不会被冲掉。
+        model.candidate.cycle()
+        assertTrue(model.state.value.candidates.any { it.id == "id-extra" })
+    }
+
+    @Test
     fun manualPickAppendsToCheckedAndDedupesExisting() {
         val model = newModel().also { it.candidate.bootstrap("按部就班 墨守成规", sample) }
         model.candidate.select("id-moshou")

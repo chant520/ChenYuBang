@@ -166,7 +166,7 @@ object P20Matcher {
         )
     }
 
-    /** 「加一个」从全库未展示词中取一条附加候选；无档位标签。 */
+    /** 「加一个」从全库未入池词中取一条（由调用方按 frequency DESC / word ASC 挑）；无档位标签。 */
     fun addedCandidate(entity: IdiomEntity): MatchCandidate =
         MatchCandidate(entity.id, entity.word, entity.frequency, MatchTier.Added)
 
