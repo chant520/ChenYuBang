@@ -1,6 +1,8 @@
 import CangyuData
 import XCTest
 
+@testable import ChenYuBang
+
 /// P08 / P09 取值纯函数（与 Android MistakeBrowse 同口径）：只验字段呈现，不碰数据库。
 final class MistakeBrowseTests: XCTestCase {
     func testGroupRowTexts() {
