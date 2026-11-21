@@ -6,6 +6,7 @@ import com.chenyubang.feature.capture.IdiomRef
 import com.chenyubang.feature.capture.OcrDraft
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -139,6 +140,40 @@ class RouterStateTest {
         assertFalse(systemBackEnabled(base))
         assertTrue(systemBackEnabled(base.push(Route.Library)))
         assertTrue(systemBackEnabled(RouterState(tab = AppTab.Me).present(Route.Clear)))
+    }
+
+    /**
+     * 同照片连录两次（P21 走「再拍一张」回 P17，拿同一张本机图与同一份草稿）必须落在新的 Match 实例上。
+     * 本例只钉 instance；`p20FormViewModelKey` 随 instance 变化由 feature-capture 的
+     * `P20FormViewModelKeyTest` 钉住，两段合起来即「二次录入不复用 P20 表单状态」。
+     */
+    @Test
+    fun samePhotoRecordedTwiceLandsOnFreshMatchInstance() {
+        val draft =
+            OcrDraft(stem = "新厂长按部就班，提出了一整套创新方案", options = listOf("按部就班", "墨守成规"))
+
+        fun shoot(atCamera: RouterState): RouterState =
+            atCamera
+                .attachCaptureImage("/tmp/same-photo.jpg")
+                .nextCapture()
+                .attachCropImage("/tmp/same-crop.jpg", frame())
+                .attachOcrText(draft)
+
+        val first = shoot(RouterState(tab = AppTab.Idiom).startCapture())
+        assertEquals(Route.Match, first.current.route)
+
+        val again =
+            first
+                .captureSaved("ue-same-photo", listOf(IdiomRef("idiom-id", "按部就班")))
+                .captureDestination(Route.Camera)
+        val second = shoot(again)
+
+        assertEquals(Route.Match, second.current.route)
+        // 照片路径、裁切图与草稿文字逐条相同：两次 P20 的差别只能来自 capture 实例。
+        assertEquals(first.captureImagePath, second.captureImagePath)
+        assertEquals(first.captureCropPath, second.captureCropPath)
+        assertEquals(first.captureDraft, second.captureDraft)
+        assertNotEquals(first.current.instance, second.current.instance)
     }
 
     @Test
