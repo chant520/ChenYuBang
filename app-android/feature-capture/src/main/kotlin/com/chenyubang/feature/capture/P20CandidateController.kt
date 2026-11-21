@@ -28,13 +28,8 @@ class P20CandidateController(
         bestId = result.bestId
         windowStart = 0
         checkedIds = linkedSetOf()
-        val window = pool.take(P20Matcher.WINDOW_SIZE)
-        val first =
-            when {
-                window.isEmpty() -> null
-                bestId != null && window.any { it.id == bestId } -> bestId
-                else -> window.first().id
-            }
+        val window = P20Matcher.initialWindow(pool, bestId)
+        val first = bestId ?: window.firstOrNull()?.id
         first?.let { checkedIds.add(it) }
         stateFlow.value =
             P20CandidateUiState(

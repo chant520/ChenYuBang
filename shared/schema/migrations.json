@@ -35,7 +35,7 @@
     },
     {
       "version": 3,
-      "status": "planned",
+      "status": "shipped",
       "description": "v1.7 一题多成语：新增 user_example_idiom 关联表（userExampleId → user_example.id、idiomId → idiom.id，联合主键，至少一条）；保存时与 user_example 同事务写入；防御性回填 mistake.userExampleId 对应的 mistake_idiom 成语，只补不删；只增不改不删",
       "tables": ["user_example_idiom"],
       "android": "DbMigrations.MIGRATION_2_3（AppDatabase version = 3，schema 导出 3.json）；单测 UserExampleIdiomMigrationTest：正常路径 + 中断回滚",
