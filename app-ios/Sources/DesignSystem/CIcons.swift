@@ -26,7 +26,7 @@ public enum CIcons {
         case gallery
         /// P17 权限被拒态相机 + 斜杠（全页稿 D v2 P17）。
         case cameraOff
-        /// P08 顶部「拍照录入题库」与空态图标（全页稿 B / D v2 P08 `.topbtn`、`.eic`）。
+        /// 悬浮拍照按钮（规范 §5.8 图标形状）、P08 顶部「拍照录入题库」与 P08 空态插画位（全页稿 A / B / D v2 `.fab svg`、`.topbtn`、`.eic`）。
         case camera
     }
 

@@ -3,7 +3,7 @@ import CangyuTokens
 
 /// 悬浮拍照按钮（规范 5.8，状态矩阵：默认 / 按下 / 禁用 / 带徽标组合）。
 ///
-/// 52×52pt、圆角 6pt、底 fab；图标 plus 24pt stroke 1.6 fabicon；投影取 Tokens.Shadow（见 CFabShadow）。
+/// 52×52pt、圆角 6pt、底 fab；图标 camera 24pt stroke 1.6 fabicon；投影取 Tokens.Shadow（见 CFabShadow）。
 /// 禁用：底 disbg、图标 disfg、无投影，几何同默认；按下按规范 5.0 亮度 ×0.9。
 /// 带徽标：右侧 gap 10pt 挂警示徽标（CBadge(.warn)，构件板 `.fabcell` 展示口径）。
 /// 定位（right 20pt / bottom 88pt，Tokens.Space.fabRight / fabBottom）由页面负责；
@@ -41,7 +41,7 @@ public struct CFab: View {
             action: action,
             label: {
                 CIcon(
-                    .plus,
+                    .camera,
                     size: Tokens.Icon.n24,
                     strokeWidth: 1.6,
                     color: enabled ? colors.fabicon : colors.disfg

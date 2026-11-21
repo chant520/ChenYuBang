@@ -151,6 +151,9 @@ def cell(mode, body):
 
 CHECK = '<svg viewBox="0 0 24 24"><path d="M5 12l4.5 4.5L19 7"/></svg>'
 PLUS = '<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>'
+# 悬浮拍照按钮图形取四份全页稿 v2 的落地值（规范 §5.8 图标形状行，2026-11-22 拍板）；
+# 构件板旧版四处复用 PLUS，属占位遗留，不是设计口径。
+CAMERA = '<svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13"/><circle cx="12" cy="13.5" r="3.6"/><path d="M8.5 7l1.4-3h4.2l1.4 3"/></svg>'
 ICO_WARN = '<svg viewBox="0 0 24 24"><path d="M12 4l8 15H4z"/><path d="M12 9v4"/><path d="M12 16.5v.5"/></svg>'
 ICO_ERR = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/></svg>'
 ICO_INFO = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 8v.5"/></svg>'
@@ -242,10 +245,10 @@ COMPONENTS = [
         ('带警示', '<div class="chkrow"><span class="chk">%s</span><span>省考</span><span class="winline">%s未选省份</span></div>' % (CHECK, ICO_WARN)),
     ]),
     ("悬浮按钮", [
-        ('默认', '<div class="fabcell"><div class="fab">%s</div></div>' % PLUS),
-        ('按下', '<div class="fabcell"><div class="fab" style="filter:brightness(.9)">%s</div></div>' % PLUS),
-        ('禁用', '<div class="fabcell"><div class="fab dis">%s</div></div>' % PLUS),
-        ('带徽标', '<div class="fabcell"><div class="fab">%s</div><span class="badgewarn">待复习 3</span></div>' % PLUS),
+        ('默认', '<div class="fabcell"><div class="fab">%s</div></div>' % CAMERA),
+        ('按下', '<div class="fabcell"><div class="fab" style="filter:brightness(.9)">%s</div></div>' % CAMERA),
+        ('禁用', '<div class="fabcell"><div class="fab dis">%s</div></div>' % CAMERA),
+        ('带徽标', '<div class="fabcell"><div class="fab">%s</div><span class="badgewarn">待复习 3</span></div>' % CAMERA),
     ]),
 ]
 
