@@ -173,7 +173,7 @@ public struct P20MatchContent: View {
                 candidateRow(candidate)
             }
             HStack(spacing: Tokens.Space.lmetaGap) {
-                CButton(text: "换一个", variant: .ghost, enabled: state.canCycle, action: actions.onCycle)
+                CButton(text: "换一组", variant: .ghost, enabled: state.canCycle, action: actions.onCycle)
                 CButton(text: "加一个", variant: .ghost, enabled: state.canAdd, action: actions.onAdd)
                 CButton(
                     text: state.deleteMode ? "完成" : "删一个",
@@ -202,7 +202,7 @@ public struct P20MatchContent: View {
         .padding(.top, Tokens.Space.lmetaTop)
     }
 
-    /// 多选或窗口外已选项的撤销入口：标签行始终跟着已选集合，不随「换一个」丢失。
+    /// 多选或窗口外已选项的撤销入口：标签行始终跟着已选集合，不随「换一组」丢失。
     private var checkedChips: some View {
         HStack(alignment: .top, spacing: Tokens.Space.lmetaGap) {
             Text("已选归属")

@@ -2,7 +2,7 @@ import Foundation
 
 /// P20 页面状态。归属可勾选一条或多条（至少一条才可保存）：
 /// candidates 是展示窗口（初始 K=3），checked 是全部已勾选（按候选池顺序，含窗口外项），
-/// 二者分开以保证「换一个」后已选归属仍可见、可取消。
+/// 二者分开以保证「换一组」后已选归属仍可见、可取消。
 public struct P20MatchState: Equatable {
     public var reviewText = ""
     public var candidates: [MatchCandidate] = []
@@ -109,7 +109,7 @@ public final class P20MatchModel: ObservableObject {
         state.info = nil
     }
 
-    /// 换一个：游标前进一批（K=3）取下一批替换展示，到池尾回卷池首；池 ≤K 禁用。
+    /// 换一组：游标前进一批（K=3）取下一批替换展示，到池尾回卷池首；池 ≤K 禁用。
     /// 已勾选集合不随窗口变化，窗口外已选项由「已选归属」标签行保留撤销入口。
     public func cycle() {
         guard pool.count > P20Matcher.windowSize else {
