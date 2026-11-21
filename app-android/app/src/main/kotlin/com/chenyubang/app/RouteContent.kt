@@ -9,6 +9,7 @@ import com.chenyubang.feature.capture.OcrScreenActions
 import com.chenyubang.feature.capture.P20FormDeps
 import com.chenyubang.feature.capture.P20FormScreen
 import com.chenyubang.feature.capture.P21DoneScreen
+import com.chenyubang.feature.mistake.P08MistakeActions
 
 /** 按当前路由渲染目标页；P04/P05 的返回与跳转与其余路由同口径。 */
 @Composable
@@ -53,6 +54,26 @@ internal fun RouteContent(
             ExampleDestination(requireNotNull(entry.id), deps.database, { onRoute(router.back()) }) { id ->
                 onRoute(router.push(Route.Idiom, id))
             }
+        Route.Mistakes ->
+            MistakesDestination(
+                viewMode = router.mistakesView,
+                database = deps.database,
+                actions =
+                    P08MistakeActions(
+                        onViewModeChange = { onRoute(router.copy(mistakesView = it)) },
+                        onOpenIdiom = { id -> onRoute(router.push(Route.IdiomMistakes, id)) },
+                        // TODO(2.7): 接 P10 错题详情；本包不 push 空路由。
+                        onOpenMistake = {},
+                        onCapture = { onRoute(router.startCapture()) },
+                    ),
+            )
+        Route.IdiomMistakes ->
+            IdiomMistakesDestination(
+                idiomId = requireNotNull(entry.id),
+                database = deps.database,
+                onBack = { onRoute(router.back()) },
+                onOpenIdiom = { id -> onRoute(router.push(Route.Idiom, id)) },
+            )
         else -> CaptureRouteContent(entry, router, deps, onRoute)
     }
 }

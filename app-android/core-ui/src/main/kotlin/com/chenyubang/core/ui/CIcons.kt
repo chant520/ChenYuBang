@@ -24,6 +24,7 @@ private fun paths(kind: CIconKind): List<String> =
         CIconKind.Warn -> listOf("M12 4l8 15H4z", "M12 9v4", "M12 16.5v.5")
         CIconKind.Error -> listOf("M21 12a9 9 0 1 1-18 0a9 9 0 1 1 18 0z", "M9 9l6 6M15 9l-6 6")
         CIconKind.Info -> listOf("M21 12a9 9 0 1 1-18 0a9 9 0 1 1 18 0z", "M12 11v5", "M12 8v.5")
+        CIconKind.Camera -> listOf("M3 7h4l2-3h6l2 3h4v13H3zM16 13a4 4 0 1 1-8 0a4 4 0 1 1 8 0")
     }
 
 private fun buildVector(

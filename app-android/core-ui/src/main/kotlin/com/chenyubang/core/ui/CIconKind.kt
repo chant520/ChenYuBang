@@ -7,4 +7,5 @@ enum class CIconKind {
     Warn,
     Error,
     Info,
+    Camera,
 }

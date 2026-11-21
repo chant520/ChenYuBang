@@ -11,6 +11,10 @@ import com.chenyubang.feature.me.ExamScopeMode
 import com.chenyubang.feature.me.ExamScopeRequest
 import com.chenyubang.feature.me.ExamScopeSaver
 import com.chenyubang.feature.me.P14ExamScopeRoute
+import com.chenyubang.feature.mistake.MistakeViewMode
+import com.chenyubang.feature.mistake.P08MistakeActions
+import com.chenyubang.feature.mistake.P08MistakeListRoute
+import com.chenyubang.feature.mistake.P09IdiomMistakesRoute
 
 /**
  * 已接入页面的目的地装配：只做「feature 页面 ← app 状态/写入口」的接线，
@@ -86,6 +90,30 @@ internal fun ExampleDestination(
 ) {
     P07ExampleDetailRoute(
         exampleId = exampleId,
+        database = database,
+        onBack = onBack,
+        onOpenIdiom = onOpenIdiom,
+    )
+}
+
+@Composable
+internal fun MistakesDestination(
+    viewMode: MistakeViewMode,
+    database: AppDatabase,
+    actions: P08MistakeActions,
+) {
+    P08MistakeListRoute(viewMode = viewMode, database = database, actions = actions)
+}
+
+@Composable
+internal fun IdiomMistakesDestination(
+    idiomId: String,
+    database: AppDatabase,
+    onBack: () -> Unit,
+    onOpenIdiom: (String) -> Unit,
+) {
+    P09IdiomMistakesRoute(
+        idiomId = idiomId,
         database = database,
         onBack = onBack,
         onOpenIdiom = onOpenIdiom,
