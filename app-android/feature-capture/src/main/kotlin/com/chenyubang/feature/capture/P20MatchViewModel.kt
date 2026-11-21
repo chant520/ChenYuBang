@@ -173,4 +173,17 @@ object P20Matcher {
     /** 空态手动回填：覆盖候选区、默认勾选、标「手动选择」。 */
     fun manualCandidate(entity: IdiomEntity): MatchCandidate =
         MatchCandidate(entity.id, entity.word, entity.frequency, MatchTier.Manual)
+
+    /** 首屏窗口：取前 K 条；最匹配不在其中时替换末位，保证进页就能看到并默认勾上它。 */
+    fun initialWindow(
+        pool: List<MatchCandidate>,
+        bestId: String?,
+    ): List<MatchCandidate> {
+        val window = pool.take(WINDOW_SIZE).toMutableList()
+        val best = bestId?.let { id -> pool.firstOrNull { it.id == id } }
+        if (best != null && window.none { it.id == best.id }) {
+            if (window.size >= WINDOW_SIZE) window[window.lastIndex] = best else window.add(best)
+        }
+        return window
+    }
 }

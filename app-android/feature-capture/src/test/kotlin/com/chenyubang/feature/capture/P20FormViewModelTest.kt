@@ -116,6 +116,19 @@ class P20FormViewModelTest {
     }
 
     @Test
+    fun bestOutsideFirstWindowIsPromotedIntoInitialWindow() {
+        val words = listOf("甲一", "乙二", "丙三", "丁四", "戊五")
+        val ordered = words.sorted()
+        val best = ordered.last()
+        val idioms = words.map { idiom("id-$it", it, if (it == best) 99 else 1) }
+        val model = newModel().also { it.candidate.bootstrap(words.joinToString(" "), idioms) }
+        assertEquals(5, model.state.value.poolSize)
+        assertEquals(listOf(ordered[0], ordered[1], best), model.state.value.candidates.map { it.word })
+        assertEquals(listOf(best), model.state.value.checked.map { it.word })
+        assertEquals(MatchTier.Best, model.state.value.candidates.last().tier)
+    }
+
+    @Test
     fun manualPickAppendsToCheckedAndDedupesExisting() {
         val model = newModel().also { it.candidate.bootstrap("按部就班 墨守成规", sample) }
         model.candidate.select("id-moshou")
