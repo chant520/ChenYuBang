@@ -17,7 +17,8 @@ import org.robolectric.annotation.GraphicsMode
 /**
  * P20 快照（规范 §11.1）：基线只增不改。
  * `twoSelected*` 是 2.5 既有基线，对应 iOS `P20MatchSnapshotTests.testFormMain*`；
- * `noMatchSingleEntry*` 为候选空态修后基线（对应 iOS `testFormEmpty*`，前代 `noMatch*` 留作修前历史）。
+ * `noMatchTagFixed*` 为候选空态修后基线（对应 iOS `testFormEmpty*`；前代 `noMatch*`、
+ * `noMatchSingleEntry*` 留作修前历史）。
  * iOS 另有 `testFormSection*` 单独渲染表单分区：Android 侧该分区没有 testTag，整页基线已含
  * FormFieldsCard，故不单独镜像——对齐的是状态语义，不是文件名一一对应。
  *
@@ -80,11 +81,9 @@ class P20FormSnapshotTest {
 
     /**
      * 候选空态：有识别文字但零命中，候选区出「手动挑成语」入口（iOS testFormEmpty* 同口径文案）。
-     * `noMatch*` 旧基线如实钉住修前渲染（双入口缺陷），按惯例不覆盖、留在仓库作历史；
-     * `noMatchSingleEntry*` 钉住修后渲染：底部 Ghost 手选按钮仅在非空态渲染，空态只剩
-     * CEmptyState 一个入口（followup 2026-11-21 §5.1）。钉住语义见 `P20FormManualEntryUiTest`。
-     * 已知遗留：自定义标签行 `Row` 未 `fillMaxWidth` 导致 `CInput` 的 `weight(1f)` 塌成近零宽、
-     * 占位符逐字断行——本组基线会如实拍到，待 followup §5.2 修复后换新测试名重录。
+     * 前代基线（`noMatch*` 双入口缺陷、`noMatchSingleEntry*` 标签行塌宽 + TAG_RULE 死码）按惯例
+     * 不覆盖、留作修前历史；`noMatchTagFixed*` 钉住修后渲染：手选入口唯一 + 标签行铺满
+     * （占位符单行、「加标签」收缩自适应）+ 编辑区下方 TAG_RULE 提示（followup 2026-11-21 §5.2/§5.3）。
      */
     private fun noMatchState(): P20CaptureState =
         P20CaptureState(
@@ -99,10 +98,10 @@ class P20FormSnapshotTest {
     fun twoSelectedDark() = capture(twoSelectedState(), night = true)
 
     @Test
-    fun noMatchSingleEntryLight() = capture(noMatchState(), night = false)
+    fun noMatchTagFixedLight() = capture(noMatchState(), night = false)
 
     @Test
-    fun noMatchSingleEntryDark() = capture(noMatchState(), night = true)
+    fun noMatchTagFixedDark() = capture(noMatchState(), night = true)
 
     private companion object {
         const val ID_ANBU = "11111111-1111-4111-8111-111111111111"
