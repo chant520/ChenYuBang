@@ -111,7 +111,8 @@ public struct IdiomCapturedExample: Equatable, Sendable, Identifiable {
     }
 }
 
-/// `mistake` / `mistake_idiom` / `user_example` / `user_example_idiom` 只读查询（P08 / P09，P10 见 `UserExampleLibrary.swift`）。
+/// `mistake` / `mistake_idiom` / `user_example` / `user_example_idiom` 只读查询（P08 / P09）。
+/// P10 单条录入题详情的查询见 `UserExampleLibrary.swift`（同一枚举的分文件扩展）。
 ///
 /// 查询口径按规范 §4.2：错题按 `mistake_idiom` 归到成语，录入题按 `user_example_idiom`
 /// 归到成语，两者不可混用；列表一律 `createdAt` 倒序并带 id 次级排序保证稳定。
@@ -218,8 +219,6 @@ public enum MistakeLibrary {
             )
         }
     }
-
-    // P10 单条录入题详情的查询见 `UserExampleLibrary.swift`（同一枚举的分文件扩展）。
 
     private static func idiomWords(byMistake db: Database) throws -> [String: [String]] {
         let pairs: [IdiomWordPair] = try IdiomWordPair.fetchAll(db, sql: """
