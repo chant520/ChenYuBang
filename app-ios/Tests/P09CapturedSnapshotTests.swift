@@ -75,7 +75,7 @@ final class P09CapturedSnapshotTests: XCTestCase {
     }
 
     private func actions() -> IdiomCapturedActions {
-        IdiomCapturedActions(onBack: {}, onOpenIdiom: {}, onBackToBook: {}, onRetry: {})
+        IdiomCapturedActions(onBack: {}, onOpenIdiom: {}, onOpenExample: { _ in }, onBackToBook: {}, onRetry: {})
     }
 
     func testListLight() {

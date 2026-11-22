@@ -84,7 +84,15 @@ final class P08MistakeSnapshotTests: XCTestCase {
     }
 
     private func actions() -> MistakeBookActions {
-        MistakeBookActions(onSelectDimension: { _ in }, onOpenIdiom: { _ in }, onCapture: {}, onRetry: {})
+        // P08 平铺行现在可点进 P10（§4.2 第 18 条）；夹具行不带 `userExampleID`，
+        // 录的是 v2 迁移前历史错题那种静态行（无导航），像素与可点行一致。
+        MistakeBookActions(
+            onSelectDimension: { _ in },
+            onOpenIdiom: { _ in },
+            onOpenUserExample: { _ in },
+            onCapture: {},
+            onRetry: {}
+        )
     }
 
     func testGroupedLight() {

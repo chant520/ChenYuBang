@@ -79,6 +79,83 @@ final class MistakeLibraryTests: XCTestCase {
         }
     }
 
+    // MARK: - P10 录入题详情
+
+    func testUserExampleReadsOptionsIdiomOrderAndLatestMistakeStamp() throws {
+        let queue = try seededQueue()
+        try queue.write { db in
+            // D 项留空：OCR 缺项不落库，详情要给 nil 而不是空串凑数。
+            try db.execute(sql: """
+                UPDATE user_example
+                SET optionA = '新厂长按部就班，提出了一整套创新方案', optionB = '他别出心裁地解决了这个难题',
+                    optionC = '这种做法墨守成规，难有突破', optionD = NULL,
+                    myAnswer = 'B', examType = '省考', year = 2023, imagePath = 'images/e1.jpg'
+                WHERE id = 'e1'
+                """)
+            try db.execute(
+                sql: "UPDATE mistake SET tagNames = ? WHERE id = 'm1'",
+                arguments: ["[\"易混词\",\"褒贬误用\"]"]
+            )
+        }
+        try queue.read { db in
+            let detail = try XCTUnwrap(try MistakeLibrary.userExample(db, id: "e1"))
+            XCTAssertEqual(detail.stem, "下列各句中，加点的成语使用不恰当的一项是")
+            XCTAssertEqual(detail.options, [
+                "新厂长按部就班，提出了一整套创新方案",
+                "他别出心裁地解决了这个难题",
+                "这种做法墨守成规，难有突破",
+                nil
+            ])
+            XCTAssertEqual(detail.myAnswer, "B")
+            XCTAssertTrue(detail.isMistake)
+            XCTAssertEqual(detail.examType, "省考")
+            XCTAssertEqual(detail.year, 2023)
+            XCTAssertEqual(detail.imagePath, "images/e1.jpg")
+            // ⑧ 按 user_example_idiom 的写入顺序（rowid）出词，不是词面字典序。
+            XCTAssertEqual(detail.idioms.map(\.word), ["按部就班", "墨守成规"])
+            XCTAssertEqual(detail.mistakeState, "待复习")
+            XCTAssertEqual(detail.reason, "望文生义")
+            XCTAssertEqual(detail.tagNames, ["易混词", "褒贬误用"])
+        }
+    }
+
+    func testUserExampleTakesLatestMistakeWhenExampleHasSeveral() throws {
+        // e3 挂了 m2（已掌握、11-10）与 m3（待复习、11-12、无错因），详情取最新那条，与 P09 同口径。
+        try seededQueue().read { db in
+            let detail = try XCTUnwrap(try MistakeLibrary.userExample(db, id: "e3"))
+            XCTAssertEqual(detail.mistakeState, "待复习")
+            XCTAssertNil(detail.reason)
+        }
+    }
+
+    func testUserExampleForUnmarkedExampleHasNoMistakeFields() throws {
+        try seededQueue().read { db in
+            let detail = try XCTUnwrap(try MistakeLibrary.userExample(db, id: "e2"))
+            XCTAssertFalse(detail.isMistake)
+            XCTAssertNil(detail.myAnswer)
+            XCTAssertNil(detail.mistakeState)
+            XCTAssertNil(detail.reason)
+            XCTAssertEqual(detail.tagNames, [])
+            XCTAssertEqual(detail.options, [nil, nil, nil, nil])
+        }
+    }
+
+    func testUserExampleReturnsNilForMissingIdAndIgnoresBrokenTagNamesJson() throws {
+        let queue = try seededQueue()
+        try queue.read { db in
+            XCTAssertNil(try MistakeLibrary.userExample(db, id: "missing"))
+        }
+        try queue.write { db in
+            try db.execute(sql: "UPDATE mistake SET tagNames = '不是 JSON' WHERE id = 'm1'")
+        }
+        // 标签解不开只当没有标签，不能让整页读失败。
+        try queue.read { db in
+            let detail = try XCTUnwrap(try MistakeLibrary.userExample(db, id: "e1"))
+            XCTAssertEqual(detail.tagNames, [])
+            XCTAssertEqual(detail.mistakeState, "待复习")
+        }
+    }
+
     /// 固定数据集：三条成语、四条录入题、五条错题（含两条 `userExampleId` 为 NULL 的历史行）。
     private func seededQueue() throws -> DatabaseQueue {
         let queue = try DatabaseQueue()

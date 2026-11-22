@@ -36,15 +36,24 @@ public struct MistakeGroupView: Identifiable, Equatable, Sendable {
 }
 
 /// P08 平铺行（信息架构 v1.4 P08 ⑤）：题干 + 录入时间 + 关联成语。
-/// P10 在工作包 2.7，本版行不可点，字段先全部呈现。
+/// 行可点进 P10（§4.2 第 18 条）；`userExampleID` 为 nil 的历史错题行（v2 迁移前写入、
+/// 没有对应录入题）不给导航，只在页面上展示。
 public struct MistakeEntryView: Identifiable, Equatable, Sendable {
     public let id: String
+    public let userExampleID: String?
     public let stem: String
     public let dateText: String
     public let idiomsText: String
 
-    public init(id: String, stem: String, dateText: String, idiomsText: String) {
+    public init(
+        id: String,
+        userExampleID: String? = nil,
+        stem: String,
+        dateText: String,
+        idiomsText: String
+    ) {
         self.id = id
+        self.userExampleID = userExampleID
         self.stem = stem
         self.dateText = dateText
         self.idiomsText = idiomsText
@@ -122,6 +131,7 @@ public enum MistakeBrowse {
     public static func view(of row: MistakeRow) -> MistakeEntryView {
         MistakeEntryView(
             id: row.id,
+            userExampleID: row.userExampleID,
             stem: row.stem,
             dateText: dateText(row.createdAt),
             idiomsText: idiomsText(row.idiomWords)
@@ -143,6 +153,38 @@ public enum MistakeBrowse {
     /// 释义一行（P09 ②）：取 `sense` 原文，空串归「暂无」；不拼感情色彩，也不自行截句。
     public static func senseLine(_ sense: String?) -> String {
         trimmed(sense) ?? placeholder
+    }
+
+    /// 选项标号（P10 ④ / ⑨）：`user_example.myAnswer` 的合法取值即这四项（`UserExampleSaver` 校验）。
+    public static let letters = ["A", "B", "C", "D"]
+
+    /// P10 ⑦ 出处：年份 · 考试类型；两者都缺显示「未填」，不猜值、不补地区与题型。
+    public static func sourceLine(examType: String?, year: Int?) -> String {
+        let parts = [year.map(String.init), trimmed(examType)].compactMap { $0 }
+        return parts.isEmpty ? "未填" : parts.joined(separator: " · ")
+    }
+
+    /// P10 重做结果（信息架构 v1.4 版内修订第 ③ 条）：本版无正确答案来源，
+    /// 只把本次所选与首次记录的「我的答案」比对；首次未填时明说无法比对，不伪造判分。
+    public static func rerollResult(first: Int?, picked: Int?) -> String {
+        guard let picked, letters.indices.contains(picked) else { return "尚未选择" }
+        guard let first, letters.indices.contains(first) else {
+            return "本题未记录你的首次作答，无法比对（本次选了 \(letters[picked])）"
+        }
+        return first == picked
+            ? "与首次作答一致（\(letters[picked])）"
+            : "与首次作答不同：首次 \(letters[first])，本次 \(letters[picked])"
+    }
+
+    /// P10 重做结果下的一行说明：把「没有正确答案」的口径写在页面上，不暗示已判分。
+    public static let rerollNote = "录入题只存你填过的内容，本版未记录正确答案，这里只与你的首次作答比对。"
+
+    /// iOS 15 无流式布局 API（开发规范 §7 平台映射）：标签按固定每行个数分组。
+    public static func rows<T>(of items: [T], perRow: Int) -> [[T]] {
+        guard perRow > 0 else { return [items] }
+        return stride(from: 0, to: items.count, by: perRow).map {
+            Array(items[$0..<min($0 + perRow, items.count)])
+        }
     }
 
     private static func trimmed(_ value: String?) -> String? {

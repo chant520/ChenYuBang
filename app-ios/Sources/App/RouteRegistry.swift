@@ -68,7 +68,7 @@ enum AppRoute: String, CaseIterable, Codable {
         case .exampleDetail: return "例题详情"
         case .mistakes: return "错题"
         case .idiomMistakes: return "某成语下错题"
-        case .mistakeDetail: return "错题详情"
+        case .mistakeDetail: return "录入题详情"
         case .queue: return "复习队列"
         case .summary: return "复习小结"
         case .profile: return "我的"

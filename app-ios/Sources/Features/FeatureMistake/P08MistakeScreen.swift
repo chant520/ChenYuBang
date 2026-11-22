@@ -49,17 +49,20 @@ public struct MistakeBookState: Equatable, Sendable {
 public struct MistakeBookActions {
     public let onSelectDimension: (MistakeDimension) -> Void
     public let onOpenIdiom: (String) -> Void
+    public let onOpenUserExample: (String) -> Void
     public let onCapture: () -> Void
     public let onRetry: () -> Void
 
     public init(
         onSelectDimension: @escaping (MistakeDimension) -> Void,
         onOpenIdiom: @escaping (String) -> Void,
+        onOpenUserExample: @escaping (String) -> Void,
         onCapture: @escaping () -> Void,
         onRetry: @escaping () -> Void
     ) {
         self.onSelectDimension = onSelectDimension
         self.onOpenIdiom = onOpenIdiom
+        self.onOpenUserExample = onOpenUserExample
         self.onCapture = onCapture
         self.onRetry = onRetry
     }
@@ -188,9 +191,10 @@ public struct P08MistakeContent: View {
         } else {
             CList {
                 ForEach(Array(state.entries.enumerated()), id: \.element.id) { index, entry in
-                    // P10 在工作包 2.7，本版平铺行先只展示，不做假导航。
+                    // 平铺行点入 P10 录入题详情（§4.2 第 18 条）；v2 迁移前无录入题来源的行不给导航。
                     CListRow(
                         stem: entry.stem,
+                        action: entry.userExampleID.map { id in { actions.onOpenUserExample(id) } },
                         showsDivider: index != state.entries.count - 1,
                         meta: {
                             Text(entry.dateText)
@@ -275,16 +279,19 @@ public struct P08MistakeScreen: View {
     @StateObject private var model: MistakeBookViewModel
 
     private let onOpenIdiom: (String) -> Void
+    private let onOpenUserExample: (String) -> Void
     private let onCapture: () -> Void
 
     @MainActor
     public init(
         reader: MistakeBookReading,
         onOpenIdiom: @escaping (String) -> Void,
+        onOpenUserExample: @escaping (String) -> Void,
         onCapture: @escaping () -> Void
     ) {
         _model = StateObject(wrappedValue: MistakeBookViewModel(reader: reader))
         self.onOpenIdiom = onOpenIdiom
+        self.onOpenUserExample = onOpenUserExample
         self.onCapture = onCapture
     }
 
@@ -295,6 +302,7 @@ public struct P08MistakeScreen: View {
             actions: MistakeBookActions(
                 onSelectDimension: { dimension in Task { await model.select(dimension) } },
                 onOpenIdiom: onOpenIdiom,
+                onOpenUserExample: onOpenUserExample,
                 onCapture: onCapture,
                 onRetry: { Task { await model.load(dimension: model.state.dimension) } }
             ),
