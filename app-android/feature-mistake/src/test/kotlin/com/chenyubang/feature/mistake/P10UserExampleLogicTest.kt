@@ -100,6 +100,7 @@ class P10UserExampleLogicTest {
         assertFalse(exited.checked)
         assertNull(exited.picked)
         assertTrue(exited.canToggleMask)
+        assertTrue(exited.revealed)
     }
 
     @Test

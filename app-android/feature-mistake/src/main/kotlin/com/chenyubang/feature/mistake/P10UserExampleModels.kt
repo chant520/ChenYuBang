@@ -132,7 +132,7 @@ object P10Transitions {
         if (state.canToggleMask) state.copy(revealed = !state.revealed) else state
 
     fun startReroll(state: P10UserExampleUiState) =
-        if (state.isMistake) state.copy(rerolling = true, picked = null, checked = false, revealed = false) else state
+        if (state.isMistake) state.copy(rerolling = true, picked = null, checked = false) else state
 
     fun pick(
         state: P10UserExampleUiState,
