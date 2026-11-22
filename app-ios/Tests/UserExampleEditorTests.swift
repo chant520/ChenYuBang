@@ -20,7 +20,7 @@ final class UserExampleEditorTests: XCTestCase {
                 SELECT 'rl', id, '对', '2024-01-01T00:00:00Z' FROM mistake WHERE userExampleId = ?
                 """, arguments: [env.userExampleID])
         }
-        let before = try snapshot(env.queue, exampleID: env.userExampleID)
+        let before = try env.queue.read { try snapshot($0, exampleID: env.userExampleID) }
 
         try UserExampleEditor(queue: env.queue, dataDirectory: env.dataDirectory).saveEdit(
             makeInput(
