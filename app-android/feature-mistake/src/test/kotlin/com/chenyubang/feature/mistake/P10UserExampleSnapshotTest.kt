@@ -125,4 +125,125 @@ class P10UserExampleSnapshotTest {
     @Config(sdk = [34], qualifiers = "w360dp-h1800dp-xhdpi")
     @Test
     fun blocksUnmarkedDark() = capture(base(isMistake = false), night = true, fullPage = true)
+
+    // —— 2.8 / C8 新增基线：编辑态整页、字段级非法、写库失败、表单两模式、未标错表单、保存中、两套确认弹层 ——
+
+    private fun editing(
+        isMistake: Boolean = true,
+        draft: P10EditDraft = P10EditTransitions.draftOf(detail(isMistake = isMistake)),
+    ) = base(isMistake = isMistake).copy(edit = P10EditState(editing = true, draft = draft))
+
+    @Config(sdk = [34], qualifiers = "w360dp-h1800dp-xhdpi")
+    @Test
+    fun editFormLight() = capture(editing(), night = false, fullPage = true)
+
+    @Config(sdk = [34], qualifiers = "w360dp-h1800dp-xhdpi")
+    @Test
+    fun editFormDark() = capture(editing(), night = true, fullPage = true)
+
+    @Test
+    fun editFormViewportLight() = capture(editing(), night = false)
+
+    @Test
+    fun editFormViewportDark() = capture(editing(), night = true)
+
+    @Config(sdk = [34], qualifiers = "w360dp-h1800dp-xhdpi")
+    @Test
+    fun editInvalidLight() =
+        capture(
+            editing(
+                draft =
+                    P10EditTransitions.draftOf(detail()).copy(
+                        answer = "E",
+                        year = "20",
+                        tagDraft = "九个字的超长标签内容啊",
+                    ),
+            ).let { it.copy(edit = it.edit.copy(errors = P10EditTransitions.fieldErrors(it.edit.draft!!))) },
+            night = false,
+            fullPage = true,
+        )
+
+    @Config(sdk = [34], qualifiers = "w360dp-h1800dp-xhdpi")
+    @Test
+    fun editInvalidDark() =
+        capture(
+            editing(
+                draft =
+                    P10EditTransitions.draftOf(detail()).copy(
+                        answer = "E",
+                        year = "20",
+                        tagDraft = "九个字的超长标签内容啊",
+                    ),
+            ).let { it.copy(edit = it.edit.copy(errors = P10EditTransitions.fieldErrors(it.edit.draft!!))) },
+            night = true,
+            fullPage = true,
+        )
+
+    @Test
+    fun editSaveFailedLight() =
+        capture(
+            editing().let { it.copy(edit = it.edit.copy(errorMessage = P10EditTransitions.SAVE_FAILED)) },
+            night = false,
+        )
+
+    @Test
+    fun editSaveFailedDark() =
+        capture(
+            editing().let { it.copy(edit = it.edit.copy(errorMessage = P10EditTransitions.SAVE_FAILED)) },
+            night = true,
+        )
+
+    @Config(sdk = [34], qualifiers = "w360dp-h1800dp-xhdpi")
+    @Test
+    fun editUnmarkedLight() = capture(editing(isMistake = false), night = false, fullPage = true)
+
+    @Config(sdk = [34], qualifiers = "w360dp-h1800dp-xhdpi")
+    @Test
+    fun editUnmarkedDark() = capture(editing(isMistake = false), night = true, fullPage = true)
+
+    @Config(sdk = [34], qualifiers = "w360dp-h1800dp-xhdpi")
+    @Test
+    fun editSavingLight() =
+        capture(
+            editing().let { it.copy(edit = it.edit.copy(saving = true)) },
+            night = false,
+            fullPage = true,
+        )
+
+    @Config(sdk = [34], qualifiers = "w360dp-h1800dp-xhdpi")
+    @Test
+    fun editSavingDark() =
+        capture(
+            editing().let { it.copy(edit = it.edit.copy(saving = true)) },
+            night = true,
+            fullPage = true,
+        )
+
+    @Test
+    fun confirmMarkedLight() =
+        capture(
+            base().copy(edit = P10EditState(deleteConfirm = P10DeleteTarget.Marked)),
+            night = false,
+        )
+
+    @Test
+    fun confirmMarkedDark() =
+        capture(
+            base().copy(edit = P10EditState(deleteConfirm = P10DeleteTarget.Marked)),
+            night = true,
+        )
+
+    @Test
+    fun confirmUnmarkedLight() =
+        capture(
+            base(isMistake = false).copy(edit = P10EditState(deleteConfirm = P10DeleteTarget.Unmarked)),
+            night = false,
+        )
+
+    @Test
+    fun confirmUnmarkedDark() =
+        capture(
+            base(isMistake = false).copy(edit = P10EditState(deleteConfirm = P10DeleteTarget.Unmarked)),
+            night = true,
+        )
 }

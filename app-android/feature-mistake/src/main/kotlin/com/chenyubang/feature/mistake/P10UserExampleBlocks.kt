@@ -229,14 +229,13 @@ internal fun P10UserExampleBlocks(
     if (state.showsBottomDeleteRow) {
         CButton(
             "删除这道错题",
-            {},
+            { actions.onRequestDelete(P10DeleteTarget.Marked) },
             modifier = Modifier.fillMaxWidth(),
             variant = CButtonVariant.DangerOutline,
-            enabled = false,
         )
         val c = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
         Text(
-            "删除会同时从错题本与对应成语详情里移除，需二次确认。",
+            "删除只把这道题移出错题本，录入的原题仍保留在对应成语下。",
             color = c.text3,
             fontSize = Tokens.Font.n11.sp,
         )

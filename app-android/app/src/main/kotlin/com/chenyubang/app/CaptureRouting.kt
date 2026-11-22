@@ -62,6 +62,7 @@ fun RouterState.captureSaved(
     return withStack(base)
         .append(RouteEntry(Route.Done, userExampleId, sequence))
         .copy(capturedIdioms = idioms)
+        .bumpContentRevision()
 }
 
 fun RouterState.cancelCapture(): RouterState {

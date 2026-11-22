@@ -234,6 +234,8 @@ abstract class AppDatabase : RoomDatabase() {
 
     abstract fun userExampleDao(): UserExampleDao
 
+    abstract fun userExampleEditDao(): UserExampleEditDao
+
     abstract fun userExampleIdiomDao(): UserExampleIdiomDao
 
     abstract fun mistakeQueryDao(): MistakeQueryDao

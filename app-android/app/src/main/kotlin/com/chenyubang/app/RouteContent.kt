@@ -57,6 +57,7 @@ internal fun RouteContent(
         Route.Mistakes ->
             MistakesDestination(
                 viewMode = router.mistakesView,
+                revision = router.contentRevision,
                 database = deps.database,
                 actions =
                     P08MistakeActions(
@@ -87,6 +88,7 @@ private fun IdiomMistakesRouteContent(
         onBack = { onRoute(router.back()) },
         onOpenIdiom = { id -> onRoute(router.push(Route.Idiom, id)) },
         onOpenExample = { id -> onRoute(router.push(Route.Mistake, id)) },
+        revision = router.contentRevision,
     )
 }
 
@@ -103,6 +105,7 @@ private fun UserExampleRouteContent(
         database = deps.database,
         onBack = { onRoute(router.back()) },
         onOpenIdiom = { id -> onRoute(router.push(Route.Idiom, id)) },
+        onDataChanged = { onRoute(router.bumpContentRevision()) },
     )
 }
 

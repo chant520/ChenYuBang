@@ -121,6 +121,19 @@ class RouterStateTest {
     }
 
     @Test
+    fun captureAndEditBumpContentRevisionForSourceRefresh() {
+        val match =
+            RouterState(tab = AppTab.Mistake)
+                .startCapture()
+                .nextCapture()
+                .nextCapture()
+                .attachOcrText(OcrDraft(stem = "题干", options = listOf("甲")))
+        val done = match.captureSaved("saved-id", listOf(IdiomRef("idiom-id", "按部就班")))
+        assertEquals(1, done.contentRevision)
+        assertEquals(2, done.bumpContentRevision().contentRevision)
+    }
+
+    @Test
     fun doneDisablesSystemBackWhileOtherRoutesKeepIt() {
         val base = RouterState(tab = AppTab.Mistake)
         val match =
