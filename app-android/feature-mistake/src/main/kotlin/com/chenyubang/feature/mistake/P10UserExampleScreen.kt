@@ -105,6 +105,31 @@ fun P10UserExampleContent(
             Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
+                .background(c.page),
+    ) {
+        P10UserExampleBody(state, image, actions) { zoomed = true }
+    }
+    if (zoomed && image != null) {
+        COverlayWrapper(image) { zoomed = false }
+    }
+}
+
+/**
+ * 页面正文（无滚动、wrap 自然高度）：与 [P10UserExampleContent] 共用同一套构件渲染。
+ * 「按自然高度单帧」整页快照直接喂它，覆盖固定视口外的 ⑤–⑩ 与底部删除行，避免半页假覆盖。
+ */
+@Composable
+internal fun P10UserExampleBody(
+    state: P10UserExampleUiState,
+    image: ImageBitmap? = null,
+    actions: P10UserExampleActions = P10UserExampleActions(),
+    onZoom: () -> Unit = {},
+) {
+    val c = if (androidx.compose.foundation.isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
+    Column(
+        modifier =
+            Modifier
+                .fillMaxWidth()
                 .background(c.page)
                 .padding(horizontal = Tokens.Space.pageX.dp)
                 .padding(top = Tokens.Space.contentTop.dp, bottom = Tokens.Space.block.dp),
@@ -125,21 +150,11 @@ fun P10UserExampleContent(
                 CEmptyState(title = "没有找到这道题", description = "它可能已被删除，或已不在本机题库中。")
             else -> {
                 val detail = state.detail!!
-                P10ImageBlock(detail, state.imageUnreadable, image) { zoomed = true }
+                P10ImageBlock(detail, state.imageUnreadable, image, onZoom)
                 P10QuestionCard(detail, state, actions)
-                if (state.isMistake) {
-                    P10MaskRow(state, actions)
-                    P10RerollActions(state, actions)
-                }
-                P10SourceCard(detail)
-                P10IdiomCard(detail.idioms, actions.onOpenIdiom)
-                P10AnswerCard(state)
-                P10ReservedAndDelete()
+                P10UserExampleBlocks(state, actions)
             }
         }
-    }
-    if (zoomed && image != null) {
-        COverlayWrapper(image) { zoomed = false }
     }
 }
 

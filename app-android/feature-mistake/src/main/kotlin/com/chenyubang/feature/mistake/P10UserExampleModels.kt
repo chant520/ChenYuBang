@@ -44,6 +44,13 @@ data class P10UserExampleUiState(
 
     /** 重做中不给看首次作答，遮罩开关置灰。 */
     val canToggleMask: Boolean get() = isMistake && !rerolling
+
+    /**
+     * 底部红描边「删除这道错题」仅标错的录入题渲染（信息架构 v1.4 版内修订第 ④ 条，用户 2026-11-22 拍板）：
+     * 未标错的普通详情整行不出现（不是置灰），删除入口只留顶部置灰「删除」，随 2.8（C8）定义。
+     * 与 canToggleMask 同层，供页面门控渲染与单测双向断言，不在 Composable 里各写判断。
+     */
+    val showsBottomDeleteRow: Boolean get() = isMistake
 }
 
 /** P10 回调打包：编辑/删除本版只占位（2.8 接线），不产生写入。 */

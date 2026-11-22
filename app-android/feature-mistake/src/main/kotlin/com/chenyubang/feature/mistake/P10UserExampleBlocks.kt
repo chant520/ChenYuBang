@@ -208,14 +208,37 @@ internal fun P10AnswerCard(state: P10UserExampleUiState) {
     }
 }
 
+/**
+ * 区块 ⑤–⑩ 公共渲染：页面与「按自然高度单帧」快照共用同一套构件，避免两处渲染漂移。
+ * 门控全部取 state 派生量（showsBottomDeleteRow / isMistake），Composable 内不再另行判断口径。
+ */
 @Composable
-internal fun P10ReservedAndDelete() {
+internal fun P10UserExampleBlocks(
+    state: P10UserExampleUiState,
+    actions: P10UserExampleActions,
+) {
+    if (state.isMistake) {
+        P10MaskRow(state, actions)
+        P10RerollActions(state, actions)
+    }
+    val detail = state.detail ?: return
+    P10SourceCard(detail)
+    P10IdiomCard(detail.idioms, actions.onOpenIdiom)
+    P10AnswerCard(state)
     CTag("掌握状态切换（预留）", style = CTagStyle.Ghost)
-    CButton("删除这道错题", {}, modifier = Modifier.fillMaxWidth(), variant = CButtonVariant.DangerOutline, enabled = false)
-    val c = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
-    Text(
-        "删除会同时从错题本与对应成语详情里移除，需二次确认。",
-        color = c.text3,
-        fontSize = Tokens.Font.n11.sp,
-    )
+    if (state.showsBottomDeleteRow) {
+        CButton(
+            "删除这道错题",
+            {},
+            modifier = Modifier.fillMaxWidth(),
+            variant = CButtonVariant.DangerOutline,
+            enabled = false,
+        )
+        val c = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
+        Text(
+            "删除会同时从错题本与对应成语详情里移除，需二次确认。",
+            color = c.text3,
+            fontSize = Tokens.Font.n11.sp,
+        )
+    }
 }

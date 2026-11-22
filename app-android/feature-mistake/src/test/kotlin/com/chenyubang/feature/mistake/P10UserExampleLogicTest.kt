@@ -111,4 +111,13 @@ class P10UserExampleLogicTest {
         assertEquals("B", P10Logic.answerText(plain.detail!!.myAnswer, plain.answerHidden))
         assertEquals("已遮住", P10Logic.answerText("B", hidden = true))
     }
+
+    /** 一处红规则适用范围：底部红描边删除行仅标错渲染，未标错整行不出现（不是置灰）。 */
+    @Test
+    fun bottomDeleteRowOnlyForMarkedExample() {
+        val marked = state(isMistake = true)
+        val unmarked = state(isMistake = false)
+        assertTrue(marked.showsBottomDeleteRow)
+        assertFalse(unmarked.showsBottomDeleteRow)
+    }
 }
