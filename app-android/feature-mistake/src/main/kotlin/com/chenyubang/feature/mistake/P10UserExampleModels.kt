@@ -32,8 +32,15 @@ data class P10UserExampleUiState(
     val picked: Int? = null,
     val checked: Boolean = false,
     val imageUnreadable: Boolean = false,
+    val edit: P10EditState = P10EditState(),
 ) {
     val isMistake: Boolean get() = detail?.isMistake == true
+
+    /** 顶部「编辑 / 删除」只读且详情在位才可点；读取中 / 失败 / 未找到置灰但仍在位。 */
+    val canEdit: Boolean
+        get() = detail != null && !loading && !failed && !missing && !edit.editing && !edit.saving
+
+    val canDelete: Boolean get() = canEdit
 
     /** 首次作答下标；空值或 A–D 之外为 null（不可比对）。 */
     val firstPick: Int? get() = P10Logic.firstPick(detail?.myAnswer)
@@ -42,18 +49,18 @@ data class P10UserExampleUiState(
     val answerHidden: Boolean
         get() = isMistake && if (rerolling) !checked else !revealed
 
-    /** 重做中不给看首次作答，遮罩开关置灰。 */
-    val canToggleMask: Boolean get() = isMistake && !rerolling
+    /** 重做中不给看首次作答，遮罩开关置灰；编辑态与重做态互斥。 */
+    val canToggleMask: Boolean get() = isMistake && !rerolling && !edit.editing
 
     /**
      * 底部红描边「删除这道错题」仅标错的录入题渲染（信息架构 v1.4 版内修订第 ④ 条，用户 2026-11-22 拍板）：
      * 未标错的普通详情整行不出现（不是置灰），删除入口只留顶部置灰「删除」，随 2.8（C8）定义。
      * 与 canToggleMask 同层，供页面门控渲染与单测双向断言，不在 Composable 里各写判断。
      */
-    val showsBottomDeleteRow: Boolean get() = isMistake
+    val showsBottomDeleteRow: Boolean get() = isMistake && !edit.editing
 }
 
-/** P10 回调打包：编辑/删除本版只占位（2.8 接线），不产生写入。 */
+/** P10 回调打包：编辑/删除 2.8 接线，回调不含写库逻辑（写在 ViewModel 注入口子）。 */
 data class P10UserExampleActions(
     val onBack: () -> Unit = {},
     val onRetry: () -> Unit = {},
@@ -63,6 +70,27 @@ data class P10UserExampleActions(
     val onCheck: () -> Unit = {},
     val onExitReroll: () -> Unit = {},
     val onOpenIdiom: (String) -> Unit = {},
+    val onEdit: () -> Unit = {},
+    val onCancelEdit: () -> Unit = {},
+    val onSave: () -> Unit = {},
+    val onStem: (String) -> Unit = {},
+    val onOption: (Int, String) -> Unit = { _, _ -> },
+    val onAnswer: (String) -> Unit = {},
+    val onReason: (String) -> Unit = {},
+    val onTagDraft: (String) -> Unit = {},
+    val onAddTag: () -> Unit = {},
+    val onRemoveTag: (String) -> Unit = {},
+    val onExamType: (String) -> Unit = {},
+    val onYear: (String) -> Unit = {},
+    val onAddIdiom: (String) -> Unit = {},
+    val onRemoveIdiom: (String) -> Unit = {},
+    val onAddNextIdiom: () -> Unit = {},
+    val onIdiomQuery: (String) -> Unit = {},
+    val onRequestDelete: (P10DeleteTarget) -> Unit = {},
+    val onDismissDelete: () -> Unit = {},
+    val onConfirmDelete: () -> Unit = {},
+    val onDismissMessage: () -> Unit = {},
+    val onPickIdiom: ((P10IdiomRef) -> Unit, () -> Unit) -> Unit = { _, _ -> },
 )
 
 private val letters = listOf("A", "B", "C", "D")

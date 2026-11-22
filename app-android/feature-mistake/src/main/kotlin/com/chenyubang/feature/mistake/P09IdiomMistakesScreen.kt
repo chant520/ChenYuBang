@@ -54,6 +54,7 @@ fun P09IdiomMistakesRoute(
     onBack: () -> Unit,
     onOpenIdiom: (String) -> Unit,
     onOpenExample: (String) -> Unit,
+    revision: Long = 0,
 ) {
     val factory =
         remember(database) {
@@ -68,7 +69,7 @@ fun P09IdiomMistakesRoute(
         }
     val model: P09IdiomMistakesViewModel = viewModel(key = "p09-idiom-mistakes", factory = factory)
     val state by model.state.collectAsState()
-    LaunchedEffect(idiomId) { model.load(idiomId) }
+    LaunchedEffect(idiomId, revision) { model.load(idiomId) }
     P09IdiomMistakesContent(
         state = state,
         onBack = onBack,

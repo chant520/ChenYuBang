@@ -1,9 +1,11 @@
 package com.chenyubang.feature.mistake
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -33,6 +35,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.chenyubang.core.data.AppDatabase
+import com.chenyubang.core.data.UserExampleEditor
 import com.chenyubang.core.ui.CBar
 import com.chenyubang.core.ui.CBarKind
 import com.chenyubang.core.ui.CButton
@@ -48,20 +51,35 @@ import java.io.File
 
 /** app 层接线：DAO 与 filesDir 注入，页面不直接依赖 Android 数据库。 */
 @Composable
+@Suppress("LongMethod")
 fun P10UserExampleRoute(
     exampleId: String,
     database: AppDatabase,
     filesDir: File,
     onBack: () -> Unit,
     onOpenIdiom: (String) -> Unit,
+    onDataChanged: () -> Unit = {},
 ) {
-    val factory =
+    val editor =
         remember(database, filesDir) {
+            UserExampleEditor(database, File(filesDir, "images"))
+        }
+    val factory =
+        remember(database, filesDir, onDataChanged, onBack) {
             viewModelFactory {
                 initializer {
                     P10UserExampleViewModel(
                         loadDetail = { loadP10Detail(database, it) },
                         isImageReadable = { isP10ImageReadable(filesDir, it) },
+                        loadIdiomCandidates = {
+                            database.idiomMatchDao().allIdioms().map { P10IdiomRef(it.id, it.word) }
+                        },
+                        saveEdit = { editor.edit(it) },
+                        deleteExample = { id, target ->
+                            if (target == P10DeleteTarget.Marked) editor.deleteMarked(id) else editor.deleteUnmarked(id)
+                        },
+                        onDataChanged = onDataChanged,
+                        onExit = onBack,
                     )
                 }
             }
@@ -69,6 +87,7 @@ fun P10UserExampleRoute(
     val model: P10UserExampleViewModel = viewModel(key = "p10-user-example", factory = factory)
     val state by model.state.collectAsState()
     var image by remember { mutableStateOf<ImageBitmap?>(null) }
+    BackHandler(enabled = state.edit.editing || state.edit.deleteConfirm != null) { model.handleBack() }
     LaunchedEffect(exampleId) { model.load(exampleId) }
     val imagePath = state.detail?.imagePath
     LaunchedEffect(imagePath) {
@@ -87,6 +106,26 @@ fun P10UserExampleRoute(
                 onCheck = { model.check() },
                 onExitReroll = { model.exitReroll() },
                 onOpenIdiom = onOpenIdiom,
+                onEdit = { model.startEdit() },
+                onCancelEdit = { model.cancelEdit() },
+                onSave = { model.save() },
+                onStem = { model.changeDraft { draft -> draft.copy(stem = it) } },
+                onOption = { index, value -> model.setOption(index, value) },
+                onAnswer = { model.changeDraft { draft -> draft.copy(answer = it) } },
+                onReason = { model.changeDraft { draft -> draft.copy(reason = it) } },
+                onTagDraft = { model.changeDraft { draft -> draft.copy(tagDraft = it) } },
+                onAddTag = { model.addTag() },
+                onRemoveTag = { tag -> model.changeDraft { draft -> draft.copy(tags = draft.tags - tag) } },
+                onExamType = { model.changeDraft { draft -> draft.copy(examType = it) } },
+                onYear = { model.changeDraft { draft -> draft.copy(year = it) } },
+                onAddIdiom = { model.addIdiom(it) },
+                onRemoveIdiom = { id -> model.changeDraft { draft -> draft.copy(idiomIds = draft.idiomIds - id) } },
+                onAddNextIdiom = { model.addNextIdiom() },
+                onIdiomQuery = { model.setIdiomQuery(it) },
+                onRequestDelete = { model.requestDelete(it) },
+                onDismissDelete = { model.dismissDelete() },
+                onConfirmDelete = { model.confirmDelete() },
+                onDismissMessage = { model.dismissMessage() },
             ),
     )
 }
@@ -100,17 +139,19 @@ fun P10UserExampleContent(
 ) {
     val c = if (androidx.compose.foundation.isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
     var zoomed by remember { mutableStateOf(false) }
-    Column(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .background(c.page),
-    ) {
-        P10UserExampleBody(state, image, actions) { zoomed = true }
-    }
-    if (zoomed && image != null) {
-        COverlayWrapper(image) { zoomed = false }
+    Box(Modifier.fillMaxSize().background(c.page)) {
+        Column(
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState()),
+        ) {
+            P10UserExampleBody(state, image, actions) { zoomed = true }
+        }
+        if (zoomed && image != null) {
+            COverlayWrapper(image) { zoomed = false }
+        }
+        state.edit.deleteConfirm?.let { P10DeleteConfirmOverlay(it, actions) }
     }
 }
 
@@ -135,7 +176,8 @@ internal fun P10UserExampleBody(
                 .padding(top = Tokens.Space.contentTop.dp, bottom = Tokens.Space.block.dp),
         verticalArrangement = Arrangement.spacedBy(Tokens.Space.block.dp),
     ) {
-        P10Header(actions)
+        P10Header(state, actions)
+        P10EditMessageBar(state, actions)
         when {
             state.failed ->
                 CBar(
@@ -155,8 +197,12 @@ internal fun P10UserExampleBody(
             else -> {
                 val detail = state.detail!!
                 P10ImageBlock(detail, state.imageUnreadable, image, onZoom)
-                P10QuestionCard(detail, state, actions)
-                P10UserExampleBlocks(state, actions)
+                if (state.edit.editing) {
+                    P10EditForm(state, actions)
+                } else {
+                    P10QuestionCard(detail, state, actions)
+                    P10UserExampleBlocks(state, actions)
+                }
             }
         }
     }
@@ -173,8 +219,12 @@ private fun COverlayWrapper(
 }
 
 @Composable
-private fun P10Header(actions: P10UserExampleActions) {
+private fun P10Header(
+    state: P10UserExampleUiState,
+    actions: P10UserExampleActions,
+) {
     val c = if (androidx.compose.foundation.isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
+    val editing = state.edit.editing
     Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         CChromeGlyph(
             kind = CChromeIcon.Back,
@@ -182,7 +232,7 @@ private fun P10Header(actions: P10UserExampleActions) {
             modifier =
                 Modifier
                     .size(21.dp)
-                    .clickable(onClick = actions.onBack)
+                    .clickable(onClick = if (editing) actions.onCancelEdit else actions.onBack)
                     .semantics { contentDescription = "返回" },
         )
         Text(
@@ -192,8 +242,25 @@ private fun P10Header(actions: P10UserExampleActions) {
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.padding(start = Tokens.Space.lmetaGap.dp).weight(1f),
         )
-        CButton("编辑", {}, Modifier.width(64.dp), CButtonVariant.Ghost, enabled = false)
-        CButton("删除", {}, Modifier.width(64.dp), CButtonVariant.Ghost, enabled = false)
+        if (editing) {
+            CButton("取消", actions.onCancelEdit, Modifier.width(64.dp), CButtonVariant.Ghost)
+            CButton(
+                "保存",
+                actions.onSave,
+                Modifier.width(64.dp),
+                enabled = !state.edit.errors.hasInvalid && !state.edit.saving,
+                loading = state.edit.saving,
+            )
+        } else {
+            CButton("编辑", actions.onEdit, Modifier.width(64.dp), CButtonVariant.Ghost, enabled = state.canEdit)
+            CButton(
+                "删除",
+                { actions.onRequestDelete(if (state.isMistake) P10DeleteTarget.Marked else P10DeleteTarget.Unmarked) },
+                Modifier.width(64.dp),
+                CButtonVariant.Ghost,
+                enabled = state.canDelete,
+            )
+        }
     }
 }
 

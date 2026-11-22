@@ -39,6 +39,7 @@ fun P08MistakeListRoute(
     viewMode: MistakeViewMode,
     database: AppDatabase,
     actions: P08MistakeActions,
+    revision: Long = 0,
 ) {
     val factory =
         remember(database) {
@@ -52,7 +53,7 @@ fun P08MistakeListRoute(
                 }
             }
         }
-    val model: P08MistakeListViewModel = viewModel(key = "p08-mistake-list", factory = factory)
+    val model: P08MistakeListViewModel = viewModel(key = "p08-mistake-list-$revision", factory = factory)
     val state by model.state.collectAsState()
     P08MistakeListContent(state = state, viewMode = viewMode, actions = actions)
 }
