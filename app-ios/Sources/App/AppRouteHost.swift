@@ -161,6 +161,7 @@ private struct AppRoutePage: View {
             P08MistakeScreen(
                 reader: reader,
                 onOpenIdiom: { id in _ = router.push(.idiomMistakes, recordID: id) },
+                onOpenUserExample: { id in _ = router.push(.mistakeDetail, recordID: id) },
                 onCapture: { _ = router.beginCapture() }
             )
         } else if entry.route == .idiomMistakes,
@@ -171,7 +172,19 @@ private struct AppRoutePage: View {
                 reader: reader,
                 onBack: { router.back() },
                 onOpenIdiom: { _ = router.push(.idiomDetail, recordID: idiomID) },
+                onOpenExample: { id in _ = router.push(.mistakeDetail, recordID: id) },
                 onBackToBook: { router.back() }
+            )
+        } else if entry.route == .mistakeDetail,
+                  let reader = launch.mistakeReader,
+                  let exampleID = entry.recordID {
+            // 路由键 `mistake/{id}` 沿用规范 §5.1 的 23 行，值取 `user_example.id`（P10 是录入题详情）。
+            P10UserExampleScreen(
+                id: exampleID,
+                reader: reader,
+                dataDirectory: launch.dataDirectory,
+                onBack: { router.back() },
+                onOpenIdiom: { id in _ = router.push(.idiomDetail, recordID: id) }
             )
         } else if entry.route == .camera, let workflowID = router.captureWorkflow?.id {
             P17CaptureScreen(

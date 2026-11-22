@@ -101,10 +101,13 @@
 		A000000000000000000000BF /* MistakeBrowse.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001BF /* MistakeBrowse.swift */; };
 		A000000000000000000000C0 /* P08MistakeScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001C0 /* P08MistakeScreen.swift */; };
 		A000000000000000000000C1 /* P09IdiomCapturedScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001C1 /* P09IdiomCapturedScreen.swift */; };
+		A000000000000000000000C6 /* P10UserExampleScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001C6 /* P10UserExampleScreen.swift */; };
+		A000000000000000000000C8 /* P10UserExampleBlocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001C8 /* P10UserExampleBlocks.swift */; };
 		A000000000000000000000C2 /* MistakeLibraryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001C2 /* MistakeLibraryTests.swift */; };
 		A000000000000000000000C3 /* MistakeBrowseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001C3 /* MistakeBrowseTests.swift */; };
 		A000000000000000000000C4 /* P08MistakeSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001C4 /* P08MistakeSnapshotTests.swift */; };
 		A000000000000000000000C5 /* P09CapturedSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001C5 /* P09CapturedSnapshotTests.swift */; };
+		A000000000000000000000C7 /* P10UserExampleSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001C7 /* P10UserExampleSnapshotTests.swift */; };
 		A000000000000000000000BA /* P20MatchContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001BA /* P20MatchContent.swift */; };
 /* End PBXBuildFile section */
 
@@ -208,10 +211,13 @@
 		A000000000000000000001BF /* MistakeBrowse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MistakeBrowse.swift; sourceTree = "<group>"; };
 		A000000000000000000001C0 /* P08MistakeScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P08MistakeScreen.swift; sourceTree = "<group>"; };
 		A000000000000000000001C1 /* P09IdiomCapturedScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P09IdiomCapturedScreen.swift; sourceTree = "<group>"; };
+		A000000000000000000001C6 /* P10UserExampleScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P10UserExampleScreen.swift; sourceTree = "<group>"; };
+		A000000000000000000001C8 /* P10UserExampleBlocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P10UserExampleBlocks.swift; sourceTree = "<group>"; };
 		A000000000000000000001C2 /* MistakeLibraryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MistakeLibraryTests.swift; sourceTree = "<group>"; };
 		A000000000000000000001C3 /* MistakeBrowseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MistakeBrowseTests.swift; sourceTree = "<group>"; };
 		A000000000000000000001C4 /* P08MistakeSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P08MistakeSnapshotTests.swift; sourceTree = "<group>"; };
 		A000000000000000000001C5 /* P09CapturedSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P09CapturedSnapshotTests.swift; sourceTree = "<group>"; };
+		A000000000000000000001C7 /* P10UserExampleSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P10UserExampleSnapshotTests.swift; sourceTree = "<group>"; };
 		A000000000000000000001BA /* P20MatchContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P20MatchContent.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -309,6 +315,8 @@
 				A000000000000000000001BF /* MistakeBrowse.swift */,
 				A000000000000000000001C0 /* P08MistakeScreen.swift */,
 				A000000000000000000001C1 /* P09IdiomCapturedScreen.swift */,
+				A000000000000000000001C6 /* P10UserExampleScreen.swift */,
+				A000000000000000000001C8 /* P10UserExampleBlocks.swift */,
 			);
 			path = FeatureMistake;
 			sourceTree = "<group>";
@@ -407,6 +415,7 @@
 				A000000000000000000001C3 /* MistakeBrowseTests.swift */,
 				A000000000000000000001C4 /* P08MistakeSnapshotTests.swift */,
 				A000000000000000000001C5 /* P09CapturedSnapshotTests.swift */,
+				A000000000000000000001C7 /* P10UserExampleSnapshotTests.swift */,
 				A00000000000000000000152 /* pack fixture */,
 			);
 			path = Tests;
@@ -556,6 +565,8 @@
 				A000000000000000000000BF /* MistakeBrowse.swift in Sources */,
 				A000000000000000000000C0 /* P08MistakeScreen.swift in Sources */,
 				A000000000000000000000C1 /* P09IdiomCapturedScreen.swift in Sources */,
+				A000000000000000000000C6 /* P10UserExampleScreen.swift in Sources */,
+				A000000000000000000000C8 /* P10UserExampleBlocks.swift in Sources */,
 				A00000000000000000000023 /* ReviewFeature.swift in Sources */,
 				A00000000000000000000024 /* MeFeature.swift in Sources */,
 				A00000000000000000000028 /* ExamScopeScreen.swift in Sources */,
@@ -633,6 +644,7 @@
 				A000000000000000000000C3 /* MistakeBrowseTests.swift in Sources */,
 				A000000000000000000000C4 /* P08MistakeSnapshotTests.swift in Sources */,
 				A000000000000000000000C5 /* P09CapturedSnapshotTests.swift in Sources */,
+				A000000000000000000000C7 /* P10UserExampleSnapshotTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -47,17 +47,20 @@ public struct IdiomCapturedState: Equatable, Sendable {
 public struct IdiomCapturedActions {
     public let onBack: () -> Void
     public let onOpenIdiom: () -> Void
+    public let onOpenExample: (String) -> Void
     public let onBackToBook: () -> Void
     public let onRetry: () -> Void
 
     public init(
         onBack: @escaping () -> Void,
         onOpenIdiom: @escaping () -> Void,
+        onOpenExample: @escaping (String) -> Void,
         onBackToBook: @escaping () -> Void,
         onRetry: @escaping () -> Void
     ) {
         self.onBack = onBack
         self.onOpenIdiom = onOpenIdiom
+        self.onOpenExample = onOpenExample
         self.onBackToBook = onBackToBook
         self.onRetry = onRetry
     }
@@ -169,9 +172,10 @@ public struct P09CapturedContent: View {
                 .padding(.bottom, 7)
             CList {
                 ForEach(Array(state.examples.enumerated()), id: \.element.id) { index, example in
-                    // P10 录入题详情在工作包 2.7，本版行先只展示，不做假导航。
+                    // 行点入 P10 录入题详情（§4.2 第 12 / 17 条）；id 即 `user_example.id`。
                     CListRow(
                         stem: example.stem,
+                        action: { actions.onOpenExample(example.id) },
                         showsDivider: index != state.examples.count - 1,
                         meta: { rowMeta(example) }
                     )
@@ -263,6 +267,7 @@ public struct P09IdiomCapturedScreen: View {
 
     private let onBack: () -> Void
     private let onOpenIdiom: () -> Void
+    private let onOpenExample: (String) -> Void
     private let onBackToBook: () -> Void
 
     @MainActor
@@ -271,11 +276,13 @@ public struct P09IdiomCapturedScreen: View {
         reader: IdiomCapturedReading,
         onBack: @escaping () -> Void,
         onOpenIdiom: @escaping () -> Void,
+        onOpenExample: @escaping (String) -> Void,
         onBackToBook: @escaping () -> Void
     ) {
         _model = StateObject(wrappedValue: IdiomCapturedViewModel(idiomID: idiomID, reader: reader))
         self.onBack = onBack
         self.onOpenIdiom = onOpenIdiom
+        self.onOpenExample = onOpenExample
         self.onBackToBook = onBackToBook
     }
 
@@ -286,6 +293,7 @@ public struct P09IdiomCapturedScreen: View {
             actions: IdiomCapturedActions(
                 onBack: onBack,
                 onOpenIdiom: onOpenIdiom,
+                onOpenExample: onOpenExample,
                 onBackToBook: onBackToBook,
                 onRetry: { Task { await model.load() } }
             ),
