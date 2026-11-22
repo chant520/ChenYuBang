@@ -12,6 +12,9 @@ import XCTest
 /// 区块 ⑥「正确答案 + 一句解析」本版无来源、不渲染（信息架构 v1.4 版内修订第 ① 条），故无对应帧；
 /// 读取失败（橙条）与「没有找到这道录入题」属边界，由构件矩阵覆盖同款 `CBar` / `CEmptyState`；
 /// 有原图的缩略帧取的是本机拍照文件，快照不注入二进制，图片位以「原图已不在」橙占位为准。
+///
+/// 本页是长页：844 视口帧只排到区块 ⑨ 首行，滚动区外的 ⑦⑧⑨⑩ 与底部删除行拍不到，
+/// 只对视口上方负责；故另出 `testBlocksLight` / `testBlocksDark` 两帧，按自然高度单帧覆盖 ⑤–⑩ 全段。
 @MainActor
 final class P10UserExampleSnapshotTests: XCTestCase {
     override func setUp() {
@@ -31,6 +34,37 @@ final class P10UserExampleSnapshotTests: XCTestCase {
         assertSnapshot(
             of: view,
             as: .image(layout: .fixed(width: 390, height: 844)),
+            file: file,
+            testName: testName,
+            line: line
+        )
+    }
+
+    /// 下半页区块（⑤–⑩ 与底部删除行）：844 视口拍不到滚动区外的内容，故按自然高度单帧覆盖。
+    private func assertP10Blocks(
+        _ state: UserExampleState,
+        dark: Bool,
+        file: StaticString = #filePath,
+        testName: String = #function,
+        line: UInt = #line
+    ) {
+        guard let detail = state.detail else {
+            XCTFail("区块帧需要 detail")
+            return
+        }
+        let view = P10UserExampleBlocks(
+            state: state,
+            detail: detail,
+            actions: actions(),
+            colors: dark ? Tokens.dark : Tokens.light
+        )
+        .frame(width: 390 - Tokens.Space.pageX * 2, alignment: .top)
+            .padding(.horizontal, Tokens.Space.pageX)
+            .padding(.vertical, Tokens.Space.block)
+            .environment(\.colorScheme, dark ? .dark : .light)
+        assertSnapshot(
+            of: view,
+            as: .image(layout: .sizeThatFits),
             file: file,
             testName: testName,
             line: line
@@ -135,5 +169,14 @@ final class P10UserExampleSnapshotTests: XCTestCase {
 
     func testUnmarkedDark() {
         assertP10(UserExampleState(loading: false, detail: example(isMistake: false)), dark: true)
+    }
+
+    /// 区块帧取「已显示答案」的标错态：一次覆盖 ⑤ 遮罩行与重做按钮、⑦ 出处、⑧ 关联成语、⑨ 答案与错因与标签、⑩ 预留位、底部删除行。
+    func testBlocksLight() {
+        assertP10Blocks(mistakeState(revealed: true), dark: false)
+    }
+
+    func testBlocksDark() {
+        assertP10Blocks(mistakeState(revealed: true), dark: true)
     }
 }
