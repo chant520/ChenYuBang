@@ -157,6 +157,22 @@ private struct AppRoutePage: View {
                 onClose: { router.back() },
                 onOpenIdiom: { id in _ = router.push(.idiomDetail, recordID: id) }
             )
+        } else if entry.route == .mistakes, let reader = launch.mistakeReader {
+            P08MistakeScreen(
+                reader: reader,
+                onOpenIdiom: { id in _ = router.push(.idiomMistakes, recordID: id) },
+                onCapture: { _ = router.beginCapture() }
+            )
+        } else if entry.route == .idiomMistakes,
+                  let reader = launch.mistakeReader,
+                  let idiomID = entry.recordID {
+            P09IdiomCapturedScreen(
+                idiomID: idiomID,
+                reader: reader,
+                onBack: { router.back() },
+                onOpenIdiom: { _ = router.push(.idiomDetail, recordID: idiomID) },
+                onBackToBook: { router.back() }
+            )
         } else if entry.route == .camera, let workflowID = router.captureWorkflow?.id {
             P17CaptureScreen(
                 isActive: isActive,
@@ -272,7 +288,8 @@ private struct RoutePlaceholderPage: View {
         case .backup:
             CButton(text: "导入方式", variant: .ghost) { router.openOverlay(.importMode) }
         case .mistakes:
-            PendingPageText(text: "复习队列待真实错题数据接入；空队列不启动复习。")
+            // P08 已接线，本分支只在本机数据库未就绪（reader 为 nil）时兜底。
+            PendingPageText(text: "错题本需在本机数据库就绪后显示；未读到数据时不展示题目与统计。")
         case .idiomDetail:
             PendingPageText(text: "复习队列待真实错题数据接入；空队列不启动复习。")
             CButton(text: "去错题本", variant: .ghost, action: router.goToMistakes)

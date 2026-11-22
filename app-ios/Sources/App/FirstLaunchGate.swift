@@ -17,6 +17,8 @@ final class FirstLaunchState: ObservableObject {
     @Published private(set) var exampleReader: ExampleLibraryReader?
     /// P20 保存入口：初始化成功后才有值；图片目录为 Application Support/ChenYuBang/images。
     @Published private(set) var captureSaver: UserExampleSaver?
+    /// P08 / P09 错题与录入题读库入口：与 libraryReader 同时就绪。
+    @Published private(set) var mistakeReader: MistakeLibraryReader?
     private var store: ExamScopeStore?
     private var importer: PackImporter?
     private var currentPack: ValidatedPack?
@@ -59,6 +61,7 @@ final class FirstLaunchState: ObservableObject {
             libraryReader = IdiomLibraryReader(queue: queue)
             exampleReader = ExampleLibraryReader(queue: queue)
             captureSaver = UserExampleSaver(queue: queue, imagesDirectory: imagesDirectory)
+            mistakeReader = MistakeLibraryReader(queue: queue)
             preferences = loaded
         } catch is PackError {
             contentError = true

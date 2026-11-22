@@ -32,6 +32,8 @@ public struct CList<Content: View>: View {
 /// 行 padding 13pt 16pt；主词 14pt/600 + 拼音 11pt（baseline 对齐、gap 8pt）；
 /// 副文 12pt/1.6 text2 上距 5pt；元信息 11pt text3 上距 6pt、gap 8pt；
 /// 右侧文字 11pt text3 靠右（按页面 `.lt1 > .r`，挂在首行末尾，元信息行仍占满整行宽）。
+/// 主词传 nil（`stem:` 便捷 init）即题干行：无 `.lt1`，副文顶格起排，
+/// 对应全页稿 v2 P09 / P08 平铺视图的 `.lrow > .lsub[style=margin:0] + .lmeta`。
 /// 选中：底 tintbg、主词 accent；禁用：底 disbg、全文 disfg（元信息由调用方挂中性标签）。
 /// 整行可点（action 可选），按下按规范 5.0 亮度 ×0.9。
 ///
@@ -41,7 +43,8 @@ public struct CList<Content: View>: View {
 public struct CListRow<Meta: View, Trailing: View>: View {
     @Environment(\.colorScheme) private var colorScheme
 
-    private let name: String
+    /// 主词；nil 表示该行无主词行，从副文起排（规范 5.13 的题干行形态）。
+    private let name: String?
     private let pinyin: String
     private let sub: String?
     private let selected: Bool
@@ -52,7 +55,7 @@ public struct CListRow<Meta: View, Trailing: View>: View {
     private let trailing: Trailing
 
     /// - Parameters:
-    ///   - name: 主词（14pt/600）。
+    ///   - name: 主词（14pt/600）；传 nil 表示无主词行，行从副文起排（题干行形态）。
     ///   - pinyin: 拼音（11pt text3，与主词 baseline 对齐）。
     ///   - sub: 可选副文（12pt/1.6 text2）。
     ///   - selected: 选中态（底 tintbg、主词 accent）。
@@ -62,8 +65,8 @@ public struct CListRow<Meta: View, Trailing: View>: View {
     ///   - meta: 元信息内容（挂标签 / 徽标，规范 5.2 / 5.6）。
     ///   - trailing: 右侧内容（11pt text3、靠右，挂首行末尾）。
     public init(
-        name: String,
-        pinyin: String,
+        name: String?,
+        pinyin: String = "",
         sub: String? = nil,
         selected: Bool = false,
         disabled: Bool = false,
@@ -99,24 +102,26 @@ public struct CListRow<Meta: View, Trailing: View>: View {
         // 行底分隔线计入行盒高度（CSS border-bottom 口径），故用 VStack 而非 overlay。
         return VStack(spacing: 0) {
             VStack(alignment: .leading, spacing: 0) {
-                // 首行：主词 + 拼音（+ 可选右侧文字），对齐页面 `.lt1`（flex / baseline / gap 8）。
-                HStack(alignment: .firstTextBaseline, spacing: Tokens.Space.lt1Gap) {
-                    Text(name)
-                        .font(.system(size: Tokens.Font.n14, weight: .semibold))
-                        // letter-spacing .01em（规范 5.13 `.lname`）。
-                        .tracking(Tokens.Font.n14 * 0.01)
-                        .foregroundStyle(nameColor(colors))
-                    Text(pinyin)
-                        .font(.system(size: Tokens.Font.n11))
-                        .foregroundStyle(disabled ? colors.disfg : colors.text3)
-                    if Trailing.self != EmptyView.self {
-                        // 页面 `.r { margin-left:auto }`：右侧文字挂在首行末尾。
-                        Spacer(minLength: 0)
-                        trailing
+                if let name {
+                    // 首行：主词 + 拼音（+ 可选右侧文字），对齐页面 `.lt1`（flex / baseline / gap 8）。
+                    HStack(alignment: .firstTextBaseline, spacing: Tokens.Space.lt1Gap) {
+                        Text(name)
+                            .font(.system(size: Tokens.Font.n14, weight: .semibold))
+                            // letter-spacing .01em（规范 5.13 `.lname`）。
+                            .tracking(Tokens.Font.n14 * 0.01)
+                            .foregroundStyle(nameColor(colors))
+                        Text(pinyin)
                             .font(.system(size: Tokens.Font.n11))
                             .foregroundStyle(disabled ? colors.disfg : colors.text3)
-                            // 右侧文字优先占位、主词换行；AX3 下不裁切（开发规范 §9.3）。
-                            .layoutPriority(1)
+                        if Trailing.self != EmptyView.self {
+                            // 页面 `.r { margin-left:auto }`：右侧文字挂在首行末尾。
+                            Spacer(minLength: 0)
+                            trailing
+                                .font(.system(size: Tokens.Font.n11))
+                                .foregroundStyle(disabled ? colors.disfg : colors.text3)
+                                // 右侧文字优先占位、主词换行；AX3 下不裁切（开发规范 §9.3）。
+                                .layoutPriority(1)
+                        }
                     }
                 }
                 if let sub {
@@ -124,7 +129,8 @@ public struct CListRow<Meta: View, Trailing: View>: View {
                         .font(.system(size: Tokens.Font.n12))
                         .cLineHeight(1.6, size: Tokens.Font.n12)
                         .foregroundStyle(disabled ? colors.disfg : colors.text2)
-                        .padding(.top, Tokens.Space.lsubTop)
+                        // 无主词行时副文即首行，页面写作 `style="margin:0"`（全页稿 v2 P09）。
+                        .padding(.top, name == nil ? 0 : Tokens.Space.lsubTop)
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 if Meta.self != EmptyView.self {
@@ -167,6 +173,28 @@ public struct CListRow<Meta: View, Trailing: View>: View {
 }
 
 extension CListRow where Trailing == EmptyView {
+    /// 题干行（规范 5.13 无主词形态）：题干按副文样式呈现，其下挂元信息。
+    /// P08「按录入时间 / 按考试类型」与 P09 录入题列表用此形态。
+    public init(
+        stem: String,
+        selected: Bool = false,
+        disabled: Bool = false,
+        action: (() -> Void)? = nil,
+        showsDivider: Bool = true,
+        @ViewBuilder meta: () -> Meta
+    ) {
+        self.init(
+            name: nil,
+            sub: stem,
+            selected: selected,
+            disabled: disabled,
+            action: action,
+            showsDivider: showsDivider,
+            meta: meta,
+            trailing: { EmptyView() }
+        )
+    }
+
     /// 无右侧内容的列表行。
     public init(
         name: String,
