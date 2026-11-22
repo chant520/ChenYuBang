@@ -33,11 +33,11 @@ abstract class UserExampleDao {
     @Query("SELECT * FROM mistake WHERE userExampleId = :id ORDER BY createdAt DESC, id DESC")
     abstract suspend fun mistakesOf(id: String): List<MistakeEntity>
 
-    /** P10 区块 ⑧：关联成语按 word、id 稳定排序（表无 order 列，不依赖默认返回序）。 */
+    /** P10 区块 ⑧：关联成语按写入序（rowid）+ idiomId 稳定次级排序，对齐 iOS（表无 order 列）。 */
     @Query(
         "SELECT idiom.* FROM user_example_idiom uei " +
             "JOIN idiom ON idiom.id = uei.idiomId " +
-            "WHERE uei.userExampleId = :id ORDER BY idiom.word, idiom.id",
+            "WHERE uei.userExampleId = :id ORDER BY uei.rowid, uei.idiomId",
     )
     abstract suspend fun linkedIdioms(id: String): List<IdiomEntity>
 
