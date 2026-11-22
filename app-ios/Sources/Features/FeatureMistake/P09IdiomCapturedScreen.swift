@@ -269,11 +269,14 @@ public struct P09IdiomCapturedScreen: View {
     private let onOpenIdiom: () -> Void
     private let onOpenExample: (String) -> Void
     private let onBackToBook: () -> Void
+    /// 用户内容写入令牌：P10 编辑或删除后回本列表时重新读库（同 P08）。
+    private let contentRevision: UUID
 
     @MainActor
     public init(
         idiomID: String,
         reader: IdiomCapturedReading,
+        contentRevision: UUID = UUID(),
         onBack: @escaping () -> Void,
         onOpenIdiom: @escaping () -> Void,
         onOpenExample: @escaping (String) -> Void,
@@ -284,6 +287,7 @@ public struct P09IdiomCapturedScreen: View {
         self.onOpenIdiom = onOpenIdiom
         self.onOpenExample = onOpenExample
         self.onBackToBook = onBackToBook
+        self.contentRevision = contentRevision
     }
 
     public var body: some View {
@@ -300,5 +304,8 @@ public struct P09IdiomCapturedScreen: View {
             colors: colors
         )
         .task { await model.load() }
+        .onChange(of: contentRevision) { _ in
+            Task { await model.load() }
+        }
     }
 }

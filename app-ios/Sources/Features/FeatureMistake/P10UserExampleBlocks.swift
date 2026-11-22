@@ -121,7 +121,7 @@ public struct P10UserExampleBlocks: View {
         }
     }
 
-    /// ⑧：关联成语标签，每个可点进 P05；「加一个」改归属属工作包 2.8，本版不渲染。
+    /// ⑧：关联成语标签，每个可点进 P05；增删归属在编辑态（工作包 2.8）里做，只读态不给入口。
     private var idiomCard: some View {
         CCard {
             CLabel("关联成语")
@@ -195,11 +195,12 @@ public struct P10UserExampleBlocks: View {
         }
     }
 
-    /// 底部删除（高保真稿 B P10：本页唯一红动作）；动作属工作包 2.8，本版在位、置灰。
+    /// 底部删除（高保真稿 B P10：本页唯一红动作）＝把这道题移出错题本，与顶部「删除」同一入口。
     private var deleteRow: some View {
         VStack(alignment: .leading, spacing: 0) {
-            CButton(text: "删除这道错题", variant: .dangerOutline, enabled: false, action: actions.onDelete)
-            Text("删除会同时从错题本与对应成语详情里移除，需二次确认。")
+            CButton(text: UserExampleEditCopy.deleteMistakeRow, variant: .dangerOutline,
+                    enabled: !state.deleting, action: actions.onDelete)
+            Text(UserExampleEditCopy.deleteMistakeNote)
                 .font(.system(size: Tokens.Font.n11))
                 .foregroundStyle(colors.text3)
                 .padding(.top, Tokens.Space.lmetaTop)

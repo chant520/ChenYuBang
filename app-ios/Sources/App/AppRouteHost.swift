@@ -160,6 +160,7 @@ private struct AppRoutePage: View {
         } else if entry.route == .mistakes, let reader = launch.mistakeReader {
             P08MistakeScreen(
                 reader: reader,
+                contentRevision: router.userContentRevision,
                 onOpenIdiom: { id in _ = router.push(.idiomMistakes, recordID: id) },
                 onOpenUserExample: { id in _ = router.push(.mistakeDetail, recordID: id) },
                 onCapture: { _ = router.beginCapture() }
@@ -170,6 +171,7 @@ private struct AppRoutePage: View {
             P09IdiomCapturedScreen(
                 idiomID: idiomID,
                 reader: reader,
+                contentRevision: router.userContentRevision,
                 onBack: { router.back() },
                 onOpenIdiom: { _ = router.push(.idiomDetail, recordID: idiomID) },
                 onOpenExample: { id in _ = router.push(.mistakeDetail, recordID: id) },
@@ -177,14 +179,20 @@ private struct AppRoutePage: View {
             )
         } else if entry.route == .mistakeDetail,
                   let reader = launch.mistakeReader,
+                  let editor = launch.userExampleEditor,
+                  let libraryReader = launch.libraryReader,
                   let exampleID = entry.recordID {
             // 路由键 `mistake/{id}` 沿用规范 §5.1 的 23 行，值取 `user_example.id`（P10 是录入题详情）。
             P10UserExampleScreen(
                 id: exampleID,
                 reader: reader,
+                editor: editor,
+                libraryReader: libraryReader,
                 dataDirectory: launch.dataDirectory,
                 onBack: { router.back() },
-                onOpenIdiom: { id in _ = router.push(.idiomDetail, recordID: id) }
+                onOpenIdiom: { id in _ = router.push(.idiomDetail, recordID: id) },
+                onContentChanged: { router.bumpUserContent() },
+                onDeleted: { router.back() }
             )
         } else if entry.route == .camera, let workflowID = router.captureWorkflow?.id {
             P17CaptureScreen(

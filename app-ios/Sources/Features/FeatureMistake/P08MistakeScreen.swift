@@ -281,10 +281,14 @@ public struct P08MistakeScreen: View {
     private let onOpenIdiom: (String) -> Void
     private let onOpenUserExample: (String) -> Void
     private let onCapture: () -> Void
+    /// 用户内容写入令牌（开发规范 §8.1.1「来源页列表刷新」）：本页在标签栈里常驻挂载，
+    /// 从 P10 返回时 `.task` 不会重跑，靠该令牌变化重新读库。
+    private let contentRevision: UUID
 
     @MainActor
     public init(
         reader: MistakeBookReading,
+        contentRevision: UUID = UUID(),
         onOpenIdiom: @escaping (String) -> Void,
         onOpenUserExample: @escaping (String) -> Void,
         onCapture: @escaping () -> Void
@@ -293,6 +297,7 @@ public struct P08MistakeScreen: View {
         self.onOpenIdiom = onOpenIdiom
         self.onOpenUserExample = onOpenUserExample
         self.onCapture = onCapture
+        self.contentRevision = contentRevision
     }
 
     public var body: some View {
@@ -309,5 +314,8 @@ public struct P08MistakeScreen: View {
             colors: colors
         )
         .task { await model.load() }
+        .onChange(of: contentRevision) { _ in
+            Task { await model.load(dimension: model.state.dimension) }
+        }
     }
 }

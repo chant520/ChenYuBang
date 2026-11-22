@@ -190,4 +190,122 @@ final class P10UserExampleSnapshotTests: XCTestCase {
     func testBlocksUnmarkedDark() {
         assertP10Blocks(UserExampleState(loading: false, detail: example(isMistake: false)), dark: true)
     }
+
+    // MARK: - 2.8 编辑与删除（C8）
+
+    /// 编辑态整页帧（844 视口）：钉住顶部换成「取消 / 保存」、原图位仍在且只读、题面已换成输入框。
+    private func assertP10Page(
+        _ state: UserExampleState,
+        dark: Bool,
+        testName: String = #function,
+        line: UInt = #line
+    ) {
+        let view = P10UserExampleContent(state: state, actions: actions(), colors: dark ? Tokens.dark : Tokens.light)
+            .environment(\.colorScheme, dark ? .dark : .light)
+        assertSnapshot(of: view, as: .image(layout: .fixed(width: 390, height: 844)),
+                       testName: testName, line: line)
+    }
+
+    /// 编辑态表单（自然高度）：844 视口拍不全题干以下与归属区，故单帧覆盖整张表单。
+    private func assertP10EditForm(
+        _ draft: UserExampleDraft,
+        saving: Bool = false,
+        dark: Bool,
+        testName: String = #function,
+        line: UInt = #line
+    ) {
+        let view = P10UserExampleEditForm(draft: draft, saving: saving, actions: .inert)
+            .frame(width: 390 - Tokens.Space.pageX * 2, alignment: .top)
+            .padding(.horizontal, Tokens.Space.pageX)
+            .padding(.vertical, Tokens.Space.block)
+            .background((dark ? Tokens.dark : Tokens.light).page)
+            .environment(\.colorScheme, dark ? .dark : .light)
+        assertSnapshot(of: view, as: .image(layout: .sizeThatFits), testName: testName, line: line)
+    }
+
+    /// 单条二次确认（规范 §8.1.1）：满屏帧含蒙层，钉住弹层覆起后「同一屏最多一处红」的那一处。
+    private func assertP10DeleteConfirm(
+        isMistake: Bool,
+        dark: Bool,
+        testName: String = #function,
+        line: UInt = #line
+    ) {
+        let view = P10UserExampleDeleteConfirm(isMistake: isMistake, deleting: false, onConfirm: {}, onDismiss: {})
+            .environment(\.colorScheme, dark ? .dark : .light)
+        assertSnapshot(of: view, as: .image(layout: .fixed(width: 390, height: 844)), testName: testName, line: line)
+    }
+
+    private func draft(isMistake: Bool, invalid: Bool = false) -> UserExampleDraft {
+        var draft = UserExampleDraft(detail: example(isMistake: isMistake))
+        guard invalid else { return draft }
+        draft.yearText = "20"
+        draft.answerText = "E"
+        draft.tags = ["超过八个字的标签名"]
+        return draft
+    }
+
+    private func editingState(draft: UserExampleDraft, issue: UserExampleIssue? = nil) -> UserExampleState {
+        var state = UserExampleState(
+            loading: false,
+            detail: example(isMistake: draft.isMistake),
+            imageUnreadable: draft.isMistake
+        )
+        state.draft = draft
+        state.issue = issue
+        return state
+    }
+
+    func testEditingLight() {
+        assertP10Page(editingState(draft: draft(isMistake: true)), dark: false)
+    }
+
+    func testEditingDark() {
+        assertP10Page(editingState(draft: draft(isMistake: true)), dark: true)
+    }
+
+    /// 字段级非法：年份与答案标红、「保存」置灰但仍在位（校验不隐藏入口）。
+    func testEditingInvalidLight() {
+        assertP10Page(editingState(draft: draft(isMistake: true, invalid: true)), dark: false)
+    }
+
+    /// 写库失败：红错误条 + 「知道了」，草稿留在原地不清空（规范 §9.1）。
+    func testEditingSaveFailedLight() {
+        assertP10Page(
+            editingState(
+                draft: draft(isMistake: true),
+                issue: UserExampleIssue(kind: .error, message: UserExampleEditCopy.saveFailed)
+            ),
+            dark: false
+        )
+    }
+
+    func testEditFormLight() {
+        assertP10EditForm(draft(isMistake: true), dark: false)
+    }
+
+    func testEditFormDark() {
+        assertP10EditForm(draft(isMistake: true), dark: true)
+    }
+
+    /// 未标错的表单：错因与标签两栏整段不出现（这两项只存在于 `mistake`，规范 §4.1）。
+    func testEditFormUnmarkedLight() {
+        assertP10EditForm(draft(isMistake: false), dark: false)
+    }
+
+    /// 保存中：字段全部禁用、增补入口（加入标签 / 添加归属成语）整段收起。
+    func testEditFormSavingLight() {
+        assertP10EditForm(draft(isMistake: true), saving: true, dark: false)
+    }
+
+    func testConfirmDeleteMistakeLight() {
+        assertP10DeleteConfirm(isMistake: true, dark: false)
+    }
+
+    func testConfirmDeleteMistakeDark() {
+        assertP10DeleteConfirm(isMistake: true, dark: true)
+    }
+
+    func testConfirmDeleteExampleLight() {
+        assertP10DeleteConfirm(isMistake: false, dark: false)
+    }
 }
