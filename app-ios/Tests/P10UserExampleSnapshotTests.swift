@@ -14,9 +14,9 @@ import XCTest
 /// 有原图的缩略帧取的是本机拍照文件，快照不注入二进制，图片位以「原图已不在」橙占位为准。
 ///
 /// 本页是长页：844 视口帧只排到区块 ⑨ 首行，滚动区外的 ⑦⑧⑨⑩ 与底部删除行拍不到，
-/// 只对视口上方负责；故另出 `testBlocksLight` / `testBlocksDark` 两帧，按自然高度单帧覆盖 ⑤–⑩ 全段。
-/// 区块帧取标错的录入题（含底部红描边删除行）；`testUnmarked*` 两帧同时钉住未标错态整行不出现
-/// （信息架构 v1.4 版内修订第 ④ 条，用户 2026-11-22 拍板），其删除入口只有顶部置灰「删除」。
+/// 只对视口上方负责；故另出按自然高度的区块帧覆盖 ⑤–⑩ 全段：`testBlocks*` 取标错的录入题（含底部红描边删除行），
+/// `testBlocksUnmarked*` 取未标错的，钉住该整行不出现（信息架构 v1.4 版内修订第 ④ 条，用户 2026-11-22 拍板）——
+/// 未标错态的删除入口只有顶部置灰「删除」，页底无红动作在 844 视口帧里本来就拍不到。
 @MainActor
 final class P10UserExampleSnapshotTests: XCTestCase {
     override func setUp() {
@@ -180,5 +180,14 @@ final class P10UserExampleSnapshotTests: XCTestCase {
 
     func testBlocksDark() {
         assertP10Blocks(mistakeState(revealed: true), dark: true)
+    }
+
+    /// 未标错的区块帧：844 视口拍不到页底，整行删除是否出现只有按自然高度的帧才算证据——本对帧钉住「⑤ 与底部红描边删除行整段不出现」。
+    func testBlocksUnmarkedLight() {
+        assertP10Blocks(UserExampleState(loading: false, detail: example(isMistake: false)), dark: false)
+    }
+
+    func testBlocksUnmarkedDark() {
+        assertP10Blocks(UserExampleState(loading: false, detail: example(isMistake: false)), dark: true)
     }
 }
