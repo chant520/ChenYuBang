@@ -235,12 +235,14 @@ final class P10UserExampleSnapshotTests: XCTestCase {
         assertSnapshot(of: view, as: .image(layout: .fixed(width: 390, height: 844)), testName: testName, line: line)
     }
 
+    /// 字段级非法草稿：年份 `20` 与答案 `E` 两处非法。
+    /// 不塞超长标签——标签在 P20 与本页编辑器都是加入时把关，库里存不出越界长度，
+    /// 把它画进基线等于给走不到的分支钉图。
     private func draft(isMistake: Bool, invalid: Bool = false) -> UserExampleDraft {
         var draft = UserExampleDraft(detail: example(isMistake: isMistake))
         guard invalid else { return draft }
         draft.yearText = "20"
         draft.answerText = "E"
-        draft.tags = ["超过八个字的标签名"]
         return draft
     }
 
@@ -264,6 +266,7 @@ final class P10UserExampleSnapshotTests: XCTestCase {
     }
 
     /// 字段级非法：年份与答案标红、「保存」置灰但仍在位（校验不隐藏入口）。
+    /// 844 视口只排到「我的答案」，年份那一栏在滚动区外，故另出下方 `testEditFormInvalidLight` 整帧。
     func testEditingInvalidLight() {
         assertP10Page(editingState(draft: draft(isMistake: true, invalid: true)), dark: false)
     }
@@ -290,6 +293,11 @@ final class P10UserExampleSnapshotTests: XCTestCase {
     /// 未标错的表单：错因与标签两栏整段不出现（这两项只存在于 `mistake`，规范 §4.1）。
     func testEditFormUnmarkedLight() {
         assertP10EditForm(draft(isMistake: false), dark: false)
+    }
+
+    /// 非法草稿的整张表单（自然高度）：844 视口拍不到年份，本帧才真有「年份标红 + 规则提示」的证据。
+    func testEditFormInvalidLight() {
+        assertP10EditForm(draft(isMistake: true, invalid: true), dark: false)
     }
 
     /// 保存中：字段全部禁用、增补入口（加入标签 / 添加归属成语）整段收起。
