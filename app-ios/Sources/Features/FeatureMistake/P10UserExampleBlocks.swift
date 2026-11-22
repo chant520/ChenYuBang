@@ -133,9 +133,10 @@ public struct P10UserExampleBlocks: View {
                             id: \.offset) { _, group in
                         HStack(spacing: Tokens.Space.lmetaGap) {
                             ForEach(group) { item in
-                                Button(action: { actions.onOpenIdiom(item.id) }) {
-                                    CTag(text: item.word)
-                                }
+                                Button(
+                                    action: { actions.onOpenIdiom(item.id) },
+                                    label: { CTag(text: item.word) }
+                                )
                                 .buttonStyle(CPressDimStyle())
                             }
                             Spacer(minLength: 0)
