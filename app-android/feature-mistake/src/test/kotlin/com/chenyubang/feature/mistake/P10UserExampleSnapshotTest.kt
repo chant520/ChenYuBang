@@ -71,10 +71,11 @@ class P10UserExampleSnapshotTest {
         imagePath = imagePath,
     )
 
+    /** 显式置 imageUnreadable：快照不注入 Bitmap，保持 14 帧都渲染「原图已不在」橙占位（P13）。 */
     private fun base(
         myAnswer: String? = "B",
         isMistake: Boolean = true,
-    ) = P10UserExampleUiState(detail = detail(myAnswer, isMistake), loading = false)
+    ) = P10UserExampleUiState(detail = detail(myAnswer, isMistake), loading = false, imageUnreadable = true)
 
     @Test
     fun mistakeMaskedLight() = capture(base(), night = false)

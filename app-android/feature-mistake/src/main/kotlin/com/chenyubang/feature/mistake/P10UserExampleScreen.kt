@@ -200,17 +200,21 @@ private fun P10ImageBlock(
     image: ImageBitmap?,
     onZoom: () -> Unit,
 ) {
-    if (detail.imagePath == null || unreadable || image == null) {
-        CImagePlaceholder(
-            kind = CPlaceholderKind.Warn,
-            text = "原图已不在",
-            subtitle = P10Logic.imageMissingSubtitle(detail.isMistake),
-        )
-    } else {
-        Image(
-            image,
-            contentDescription = "录入题原图，点击放大",
-            modifier = Modifier.fillMaxWidth().clickable(onClick = onZoom),
-        )
+    when (P10Logic.imageSlotKind(detail.imagePath, unreadable, image != null)) {
+        P10ImageSlotKind.Warn ->
+            CImagePlaceholder(
+                kind = CPlaceholderKind.Warn,
+                text = "原图已不在",
+                subtitle = P10Logic.imageMissingSubtitle(detail.isMistake),
+            )
+        P10ImageSlotKind.Skeleton -> CImagePlaceholder(kind = CPlaceholderKind.Skeleton)
+        P10ImageSlotKind.Image ->
+            image?.let {
+                Image(
+                    it,
+                    contentDescription = "录入题原图，点击放大",
+                    modifier = Modifier.fillMaxWidth().clickable(onClick = onZoom),
+                )
+            }
     }
 }
