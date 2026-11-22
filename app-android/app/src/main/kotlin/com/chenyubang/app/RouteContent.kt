@@ -9,6 +9,7 @@ import com.chenyubang.feature.capture.OcrScreenActions
 import com.chenyubang.feature.capture.P20FormDeps
 import com.chenyubang.feature.capture.P20FormScreen
 import com.chenyubang.feature.capture.P21DoneScreen
+import com.chenyubang.feature.mistake.P08MistakeActions
 
 /** 按当前路由渲染目标页；P04/P05 的返回与跳转与其余路由同口径。 */
 @Composable
@@ -53,8 +54,56 @@ internal fun RouteContent(
             ExampleDestination(requireNotNull(entry.id), deps.database, { onRoute(router.back()) }) { id ->
                 onRoute(router.push(Route.Idiom, id))
             }
+        Route.Mistakes ->
+            MistakesDestination(
+                viewMode = router.mistakesView,
+                database = deps.database,
+                actions =
+                    P08MistakeActions(
+                        onViewModeChange = { onRoute(router.copy(mistakesView = it)) },
+                        onOpenIdiom = { id -> onRoute(router.push(Route.IdiomMistakes, id)) },
+                        // 路由键 mistake/{id} 的值取 user_example.id（P08 平铺行仅该列非空可点）。
+                        onOpenMistake = { id -> onRoute(router.push(Route.Mistake, id)) },
+                        onCapture = { onRoute(router.startCapture()) },
+                    ),
+            )
+        Route.IdiomMistakes -> IdiomMistakesRouteContent(entry, router, deps, onRoute)
+        Route.Mistake -> UserExampleRouteContent(entry, router, deps, onRoute)
         else -> CaptureRouteContent(entry, router, deps, onRoute)
     }
+}
+
+/** P09 成语下录入题：行点击进入 P10（user_example.id）。 */
+@Composable
+private fun IdiomMistakesRouteContent(
+    entry: RouteEntry,
+    router: RouterState,
+    deps: RouteDeps,
+    onRoute: (RouterState) -> Unit,
+) {
+    IdiomMistakesDestination(
+        idiomId = requireNotNull(entry.id),
+        database = deps.database,
+        onBack = { onRoute(router.back()) },
+        onOpenIdiom = { id -> onRoute(router.push(Route.Idiom, id)) },
+        onOpenExample = { id -> onRoute(router.push(Route.Mistake, id)) },
+    )
+}
+
+/** P10 录入题详情：路由键 mistake/{id} 的值取 user_example.id。 */
+@Composable
+private fun UserExampleRouteContent(
+    entry: RouteEntry,
+    router: RouterState,
+    deps: RouteDeps,
+    onRoute: (RouterState) -> Unit,
+) {
+    UserExampleDestination(
+        exampleId = requireNotNull(entry.id),
+        database = deps.database,
+        onBack = { onRoute(router.back()) },
+        onOpenIdiom = { id -> onRoute(router.push(Route.Idiom, id)) },
+    )
 }
 
 /** P17–P21 录题步骤的分发；未拿到上一步产物时退回占位页。 */

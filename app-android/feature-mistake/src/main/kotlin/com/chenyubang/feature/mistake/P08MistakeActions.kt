@@ -1,0 +1,9 @@
+package com.chenyubang.feature.mistake
+
+/** P08 页面上的导航动作；集中成一个参数，避免过长参数列表。 */
+data class P08MistakeActions(
+    val onViewModeChange: (MistakeViewMode) -> Unit,
+    val onOpenIdiom: (String) -> Unit,
+    val onOpenMistake: (String) -> Unit,
+    val onCapture: () -> Unit,
+)

@@ -23,6 +23,7 @@ import org.robolectric.annotation.GraphicsMode
 /**
  * 导航图标黄金快照（规范 §6 / §11.1 / §13）。10 语义 × 浅/深。
  * 浅/深通过 LocalConfiguration.uiMode 控制；颜色取主题 onSurface（与文字同色）。
+ * `chromeCameraSpec*` 对应相机图标改设计规范 v1.3 三段值（followup p08-p09 A9，前代 chromeCamera* 留作修前历史）。
  */
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
@@ -85,10 +86,10 @@ class CChromeIconSnapshotTest {
     fun chromeMeDark() = captureGlyph(CChromeIcon.Me, night = true)
 
     @Test
-    fun chromeCameraLight() = captureGlyph(CChromeIcon.Camera, night = false)
+    fun chromeCameraSpecLight() = captureGlyph(CChromeIcon.Camera, night = false)
 
     @Test
-    fun chromeCameraDark() = captureGlyph(CChromeIcon.Camera, night = true)
+    fun chromeCameraSpecDark() = captureGlyph(CChromeIcon.Camera, night = true)
 
     @Test
     fun chromeSearchLight() = captureGlyph(CChromeIcon.Search, night = false)
