@@ -65,14 +65,14 @@ interface MistakeQueryDao {
     )
     fun overview(): Flow<MistakeOverview>
 
-    /** 按成语分组：只统计挂到 mistake_idiom 上的错题，计数倒序、同数按成语词序。 */
+    /** 按成语分组：只统计挂到 mistake_idiom 上的错题，计数倒序、同数按拼音首字母（iOS MistakeLibrary.swift:143 同 tie-break）。 */
     @Query(
         "SELECT idiom.id AS idiomId, idiom.word AS word, COUNT(*) AS mistakeCount " +
             "FROM mistake " +
             "JOIN mistake_idiom ON mistake_idiom.mistakeId = mistake.id " +
             "JOIN idiom ON idiom.id = mistake_idiom.idiomId " +
             "GROUP BY idiom.id, idiom.word " +
-            "ORDER BY mistakeCount DESC, idiom.word",
+            "ORDER BY mistakeCount DESC, idiom.initials, idiom.word",
     )
     fun groupsByIdiom(): Flow<List<MistakeIdiomGroup>>
 

@@ -3,6 +3,7 @@ package com.chenyubang.feature.mistake
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.chenyubang.core.data.IdiomEntity
+import com.chenyubang.core.data.MistakeEntity
 import com.chenyubang.core.data.UserExampleWithMistake
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
@@ -80,8 +81,15 @@ class P09IdiomMistakesViewModel(
     }
 }
 
+/**
+ * 一道录入题可挂多条错题记录（导入合并等场景）：展示取最新一条——createdAt 倒序、同刻按 id 倒序
+ * （iOS MistakeLibrary.swift:197-205 同口径）；@Relation 关联无序，不能依赖 firstOrNull 的到来顺序。
+ */
+internal fun pickLatestMark(mistakes: List<MistakeEntity>): MistakeEntity? =
+    mistakes.maxWithOrNull(compareBy({ it.createdAt }, { it.id }))
+
 private fun UserExampleWithMistake.toView(): IdiomUserExampleView {
-    val mark = mistakes.firstOrNull()
+    val mark = pickLatestMark(mistakes)
     return IdiomUserExampleView(
         id = userExample.id,
         stem = userExample.stem.trim(),

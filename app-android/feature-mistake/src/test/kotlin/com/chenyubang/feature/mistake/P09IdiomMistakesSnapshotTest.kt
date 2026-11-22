@@ -14,7 +14,12 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
-/** P09 成语下录入题黄金快照：有数据（含未标错）/ 空态，各浅/深一张。 */
+/**
+ * P09 成语下录入题黄金快照：有数据（含未标错）/ 空态，各浅/深一张。基线只增不改。
+ *
+ * `emptyPurged*` 对应空态文案改 IA v1.4 行 549 现值（followup p08-p09 A5：标题「这个成语下还没有录入题」、
+ * 副句「之前录的题已经删掉或已归到别的成语下。」，前代 `empty*` 留作修前历史）。
+ */
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 @Config(sdk = [34], qualifiers = "w360dp-h812dp-xhdpi")
@@ -89,8 +94,8 @@ class P09IdiomMistakesSnapshotTest {
     fun withDataDark() = capture(night = true, state = loaded())
 
     @Test
-    fun emptyLight() = capture(night = false, state = empty())
+    fun emptyPurgedLight() = capture(night = false, state = empty())
 
     @Test
-    fun emptyDark() = capture(night = true, state = empty())
+    fun emptyPurgedDark() = capture(night = true, state = empty())
 }

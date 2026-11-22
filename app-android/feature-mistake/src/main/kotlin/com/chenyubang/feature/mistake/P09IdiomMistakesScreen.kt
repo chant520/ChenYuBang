@@ -122,8 +122,8 @@ fun P09IdiomMistakesContent(
                 CLabel(text = "我录入的题（标错的按错题展示）")
                 if (state.rows.isEmpty()) {
                     CEmptyState(
-                        title = "该成语下还没有录入的题",
-                        description = "拍一张卷子上的题录进题库，勾选这个成语就会出现在这里。",
+                        title = "这个成语下还没有录入题",
+                        description = "之前录的题已经删掉或已归到别的成语下。",
                         actionText = "返回错题本",
                         onAction = onBack,
                     )

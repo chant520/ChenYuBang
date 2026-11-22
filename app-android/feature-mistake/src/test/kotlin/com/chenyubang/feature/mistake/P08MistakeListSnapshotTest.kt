@@ -15,9 +15,13 @@ import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
 /**
- * P08 错题列表黄金快照：三视图 + 无错题空态 + 待复习已清空态，各浅/深一张。
+ * P08 错题列表黄金快照：三视图 + 无错题空态 + 待复习已清空态，各浅/深一张。基线只增不改。
  *
- * toReviewCleared* 两帧为构造态：pending == 0 需 3.1 的掌握状态切换写入后才会真实可达，本包（2.6）无路径造出该状态。
+ * `*ReviewCount*` 对应「开始复习」按钮带待复习数文案（followup p08-p09 A2，前代 `grouped*`/
+ * `byTime*`/`byExamType*`/`toReviewCleared*` 留作修前历史）；`emptyCamIcon*` 对应相机图标改
+ * 设计规范 v1.3 三段值（A9，前代 `empty*` 留作修前历史）。
+ *
+ * toReviewClearedReviewCount* 两帧为构造态：pending == 0 需 3.1 的掌握状态切换写入后才会真实可达，本包（2.6）无路径造出该状态。
  */
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
@@ -97,32 +101,33 @@ class P08MistakeListSnapshotTest {
     private fun cleared(): P08MistakeListUiState = loaded().copy(pending = 0)
 
     @Test
-    fun groupedLight() = capture(night = false, state = loaded(), viewMode = MistakeViewMode.ByIdiom)
+    fun groupedReviewCountLight() = capture(night = false, state = loaded(), viewMode = MistakeViewMode.ByIdiom)
 
     @Test
-    fun groupedDark() = capture(night = true, state = loaded(), viewMode = MistakeViewMode.ByIdiom)
+    fun groupedReviewCountDark() = capture(night = true, state = loaded(), viewMode = MistakeViewMode.ByIdiom)
 
     @Test
-    fun byTimeLight() = capture(night = false, state = loaded(), viewMode = MistakeViewMode.ByTime)
+    fun byTimeReviewCountLight() = capture(night = false, state = loaded(), viewMode = MistakeViewMode.ByTime)
 
     @Test
-    fun byTimeDark() = capture(night = true, state = loaded(), viewMode = MistakeViewMode.ByTime)
+    fun byTimeReviewCountDark() = capture(night = true, state = loaded(), viewMode = MistakeViewMode.ByTime)
 
     @Test
-    fun byExamTypeLight() = capture(night = false, state = loaded(), viewMode = MistakeViewMode.ByExamType)
+    fun byExamTypeReviewCountLight() = capture(night = false, state = loaded(), viewMode = MistakeViewMode.ByExamType)
 
     @Test
-    fun byExamTypeDark() = capture(night = true, state = loaded(), viewMode = MistakeViewMode.ByExamType)
+    fun byExamTypeReviewCountDark() = capture(night = true, state = loaded(), viewMode = MistakeViewMode.ByExamType)
 
     @Test
-    fun emptyLight() = capture(night = false, state = empty(), viewMode = MistakeViewMode.ByIdiom)
+    fun emptyCamIconLight() = capture(night = false, state = empty(), viewMode = MistakeViewMode.ByIdiom)
 
     @Test
-    fun emptyDark() = capture(night = true, state = empty(), viewMode = MistakeViewMode.ByIdiom)
+    fun emptyCamIconDark() = capture(night = true, state = empty(), viewMode = MistakeViewMode.ByIdiom)
 
     @Test
-    fun toReviewClearedLight() = capture(night = false, state = cleared(), viewMode = MistakeViewMode.ByIdiom)
+    fun toReviewClearedReviewCountLight() =
+        capture(night = false, state = cleared(), viewMode = MistakeViewMode.ByIdiom)
 
     @Test
-    fun toReviewClearedDark() = capture(night = true, state = cleared(), viewMode = MistakeViewMode.ByIdiom)
+    fun toReviewClearedReviewCountDark() = capture(night = true, state = cleared(), viewMode = MistakeViewMode.ByIdiom)
 }

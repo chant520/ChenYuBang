@@ -16,7 +16,9 @@ enum class CChromeIcon(val path: String) {
     Example("M6 3h12v18H6zM9 7h6M9 11h6M9 15h4"),
     Mistake("M5 3h14v18H5zM8 8l2 2 5-5M8 14h8M8 18h6"),
     Me("M16 7a4 4 0 1 1-8 0a4 4 0 1 1 8 0M4 21v-2a8 8 0 0 1 16 0v2"),
-    Camera("M3 7h4l2-3h6l2 3h4v13H3zM16 13a4 4 0 1 1-8 0a4 4 0 1 1 8 0"),
+
+    // 相机三段值（设计规范 v1.3 第 5.8 节，与 CIcons.CIconKind.Camera 同源；P08 空态插画位用）。
+    Camera("M3 7h18v13H3zM15.6 13.5a3.6 3.6 0 1 1-7.2 0a3.6 3.6 0 1 1 7.2 0M8.5 7l1.4-3h4.2l1.4 3"),
     Search("M17.5 11a6.5 6.5 0 1 1-13 0a6.5 6.5 0 1 1 13 0M20 20l-4.6-4.6"),
     Chevron("M9 5l7 7-7 7"),
     Back("M15 5l-7 7 7 7"),

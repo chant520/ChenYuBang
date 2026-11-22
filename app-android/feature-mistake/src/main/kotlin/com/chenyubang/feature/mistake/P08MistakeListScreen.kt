@@ -122,8 +122,8 @@ fun P08MistakeListContent(
                     MistakeViewMode.ByExamType ->
                         P08ExamTypeGroups(items = state.mistakes, onOpenMistake = actions.onOpenMistake)
                 }
-                // TODO(3.1): 「开始复习」接 P11 复习队列；本包只保证按钮在位、置灰、文案不改。
-                CButton(text = "开始复习", onClick = {}, enabled = false)
+                // TODO(3.1): 「开始复习」接 P11 复习队列；本包只保证按钮在位、置灰（文案带待复习数，iOS MistakeBrowse.swift:110 同口径）。
+                CButton(text = "开始复习 · ${state.pending} 道待复习", onClick = {}, enabled = false)
             }
         }
     }

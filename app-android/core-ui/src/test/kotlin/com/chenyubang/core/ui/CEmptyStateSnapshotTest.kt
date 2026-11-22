@@ -23,6 +23,7 @@ import org.robolectric.annotation.GraphicsMode
  * 空态黄金快照（规范 §5.8 / §11.1 / §13）。纯文案 / 带动作 × 浅/深。
  * 浅/深通过 LocalConfiguration.uiMode 控制，与 CEmptyState 内部 isSystemInDarkTheme() 取色一致。
  * 带动作态内嵌 CButton Ghost（静态，无动画），直接截图。
+ * `emptyStateIconCam*` 对应相机图标改设计规范 v1.3 三段值（followup p08-p09 A9，前代 `emptyStateIcon*` 留作修前历史）。
  */
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
@@ -81,8 +82,8 @@ class CEmptyStateSnapshotTest {
     fun emptyStateActionDark() = captureEmptyState(withAction = true, night = true)
 
     @Test
-    fun emptyStateIconLight() = captureEmptyState(withAction = false, night = false, withIcon = true)
+    fun emptyStateIconCamLight() = captureEmptyState(withAction = false, night = false, withIcon = true)
 
     @Test
-    fun emptyStateIconDark() = captureEmptyState(withAction = false, night = true, withIcon = true)
+    fun emptyStateIconCamDark() = captureEmptyState(withAction = false, night = true, withIcon = true)
 }

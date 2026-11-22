@@ -27,6 +27,7 @@ private const val PRESS_HOLD_MS = 100L
  * 按下态 pressDim 瞬时生效（collectIsPressedAsState 驱动）：暂停主时钟，对唯一可点节点
  * performTouchInput down() 后推进一帧再截，截图应较默认态整体变暗（×0.9）。
  * 浅/深通过 LocalConfiguration.uiMode 控制，与 CFab 内部 isSystemInDarkTheme() 取色一致。
+ * `*Cam*` 对应相机图标改设计规范 v1.3 三段值（followup p08-p09 A9，前代 `fab*` 留作修前历史）。
  */
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
@@ -77,26 +78,26 @@ class CFabSnapshotTest {
     }
 
     @Test
-    fun fabDefaultLight() = captureFab(night = false)
+    fun fabDefaultCamLight() = captureFab(night = false)
 
     @Test
-    fun fabDefaultDark() = captureFab(night = true)
+    fun fabDefaultCamDark() = captureFab(night = true)
 
     @Test
-    fun fabDisabledLight() = captureFab(night = false, enabled = false)
+    fun fabDisabledCamLight() = captureFab(night = false, enabled = false)
 
     @Test
-    fun fabDisabledDark() = captureFab(night = true, enabled = false)
+    fun fabDisabledCamDark() = captureFab(night = true, enabled = false)
 
     @Test
-    fun fabBadgeLight() = captureFab(night = false, badgeText = "3")
+    fun fabBadgeCamLight() = captureFab(night = false, badgeText = "3")
 
     @Test
-    fun fabBadgeDark() = captureFab(night = true, badgeText = "3")
+    fun fabBadgeCamDark() = captureFab(night = true, badgeText = "3")
 
     @Test
-    fun fabPressedLight() = captureFabPressed(night = false)
+    fun fabPressedCamLight() = captureFabPressed(night = false)
 
     @Test
-    fun fabPressedDark() = captureFabPressed(night = true)
+    fun fabPressedCamDark() = captureFabPressed(night = true)
 }
