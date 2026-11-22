@@ -123,18 +123,22 @@ public struct UserExampleEditActions {
     public let onOpenIdiomPicker: () -> Void
 
     /// 只读态与快照测试用：编辑动作不会被触达。
-    public static let inert = UserExampleEditActions(
-        onStem: { _ in },
-        onOption: { _, _ in },
-        onAnswer: { _ in },
-        onExamType: { _ in },
-        onYear: { _ in },
-        onReason: { _ in },
-        onAddTag: { _ in false },
-        onRemoveTag: { _ in },
-        onRemoveIdiom: { _ in },
-        onOpenIdiomPicker: {}
-    )
+    /// 计算属性而非 `static let`：本类型装的是页面回调、非 `Sendable`，静态存储会撞严格并发检查
+    /// （`static property 'inert' is not concurrency-safe`），每次现装即可。
+    public static var inert: UserExampleEditActions {
+        UserExampleEditActions(
+            onStem: { _ in },
+            onOption: { _, _ in },
+            onAnswer: { _ in },
+            onExamType: { _ in },
+            onYear: { _ in },
+            onReason: { _ in },
+            onAddTag: { _ in false },
+            onRemoveTag: { _ in },
+            onRemoveIdiom: { _ in },
+            onOpenIdiomPicker: {}
+        )
+    }
 }
 
 /// P10 编辑态表单（信息架构 v1.4 版内修订第 ① 条）：题干、选项 A–D、我的答案、
