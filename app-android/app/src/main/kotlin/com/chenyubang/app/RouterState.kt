@@ -42,6 +42,8 @@ data class RouterState(
     val rootTopEpoch: Map<AppTab, Int> = AppTab.entries.associateWith { 0 },
     /** P08 当前视图（分组 / 时间 / 考试类型）；跟着路由一起保存，返回不重置，默认分组。 */
     val mistakesView: MistakeViewMode = MistakeViewMode.ByIdiom,
+    /** 用户数据变动计数：保存 / 删除 / 拍照录入成功后自增，来源页据此重新读库。 */
+    val contentRevision: Long = 0,
 ) : Serializable {
     val stack: List<RouteEntry> get() = stacks.getValue(tab)
     val current: RouteEntry get() = stack.last()
@@ -105,6 +107,8 @@ data class RouterState(
             stack.size > 1 -> withStack(stack.dropLast(1))
             else -> this
         }
+
+    fun bumpContentRevision(): RouterState = copy(contentRevision = contentRevision + 1)
 
     internal fun append(entry: RouteEntry): RouterState = withStack(stack + entry).copy(sequence = sequence + 1)
 

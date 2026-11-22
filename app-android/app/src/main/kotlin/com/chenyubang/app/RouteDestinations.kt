@@ -101,10 +101,11 @@ internal fun ExampleDestination(
 @Composable
 internal fun MistakesDestination(
     viewMode: MistakeViewMode,
+    revision: Long,
     database: AppDatabase,
     actions: P08MistakeActions,
 ) {
-    P08MistakeListRoute(viewMode = viewMode, database = database, actions = actions)
+    P08MistakeListRoute(viewMode = viewMode, revision = revision, database = database, actions = actions)
 }
 
 @Composable
@@ -114,6 +115,7 @@ internal fun IdiomMistakesDestination(
     onBack: () -> Unit,
     onOpenIdiom: (String) -> Unit,
     onOpenExample: (String) -> Unit,
+    revision: Long = 0,
 ) {
     P09IdiomMistakesRoute(
         idiomId = idiomId,
@@ -121,6 +123,7 @@ internal fun IdiomMistakesDestination(
         onBack = onBack,
         onOpenIdiom = onOpenIdiom,
         onOpenExample = onOpenExample,
+        revision = revision,
     )
 }
 
@@ -130,6 +133,7 @@ internal fun UserExampleDestination(
     database: AppDatabase,
     onBack: () -> Unit,
     onOpenIdiom: (String) -> Unit,
+    onDataChanged: () -> Unit = {},
 ) {
     val filesDir = LocalContext.current.filesDir
     P10UserExampleRoute(
@@ -138,5 +142,6 @@ internal fun UserExampleDestination(
         filesDir = filesDir,
         onBack = onBack,
         onOpenIdiom = onOpenIdiom,
+        onDataChanged = onDataChanged,
     )
 }
