@@ -67,6 +67,9 @@ data class P10UserExampleActions(
 
 private val letters = listOf("A", "B", "C", "D")
 
+/** P10 图片位三态：纯派生量，无 Bitmap / Compose 依赖，Composable 只按此渲染。 */
+enum class P10ImageSlotKind { Warn, Skeleton, Image }
+
 /** P10 纯逻辑：文案与比对口径与 iOS MistakeBrowse 逐字一致（双端同源）。 */
 object P10Logic {
     const val REROLL_NOTE = "录入题只存你填过的内容，本版未记录正确答案，这里只与你的首次作答比对。"
@@ -106,6 +109,21 @@ object P10Logic {
             true -> "文件可能被清理；题干与选项仍可查看与重做。"
             false -> "文件可能被清理；题干与选项仍可查看。"
         }
+
+    /**
+     * 图片位三态派生量（纯逻辑，钉住解码中的中间态）：
+     * imagePath 缺失或读不出 → Warn；路径有效但解码未完成 → Skeleton；已解码 → Image。
+     */
+    fun imageSlotKind(
+        imagePath: String?,
+        unreadable: Boolean,
+        hasImage: Boolean,
+    ): P10ImageSlotKind =
+        when {
+            imagePath == null || unreadable -> P10ImageSlotKind.Warn
+            !hasImage -> P10ImageSlotKind.Skeleton
+            else -> P10ImageSlotKind.Image
+        }
 }
 
 /** P10 状态机：同页切换，无写入（不落 review_log、不改掌握状态）。 */
@@ -114,7 +132,7 @@ object P10Transitions {
         if (state.canToggleMask) state.copy(revealed = !state.revealed) else state
 
     fun startReroll(state: P10UserExampleUiState) =
-        if (state.isMistake) state.copy(rerolling = true, picked = null, checked = false, revealed = false) else state
+        if (state.isMistake) state.copy(rerolling = true, picked = null, checked = false) else state
 
     fun pick(
         state: P10UserExampleUiState,

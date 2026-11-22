@@ -146,8 +146,12 @@ internal fun P10UserExampleBody(
                     onAction = actions.onRetry,
                 )
             state.loading -> CSpinner(color = c.accent)
+            // 双端同文案：iOS P10UserExampleScreen.swift:85-86（页名已拍板「录入题详情」）。
             state.missing || state.detail == null ->
-                CEmptyState(title = "没有找到这道题", description = "它可能已被删除，或已不在本机题库中。")
+                CEmptyState(
+                    title = "没有找到这道录入题",
+                    description = "该题已不在本机题库中，可返回上一个页面换一道看。",
+                )
             else -> {
                 val detail = state.detail!!
                 P10ImageBlock(detail, state.imageUnreadable, image, onZoom)
@@ -200,17 +204,21 @@ private fun P10ImageBlock(
     image: ImageBitmap?,
     onZoom: () -> Unit,
 ) {
-    if (detail.imagePath == null || unreadable || image == null) {
-        CImagePlaceholder(
-            kind = CPlaceholderKind.Warn,
-            text = "原图已不在",
-            subtitle = P10Logic.imageMissingSubtitle(detail.isMistake),
-        )
-    } else {
-        Image(
-            image,
-            contentDescription = "录入题原图，点击放大",
-            modifier = Modifier.fillMaxWidth().clickable(onClick = onZoom),
-        )
+    when (P10Logic.imageSlotKind(detail.imagePath, unreadable, image != null)) {
+        P10ImageSlotKind.Warn ->
+            CImagePlaceholder(
+                kind = CPlaceholderKind.Warn,
+                text = "原图已不在",
+                subtitle = P10Logic.imageMissingSubtitle(detail.isMistake),
+            )
+        P10ImageSlotKind.Skeleton -> CImagePlaceholder(kind = CPlaceholderKind.Skeleton)
+        P10ImageSlotKind.Image ->
+            image?.let {
+                Image(
+                    it,
+                    contentDescription = "录入题原图，点击放大",
+                    modifier = Modifier.fillMaxWidth().clickable(onClick = onZoom),
+                )
+            }
     }
 }

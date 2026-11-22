@@ -157,7 +157,7 @@ private fun MistakeRow(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .clickable(onClick = onClick)
+                .clickable(enabled = item.userExampleId != null, onClick = onClick)
                 .padding(horizontal = Tokens.Space.lrowX.dp, vertical = Tokens.Space.lrowY.dp),
     ) {
         Text(

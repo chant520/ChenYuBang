@@ -100,6 +100,7 @@ class P10UserExampleLogicTest {
         assertFalse(exited.checked)
         assertNull(exited.picked)
         assertTrue(exited.canToggleMask)
+        assertTrue(exited.revealed)
     }
 
     @Test
@@ -131,6 +132,27 @@ class P10UserExampleLogicTest {
         assertEquals(
             "文件可能被清理；题干与选项仍可查看。",
             P10Logic.imageMissingSubtitle(isMistake = false),
+        )
+    }
+
+    /** R1：有 imagePath 且未标不可读、但解码未完成时不得判「原图已不在」，走骨架态。 */
+    @Test
+    fun imageSlotKindTreatsDecodingAsSkeletonNotWarn() {
+        assertEquals(
+            P10ImageSlotKind.Warn,
+            P10Logic.imageSlotKind(null, unreadable = false, hasImage = false),
+        )
+        assertEquals(
+            P10ImageSlotKind.Warn,
+            P10Logic.imageSlotKind("images/ue-1.jpg", unreadable = true, hasImage = false),
+        )
+        assertEquals(
+            P10ImageSlotKind.Skeleton,
+            P10Logic.imageSlotKind("images/ue-1.jpg", unreadable = false, hasImage = false),
+        )
+        assertEquals(
+            P10ImageSlotKind.Image,
+            P10Logic.imageSlotKind("images/ue-1.jpg", unreadable = false, hasImage = true),
         )
     }
 }
