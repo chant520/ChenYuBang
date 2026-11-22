@@ -114,11 +114,11 @@ public struct P10UserExampleContent: View {
             .buttonStyle(CPressDimStyle())
             .accessibilityLabel("查看原图")
         } else if detail.imagePath == nil || state.imageUnreadable {
-            CImagePlaceholder(
-                kind: .warn,
-                title: "原图已不在",
-                subtitle: "文件可能被清理；题干与选项仍可查看与重做。"
-            )
+            // 信息架构 v1.4 §5.4 的影响列只把「仍可重做」给标错的，未标错的不能这么写。
+            let subtitle = state.isMistake
+                ? "文件可能被清理；题干与选项仍可查看与重做。"
+                : "文件可能被清理；题干与选项仍可查看。"
+            CImagePlaceholder(kind: .warn, title: "原图已不在", subtitle: subtitle)
         } else {
             CImagePlaceholder(kind: .skeleton)
         }
