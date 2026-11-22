@@ -15,6 +15,8 @@ import XCTest
 ///
 /// 本页是长页：844 视口帧只排到区块 ⑨ 首行，滚动区外的 ⑦⑧⑨⑩ 与底部删除行拍不到，
 /// 只对视口上方负责；故另出 `testBlocksLight` / `testBlocksDark` 两帧，按自然高度单帧覆盖 ⑤–⑩ 全段。
+/// 区块帧取标错的录入题（含底部红描边删除行）；`testUnmarked*` 两帧同时钉住未标错态整行不出现
+/// （信息架构 v1.4 版内修订第 ④ 条，用户 2026-11-22 拍板），其删除入口只有顶部置灰「删除」。
 @MainActor
 final class P10UserExampleSnapshotTests: XCTestCase {
     override func setUp() {

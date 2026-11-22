@@ -38,7 +38,11 @@ public struct P10UserExampleBlocks: View {
             answerCard
             // ⑩：掌握状态切换为 C9 进阶预留位。
             reservedRow
-            deleteRow
+            // 底部红描边删除行仅标错的录入题渲染（信息架构 v1.4 版内修订第 ④ 条）：
+            // 未标错的普通详情整行不出现，删除入口只留顶部置灰「删除」，其文案与语义随 2.8（C8）定义。
+            if state.showsBottomDeleteRow {
+                deleteRow
+            }
         }
     }
 

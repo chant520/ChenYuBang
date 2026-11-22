@@ -144,6 +144,15 @@ final class MistakeBrowseTests: XCTestCase {
         XCTAssertEqual(UserExampleState(loading: false, detail: detail(isMistake: true, myAnswer: nil)).firstPick, nil)
     }
 
+    func testBottomDeleteRowOnlyForMarkedExample() {
+        // 一处红规则的适用范围（信息架构 v1.4 版内修订第 ④ 条，用户 2026-11-22 拍板）：
+        // 底部红描边「删除这道错题」仅标错的录入题渲染，未标错整行不出现（不是置灰）。
+        let marked = UserExampleState(loading: false, detail: detail(isMistake: true, myAnswer: "B"))
+        let unmarked = UserExampleState(loading: false, detail: detail(isMistake: false, myAnswer: "C"))
+        XCTAssertTrue(marked.showsBottomDeleteRow)
+        XCTAssertFalse(unmarked.showsBottomDeleteRow)
+    }
+
     private func detail(isMistake: Bool, myAnswer: String?) -> UserExampleDetail {
         UserExampleDetail(
             id: "e1",

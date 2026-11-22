@@ -67,6 +67,10 @@ public struct UserExampleState: Equatable, Sendable {
 
     /// 遮罩开关只在非重做态可点：重做中途给看首次作答就没有重做意义了。
     public var canToggleMask: Bool { isMistake && !rerolling }
+
+    /// 底部红描边「删除这道错题」只在标错的录入题上渲染（信息架构 v1.4 版内修订第 ④ 条）：
+    /// 未标错的普通详情本版无底部红动作，删除入口只留顶部置灰「删除」，随 2.8（C8）定义。
+    public var showsBottomDeleteRow: Bool { isMistake }
 }
 
 /// P10 回调打包。
