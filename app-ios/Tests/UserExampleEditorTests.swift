@@ -263,11 +263,8 @@ final class UserExampleEditorTests: XCTestCase {
         try FileManager.default.removeItem(at: env.imagePath)
         let editor = UserExampleEditor(queue: env.queue, dataDirectory: env.dataDirectory)
 
-        XCTAssertNoThrow(try editor.deleteUserExample(id: env.userExampleID))
-        try env.queue.read { db in
-            XCTAssertEqual(try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM user_example"), 0)
-        }
-        XCTAssertThrowsError(try editor.deleteUserExample(id: env.userExampleID)) {
+        // 未知 id 先拒，并且在库那道题不受牵连（正文与归属都还在）。
+        XCTAssertThrowsError(try editor.deleteUserExample(id: "missing-id")) {
             XCTAssertEqual($0 as? UserExampleEditError, .notFound)
         }
         try env.queue.read { db in
@@ -275,6 +272,12 @@ final class UserExampleEditorTests: XCTestCase {
                 try String.fetchOne(db, sql: "SELECT stem FROM user_example"),
                 "下列各句中，加点的成语使用不恰当的一项是……"
             )
+            XCTAssertEqual(try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM user_example_idiom"), 2)
+        }
+
+        XCTAssertNoThrow(try editor.deleteUserExample(id: env.userExampleID))
+        try env.queue.read { db in
+            XCTAssertEqual(try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM user_example"), 0)
         }
     }
 }

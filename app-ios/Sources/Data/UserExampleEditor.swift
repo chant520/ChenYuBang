@@ -76,7 +76,8 @@ public final class UserExampleEditor: @unchecked Sendable {
         guard !idioms.isEmpty, idioms.allSatisfy({ !$0.id.isEmpty }) else {
             throw UserExampleEditError.noIdioms
         }
-        guard !input.stem.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+        let stem = input.stem.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !stem.isEmpty else {
             throw UserExampleEditError.emptyStem
         }
         if let answer = input.myAnswer, !["A", "B", "C", "D"].contains(answer) {
@@ -94,7 +95,7 @@ public final class UserExampleEditor: @unchecked Sendable {
                     myAnswer = ?, examType = ?, year = ?
                 WHERE id = ?
                 """, arguments: [
-                input.stem, options[0], options[1], options[2], options[3],
+                stem, options[0], options[1], options[2], options[3],
                 input.myAnswer, input.examType, input.year, input.id
             ])
             try db.execute(
@@ -115,7 +116,7 @@ public final class UserExampleEditor: @unchecked Sendable {
                     myAnswer = ?, examType = ?, year = ?, reason = ?, tagNames = ?
                 WHERE userExampleId = ?
                 """, arguments: [
-                input.stem, options[0] ?? "", options[1] ?? "", options[2] ?? "", options[3] ?? "",
+                stem, options[0] ?? "", options[1] ?? "", options[2] ?? "", options[3] ?? "",
                 input.myAnswer, input.examType, input.year, trimmed(input.reason),
                 tagJSON(input.tagNames), input.id
             ])
