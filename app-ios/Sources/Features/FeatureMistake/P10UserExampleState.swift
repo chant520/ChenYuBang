@@ -150,7 +150,7 @@ public struct UserExampleActions {
         onConfirmDelete: @escaping () -> Void = {},
         onDismissDelete: @escaping () -> Void = {},
         edit: UserExampleEditActions = .inert,
-        idiomPicker: (
+        idiomPicker: @escaping (
             @escaping (String) -> Void, @escaping () -> Void
         ) -> AnyView = { _, _ in AnyView(EmptyView()) }
     ) {
