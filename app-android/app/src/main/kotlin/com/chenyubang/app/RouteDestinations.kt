@@ -1,6 +1,7 @@
 package com.chenyubang.app
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import com.chenyubang.core.data.AppDatabase
 import com.chenyubang.core.data.ExamScopeSelection
 import com.chenyubang.feature.example.P07ExampleDetailRoute
@@ -15,6 +16,7 @@ import com.chenyubang.feature.mistake.MistakeViewMode
 import com.chenyubang.feature.mistake.P08MistakeActions
 import com.chenyubang.feature.mistake.P08MistakeListRoute
 import com.chenyubang.feature.mistake.P09IdiomMistakesRoute
+import com.chenyubang.feature.mistake.P10UserExampleRoute
 
 /**
  * 已接入页面的目的地装配：只做「feature 页面 ← app 状态/写入口」的接线，
@@ -111,10 +113,29 @@ internal fun IdiomMistakesDestination(
     database: AppDatabase,
     onBack: () -> Unit,
     onOpenIdiom: (String) -> Unit,
+    onOpenExample: (String) -> Unit,
 ) {
     P09IdiomMistakesRoute(
         idiomId = idiomId,
         database = database,
+        onBack = onBack,
+        onOpenIdiom = onOpenIdiom,
+        onOpenExample = onOpenExample,
+    )
+}
+
+@Composable
+internal fun UserExampleDestination(
+    exampleId: String,
+    database: AppDatabase,
+    onBack: () -> Unit,
+    onOpenIdiom: (String) -> Unit,
+) {
+    val filesDir = LocalContext.current.filesDir
+    P10UserExampleRoute(
+        exampleId = exampleId,
+        database = database,
+        filesDir = filesDir,
         onBack = onBack,
         onOpenIdiom = onOpenIdiom,
     )

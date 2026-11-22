@@ -53,6 +53,7 @@ fun P09IdiomMistakesRoute(
     database: AppDatabase,
     onBack: () -> Unit,
     onOpenIdiom: (String) -> Unit,
+    onOpenExample: (String) -> Unit,
 ) {
     val factory =
         remember(database) {
@@ -73,6 +74,7 @@ fun P09IdiomMistakesRoute(
         onBack = onBack,
         onOpenIdiom = onOpenIdiom,
         onRetry = { model.load(idiomId) },
+        onOpenExample = onOpenExample,
     )
 }
 
@@ -88,6 +90,7 @@ fun P09IdiomMistakesContent(
     onBack: () -> Unit,
     onOpenIdiom: (String) -> Unit,
     onRetry: () -> Unit,
+    onOpenExample: (String) -> Unit = {},
 ) {
     Column(
         modifier =
@@ -130,7 +133,7 @@ fun P09IdiomMistakesContent(
                 } else {
                     CList {
                         state.rows.forEachIndexed { index, row ->
-                            UserExampleRow(row = row)
+                            UserExampleRow(row = row, onClick = { onOpenExample(row.id) })
                             if (index != state.rows.lastIndex) RowDivider()
                         }
                     }
@@ -199,13 +202,16 @@ private fun P09SenseCard(
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun UserExampleRow(row: IdiomUserExampleView) {
+private fun UserExampleRow(
+    row: IdiomUserExampleView,
+    onClick: () -> Unit,
+) {
     val c = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
-    // TODO(2.7): 点行进 P10 录入题详情（标错的含重做态）；本包不做入口，也不 push 空路由。
     Column(
         modifier =
             Modifier
                 .fillMaxWidth()
+                .clickable(onClick = onClick)
                 .padding(horizontal = Tokens.Space.lrowX.dp, vertical = Tokens.Space.lrowY.dp),
     ) {
         Text(

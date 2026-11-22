@@ -29,6 +29,18 @@ abstract class UserExampleDao {
     @Query("SELECT * FROM user_example WHERE id = :id")
     abstract suspend fun byId(id: String): UserExampleEntity?
 
+    /** P10：一题多 mistake 时在页面侧按 createdAt DESC, id DESC 取最新（与 2.6 A4 同口径）。 */
+    @Query("SELECT * FROM mistake WHERE userExampleId = :id ORDER BY createdAt DESC, id DESC")
+    abstract suspend fun mistakesOf(id: String): List<MistakeEntity>
+
+    /** P10 区块 ⑧：关联成语按 word、id 稳定排序（表无 order 列，不依赖默认返回序）。 */
+    @Query(
+        "SELECT idiom.* FROM user_example_idiom uei " +
+            "JOIN idiom ON idiom.id = uei.idiomId " +
+            "WHERE uei.userExampleId = :id ORDER BY idiom.word, idiom.id",
+    )
+    abstract suspend fun linkedIdioms(id: String): List<IdiomEntity>
+
     /**
      * 同事务写入一条录入题与它的全量归属（至少一条），标错才另写错题标记与其归属快照。
      * 任一插入失败，整批回滚；调用方捕获异常后删除已复制的图片，不留半条数据。

@@ -19,6 +19,7 @@ data class MistakeItemView(
     val recordedAt: String,
     val idiomWords: List<String>,
     val examType: String?,
+    val userExampleId: String? = null,
 )
 
 /** P08「按成语分组」一行。 */
@@ -75,6 +76,7 @@ class P08MistakeListViewModel(
                     recordedAt = formatRecordedAt(row.mistake.createdAt),
                     idiomWords = row.idioms.map { it.word },
                     examType = row.mistake.examType,
+                    userExampleId = row.mistake.userExampleId,
                 )
             }
         val grouped =

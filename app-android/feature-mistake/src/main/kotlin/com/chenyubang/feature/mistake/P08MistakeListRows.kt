@@ -119,7 +119,7 @@ internal fun P08MistakeRows(
 ) {
     CList {
         items.forEachIndexed { index, item ->
-            MistakeRow(item = item, onClick = { onOpenMistake(item.id) })
+            MistakeRow(item = item, onClick = { item.userExampleId?.let(onOpenMistake) })
             if (index != items.lastIndex) RowDivider()
         }
     }
@@ -137,7 +137,7 @@ internal fun P08ExamTypeGroups(
                 CLabel(text = label, modifier = Modifier.padding(start = Tokens.Space.lrowX.dp))
                 CList {
                     rows.forEachIndexed { index, item ->
-                        MistakeRow(item = item, onClick = { onOpenMistake(item.id) })
+                        MistakeRow(item = item, onClick = { item.userExampleId?.let(onOpenMistake) })
                         if (index != rows.lastIndex) RowDivider()
                     }
                 }
