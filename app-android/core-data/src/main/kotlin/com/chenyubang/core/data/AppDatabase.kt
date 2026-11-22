@@ -236,6 +236,8 @@ abstract class AppDatabase : RoomDatabase() {
 
     abstract fun userExampleIdiomDao(): UserExampleIdiomDao
 
+    abstract fun mistakeQueryDao(): MistakeQueryDao
+
     companion object {
         const val NAME = "chenyubang.db"
 

@@ -4,6 +4,7 @@ import com.chenyubang.core.data.ExamScopeSelection
 import com.chenyubang.feature.capture.CropFrame
 import com.chenyubang.feature.capture.IdiomRef
 import com.chenyubang.feature.capture.OcrDraft
+import com.chenyubang.feature.mistake.MistakeViewMode
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
@@ -273,5 +274,33 @@ class RouterStateTest {
         val cancelled = defaults.copy(national = false, provincial = false, institution = false)
         assertTrue(cancelled.isEmpty)
         assertEquals("未选考试范围", cancelled.description)
+    }
+
+    @Test
+    fun mistakesViewDefaultsToIdiomGrouping() {
+        assertEquals(MistakeViewMode.ByIdiom, RouterState(tab = AppTab.Mistake).mistakesView)
+    }
+
+    @Test
+    fun backFromIdiomMistakesStopsAtIdiomGroupingView() {
+        val grouped = RouterState(tab = AppTab.Mistake)
+        val pushed = grouped.push(Route.IdiomMistakes, "idiom-id")
+        assertEquals(Route.IdiomMistakes, pushed.current.route)
+        val returned = pushed.back()
+        assertEquals(Route.Mistakes, returned.current.route)
+        // 返回停在「按成语分组」：视图存在 RouterState，页面内部不持有。
+        assertEquals(MistakeViewMode.ByIdiom, returned.mistakesView)
+        assertEquals(grouped.stack, returned.stack)
+    }
+
+    @Test
+    fun mistakesViewSurvivesTabSwitchAndCaptureReturn() {
+        val time = RouterState(tab = AppTab.Mistake).copy(mistakesView = MistakeViewMode.ByTime)
+        assertEquals(MistakeViewMode.ByTime, time.goToMistakes().mistakesView)
+        assertEquals(MistakeViewMode.ByTime, time.selectTab(AppTab.Idiom).goToMistakes().mistakesView)
+        val done =
+            time.startCapture().nextCapture().nextCapture().nextCapture()
+                .captureSaved("saved-id", listOf(IdiomRef("idiom-id", "按部就班")))
+        assertEquals(MistakeViewMode.ByTime, done.captureDestination(Route.Mistakes).mistakesView)
     }
 }

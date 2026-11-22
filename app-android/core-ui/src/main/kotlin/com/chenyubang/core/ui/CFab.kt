@@ -107,7 +107,7 @@ fun CFab(
             contentAlignment = Alignment.Center,
         ) {
             CIcon(
-                kind = CIconKind.Plus,
+                kind = CIconKind.Camera,
                 size = Tokens.Icon.n24.dp,
                 stroke = FAB_ICON_STROKE,
                 color = if (enabled) c.fabicon else c.disfg,

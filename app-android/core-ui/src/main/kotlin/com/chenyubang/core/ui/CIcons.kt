@@ -24,6 +24,9 @@ private fun paths(kind: CIconKind): List<String> =
         CIconKind.Warn -> listOf("M12 4l8 15H4z", "M12 9v4", "M12 16.5v.5")
         CIconKind.Error -> listOf("M21 12a9 9 0 1 1-18 0a9 9 0 1 1 18 0z", "M9 9l6 6M15 9l-6 6")
         CIconKind.Info -> listOf("M21 12a9 9 0 1 1-18 0a9 9 0 1 1 18 0z", "M12 11v5", "M12 8v.5")
+        // 相机三段值（设计规范 v1.3 第 5.8 节）：机身 rect 3,7→21,20；镜头 circle(12,13.5,r3.6)；顶部凸起。
+        CIconKind.Camera ->
+            listOf("M3 7h18v13H3z", "M15.6 13.5a3.6 3.6 0 1 1-7.2 0a3.6 3.6 0 1 1 7.2 0", "M8.5 7l1.4-3h4.2l1.4 3")
     }
 
 private fun buildVector(

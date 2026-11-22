@@ -3,6 +3,7 @@ package com.chenyubang.app
 import com.chenyubang.feature.capture.CropFrame
 import com.chenyubang.feature.capture.IdiomRef
 import com.chenyubang.feature.capture.OcrDraft
+import com.chenyubang.feature.mistake.MistakeViewMode
 import java.io.Serializable
 
 data class RouteEntry(val route: Route, val id: String? = null, val instance: Long = 0) : Serializable {
@@ -39,6 +40,8 @@ data class RouterState(
     val captureDraft: OcrDraft? = null,
     val sequence: Long = 1,
     val rootTopEpoch: Map<AppTab, Int> = AppTab.entries.associateWith { 0 },
+    /** P08 当前视图（分组 / 时间 / 考试类型）；跟着路由一起保存，返回不重置，默认分组。 */
+    val mistakesView: MistakeViewMode = MistakeViewMode.ByIdiom,
 ) : Serializable {
     val stack: List<RouteEntry> get() = stacks.getValue(tab)
     val current: RouteEntry get() = stack.last()
