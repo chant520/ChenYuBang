@@ -87,7 +87,8 @@ public final class UserExampleEditor: @unchecked Sendable {
         }
         let options = padded(input.options)
         try queue.write { db in
-            let touched = try db.execute(sql: """
+            try requireUserExample(db, id: input.id)
+            try db.execute(sql: """
                 UPDATE user_example
                 SET stem = ?, optionA = ?, optionB = ?, optionC = ?, optionD = ?,
                     myAnswer = ?, examType = ?, year = ?
@@ -96,7 +97,6 @@ public final class UserExampleEditor: @unchecked Sendable {
                 input.stem, options[0], options[1], options[2], options[3],
                 input.myAnswer, input.examType, input.year, input.id
             ])
-            guard touched > 0 else { throw UserExampleEditError.notFound }
             try db.execute(
                 sql: "DELETE FROM user_example_idiom WHERE userExampleId = ?",
                 arguments: [input.id]
@@ -138,6 +138,7 @@ public final class UserExampleEditor: @unchecked Sendable {
     /// 录入题本身与本机原图都不动，题仍可在对应成语的「我的录入题」里看到。
     public func deleteMistake(userExampleID: String) throws {
         try queue.write { db in
+            try requireUserExample(db, id: userExampleID)
             try db.execute(sql: """
                 DELETE FROM mistake_idiom WHERE mistakeId IN
                     (SELECT id FROM mistake WHERE userExampleId = ?)
@@ -150,11 +151,10 @@ public final class UserExampleEditor: @unchecked Sendable {
                 sql: "DELETE FROM mistake WHERE userExampleId = ?",
                 arguments: [userExampleID]
             )
-            let touched = try db.execute(
+            try db.execute(
                 sql: "UPDATE user_example SET isMistake = 0 WHERE id = ?",
                 arguments: [userExampleID]
             )
-            guard touched > 0 else { throw UserExampleEditError.notFound }
         }
     }
 
@@ -209,8 +209,23 @@ public final class UserExampleEditor: @unchecked Sendable {
         return String(data: data, encoding: .utf8) ?? "[]"
     }
 
+    /// 事务开头把关录入题是否存在：不在库即抛 `notFound`，不留下改了一半的正文与关联。
+    private func requireUserExample(_ db: Database, id: String) throws {
+        let row = try CountRow.fetchOne(
+            db,
+            sql: "SELECT COUNT(*) AS count FROM user_example WHERE id = ?",
+            arguments: [id]
+        )
+        guard let row, row.count > 0 else { throw UserExampleEditError.notFound }
+    }
+
     /// 删除前取一次 `imagePath`：可空列，用记录解，不用标量 fetch（NULL 会解成 nil）。
     private struct HeadRow: FetchableRecord, Decodable {
         let imagePath: String?
+    }
+
+    /// 存在性用记录解，和 `HeadRow` 同一口径。
+    private struct CountRow: FetchableRecord, Decodable {
+        let count: Int
     }
 }
