@@ -120,4 +120,17 @@ class P10UserExampleLogicTest {
         assertTrue(marked.showsBottomDeleteRow)
         assertFalse(unmarked.showsBottomDeleteRow)
     }
+
+    /** 原图已不在副句双向钉住：仅标错态带「与重做」，未标错态不带。 */
+    @Test
+    fun imageMissingSubtitleBranchesOnMistake() {
+        assertEquals(
+            "文件可能被清理；题干与选项仍可查看与重做。",
+            P10Logic.imageMissingSubtitle(isMistake = true),
+        )
+        assertEquals(
+            "文件可能被清理；题干与选项仍可查看。",
+            P10Logic.imageMissingSubtitle(isMistake = false),
+        )
+    }
 }

@@ -99,6 +99,13 @@ object P10Logic {
         myAnswer: String?,
         hidden: Boolean,
     ): String = if (hidden) "已遮住" else myAnswer?.trim()?.takeIf { it.isNotEmpty() } ?: PLACEHOLDER
+
+    /** 原图已不在的副句：仅标错态带「与重做」，未标错态没有重做入口（信息架构 v1.4 §5.4 第 551 行）。 */
+    fun imageMissingSubtitle(isMistake: Boolean): String =
+        when (isMistake) {
+            true -> "文件可能被清理；题干与选项仍可查看与重做。"
+            false -> "文件可能被清理；题干与选项仍可查看。"
+        }
 }
 
 /** P10 状态机：同页切换，无写入（不落 review_log、不改掌握状态）。 */

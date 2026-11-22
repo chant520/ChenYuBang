@@ -204,7 +204,7 @@ private fun P10ImageBlock(
         CImagePlaceholder(
             kind = CPlaceholderKind.Warn,
             text = "原图已不在",
-            subtitle = "文件可能被清理；题干与选项仍可查看与重做。",
+            subtitle = P10Logic.imageMissingSubtitle(detail.isMistake),
         )
     } else {
         Image(
