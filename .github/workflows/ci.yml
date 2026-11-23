@@ -1,7 +1,7 @@
 name: CI
 
 on:
-  # 2026-11-23 版内修订（规范 §13.1）：仅 PR 触发 + 路径过滤；push: main 重复轮移除，
+  # 2026-11-23 版内修订（规范第 13.1 节）：仅 PR 触发 + 路径过滤；push: main 重复轮移除，
   # 纯 Android / docs 改动不触发 iOS CI（Android 前置＝本机门禁）
   pull_request:
     paths:
@@ -128,7 +128,7 @@ jobs:
           name: ios-snapshots
           path: app-ios/Tests/__Snapshots__
           if-no-files-found: ignore
-      - name: 上传 xcresult（仅 verify 失败；规范 §11.2 / §13.1，供定向提取实际帧审阅）
+      - name: 上传 xcresult（仅 verify 失败；规范第 11.2、13.1 节，供定向提取实际帧审阅）
         if: failure()
         uses: actions/upload-artifact@v4
         with:
