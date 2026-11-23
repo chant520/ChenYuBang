@@ -5,6 +5,7 @@ import com.chenyubang.feature.capture.CropFrame
 import com.chenyubang.feature.capture.IdiomRef
 import com.chenyubang.feature.capture.OcrDraft
 import com.chenyubang.feature.mistake.MistakeViewMode
+import com.chenyubang.feature.review.ReviewSummary
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
@@ -79,8 +80,10 @@ class RouterStateTest {
         assertEquals(idiomId, queue.review?.idiomId)
         assertFalse(queue.showTabs)
         assertEquals(source.stack, queue.back().stack)
-        val summary = queue.finishReview(2)
+        val lastRound = ReviewSummary(questionCount = 2, answerCount = 2, correctCount = 1, idioms = emptyList())
+        val summary = queue.finishReview(2, lastRound)
         val retry = summary.retryReview(1)
+        assertEquals(lastRound, retry.reviewSummary)
         assertEquals(summary.stack, retry.back().stack)
         assertEquals(idiomId, retry.review?.idiomId)
         assertEquals(source.stack, retry.back().back().stack)

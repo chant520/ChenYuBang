@@ -50,6 +50,7 @@ internal fun ReviewRouteContent(
             )
         else ->
             ReviewSummaryDestination(
+                // 0 题兜底只留给进程重建等真异常；正常「再复习一轮」已保留上一轮小结。
                 summary =
                     router.reviewSummary
                         ?: ReviewSummary(questionCount = 0, answerCount = 0, correctCount = 0, idioms = emptyList()),

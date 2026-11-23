@@ -21,7 +21,8 @@ fun RouterState.finishReview(
 fun RouterState.retryReview(pendingCount: Int): RouterState {
     val session = review
     if (pendingCount <= 0 || session == null || current.route != Route.Summary) return this
-    return append(RouteEntry(Route.Queue, session.idiomId, sequence)).copy(reviewSummary = null)
+    // 保留上一轮小结：从新队列返回时 P12 仍显示当轮数字；0 题兜底只留给进程重建等真异常。
+    return append(RouteEntry(Route.Queue, session.idiomId, sequence))
 }
 
 fun RouterState.exitReview(): RouterState {
