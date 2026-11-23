@@ -104,7 +104,7 @@ public struct P11ReviewContent: View {
                 judgeCard
             }
             CButton(
-                text: state.isLast ? "看本轮小结" : "下一题",
+                text: "下一题",
                 enabled: state.canGoNext,
                 action: actions.onNext
             )
@@ -192,7 +192,7 @@ public struct P11ReviewContent: View {
             if scope.idiomID == nil {
                 CEmptyState(
                     title: "今天没有待复习的错题",
-                    description: "可以回错题本看看全部错题",
+                    description: "错题本里标记为做错的题会出现在这里",
                     actionTitle: "回错题本",
                     onAction: actions.onLeave
                 )
