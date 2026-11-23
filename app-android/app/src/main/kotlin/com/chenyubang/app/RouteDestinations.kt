@@ -31,7 +31,6 @@ import com.chenyubang.feature.review.P12ReviewSummaryContent
 import com.chenyubang.feature.review.ReviewFlow
 import com.chenyubang.feature.review.ReviewSummary
 import com.chenyubang.feature.review.ReviewViewModel
-import kotlinx.coroutines.flow.collect
 
 /**
  * 已接入页面的目的地装配：只做「feature 页面 ← app 状态/写入口」的接线，
@@ -202,7 +201,6 @@ internal fun ReviewQueueDestination(
         val word = scopeIdiomId?.let { database.idiomDao().byId(it)?.word }
         if (word != null) model.setScopeWord(word)
     }
-    LaunchedEffect(Unit) { model.finish.collect { handOff(it) } }
     P11ReviewQueueContent(
         state = state,
         onPick = { model.pick(it) },

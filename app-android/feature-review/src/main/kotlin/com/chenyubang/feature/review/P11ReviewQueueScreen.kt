@@ -161,11 +161,7 @@ private fun reviewQuestionBody(
         if (verdict.comparable) {
             Text(text = "本题未记录正确答案", color = colors.text3, fontSize = Tokens.Font.n12.sp)
         }
-        if (state.isLast) {
-            CButton(text = "查看小结", onClick = onFinish)
-        } else {
-            CButton(text = "下一题", onClick = onNext)
-        }
+        CButton(text = "下一题", onClick = if (state.isLast) onFinish else onNext)
     }
 }
 

@@ -4,11 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.chenyubang.core.data.ReviewQuestion
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.time.Instant
@@ -16,7 +13,7 @@ import java.time.temporal.ChronoUnit
 
 /**
  * P11 一轮复习的装配：进页重新取队列（不保留中间状态），选完立即判分并落 review_log；
- * 无法比对时不落库、不计正确数；最后一题作答完成自动交出 [finish] 供宿主推进 P12。
+ * 无法比对时不落库、不计正确数；末题判分结果常驻可见，由「下一题」按钮交出本轮小结。
  */
 class ReviewViewModel(
     private val scopeIdiomId: String?,
@@ -26,9 +23,6 @@ class ReviewViewModel(
 ) : ViewModel() {
     private val _state = MutableStateFlow(ReviewUiState(scopeIdiomId = scopeIdiomId))
     val state: StateFlow<ReviewUiState> = _state.asStateFlow()
-
-    private val _finish = MutableSharedFlow<ReviewSummary>()
-    val finish: SharedFlow<ReviewSummary> = _finish.asSharedFlow()
 
     init {
         load()
@@ -74,7 +68,6 @@ class ReviewViewModel(
                 viewModelScope.launch { record(mistakeId, result, now()) }
             }
         }
-        if (after.isLast) viewModelScope.launch { _finish.emit(ReviewFlow.summary(after)) }
     }
 
     fun next() {
