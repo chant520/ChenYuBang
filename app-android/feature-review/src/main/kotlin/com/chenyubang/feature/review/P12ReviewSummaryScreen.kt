@@ -53,11 +53,13 @@ fun P12ReviewSummaryContent(
         verticalArrangement = Arrangement.spacedBy(Tokens.Space.block.dp),
     ) {
         summaryTopBar(onBack, colors)
-        Text(text = summary.scopeLine, color = colors.text3, fontSize = Tokens.Font.n12.sp)
         if (summary.questionCount == 0) {
             // E17 兜底态：正常路径不可达（队列为空进不了 P11）。
+            // 稿 D 零题帧：保留 0/0/0 成绩卡、不画本轮范围行，也不出成语卡与「再复习一轮」。
+            summaryResultCard(summary, colors)
             summaryEmpty(onBackToSource)
         } else {
+            Text(text = summary.scopeLine, color = colors.text3, fontSize = Tokens.Font.n12.sp)
             summaryResultCard(summary, colors)
             summaryIdiomsCard(summary, colors, onOpenIdiom)
             CButton(
@@ -157,7 +159,8 @@ private fun summaryIdiomsCard(
 private fun summaryEmpty(onBackToSource: () -> Unit) {
     CEmptyState(
         title = "这一轮没有题目",
-        description = "这一轮没有可复习的错题，可以回到来源页。",
+        // 副文案逐字取高保真 D 组零题整句（2026-11-23 拍板：空态全按稿 D）。
+        description = "队列在开始时就被清空了，属异常情形，正常不会到这里。",
         actionText = "回上一页",
         onAction = onBackToSource,
     )
