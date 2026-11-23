@@ -93,12 +93,10 @@ class P11ReviewQueueSnapshotTest {
     fun verdictDifferentDark() = capture(true, loaded(mapOf("m-1" to answered(2))))
 
     @Test
-    fun verdictLastLight() =
-        capture(false, loadedLast(mapOf("m-1" to answered(1), "m-2" to answeredSecond(2))))
+    fun verdictLastLight() = capture(false, loadedLast(mapOf("m-1" to answered(1), "m-2" to answeredSecond(2))))
 
     @Test
-    fun verdictLastDark() =
-        capture(true, loadedLast(mapOf("m-1" to answered(1), "m-2" to answeredSecond(2))))
+    fun verdictLastDark() = capture(true, loadedLast(mapOf("m-1" to answered(1), "m-2" to answeredSecond(2))))
 
     @Test
     fun emptyGlobalLight() = capture(false, ReviewUiState(loading = false))

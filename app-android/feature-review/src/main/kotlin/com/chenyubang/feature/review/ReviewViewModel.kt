@@ -81,7 +81,10 @@ class ReviewViewModel(
     /**
      * 判分落库：先传播取消，再捕获业务异常置错误态；ReviewDao.record 是单事务，失败即整笔回滚，无需补偿写库。
      */
-    private fun persistResult(mistakeId: String, result: String) {
+    private fun persistResult(
+        mistakeId: String,
+        result: String,
+    ) {
         viewModelScope.launch {
             try {
                 record(mistakeId, result, now())
