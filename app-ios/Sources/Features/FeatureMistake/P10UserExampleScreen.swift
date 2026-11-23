@@ -5,7 +5,8 @@ import CangyuDesignSystem
 import CangyuTokens
 
 /// P10 纯渲染层（信息架构 v1.4 P10 ①–④ / 高保真稿 B P10）：
-/// 页名与编辑删除占位、原图位、题干与四选项；⑤–⑩ 与底部删除见 `P10UserExampleBlocks`。
+/// 页名与编辑删除入口、原图位、题干与四选项；⑤–⑩ 与底部删除见 `P10UserExampleBlocks`；
+/// 编辑态表单见 `P10UserExampleEdit`、二次确认弹层见 `P10UserExampleDeleteConfirm`、视图模型见 `P10UserExampleViewModel`。
 /// 区块 ⑥「正确答案 + 一句解析」本版不渲染（库内无来源，见信息架构 v1.4 版内修订第 ① 条）。
 public struct P10UserExampleContent: View {
     private let state: UserExampleState
@@ -40,27 +41,57 @@ public struct P10UserExampleContent: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(colors.page)
         .overlay { if zoomed { zoomLayer } }
+        .overlay {
+            // 归属手选：整屏复用 P04 搜索（与 P20「手动挑成语」同一浮层、同一注入形态）。
+            if state.showsIdiomPicker {
+                actions.idiomPicker(actions.onPickIdiom, actions.onDismissIdiomPicker)
+            }
+        }
+        .overlay {
+            // 单条二次确认（开发规范 §8.1.1）：覆起后底部红行不再是可见层的那一处红。
+            if state.confirmDelete {
+                P10UserExampleDeleteConfirm(
+                    isMistake: state.isMistake,
+                    deleting: state.deleting,
+                    onConfirm: actions.onConfirmDelete,
+                    onDismiss: actions.onDismissDelete
+                )
+            }
+        }
     }
 
-    /// ①：返回 + 页名 + 编辑 / 删除（本版在位、置灰，动作属工作包 2.8）。
+    /// ①：返回 + 页名 + 编辑 / 删除（只读态）或取消 / 保存（编辑态）。
+    /// 编辑态的返回箭头与「取消」同义：草稿不落库，直接回只读态。
     private var header: some View {
-        HStack(spacing: Tokens.Space.lmetaGap) {
-            Button(action: actions.onBack) {
+        let readonly = state.detail != nil && !state.loading && !state.failed
+        return HStack(spacing: Tokens.Space.lmetaGap) {
+            Button(action: state.editing ? actions.onCancelEdit : actions.onBack) {
                 CIcon(.back, size: Tokens.Icon.n21, strokeWidth: 1.6, color: colors.text2)
                     .frame(width: Tokens.Space.hitMin, height: Tokens.Space.hitMin)
                     .contentShape(Rectangle())
             }
             .buttonStyle(CPressDimStyle())
-            .accessibilityLabel("返回")
+            .accessibilityLabel(state.editing ? "取消编辑" : "返回")
             Text("录入题详情")
                 .font(.system(size: Tokens.Font.n15, weight: .semibold))
                 .foregroundStyle(colors.head)
                 .accessibilityAddTraits(.isHeader)
             Spacer(minLength: 0)
-            CButton(text: "编辑", variant: .ghost, enabled: false, action: actions.onEdit)
-                .fixedSize()
-            CButton(text: "删除", variant: .ghost, enabled: false, action: actions.onDelete)
-                .fixedSize()
+            if state.editing {
+                CButton(text: UserExampleEditCopy.cancel, variant: .ghost,
+                        enabled: !state.saving, action: actions.onCancelEdit)
+                    .fixedSize()
+                CButton(text: UserExampleEditCopy.save, enabled: state.draft?.canSave ?? false,
+                        loading: state.saving, action: actions.onSave)
+                    .fixedSize()
+            } else {
+                CButton(text: UserExampleEditCopy.edit, variant: .ghost,
+                        enabled: readonly, action: actions.onEdit)
+                    .fixedSize()
+                CButton(text: UserExampleEditCopy.delete, variant: .ghost,
+                        enabled: readonly, action: actions.onDelete)
+                    .fixedSize()
+            }
         }
     }
 
@@ -86,10 +117,28 @@ public struct P10UserExampleContent: View {
                 description: "该题已不在本机题库中，可返回上一个页面换一道看。"
             )
         } else if let detail = state.detail {
+            if let issue = state.issue {
+                issueBar(issue)
+            }
             imageSlot(detail)
-            stemCard(detail)
-            P10UserExampleBlocks(state: state, detail: detail, actions: actions, colors: colors)
+            if let draft = state.draft {
+                // 编辑态：原图位保留（只读、可放大），题面与 ⑤–⑩ 换成可编表单（§8.1.1）。
+                P10UserExampleEditForm(draft: draft, saving: state.saving, actions: actions.edit)
+            } else {
+                stemCard(detail)
+                P10UserExampleBlocks(state: state, detail: detail, actions: actions, colors: colors)
+            }
         }
+    }
+
+    /// 校验提示走中性条（点「知道了」消失）、写库失败走红错误条，与 P20 同一口径。
+    private func issueBar(_ issue: UserExampleIssue) -> some View {
+        CBar(
+            kind: issue.kind == .error ? .error : .info,
+            title: issue.message,
+            actionTitle: UserExampleEditCopy.gotIt,
+            onAction: actions.onDismissIssue
+        )
     }
 
     /// ②：原图缩略图（可点放大）；未存图或文件读不出＝橙占位「原图已不在」（信息架构 v1.4 §5.4）。
@@ -197,118 +246,42 @@ public struct P10UserExampleContent: View {
     }
 }
 
-/// 后台解码结果装箱（`UIImage` 生成后只读，不入 UI，同 `CropSource` 口径）。
-private struct DecodedOriginal: @unchecked Sendable {
-    let image: UIImage?
-}
-
-/// P10 页面状态与行为（读库失败＝橙条可重试，与 P08 / P09 同一口径）。
-@MainActor
-public final class UserExampleViewModel: ObservableObject {
-    @Published public private(set) var state = UserExampleState()
-    /// ② 原图解码结果；与 `state.imageUnreadable` 合起来决定图片位形态。
-    @Published public private(set) var image: UIImage?
-
-    private let id: String
-    private let reader: UserExampleReading
-    /// 本机数据根目录（`images/…` 相对路径的解析基准）；nil＝不尝试读图。
-    private let dataDirectory: URL?
-
-    public init(id: String, reader: UserExampleReading, dataDirectory: URL?) {
-        self.id = id
-        self.reader = reader
-        self.dataDirectory = dataDirectory
-    }
-
-    public func load() async {
-        state.loading = true
-        state.failed = false
-        do {
-            guard let detail = try reader.userExample(id: id) else {
-                state.missing = true
-                state.detail = nil
-                image = nil
-                state.loading = false
-                return
-            }
-            state.missing = false
-            state.detail = detail
-            state.loading = false
-            await loadImage(from: detail.imagePath)
-        } catch {
-            state.detail = nil
-            state.loading = false
-            state.failed = true
-        }
-    }
-
-    /// 读图在后台队列解码，失败（文件丢失或解不出）只影响图片位，不影响题干与重做。
-    private func loadImage(from relativePath: String?) async {
-        image = nil
-        state.imageUnreadable = false
-        guard let relativePath, let dataDirectory else {
-            state.imageUnreadable = relativePath != nil
-            return
-        }
-        let url = dataDirectory.appendingPathComponent(relativePath)
-        // UIImage 非 Sendable，与 P18 `CropSource` 同一口径：后台解码、装箱回主线程。
-        let decoded = await Task.detached(priority: .userInitiated) {
-            DecodedOriginal(image: UIImage(contentsOfFile: url.path))
-        }.value
-        image = decoded.image
-        state.imageUnreadable = decoded.image == nil
-    }
-
-    public func toggleAnswer() {
-        state.revealed.toggle()
-    }
-
-    /// 重做入口只在非重做态显示；进入后清掉本轮选择，遮住首次作答。
-    public func startReroll() {
-        state.rerolling = true
-        state.picked = nil
-        state.checked = false
-    }
-
-    public func pick(_ index: Int) {
-        guard state.rerolling, (0..<4).contains(index) else { return }
-        state.picked = index
-        state.checked = false
-    }
-
-    public func check() {
-        guard state.picked != nil else { return }
-        state.checked = true
-    }
-
-    public func exitReroll() {
-        state.rerolling = false
-        state.picked = nil
-        state.checked = false
-    }
-}
-
 /// P10 录入题详情（二级页，从 P08 平铺行或 P09 列表点入；P05 数字入口在工作包 2.10 接）。
+///
+/// 编辑与删除（工作包 2.8）在本页同页切态：写库经注入的 `UserExampleWriting`，
+/// 手选归属复用 P04 搜索浮层；成功保存或删除后先通知 app 层刷新来源页。
 public struct P10UserExampleScreen: View {
     @Environment(\.colorScheme) private var colorScheme
     @StateObject private var model: UserExampleViewModel
 
     private let onBack: () -> Void
     private let onOpenIdiom: (String) -> Void
+    private let libraryReader: IdiomLibraryReader
 
     @MainActor
     public init(
         id: String,
         reader: UserExampleReading,
+        editor: UserExampleWriting,
+        libraryReader: IdiomLibraryReader,
         dataDirectory: URL?,
         onBack: @escaping () -> Void,
-        onOpenIdiom: @escaping (String) -> Void
+        onOpenIdiom: @escaping (String) -> Void,
+        onContentChanged: @escaping () -> Void = {},
+        onDeleted: @escaping () -> Void = {}
     ) {
-        _model = StateObject(
-            wrappedValue: UserExampleViewModel(id: id, reader: reader, dataDirectory: dataDirectory)
-        )
+        _model = StateObject(wrappedValue: UserExampleViewModel(
+            id: id,
+            reader: reader,
+            editor: editor,
+            libraryReader: libraryReader,
+            dataDirectory: dataDirectory,
+            onContentChanged: onContentChanged,
+            onDeleted: onDeleted
+        ))
         self.onBack = onBack
         self.onOpenIdiom = onOpenIdiom
+        self.libraryReader = libraryReader
     }
 
     public var body: some View {
@@ -324,8 +297,35 @@ public struct P10UserExampleScreen: View {
                 onCheck: model.check,
                 onExitReroll: model.exitReroll,
                 onOpenIdiom: onOpenIdiom,
-                onEdit: {},
-                onDelete: {}
+                onEdit: model.startEdit,
+                onDelete: model.requestDelete,
+                onCancelEdit: model.cancelEdit,
+                onSave: model.save,
+                onDismissIssue: model.dismissIssue,
+                onOpenIdiomPicker: { model.setIdiomPicker(visible: true) },
+                onDismissIdiomPicker: { model.setIdiomPicker(visible: false) },
+                onPickIdiom: model.pickIdiom,
+                onConfirmDelete: model.confirmDelete,
+                onDismissDelete: model.dismissDelete,
+                edit: UserExampleEditActions(
+                    onStem: model.setStem,
+                    onOption: model.setOption,
+                    onAnswer: model.setAnswerText,
+                    onExamType: model.setExamType,
+                    onYear: model.setYearText,
+                    onReason: model.setReason,
+                    onAddTag: model.addTag,
+                    onRemoveTag: model.removeTag,
+                    onRemoveIdiom: model.removeIdiom(id:),
+                    onOpenIdiomPicker: { model.setIdiomPicker(visible: true) }
+                ),
+                idiomPicker: { onPick, onDismiss in
+                    AnyView(P04SearchScreen(
+                        reader: libraryReader,
+                        onClose: onDismiss,
+                        onOpenIdiom: onPick
+                    ))
+                }
             ),
             colors: colors,
             image: model.image
