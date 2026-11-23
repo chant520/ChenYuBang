@@ -21,6 +21,8 @@ public struct MistakeBookState: Equatable, Sendable {
     public var pending: Int
     public var groups: [MistakeGroupView]
     public var entries: [MistakeEntryView]
+    /// 中性提示条（点「知道了」消失）；本版只有「队列已空、没开始复习」一种。
+    public var pageMessage: String?
 
     public init(
         loading: Bool = true,
@@ -29,7 +31,8 @@ public struct MistakeBookState: Equatable, Sendable {
         total: Int = 0,
         pending: Int = 0,
         groups: [MistakeGroupView] = [],
-        entries: [MistakeEntryView] = []
+        entries: [MistakeEntryView] = [],
+        pageMessage: String? = nil
     ) {
         self.loading = loading
         self.failed = failed
@@ -38,6 +41,7 @@ public struct MistakeBookState: Equatable, Sendable {
         self.pending = pending
         self.groups = groups
         self.entries = entries
+        self.pageMessage = pageMessage
     }
 
     public var isEmpty: Bool {
@@ -52,19 +56,27 @@ public struct MistakeBookActions {
     public let onOpenUserExample: (String) -> Void
     public let onCapture: () -> Void
     public let onRetry: () -> Void
+    /// ④「开始复习」：待复习数为 0 时按钮置灰；宿主未开启复习（队列已空）时给中性提示（跳转表 19）。
+    public let onStartReview: () -> Void
+    /// 中性提示条的「知道了」。
+    public let onDismissMessage: () -> Void
 
     public init(
         onSelectDimension: @escaping (MistakeDimension) -> Void,
         onOpenIdiom: @escaping (String) -> Void,
         onOpenUserExample: @escaping (String) -> Void,
         onCapture: @escaping () -> Void,
-        onRetry: @escaping () -> Void
+        onRetry: @escaping () -> Void,
+        onStartReview: @escaping () -> Void,
+        onDismissMessage: @escaping () -> Void
     ) {
         self.onSelectDimension = onSelectDimension
         self.onOpenIdiom = onOpenIdiom
         self.onOpenUserExample = onOpenUserExample
         self.onCapture = onCapture
         self.onRetry = onRetry
+        self.onStartReview = onStartReview
+        self.onDismissMessage = onDismissMessage
     }
 }
 
@@ -167,8 +179,20 @@ public struct P08MistakeContent: View {
         } else {
             VStack(alignment: .leading, spacing: Tokens.Space.block) {
                 list
-                // ④：按钮在位、置灰，接 P11 全局复习留到工作包 3.1（开发排期 v1.2）。
-                CButton(text: MistakeBrowse.reviewTitle(pending: state.pending), enabled: false) {}
+                if let message = state.pageMessage {
+                    CBar(
+                        kind: .info,
+                        title: message,
+                        actionTitle: MistakeBrowse.gotIt,
+                        onAction: actions.onDismissMessage
+                    )
+                }
+                // ④：待复习数为 0 时置灰（决策 H 同口径）；可点进 P11 全局模式（工作包 3.1）。
+                CButton(
+                    text: MistakeBrowse.reviewTitle(pending: state.pending),
+                    enabled: state.pending > 0,
+                    action: actions.onStartReview
+                )
             }
         }
     }
@@ -262,6 +286,15 @@ public final class MistakeBookViewModel: ObservableObject {
         }
     }
 
+    /// ④：点「开始复习」时队列已空（列表数与库内不同步）——不开复习，页内如实提示。
+    public func showEmptyReviewHint() {
+        state.pageMessage = MistakeBrowse.emptyReviewHint
+    }
+
+    public func dismissMessage() {
+        state.pageMessage = nil
+    }
+
     private func loadList(_ dimension: MistakeDimension) throws {
         if dimension == .grouped {
             state.groups = try reader.idiomGroups().map(MistakeBrowse.view(of:))
@@ -281,6 +314,8 @@ public struct P08MistakeScreen: View {
     private let onOpenIdiom: (String) -> Void
     private let onOpenUserExample: (String) -> Void
     private let onCapture: () -> Void
+    /// 「开始复习」由宿主读队列并开启 P11；返回 false＝队列此刻已空，本页按实提示（跳转表 19）。
+    private let onStartReview: () -> Bool
     /// 用户内容写入令牌（开发规范 §8.1.1「来源页列表刷新」）：本页在标签栈里常驻挂载，
     /// 从 P10 返回时 `.task` 不会重跑，靠该令牌变化重新读库。
     private let contentRevision: UUID
@@ -291,12 +326,14 @@ public struct P08MistakeScreen: View {
         contentRevision: UUID = UUID(),
         onOpenIdiom: @escaping (String) -> Void,
         onOpenUserExample: @escaping (String) -> Void,
-        onCapture: @escaping () -> Void
+        onCapture: @escaping () -> Void,
+        onStartReview: @escaping () -> Bool
     ) {
         _model = StateObject(wrappedValue: MistakeBookViewModel(reader: reader))
         self.onOpenIdiom = onOpenIdiom
         self.onOpenUserExample = onOpenUserExample
         self.onCapture = onCapture
+        self.onStartReview = onStartReview
         self.contentRevision = contentRevision
     }
 
@@ -309,7 +346,9 @@ public struct P08MistakeScreen: View {
                 onOpenIdiom: onOpenIdiom,
                 onOpenUserExample: onOpenUserExample,
                 onCapture: onCapture,
-                onRetry: { Task { await model.load(dimension: model.state.dimension) } }
+                onRetry: { Task { await model.load(dimension: model.state.dimension) } },
+                onStartReview: { if !self.onStartReview() { model.showEmptyReviewHint() } },
+                onDismissMessage: { model.dismissMessage() }
             ),
             colors: colors
         )

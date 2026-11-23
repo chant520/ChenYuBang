@@ -119,6 +119,11 @@ public enum MistakeBrowse {
         "开始复习 · \(pending) \(unit)待复习"
     }
 
+    /// 「开始复习」点下时队列已空的如实提示（与第 5.4 节 P11 全局空态标题同字面值）。
+    public static let emptyReviewHint = "今天没有待复习的错题"
+    /// 中性提示条的确认动作（与 P10 / P20 同字面值，feature 之间不互相引用故各自持有）。
+    public static let gotIt = "知道了"
+
     /// P09 列表脚注（高保真稿 B P09 `.listfoot`）；P08 无脚注（信息架构 v1.4 P08 区块 ①–⑦ 不含脚注，高保真 P08 帧亦无）。
     public static func capturedFooter(_ count: Int) -> String {
         "\(count) \(unit) · 已到末尾"

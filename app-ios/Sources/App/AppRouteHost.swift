@@ -137,9 +137,13 @@ private struct AppRoutePage: View {
                 id: idiomID,
                 reader: reader,
                 examplesReader: exampleReader,
+                reviewCounter: launch.reviewReader as PendingReviewCountReading?,
                 onBack: { router.back() },
                 onOpenMistakes: { router.goToMistakes() },
-                onOpenExample: { id in _ = router.push(.exampleDetail, recordID: id) }
+                onOpenExample: { id in _ = router.push(.exampleDetail, recordID: id) },
+                onReviewIdiom: { word in
+                    _ = self.startReview(source: .idiom(id: idiomID, word: word))
+                }
             )
         } else if entry.route == .exampleDetail,
                   let reader = launch.exampleReader,
@@ -163,7 +167,8 @@ private struct AppRoutePage: View {
                 contentRevision: router.userContentRevision,
                 onOpenIdiom: { id in _ = router.push(.idiomMistakes, recordID: id) },
                 onOpenUserExample: { id in _ = router.push(.mistakeDetail, recordID: id) },
-                onCapture: { _ = router.beginCapture() }
+                onCapture: { _ = router.beginCapture() },
+                onStartReview: { self.startReview(source: .global) }
             )
         } else if entry.route == .idiomMistakes,
                   let reader = launch.mistakeReader,
@@ -253,9 +258,47 @@ private struct AppRoutePage: View {
                 onOpenMistakes: { _ = router.finishCapture() },
                 onContinue: { _ = router.continueCapture() }
             )
+        } else if entry.route == .queue, let reader = launch.reviewReader {
+            P11ReviewScreen(
+                reader: reader,
+                scope: reviewScope(for: router.reviewSession),
+                queueIDs: entry.queueIDs,
+                onRoundFinished: { outcome in
+                    _ = router.finishReview(queueEntryID: entry.id, outcome: outcome)
+                },
+                onExit: { router.dismissFullScreen() }
+            )
+        } else if entry.route == .summary,
+                  let reader = launch.reviewReader,
+                  let summary = entry.reviewOutcome {
+            P12SummaryScreen(
+                reader: reader,
+                scope: reviewScope(for: router.reviewSession),
+                summary: summary,
+                queueIDs: entry.queueIDs,
+                onHome: { router.dismissFullScreen() },
+                onRetryRound: { _ = router.retryReview(queueIDs: entry.queueIDs) },
+                onOpenIdiom: { id in _ = router.push(.idiomDetail, recordID: id) }
+            )
         } else {
             RoutePlaceholderPage(router: router, launch: launch, entry: entry, tab: tab)
         }
+    }
+
+    /// P11 / P12 的「本轮范围」一行取复习会话的来源（决策 E）；会话不在时按全局兜底。
+    private func reviewScope(for session: ReviewSession?) -> ReviewScope {
+        guard let session, case .idiom(let id, let word) = session.source else { return .global() }
+        return .idiom(id: id, word: word)
+    }
+
+    /// 复习入口（P08 ④ 全局、P05 D1 单成语）：点下时才读该来源的待复习队列，队列 id 交路由。
+    /// 返回 false＝队列已空或读库失败，由来源页如实提示（跳转表 19），不开空复习。
+    private func startReview(source: ReviewSource) -> Bool {
+        guard let reader = launch.reviewReader else { return false }
+        let idiomID: String?
+        if case .idiom(let id, _) = source { idiomID = id } else { idiomID = nil }
+        guard let ids = try? reader.queue(idiomID: idiomID).map(\.id), !ids.isEmpty else { return false }
+        return router.beginReview(source: source, queueIDs: ids)
     }
 }
 
