@@ -60,14 +60,16 @@ final class ReviewLibraryTests: XCTestCase {
         let queue = try seededQueue()
         try queue.read { db in
             let idioms = try ReviewLibrary.idiomsInRound(db, mistakeIDs: ["m1", "m2", "m1"])
-            XCTAssertEqual(idioms.map(\.word), ["按部就班", "墨守成规"])
+            // 排序取 SQLite 默认二进制序（与 Android 同一条 ORDER BY idiom.word）：墨 U+58A8 先于按 U+6309。
+            XCTAssertEqual(idioms.map(\.word), ["墨守成规", "按部就班"])
             XCTAssertEqual(try ReviewLibrary.idiomsInRound(db, mistakeIDs: []), [])
         }
     }
 
     func testRecordWritesReviewLogAndUpdatesMistakeWithoutStateChange() throws {
         let queue = try seededQueue()
-        try queue.write { db in
+        // `ReviewLibrary.record` 自带事务，故外层用 writeWithoutTransaction（同 ReviewLibraryService 与 PackImporter）。
+        try queue.writeWithoutTransaction { db in
             try ReviewLibrary.record(db, mistakeID: "m1", result: ReviewLibrary.resultRight,
                                      reviewedAt: "2026-11-23T00:00:00Z")
             try ReviewLibrary.record(db, mistakeID: "m1", result: ReviewLibrary.resultWrong,
@@ -92,7 +94,7 @@ final class ReviewLibraryTests: XCTestCase {
 
     func testRecordThrowsForMissingMistakeAndLeavesNoRow() throws {
         let queue = try seededQueue()
-        try queue.write { db in
+        try queue.writeWithoutTransaction { db in
             XCTAssertThrowsError(try ReviewLibrary.record(
                 db, mistakeID: "gone", result: ReviewLibrary.resultRight,
                 reviewedAt: "2026-11-23T00:00:00Z"

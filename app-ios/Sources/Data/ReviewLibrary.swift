@@ -95,9 +95,12 @@ public enum ReviewLibrary {
             """, arguments: StatementArguments(mistakeIDs))
     }
 
-    /// 复习结果落库（第 8.2 节版内修订）：一行 `review_log`，并在同一事务内
+    /// 复习结果落库（第 8.2 节）：一行 `review_log`，并在同一事务内
     /// `mistake.reviewCount` 加一、`lastReviewedAt` 刷新；错题已不在本机时抛错，
     /// 不落孤儿 `review_log` 行。`reviewedAt` 为 ISO8601 UTC 秒级串（与 `UserExampleSaver` 同口径）。
+    ///
+    /// 事务由本函数自己开：调用方须用 `writeWithoutTransaction` 传入连接，
+    /// 否则 GRDB 的 `write` 已起事务，SQLite 会报「cannot start a transaction within a transaction」（同 `PackImporter` 口径）。
     public static func record(_ db: Database, mistakeID: String, result: String, reviewedAt: String) throws {
         try db.inTransaction {
             let exists = try Bool.fetchOne(
@@ -169,7 +172,7 @@ public final class ReviewLibraryService: @unchecked Sendable {
     }
 
     public func record(mistakeID: String, result: String, reviewedAt: String) throws {
-        try queue.write { db in
+        try queue.writeWithoutTransaction { db in
             try ReviewLibrary.record(db, mistakeID: mistakeID, result: result, reviewedAt: reviewedAt)
         }
     }
