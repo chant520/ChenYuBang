@@ -13,12 +13,15 @@ struct RouteEntry: Identifiable, Equatable {
     let route: AppRoute
     var recordID: String?
     var queueIDs: [String] = []
+    /// 本轮复习小结：跟着 P12 那一条栈entry 存，「再复习一轮」后再退回上一轮 P12 仍是当轮数字。
+    var reviewOutcome: ReviewRoundOutcome?
     var viewState = RouteViewState()
 }
 
 enum ReviewSource: Equatable {
     case global
-    case idiom(String)
+    /// 单成语模式：`word` 为该成语词面，供 P11 / P12 的「本轮范围」一行显示。
+    case idiom(id: String, word: String)
 }
 
 struct ReviewSession: Equatable {
@@ -150,7 +153,7 @@ final class RouterState: ObservableObject {
         switch source {
         case .global:
             guard currentEntry.route == .mistakes else { return false }
-        case .idiom(let idiomID):
+        case .idiom(let idiomID, _):
             guard currentEntry.route == .idiomDetail, currentEntry.recordID == idiomID else { return false }
         }
         reviewSession = ReviewSession(source: source, tab: selectedTab, originEntryID: currentEntry.id)
@@ -160,10 +163,16 @@ final class RouterState: ObservableObject {
     }
 
     /// 仅由真实复习业务完成回调调用；不在占位页制造成绩。
+    /// 题量取本轮队列长度，`answered` 之外的无法比对题只计题量（第 8.2 节）。
     @discardableResult
-    func finishReview(queueEntryID: UUID) -> Bool {
-        guard reviewSession != nil, currentEntry.route == .queue, currentEntry.id == queueEntryID else { return false }
-        fullScreenEntries[fullScreenEntries.count - 1] = RouteEntry(route: .summary, queueIDs: currentEntry.queueIDs)
+    func finishReview(queueEntryID: UUID, outcome: ReviewRoundOutcome) -> Bool {
+        guard reviewSession != nil, currentEntry.route == .queue, currentEntry.id == queueEntryID,
+              outcome.total > 0 else { return false }
+        fullScreenEntries[fullScreenEntries.count - 1] = RouteEntry(
+            route: .summary,
+            queueIDs: currentEntry.queueIDs,
+            reviewOutcome: outcome
+        )
         return true
     }
 

@@ -12,6 +12,18 @@
 		A00000000000000000000021 /* ExampleFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000131 /* ExampleFeature.swift */; };
 		A00000000000000000000022 /* MistakeFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000132 /* MistakeFeature.swift */; };
 		A00000000000000000000023 /* ReviewFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000133 /* ReviewFeature.swift */; };
+		A000000000000000000000CE /* ReviewBrowse.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001CE /* ReviewBrowse.swift */; };
+		A000000000000000000000D0 /* P11ReviewModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001D0 /* P11ReviewModels.swift */; };
+		A000000000000000000000D1 /* P11ReviewScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001D1 /* P11ReviewScreen.swift */; };
+		A000000000000000000000D2 /* P12SummaryModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001D2 /* P12SummaryModels.swift */; };
+		A000000000000000000000D3 /* P12SummaryScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001D3 /* P12SummaryScreen.swift */; };
+		A000000000000000000000D4 /* ReviewLibraryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001D4 /* ReviewLibraryTests.swift */; };
+		A000000000000000000000D5 /* ReviewBrowseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001D5 /* ReviewBrowseTests.swift */; };
+		A000000000000000000000D6 /* P11ReviewFlowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001D6 /* P11ReviewFlowTests.swift */; };
+		A000000000000000000000D7 /* P11ReviewSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001D7 /* P11ReviewSnapshotTests.swift */; };
+		A000000000000000000000D8 /* P12SummarySnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001D8 /* P12SummarySnapshotTests.swift */; };
+		A000000000000000000000D9 /* P08ReviewHintTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001D9 /* P08ReviewHintTests.swift */; };
+		A000000000000000000000DA /* RouterReviewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001DA /* RouterReviewTests.swift */; };
 		A00000000000000000000024 /* MeFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000134 /* MeFeature.swift */; };
 		A00000000000000000000026 /* LibraryBrowse.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000136 /* LibraryBrowse.swift */; };
 		A00000000000000000000027 /* LibraryScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000137 /* LibraryScreen.swift */; };
@@ -134,6 +146,18 @@
 		A00000000000000000000131 /* ExampleFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleFeature.swift; sourceTree = "<group>"; };
 		A00000000000000000000132 /* MistakeFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MistakeFeature.swift; sourceTree = "<group>"; };
 		A00000000000000000000133 /* ReviewFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewFeature.swift; sourceTree = "<group>"; };
+		A000000000000000000001CE /* ReviewBrowse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewBrowse.swift; sourceTree = "<group>"; };
+		A000000000000000000001D0 /* P11ReviewModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P11ReviewModels.swift; sourceTree = "<group>"; };
+		A000000000000000000001D1 /* P11ReviewScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P11ReviewScreen.swift; sourceTree = "<group>"; };
+		A000000000000000000001D2 /* P12SummaryModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P12SummaryModels.swift; sourceTree = "<group>"; };
+		A000000000000000000001D3 /* P12SummaryScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P12SummaryScreen.swift; sourceTree = "<group>"; };
+		A000000000000000000001D4 /* ReviewLibraryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewLibraryTests.swift; sourceTree = "<group>"; };
+		A000000000000000000001D5 /* ReviewBrowseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewBrowseTests.swift; sourceTree = "<group>"; };
+		A000000000000000000001D6 /* P11ReviewFlowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P11ReviewFlowTests.swift; sourceTree = "<group>"; };
+		A000000000000000000001D7 /* P11ReviewSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P11ReviewSnapshotTests.swift; sourceTree = "<group>"; };
+		A000000000000000000001D8 /* P12SummarySnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P12SummarySnapshotTests.swift; sourceTree = "<group>"; };
+		A000000000000000000001D9 /* P08ReviewHintTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P08ReviewHintTests.swift; sourceTree = "<group>"; };
+		A000000000000000000001DA /* RouterReviewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouterReviewTests.swift; sourceTree = "<group>"; };
 		A00000000000000000000134 /* MeFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeFeature.swift; sourceTree = "<group>"; };
 		A00000000000000000000135 /* CaptureFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureFeature.swift; sourceTree = "<group>"; };
 		A00000000000000000000136 /* LibraryBrowse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryBrowse.swift; sourceTree = "<group>"; };
@@ -339,6 +363,11 @@
 			isa = PBXGroup;
 			children = (
 				A00000000000000000000133 /* ReviewFeature.swift */,
+				A000000000000000000001CE /* ReviewBrowse.swift */,
+				A000000000000000000001D0 /* P11ReviewModels.swift */,
+				A000000000000000000001D1 /* P11ReviewScreen.swift */,
+				A000000000000000000001D2 /* P12SummaryModels.swift */,
+				A000000000000000000001D3 /* P12SummaryScreen.swift */,
 			);
 			path = FeatureReview;
 			sourceTree = "<group>";
@@ -431,6 +460,13 @@
 				A000000000000000000001C5 /* P09CapturedSnapshotTests.swift */,
 				A000000000000000000001C7 /* P10UserExampleSnapshotTests.swift */,
 				A000000000000000000001CB /* UserExampleEditorTests.swift */,
+				A000000000000000000001D4 /* ReviewLibraryTests.swift */,
+				A000000000000000000001D5 /* ReviewBrowseTests.swift */,
+				A000000000000000000001D6 /* P11ReviewFlowTests.swift */,
+				A000000000000000000001D7 /* P11ReviewSnapshotTests.swift */,
+				A000000000000000000001D8 /* P12SummarySnapshotTests.swift */,
+				A000000000000000000001D9 /* P08ReviewHintTests.swift */,
+				A000000000000000000001DA /* RouterReviewTests.swift */,
 				A00000000000000000000152 /* pack fixture */,
 			);
 			path = Tests;
@@ -587,6 +623,11 @@
 				A000000000000000000000CC /* P10UserExampleDeleteConfirm.swift in Sources */,
 				A000000000000000000000CD /* P10UserExampleViewModel.swift in Sources */,
 				A00000000000000000000023 /* ReviewFeature.swift in Sources */,
+				A000000000000000000000CE /* ReviewBrowse.swift in Sources */,
+				A000000000000000000000D0 /* P11ReviewModels.swift in Sources */,
+				A000000000000000000000D1 /* P11ReviewScreen.swift in Sources */,
+				A000000000000000000000D2 /* P12SummaryModels.swift in Sources */,
+				A000000000000000000000D3 /* P12SummaryScreen.swift in Sources */,
 				A00000000000000000000024 /* MeFeature.swift in Sources */,
 				A00000000000000000000028 /* ExamScopeScreen.swift in Sources */,
 				A00000000000000000000025 /* CaptureFeature.swift in Sources */,
@@ -665,6 +706,13 @@
 				A000000000000000000000C5 /* P09CapturedSnapshotTests.swift in Sources */,
 				A000000000000000000000C7 /* P10UserExampleSnapshotTests.swift in Sources */,
 				A000000000000000000000CB /* UserExampleEditorTests.swift in Sources */,
+				A000000000000000000000D4 /* ReviewLibraryTests.swift in Sources */,
+				A000000000000000000000D5 /* ReviewBrowseTests.swift in Sources */,
+				A000000000000000000000D6 /* P11ReviewFlowTests.swift in Sources */,
+				A000000000000000000000D7 /* P11ReviewSnapshotTests.swift in Sources */,
+				A000000000000000000000D8 /* P12SummarySnapshotTests.swift in Sources */,
+				A000000000000000000000D9 /* P08ReviewHintTests.swift in Sources */,
+				A000000000000000000000DA /* RouterReviewTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

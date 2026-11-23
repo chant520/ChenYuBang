@@ -17,6 +17,15 @@ public protocol IdiomExamplesReading {
 
 extension ExampleLibraryReader: IdiomExamplesReading {}
 
+/// P05「复习这个成语」置灰判定口子（阶段 3，决策 H）：只取该成语的待复习错题数。
+/// 读库实现 `ReviewLibraryService` 属 feature-review / 数据层，feature 之间不互相引用，
+/// 故在本侧声明协议并由 app 层注入实例（与 `MistakeLibraryReader: MistakeBookReading` 同构）。
+public protocol PendingReviewCountReading {
+    func pendingCount(idiomID: String) throws -> Int
+}
+
+extension ReviewLibraryService: PendingReviewCountReading {}
+
 /// P05「相关题目 · 系统题库」单行展示模型（与 Android IdiomExampleView 同口径）：
 /// 题干摘要 + 「年份 · 地区 · 考试类型」+ 题型，缺字段已在 `IdiomExamples.view(of:)` 归到「暂无」。
 public struct IdiomExampleView: Identifiable, Equatable, Sendable {
@@ -68,13 +77,21 @@ public final class IdiomDetailViewModel: ObservableObject {
     @Published public private(set) var loading = true
     @Published public private(set) var missing = false
     @Published public private(set) var failed = false
+    /// 该成语的待复习错题数（决策 H：0 时「复习这个成语」保持置灰）。
+    @Published public private(set) var pendingReviewCount = 0
 
     private let reader: IdiomDetailReading
     private let examplesReader: IdiomExamplesReading
+    private let reviewCounter: PendingReviewCountReading?
 
-    public init(reader: IdiomDetailReading, examplesReader: IdiomExamplesReading) {
+    public init(
+        reader: IdiomDetailReading,
+        examplesReader: IdiomExamplesReading,
+        reviewCounter: PendingReviewCountReading? = nil
+    ) {
         self.reader = reader
         self.examplesReader = examplesReader
+        self.reviewCounter = reviewCounter
     }
 
     public func load(_ id: String) async {
@@ -82,11 +99,13 @@ public final class IdiomDetailViewModel: ObservableObject {
         examples = []
         missing = false
         failed = false
+        pendingReviewCount = 0
         loading = true
         do {
             if let record = try reader.detail(id: id) {
                 detail = IdiomDetail.view(of: record)
                 examples = try examplesReader.examples(idiomID: id).map(IdiomExamples.view(of:))
+                pendingReviewCount = try reviewCounter?.pendingCount(idiomID: id) ?? 0
             } else {
                 missing = true
             }
@@ -107,21 +126,30 @@ public struct P05IdiomDetailScreen: View {
     private let onBack: () -> Void
     private let onOpenMistakes: () -> Void
     private let onOpenExample: (String) -> Void
+    /// 单成语复习入口（决策 H）：参数为该成语词面，供 P11 / P12 的「本轮范围」一行显示。
+    private let onReviewIdiom: (String) -> Void
 
     @MainActor
     public init(
         id: String,
         reader: IdiomDetailReading,
         examplesReader: IdiomExamplesReading,
+        reviewCounter: PendingReviewCountReading? = nil,
         onBack: @escaping () -> Void,
         onOpenMistakes: @escaping () -> Void,
-        onOpenExample: @escaping (String) -> Void
+        onOpenExample: @escaping (String) -> Void,
+        onReviewIdiom: @escaping (String) -> Void = { _ in }
     ) {
-        _model = StateObject(wrappedValue: IdiomDetailViewModel(reader: reader, examplesReader: examplesReader))
+        _model = StateObject(wrappedValue: IdiomDetailViewModel(
+            reader: reader,
+            examplesReader: examplesReader,
+            reviewCounter: reviewCounter
+        ))
         self.idiomID = id
         self.onBack = onBack
         self.onOpenMistakes = onOpenMistakes
         self.onOpenExample = onOpenExample
+        self.onReviewIdiom = onReviewIdiom
     }
 
     public var body: some View {
@@ -220,12 +248,18 @@ public struct P05IdiomDetailScreen: View {
         relatedExamplesCard(colors)
         myExamplesPlaceholder(colors)
 
-        // D1 单成语复习入口：MVP 内容只有错题，待阶段 3 接入真实待复习数据；无内容置灰。
-        // 阶段3：P05 → P11 单成语模式，按该成语待复习错题判定可点性。
-        CButton(text: "复习这个成语", variant: .primary, enabled: false, action: {})
-        Text("这个成语下还没有待复习的错题")
-            .font(.system(size: Tokens.Font.n12))
-            .foregroundStyle(colors.text3)
+        // D1 单成语复习入口（决策 H）：按该成语待复习错题数判定可点性，为 0 时保持置灰并说明原因。
+        CButton(
+            text: "复习这个成语",
+            variant: .primary,
+            enabled: model.pendingReviewCount > 0,
+            action: { onReviewIdiom(detail.word) }
+        )
+        if model.pendingReviewCount == 0 {
+            Text("这个成语下还没有待复习的错题")
+                .font(.system(size: Tokens.Font.n12))
+                .foregroundStyle(colors.text3)
+        }
     }
 
     private func infoCard(

@@ -122,36 +122,6 @@ final class RouterStateTests: XCTestCase {
         }
     }
 
-    func testReviewSourcesRetryAndEmptyQueue() {
-        let router = RouterState()
-        XCTAssertFalse(router.beginReview(source: .global, queueIDs: ["fixture"]))
-        router.selectTab(.mistake)
-        let origin = router.currentEntry.id
-        XCTAssertFalse(router.beginReview(source: .global, queueIDs: []))
-        XCTAssertTrue(router.fullScreenEntries.isEmpty)
-        XCTAssertTrue(router.beginReview(source: .global, queueIDs: ["mistake-a"]))
-        XCTAssertEqual(router.reviewSession, ReviewSession(source: .global, tab: .mistake, originEntryID: origin))
-        XCTAssertFalse(router.tabBarVisible)
-        XCTAssertFalse(router.finishCapture())
-        XCTAssertTrue(router.finishReview(queueEntryID: router.currentEntry.id))
-        let summaryID = router.currentEntry.id
-        XCTAssertFalse(router.retryReview(queueIDs: []))
-        XCTAssertEqual(router.currentEntry.id, summaryID)
-        XCTAssertTrue(router.retryReview(queueIDs: ["mistake-b"]))
-        XCTAssertEqual(router.fullScreenEntries.count, 2)
-        XCTAssertEqual(router.currentEntry.queueIDs, ["mistake-b"])
-        router.back()
-        XCTAssertEqual(router.currentEntry.id, summaryID)
-        router.back()
-        XCTAssertEqual(router.currentEntry.id, origin)
-        XCTAssertNil(router.reviewSession)
-        router.selectTab(.idiom)
-        router.push(.idiomDetail, recordID: "idiom-fixture")
-        XCTAssertFalse(router.beginReview(source: .idiom("other"), queueIDs: ["mistake-a"]))
-        XCTAssertTrue(router.beginReview(source: .idiom("idiom-fixture"), queueIDs: ["mistake-a"]))
-        XCTAssertEqual(router.reviewSession?.source, .idiom("idiom-fixture"))
-    }
-
     func testCaptureCallbacksFiveStepsAndDoneForcesMistakeRootAndTop() throws {
         let router = RouterState()
         router.selectTab(.mistake)
@@ -232,14 +202,18 @@ final class RouterStateTests: XCTestCase {
         let state = RouteViewState(query: "按", scrollAnchor: "detail-anchor")
         router.updateViewState(entryID: origin.id, state: state)
         let originalStack = router.fullScreenEntries
-        XCTAssertTrue(router.beginReview(source: .idiom("idiom-fixture"), queueIDs: ["mistake-fixture"]))
+        XCTAssertTrue(router.beginReview(
+            source: .idiom(id: "idiom-fixture", word: "一字千金"), queueIDs: ["mistake-fixture"]
+        ))
         XCTAssertEqual(router.suspendedFullScreenEntries, originalStack)
         XCTAssertFalse(router.beginCapture())
         router.back()
         XCTAssertEqual(router.fullScreenEntries, originalStack)
         XCTAssertEqual(router.currentEntry.viewState, state)
         XCTAssertTrue(router.beginCapture())
-        XCTAssertFalse(router.beginReview(source: .idiom("idiom-fixture"), queueIDs: ["mistake-fixture"]))
+        XCTAssertFalse(router.beginReview(
+            source: .idiom(id: "idiom-fixture", word: "一字千金"), queueIDs: ["mistake-fixture"]
+        ))
         let workflowID = try XCTUnwrap(router.captureWorkflow?.id)
         router.cancelCapture()
         XCTAssertEqual(router.fullScreenEntries, originalStack)
@@ -265,24 +239,9 @@ final class RouterStateTests: XCTestCase {
         XCTAssertNil(router.overlay)
         XCTAssertEqual(router.currentEntry, backup)
     }
-
 }
 
 extension RouterStateTests {
-    func testLateReviewCompletionCannotFinishAnotherQueue() {
-        let router = RouterState()
-        router.selectTab(.mistake)
-        router.beginReview(source: .global, queueIDs: ["fixture-a"])
-        let oldEntryID = router.currentEntry.id
-        router.back()
-        router.beginReview(source: .global, queueIDs: ["fixture-b"])
-        XCTAssertFalse(router.finishReview(queueEntryID: oldEntryID))
-        XCTAssertEqual(router.currentEntry.route, .queue)
-        XCTAssertTrue(router.finishReview(queueEntryID: router.currentEntry.id))
-        router.retryReview(queueIDs: ["fixture-c"])
-        XCTAssertFalse(router.finishReview(queueEntryID: oldEntryID))
-    }
-
     func testLateRecognitionCannotAdvanceRecroppedImage() throws {
         let router = RouterState()
         router.beginCapture()
@@ -299,22 +258,6 @@ extension RouterStateTests {
         XCTAssertTrue(router.recognized(
             workflowID: workflowID, entryID: router.currentEntry.id, text: "callback-payload"
         ))
-    }
-
-    func testSummaryDetailsReturnToSummaryThenOrigin() {
-        let router = RouterState()
-        router.selectTab(.mistake)
-        let origin = router.currentEntry
-        XCTAssertTrue(router.beginReview(source: .global, queueIDs: ["fixture-a"]))
-        XCTAssertFalse(router.push(.idiomDetail, recordID: "fixture-idiom"))
-        XCTAssertTrue(router.finishReview(queueEntryID: router.currentEntry.id))
-        let summary = router.currentEntry
-        XCTAssertTrue(router.push(.idiomDetail, recordID: "fixture-idiom"))
-        router.back()
-        XCTAssertEqual(router.currentEntry, summary)
-        router.back()
-        XCTAssertEqual(router.currentEntry, origin)
-        XCTAssertNil(router.reviewSession)
     }
 
     func testGoToMistakesClearsDeepStackAndRequestsRootTop() {

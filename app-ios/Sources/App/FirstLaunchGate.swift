@@ -21,6 +21,8 @@ final class FirstLaunchState: ObservableObject {
     @Published private(set) var mistakeReader: MistakeLibraryReader?
     /// P10 编辑与删除写库入口（工作包 2.8）：与 captureSaver 同时就绪，共用 images 目录。
     @Published private(set) var userExampleEditor: UserExampleEditor?
+    /// P11 / P12 复习队列读库与成绩落库入口（阶段 3）：与 mistakeReader 同时就绪。
+    @Published private(set) var reviewReader: ReviewLibraryService?
     /// P10 原图位的解析基准：Application Support/ChenYuBang，库内存的是相对路径 `images/<id>.jpg`。
     @Published private(set) var dataDirectory: URL?
     private var store: ExamScopeStore?
@@ -67,6 +69,7 @@ final class FirstLaunchState: ObservableObject {
             captureSaver = UserExampleSaver(queue: queue, imagesDirectory: imagesDirectory)
             userExampleEditor = UserExampleEditor(queue: queue, dataDirectory: directory)
             mistakeReader = MistakeLibraryReader(queue: queue)
+            reviewReader = ReviewLibraryService(queue: queue)
             dataDirectory = directory
             preferences = loaded
         } catch is PackError {
