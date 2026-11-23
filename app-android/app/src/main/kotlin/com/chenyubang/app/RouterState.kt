@@ -4,6 +4,7 @@ import com.chenyubang.feature.capture.CropFrame
 import com.chenyubang.feature.capture.IdiomRef
 import com.chenyubang.feature.capture.OcrDraft
 import com.chenyubang.feature.mistake.MistakeViewMode
+import com.chenyubang.feature.review.ReviewSummary
 import java.io.Serializable
 
 data class RouteEntry(val route: Route, val id: String? = null, val instance: Long = 0) : Serializable {
@@ -27,6 +28,8 @@ data class RouterState(
     val stacks: Map<AppTab, List<RouteEntry>> = AppTab.entries.associateWith { listOf(RouteEntry(it.root)) },
     val modal: Route? = null,
     val review: ReviewSession? = null,
+    /** P11 交出的本轮小结，供 P12 渲染；回栈底或重开一轮时清空。 */
+    val reviewSummary: ReviewSummary? = null,
     val captureBaseDepth: Int? = null,
     /** P21 归属列表（候选顺序，手动增补排末尾）；去成语详情取第一条。 */
     val capturedIdioms: List<IdiomRef> = emptyList(),
