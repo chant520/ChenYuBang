@@ -6,4 +6,6 @@ data class P08MistakeActions(
     val onOpenIdiom: (String) -> Unit,
     val onOpenMistake: (String) -> Unit,
     val onCapture: () -> Unit,
+    /** 带当前待复习数；队列为空时停在 P08，由调用方判空提示。 */
+    val onStartReview: (Int) -> Unit = {},
 )

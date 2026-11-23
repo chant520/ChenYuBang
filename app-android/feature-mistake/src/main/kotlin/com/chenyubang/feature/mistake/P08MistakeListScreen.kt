@@ -82,14 +82,9 @@ fun P08MistakeListContent(
         when {
             state.loading -> CBar(CBarKind.Info, "正在读取错题", subtitle = "只读本机题库，不联网。")
             state.failed -> CBar(CBarKind.Warn, "错题读取失败，请重试", subtitle = "再进一次本页会重新读取。")
-            // 空态（IA §5.4 行 547）：②总览行与 ③视图切换仍是常驻区块，⑥空态区在 ③之后、不含 ④「开始复习」。
             state.total == 0 -> {
                 P08Overview(total = state.total, pending = state.pending)
-                CSegmentedControl(
-                    items = MistakeViewMode.labels,
-                    selectedIndex = MistakeViewMode.entries.indexOf(viewMode),
-                    onSelect = { idx -> actions.onViewModeChange(MistakeViewMode.entries[idx]) },
-                )
+                mistakeViewSelector(viewMode, actions)
                 CEmptyState(
                     title = "还没有错题",
                     description = "拍一张卷子上的题录进题库，标记为做错后就会归到对应成语下",
@@ -101,11 +96,7 @@ fun P08MistakeListContent(
             }
             else -> {
                 P08Overview(total = state.total, pending = state.pending)
-                CSegmentedControl(
-                    items = MistakeViewMode.labels,
-                    selectedIndex = MistakeViewMode.entries.indexOf(viewMode),
-                    onSelect = { actions.onViewModeChange(MistakeViewMode.entries[it]) },
-                )
+                mistakeViewSelector(viewMode, actions)
                 if (state.pending == 0) {
                     CBar(
                         kind = CBarKind.Info,
@@ -123,11 +114,26 @@ fun P08MistakeListContent(
                     MistakeViewMode.ByExamType ->
                         P08ExamTypeGroups(items = state.mistakes, onOpenMistake = actions.onOpenMistake)
                 }
-                // TODO(3.1): 「开始复习」接 P11 复习队列；本包只保证按钮在位、置灰（文案带待复习数，iOS MistakeBrowse.swift:110 同口径）。
-                CButton(text = "开始复习 · ${state.pending} 道待复习", onClick = {}, enabled = false)
+                CButton(
+                    text = "开始复习 · ${state.pending} 道待复习",
+                    onClick = { actions.onStartReview(state.pending) },
+                    enabled = state.pending > 0,
+                )
             }
         }
     }
+}
+
+@Composable
+private fun mistakeViewSelector(
+    viewMode: MistakeViewMode,
+    actions: P08MistakeActions,
+) {
+    CSegmentedControl(
+        items = MistakeViewMode.labels,
+        selectedIndex = MistakeViewMode.entries.indexOf(viewMode),
+        onSelect = { actions.onViewModeChange(MistakeViewMode.entries[it]) },
+    )
 }
 
 @Composable
