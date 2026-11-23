@@ -9,7 +9,6 @@ import com.chenyubang.feature.capture.OcrScreenActions
 import com.chenyubang.feature.capture.P20FormDeps
 import com.chenyubang.feature.capture.P20FormScreen
 import com.chenyubang.feature.capture.P21DoneScreen
-import com.chenyubang.feature.mistake.P08MistakeActions
 
 /** 按当前路由渲染目标页；P04/P05 的返回与跳转与其余路由同口径。 */
 @Composable
@@ -18,6 +17,7 @@ internal fun RouteContent(
     router: RouterState,
     deps: RouteDeps,
     onRoute: (RouterState) -> Unit,
+    back: () -> Unit,
 ) {
     when (entry.route) {
         Route.Scope ->
@@ -49,6 +49,7 @@ internal fun RouteContent(
                 onBack = { onRoute(router.back()) },
                 onOpenMistakes = { onRoute(router.goToMistakes()) },
                 onOpenExample = { id -> onRoute(router.push(Route.Example, id)) },
+                onReviewIdiom = { count -> onRoute(router.startReview(count)) },
             )
         Route.Example ->
             ExampleDestination(requireNotNull(entry.id), deps.database, { onRoute(router.back()) }) { id ->
@@ -59,17 +60,11 @@ internal fun RouteContent(
                 viewMode = router.mistakesView,
                 revision = router.contentRevision,
                 database = deps.database,
-                actions =
-                    P08MistakeActions(
-                        onViewModeChange = { onRoute(router.copy(mistakesView = it)) },
-                        onOpenIdiom = { id -> onRoute(router.push(Route.IdiomMistakes, id)) },
-                        // 路由键 mistake/{id} 的值取 user_example.id（P08 平铺行仅该列非空可点）。
-                        onOpenMistake = { id -> onRoute(router.push(Route.Mistake, id)) },
-                        onCapture = { onRoute(router.startCapture()) },
-                    ),
+                actions = mistakeActions(router, onRoute),
             )
         Route.IdiomMistakes -> IdiomMistakesRouteContent(entry, router, deps, onRoute)
         Route.Mistake -> UserExampleRouteContent(entry, router, deps, onRoute)
+        Route.Queue, Route.Summary -> ReviewRouteContent(entry, router, deps, onRoute, back)
         else -> CaptureRouteContent(entry, router, deps, onRoute)
     }
 }

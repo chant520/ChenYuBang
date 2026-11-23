@@ -114,7 +114,15 @@ private fun RouterShell(deps: RouteDeps) {
     var confirmExit by remember { mutableStateOf(false) }
     val holder = rememberSaveableStateHolder()
     val colors = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
-    val back = { if (router.current.route == Route.Queue) confirmExit = true else router = router.back() }
+    val back = {
+        val previous = router.stack.getOrNull(router.stack.lastIndex - 1)?.route
+        // 首轮进队列退出要二次确认；「再复习一轮」退回小结不算丢进度。
+        if (router.current.route == Route.Queue && previous != Route.Summary) {
+            confirmExit = true
+        } else {
+            router = router.back()
+        }
+    }
     BackHandler(enabled = systemBackEnabled(router), onBack = back)
     val onSearch: (() -> Unit)? =
         if (router.current.route == Route.Library) ({ router = router.push(Route.Search) }) else null
@@ -124,7 +132,7 @@ private fun RouterShell(deps: RouteDeps) {
             Box(Modifier.weight(1f)) {
                 val entry = router.current
                 holder.SaveableStateProvider("${router.tab.name}:${entry.instance}") {
-                    RouteContent(entry, router, deps) { router = it }
+                    RouteContent(entry, router, deps, { router = it }, back)
                 }
             }
             if (router.showTabs) {

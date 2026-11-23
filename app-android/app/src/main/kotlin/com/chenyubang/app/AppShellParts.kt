@@ -47,7 +47,7 @@ internal fun ExitReviewOverlay(
 ) {
     val colors = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
     COverlay("放弃本轮复习？", true, onDismiss) {
-        Text("退出会丢弃本轮进度。", color = colors.text2, fontSize = Tokens.Font.n12.sp)
+        Text("退出会丢本轮进度", color = colors.text2, fontSize = Tokens.Font.n12.sp)
         CButton("确认退出", onConfirm)
         CButton("继续复习", onDismiss, variant = CButtonVariant.Ghost)
     }

@@ -25,7 +25,17 @@ import com.chenyubang.core.ui.tokens.Tokens
 
 /** 自带完整顶部区的页面：P04 搜索浮层、P05 详情、P17 拍照、P18 裁切、P19 识别。 */
 private val selfChromedRoutes =
-    setOf(Route.Search, Route.Idiom, Route.Mistakes, Route.IdiomMistakes, Route.Camera, Route.Crop, Route.Ocr)
+    setOf(
+        Route.Search,
+        Route.Idiom,
+        Route.Mistakes,
+        Route.IdiomMistakes,
+        Route.Queue,
+        Route.Summary,
+        Route.Camera,
+        Route.Crop,
+        Route.Ocr,
+    )
 
 /** 顶部区：左返回 / 页名 / 该页上下文操作（信息架构 v1.2 §2）。 */
 @Composable

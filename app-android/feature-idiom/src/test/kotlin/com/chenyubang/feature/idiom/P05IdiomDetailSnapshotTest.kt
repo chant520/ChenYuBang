@@ -29,6 +29,7 @@ class P05IdiomDetailSnapshotTest {
     private fun capture(
         night: Boolean,
         scrollToText: String? = null,
+        canReview: Boolean = false,
     ) {
         composeTestRule.setContent {
             val base = LocalConfiguration.current
@@ -37,7 +38,7 @@ class P05IdiomDetailSnapshotTest {
             config.uiMode = (config.uiMode and Configuration.UI_MODE_NIGHT_MASK.inv()) or nightBits
             CompositionLocalProvider(LocalConfiguration provides config) {
                 ChenYuBangTheme(darkTheme = night) {
-                    P05IdiomDetailContent(state = state())
+                    P05IdiomDetailContent(state = state(), canReview = canReview)
                 }
             }
         }
@@ -103,4 +104,11 @@ class P05IdiomDetailSnapshotTest {
     /** 滚动到「相关题目」区：两条系统真题行 + 我录入的题占位（1.6 验收点）。 */
     @Test
     fun detailRelatedLight() = capture(night = false, scrollToText = "我录入的题（标错才进错题本）")
+
+    /** 阶段 3 补帧：有待复习错题时「复习这个成语」由置灰转可点，且不显示置灰原因句。 */
+    @Test
+    fun reviewEnabledLight() = capture(night = false, scrollToText = "复习这个成语", canReview = true)
+
+    @Test
+    fun reviewEnabledDark() = capture(night = true, scrollToText = "复习这个成语", canReview = true)
 }

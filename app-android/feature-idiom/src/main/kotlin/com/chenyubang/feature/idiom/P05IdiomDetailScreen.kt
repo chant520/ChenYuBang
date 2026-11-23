@@ -17,7 +17,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -49,7 +51,10 @@ fun P05IdiomDetailRoute(
     onBack: () -> Unit,
     onOpenMistakes: () -> Unit,
     onOpenExample: (String) -> Unit,
+    onReviewIdiom: (Int) -> Unit = {},
 ) {
+    var pendingCount by remember { mutableStateOf(0) }
+    LaunchedEffect(idiomId) { pendingCount = database.reviewDao().pendingCount(idiomId) }
     val factory =
         remember(database) {
             viewModelFactory {
@@ -70,6 +75,8 @@ fun P05IdiomDetailRoute(
         onOpenMistakes = onOpenMistakes,
         onOpenExample = onOpenExample,
         onRetry = { model.load(idiomId) },
+        canReview = pendingCount > 0,
+        onReviewIdiom = { onReviewIdiom(pendingCount) },
     )
 }
 
@@ -87,6 +94,8 @@ fun P05IdiomDetailContent(
     onOpenMistakes: () -> Unit = {},
     onOpenExample: (String) -> Unit = {},
     onRetry: () -> Unit = {},
+    canReview: Boolean = false,
+    onReviewIdiom: () -> Unit = {},
 ) {
     val colors = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
     Column(
@@ -118,12 +127,17 @@ fun P05IdiomDetailContent(
                     onAction = onRetry,
                 )
             state.detail != null ->
-                DetailBody(
+                detailBody(
                     detail = state.detail,
                     examples = state.examples,
                     colors = colors,
-                    onOpenMistakes = onOpenMistakes,
-                    onOpenExample = onOpenExample,
+                    actions =
+                        IdiomDetailActions(
+                            onOpenMistakes = onOpenMistakes,
+                            onOpenExample = onOpenExample,
+                            canReview = canReview,
+                            onReviewIdiom = onReviewIdiom,
+                        ),
                 )
         }
     }
@@ -156,13 +170,20 @@ private fun DetailHeader(
     }
 }
 
+/** P05 正文区的导航与单成语复习入口，打包避免 detailBody 参数过多。 */
+data class IdiomDetailActions(
+    val onOpenMistakes: () -> Unit,
+    val onOpenExample: (String) -> Unit,
+    val canReview: Boolean,
+    val onReviewIdiom: () -> Unit,
+)
+
 @Composable
-private fun DetailBody(
+private fun detailBody(
     detail: IdiomDetailView,
     examples: List<IdiomExampleView>,
     colors: Tokens.ColorSet,
-    onOpenMistakes: () -> Unit,
-    onOpenExample: (String) -> Unit,
+    actions: IdiomDetailActions,
 ) {
     // 成语名 + 拼音 + 读音（朗读是未来项，这里只展示图标与拼音，不触发播放）。
     Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -204,17 +225,18 @@ private fun DetailBody(
         BodyText(text = "反义：${IdiomDetail.presentList(detail.antonyms)}", colors = colors)
     }
 
-    RelatedExamplesCard(examples = examples, colors = colors, onOpenExample = onOpenExample)
-    MyExamplesPlaceholder(onOpenMistakes = onOpenMistakes, colors = colors)
+    RelatedExamplesCard(examples = examples, colors = colors, onOpenExample = actions.onOpenExample)
+    MyExamplesPlaceholder(onOpenMistakes = actions.onOpenMistakes, colors = colors)
 
-    // D1 单成语复习入口：MVP 复习内容只有错题，待阶段 3 接入真实待复习数据；无内容时置灰。
-    // TODO(阶段3): P05 → P11 单成语模式，按该成语待复习错题判定可点性。
-    CButton(text = "复习这个成语", onClick = {}, enabled = false)
-    Text(
-        text = "这个成语下还没有待复习的错题",
-        color = colors.text3,
-        fontSize = Tokens.Font.n12.sp,
-    )
+    // D1 单成语复习入口（决策 H）：该成语无待复习错题时保持置灰并说明原因；可点进 P11 单成语模式。
+    CButton(text = "复习这个成语", onClick = actions.onReviewIdiom, enabled = actions.canReview)
+    if (!actions.canReview) {
+        Text(
+            text = "这个成语下还没有待复习的错题",
+            color = colors.text3,
+            fontSize = Tokens.Font.n12.sp,
+        )
+    }
 }
 
 @Composable

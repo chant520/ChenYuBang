@@ -34,6 +34,7 @@ class P08MistakeListSnapshotTest {
         night: Boolean,
         state: P08MistakeListUiState,
         viewMode: MistakeViewMode,
+        pageMessage: String? = null,
     ) {
         composeTestRule.setContent {
             val base = LocalConfiguration.current
@@ -51,6 +52,7 @@ class P08MistakeListSnapshotTest {
                                 onOpenIdiom = {},
                                 onOpenMistake = {},
                                 onCapture = {},
+                                pageMessage = pageMessage,
                             ),
                     )
                 }
@@ -130,4 +132,22 @@ class P08MistakeListSnapshotTest {
 
     @Test
     fun toReviewClearedReviewCountDark() = capture(night = true, state = cleared(), viewMode = MistakeViewMode.ByIdiom)
+
+    @Test
+    fun emptyReviewHintLight() =
+        capture(
+            night = false,
+            state = loaded(),
+            viewMode = MistakeViewMode.ByIdiom,
+            pageMessage = "今天没有待复习的错题",
+        )
+
+    @Test
+    fun emptyReviewHintDark() =
+        capture(
+            night = true,
+            state = loaded(),
+            viewMode = MistakeViewMode.ByIdiom,
+            pageMessage = "今天没有待复习的错题",
+        )
 }

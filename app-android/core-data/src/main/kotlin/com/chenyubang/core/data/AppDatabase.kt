@@ -240,6 +240,8 @@ abstract class AppDatabase : RoomDatabase() {
 
     abstract fun mistakeQueryDao(): MistakeQueryDao
 
+    abstract fun reviewDao(): ReviewDao
+
     companion object {
         const val NAME = "chenyubang.db"
 
