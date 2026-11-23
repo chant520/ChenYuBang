@@ -25,16 +25,21 @@ public struct P12SummaryContent: View {
         ScrollView {
             VStack(alignment: .leading, spacing: Tokens.Space.block) {
                 header
-                scopeRow
-                scoreCard
-                idiomCard
-                advancedRow
-                CButton(
-                    text: state.scope.idiomID == nil ? "回错题本" : "回成语详情",
-                    enabled: true,
-                    action: actions.onHome
-                )
-                CButton(text: "再复习一轮", variant: .ghost, enabled: true, action: actions.onRetryRound)
+                if state.total == 0 {
+                    scoreCard
+                    zeroRoundState
+                } else {
+                    scopeRow
+                    scoreCard
+                    idiomCard
+                    advancedRow
+                    CButton(
+                        text: state.scope.idiomID == nil ? "回错题本" : "回成语详情",
+                        enabled: true,
+                        action: actions.onHome
+                    )
+                    CButton(text: "再复习一轮", variant: .ghost, enabled: true, action: actions.onRetryRound)
+                }
             }
             .padding(.horizontal, Tokens.Space.pageX)
             .padding(.top, Tokens.Space.contentTop)
@@ -95,6 +100,19 @@ public struct P12SummaryContent: View {
                 .foregroundStyle(colors.text2)
         }
         .accessibilityElement(children: .combine)
+    }
+
+    /// 0 题兜底态（信息架构 v1.4 第 5.4 节 P12 行 / 高保真稿 D P12「0 题」）：题量卡照常，
+    /// 收尾只给「回上一页」，不出成语卡、进阶占位与「再复习一轮」。
+    /// 正常路径不可达（空队列进不了 P11），与 Android 同按异常态兜底。
+    private var zeroRoundState: some View {
+        CEmptyState(
+            title: "这一轮没有题目",
+            description: "队列在开始时就被清空了，属异常情形，正常不会到这里。",
+            actionTitle: "回上一页",
+            onAction: actions.onHome
+        )
+        .padding(.top, Tokens.Space.lsubTop)
     }
 
     /// ④：本轮碰到的成语（去重、按词面升序）；点击成语进 P05 看详情与真题。

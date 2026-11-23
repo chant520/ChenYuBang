@@ -30,11 +30,14 @@ public struct P11ReviewContent: View {
                 header
                 content
                 // ⑤：页脚把退出口径写死在页面上（高保真稿 B P11 `.leavetip`）。
-                Text("退出会丢弃本轮进度，需二次确认")
-                    .font(.system(size: Tokens.Font.n11))
-                    .foregroundStyle(colors.text3)
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .padding(.top, Tokens.Space.lmetaTop)
+                // 空队列没有进度可丢弃，稿 D 的空态帧也没有这一行，故只在有题时出现。
+                if !state.items.isEmpty {
+                    Text("退出会丢弃本轮进度，需二次确认")
+                        .font(.system(size: Tokens.Font.n11))
+                        .foregroundStyle(colors.text3)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .padding(.top, Tokens.Space.lmetaTop)
+                }
             }
             .padding(.horizontal, Tokens.Space.pageX)
             .padding(.top, Tokens.Space.contentTop)
@@ -44,8 +47,9 @@ public struct P11ReviewContent: View {
         .background(colors.page)
     }
 
-    /// ①：关闭（SVG 矢量图标，退出需二次确认）+「复习中 · 退出会二次确认」；
-    /// 进度与「本轮范围」一行。
+    /// ①：关闭（SVG 矢量图标，退出需二次确认）+ 页名；有题时另起一行进度与「本轮范围」徽标。
+    /// 页名与行取舍按高保真稿：有题＝稿 B P11「复习中 · 退出会二次确认」+「第 N 题 / 共 M 题」+ 范围徽标；
+    /// 空队列＝稿 D P11 无待复习帧「复习中」／「复习 · 某成语」，进度与共 0 题的自相矛盾行不出现。
     private var header: some View {
         VStack(alignment: .leading, spacing: Tokens.Space.lmetaTop) {
             HStack(spacing: Tokens.Space.lt1Gap) {
@@ -56,20 +60,28 @@ public struct P11ReviewContent: View {
                 }
                 .buttonStyle(CPressDimStyle())
                 .accessibilityLabel("退出复习")
-                Text("复习中 · 退出会二次确认")
+                Text(titleText)
                     .font(.system(size: Tokens.Font.n15, weight: .semibold))
                     .foregroundStyle(colors.text)
                     .accessibilityAddTraits(.isHeader)
                 Spacer(minLength: 0)
             }
-            HStack(spacing: 0) {
-                Text(state.progressText)
-                    .font(.system(size: Tokens.Font.n13, weight: .semibold))
-                    .foregroundStyle(colors.text)
-                Spacer(minLength: 0)
-                CBadge(text: scope.line, kind: .info)
+            if !state.items.isEmpty {
+                HStack(spacing: 0) {
+                    Text(state.progressText)
+                        .font(.system(size: Tokens.Font.n13, weight: .semibold))
+                        .foregroundStyle(colors.text)
+                    Spacer(minLength: 0)
+                    CBadge(text: scope.line, kind: .info)
+                }
             }
         }
+    }
+
+    private var titleText: String {
+        guard state.items.isEmpty else { return "复习中 · 退出会二次确认" }
+        guard scope.idiomID != nil, let word = scope.word else { return "复习中" }
+        return "复习 · \(word)"
     }
 
     @ViewBuilder
@@ -186,20 +198,21 @@ public struct P11ReviewContent: View {
         }
     }
 
-    /// 空态（信息架构 v1.4 第 5.4 节 P11 两行）：全局 / 单成语各自落点，按钮直接回各自栈底。
+    /// 空态（高保真稿 D P11 无待复习两帧）：全局 / 单成语各自落点，按钮直接回各自栈底。
+    /// 全局那行说明按稿（信息架构 v1.4 第 5.4 节只给标题与按钮）；单成语那句含「入口正常是灰的」兜底解释。
     private var emptyState: some View {
         Group {
             if scope.idiomID == nil {
                 CEmptyState(
                     title: "今天没有待复习的错题",
-                    description: "错题本里标记为做错的题会出现在这里",
+                    description: "MVP 不做记忆算法：待复习按最近录入优先排序，队列清空后这里就是空的。",
                     actionTitle: "回错题本",
                     onAction: actions.onLeave
                 )
             } else {
                 CEmptyState(
                     title: "这个成语下没有待复习的错题",
-                    description: "可以回成语详情看它的真题",
+                    description: "这个入口正常是灰的；直接进来时走这条兜底。可以回成语详情看它的真题。",
                     actionTitle: "回成语详情",
                     onAction: actions.onLeave
                 )
