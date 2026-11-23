@@ -120,6 +120,18 @@ public enum ReviewLibrary {
         case mistakeNotFound(String)
     }
 
+    /// 队列查询的行头：正文列经 `COALESCE` 后仍可能为 NULL（快照列空串已归 nil），故选项与本答案按可空取。
+    private struct QueueHead: FetchableRecord, Decodable {
+        let id: String
+        let stem: String
+        let optionA: String?
+        let optionB: String?
+        let optionC: String?
+        let optionD: String?
+        let myAnswer: String?
+        let createdAt: String
+    }
+
     /// 空串归 nil；`mistake.optionA` 等列非空约束但保存时缺项写空串。
     private static func normalized(_ value: String?) -> String? {
         guard let value, !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return nil }

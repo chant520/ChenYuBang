@@ -70,7 +70,7 @@ public struct P12SummaryContent: View {
     }
 
     private var scopeLine: String {
-        state.scope.idiomID == nil ? "全部待复习" : "只看『\(state.scope.word)』"
+        state.scope.line
     }
 
     /// ③：成绩卡——本轮题量 / 答对 / 答错（答错＝与首次作答一致）。

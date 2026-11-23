@@ -13,7 +13,7 @@ struct RouteEntry: Identifiable, Equatable {
     let route: AppRoute
     var recordID: String?
     var queueIDs: [String] = []
-    /// 本轮复习小结：跟着 P12 那一条栈entry 存，「再复习一轮」后再退回上一轮 P12 仍是当轮数字。
+    /// 本轮复习小结：跟着 P12 那一条栈条目存，「再复习一轮」后再退回上一轮 P12 仍是当轮数字。
     var reviewOutcome: ReviewRoundOutcome?
     var viewState = RouteViewState()
 }
