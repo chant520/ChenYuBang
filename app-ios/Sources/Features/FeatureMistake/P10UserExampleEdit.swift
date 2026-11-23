@@ -26,6 +26,7 @@ public enum UserExampleEditCopy {
     public static let deleteFailed = "删除失败，请重试"
     public static let atLeastOne = P20Matcher.atLeastOne
     public static let yearRule = "年份为 4 位数字"
+    public static let answerRule = "我的答案只能是 A/B/C/D"
     public static let tagRule = P20Matcher.tagRule
     public static let stemPlaceholder = "题目原文"
     public static let answerPlaceholder = "选 A / B / C / D"
@@ -200,7 +201,8 @@ public struct P10UserExampleEditForm: View {
             CLabel("我的答案")
             CInput(text: binding(draft.answerText, actions.onAnswer),
                    state: draft.answerInvalid ? .error : fieldState,
-                   placeholder: UserExampleEditCopy.answerPlaceholder)
+                   placeholder: UserExampleEditCopy.answerPlaceholder,
+                   errorHint: draft.answerInvalid ? UserExampleEditCopy.answerRule : nil)
                 .padding(.top, Tokens.Space.lt1Gap)
             if draft.isMistake {
                 CLabel("我的错因")
