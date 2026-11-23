@@ -112,13 +112,15 @@ private fun reviewQueueTopBar(
             CChromeGlyph(CChromeIcon.Close, colors.text2, Modifier.size(Tokens.Icon.n21.dp))
         }
         Text(
-            text = if (state.total == 0) "复习队列" else "第 ${state.index + 1} 题 / 共 ${state.total} 题",
+            text = state.topBarTitle,
             color = colors.head,
             fontSize = Tokens.Font.n15.sp,
             fontWeight = FontWeight.W700,
         )
     }
-    Text(text = state.scopeLine, color = colors.text3, fontSize = Tokens.Font.n12.sp)
+    if (state.total > 0) {
+        Text(text = state.scopeLine, color = colors.text3, fontSize = Tokens.Font.n12.sp)
+    }
 }
 
 @Composable
@@ -129,7 +131,13 @@ private fun reviewQueueEmpty(
     val single = state.scopeIdiomId != null
     CEmptyState(
         title = if (single) "这个成语下没有待复习的错题" else "今天没有待复习的错题",
-        description = if (single) "可以回成语详情看它的真题" else "错题本里标记为做错的题会出现在这里",
+        // 副文案逐字取高保真 D 组空态整句（2026-11-23 拍板：空态全按稿 D）。
+        description =
+            if (single) {
+                "这个入口正常是灰的；直接进来时走这条兜底。可以回成语详情看它的真题。"
+            } else {
+                "MVP 不做记忆算法：待复习按最近录入优先排序，队列清空后这里就是空的。"
+            },
         actionText = if (single) "回成语详情" else "回错题本",
         onAction = onBackToSource,
     )

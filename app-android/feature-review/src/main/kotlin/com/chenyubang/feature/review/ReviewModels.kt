@@ -29,6 +29,15 @@ data class ReviewUiState(
     val answerCount: Int get() = answers.size
     val correctCount: Int get() = answers.values.count { it.verdict.result == ReviewScoring.RESULT_CORRECT }
     val scopeLine: String get() = scopeWord?.let { "只看『$it』" } ?: "全部待复习"
+
+    /** 顶栏页名：空态取稿 D「复习中 / 复习 · 某成语」，有题时为进度行。 */
+    val topBarTitle: String
+        get() =
+            if (total == 0) {
+                scopeWord?.let { "复习 · $it" } ?: "复习中"
+            } else {
+                "第 ${index + 1} 题 / 共 $total 题"
+            }
 }
 
 /** P12 展示用的一轮结果；涉及成语按本轮范围收窄，单成语不扩大到全局。 */
