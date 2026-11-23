@@ -196,4 +196,42 @@ final class P11ReviewSnapshotTests: XCTestCase {
     func testIdiomEmptyDark() {
         assertP11(P11ReviewState(loading: false), scope: .idiom(id: "i1", word: "按部就班"), dark: true)
     }
+
+    /// 长题干 + 长选项 + 不可比对说明行：钉住三四行题干与四行长选项下的换行与判分区位置，
+    /// 防止真机长文本把判分结论挤出首屏（短 fixture 覆盖不到，见复查清单第五节第 5 条）。
+    private func longStemItem() -> ReviewQueueItem {
+        ReviewQueueItem(
+            id: "m9",
+            stem: "填入横线处最恰当的一项是：全面深化改革既要敢于突破既有利益格局，"
+                + "又要善于把握节奏、稳扎稳打，不能______，也不能畏首畏尾、裹足不前。",
+            options: [
+                "墨守成规、照搬照抄过去的经验",
+                "按部就班、一步一个脚印地推进",
+                "别出心裁、另辟蹊径地寻求突破",
+                "急于求成、不顾实际地强推硬推",
+            ],
+            myAnswer: nil,
+            createdAt: "2026-11-20T09:00:00Z"
+        )
+    }
+
+    func testLongQuestionUncomparableLight() {
+        assertP11(
+            P11ReviewState(
+                loading: false, items: [longStemItem()], picked: "D",
+                judged: true, recorded: true
+            ),
+            dark: false
+        )
+    }
+
+    func testLongQuestionUncomparableDark() {
+        assertP11(
+            P11ReviewState(
+                loading: false, items: [longStemItem()], picked: "D",
+                judged: true, recorded: true
+            ),
+            dark: true
+        )
+    }
 }
