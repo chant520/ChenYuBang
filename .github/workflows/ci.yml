@@ -1,23 +1,17 @@
 name: CI
 
 on:
-  push:
-    branches: [main]
-    paths-ignore:
-      - "docs/**"
-      - "**/*.md"
-      - ".workbuddy/**"
-      - ".codebuddy/**"
+  # 2026-11-23 版内修订（规范 §13.1）：仅 PR 触发 + 路径过滤；push: main 重复轮移除，
+  # 纯 Android / docs 改动不触发 iOS CI（Android 前置＝本机门禁）
   pull_request:
-    paths-ignore:
-      - "docs/**"
-      - "**/*.md"
-      - ".workbuddy/**"
-      - ".codebuddy/**"
+    paths:
+      - "app-ios/**"
+      - "shared/**"
+      - ".github/workflows/ci.yml"
   workflow_dispatch:
     inputs:
       record:
-        description: "iOS 快照录制引导（true=record 并上传产物；默认 false=verify 门禁）"
+        description: "iOS 快照录制引导（true=record 并上传产物、轮次绿色退出；默认 false=verify 门禁）"
         type: boolean
         default: false
       ios_snapshot_scope:
@@ -27,6 +21,10 @@ on:
           - all
           - representative
         default: all
+      test_filter:
+        description: "仅录制轮：测试类名（拼为 -only-testing:ChenYuBangTests/<类名>），空=全量"
+        type: string
+        default: ""
 
 # 同一分支有新提交时取消上一轮未完成的运行，避免重复消耗
 concurrency:
@@ -58,20 +56,32 @@ jobs:
           brew install swiftlint
           cd app-ios
           swiftlint lint --strict
+      - name: Cache SPM packages (restore latest; unique key per run)
+        uses: actions/cache@v4
+        with:
+          path: app-ios/.spm-packages
+          key: spm-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            spm-${{ runner.os }}-
       - name: 解析 SPM 依赖（xcodeproj 已入库，不生成、不用 CocoaPods；规范 §13.1）
         run: |
           cd app-ios
           xcodebuild -resolvePackageDependencies \
+            -clonedSourcePackagesDirPath .spm-packages \
             -project ChenYuBang.xcodeproj -scheme ChenYuBang
       - name: 编译
         run: |
           cd app-ios
           xcodebuild -project ChenYuBang.xcodeproj -scheme ChenYuBang \
+            -clonedSourcePackagesDirPath .spm-packages \
             -destination 'generic/platform=iOS' build CODE_SIGNING_ALLOWED=NO
       - name: 单测 + 快照比对（swift-snapshot-testing 作为 test 的一部分；规范 §13 / §13.1）
+        # Record runs fail every snapshot by design; continue-on-error keeps the run green
+        continue-on-error: ${{ github.event.inputs.record == 'true' }}
         env:
           TEST_RUNNER_SNAPSHOT_RECORD: ${{ github.event.inputs.record == 'true' && '1' || '' }}
           IOS_SNAPSHOT_SCOPE: ${{ github.event.inputs.ios_snapshot_scope || 'all' }}
+          TEST_FILTER: ${{ github.event.inputs.test_filter || '' }}
         run: |
           cd app-ios
           test_args=()
@@ -86,13 +96,29 @@ jobs:
               ;;
             *) exit 2 ;;
           esac
+          if [[ -n "$TEST_FILTER" ]]; then
+            if [[ "$TEST_RUNNER_SNAPSHOT_RECORD" != 1 ]]; then
+              echo "::error::test_filter only allowed with record=true; verify gate stays full scope"
+              exit 2
+            fi
+            if [[ "$IOS_SNAPSHOT_SCOPE" != all ]]; then
+              echo "::error::test_filter and representative are mutually exclusive"
+              exit 2
+            fi
+            test_args+=("-only-testing:ChenYuBangTests/$TEST_FILTER")
+          fi
+          rm -rf .xcresult
           xcodebuild -project ChenYuBang.xcodeproj -scheme ChenYuBang \
+            -clonedSourcePackagesDirPath .spm-packages \
             -destination 'platform=iOS Simulator,name=iPhone 16' \
+            -resultBundlePath .xcresult/ios-results.xcresult \
             "${test_args[@]}" test CODE_SIGNING_ALLOWED=NO
           if [[ "$IOS_SNAPSHOT_SCOPE" == representative && "$TEST_RUNNER_SNAPSHOT_RECORD" == 1 ]]; then
             TEST_RUNNER_SNAPSHOT_RECORD=0 xcodebuild \
               -project ChenYuBang.xcodeproj -scheme ChenYuBang \
+              -clonedSourcePackagesDirPath .spm-packages \
               -destination 'platform=iOS Simulator,name=iPhone 16' \
+              -resultBundlePath .xcresult/ios-recheck.xcresult \
               "${test_args[@]}" test CODE_SIGNING_ALLOWED=NO
           fi
       - name: 上传快照基线产物（首次录制引导 / 失败时取回审阅；规范 §11.1）
@@ -101,4 +127,11 @@ jobs:
         with:
           name: ios-snapshots
           path: app-ios/Tests/__Snapshots__
+          if-no-files-found: ignore
+      - name: 上传 xcresult（仅 verify 失败；规范 §11.2 / §13.1，供定向提取实际帧审阅）
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-xcresult
+          path: app-ios/.xcresult
           if-no-files-found: ignore
