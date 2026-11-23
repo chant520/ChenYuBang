@@ -81,7 +81,7 @@ final class P11ReviewSnapshotTests: XCTestCase {
         assertP11(
             P11ReviewState(
                 loading: false, items: roundItems(), index: 0, picked: "A",
-                judged: true, recorded: true, answeredCount: 1, wrongCount: 1
+                judged: true, recorded: true, wrongCount: 1, answeredCount: 1
             ),
             dark: false
         )
@@ -91,7 +91,7 @@ final class P11ReviewSnapshotTests: XCTestCase {
         assertP11(
             P11ReviewState(
                 loading: false, items: roundItems(), index: 0, picked: "A",
-                judged: true, recorded: true, answeredCount: 1, wrongCount: 1
+                judged: true, recorded: true, wrongCount: 1, answeredCount: 1
             ),
             dark: true
         )
@@ -102,7 +102,7 @@ final class P11ReviewSnapshotTests: XCTestCase {
         assertP11(
             P11ReviewState(
                 loading: false, items: roundItems(), index: 1, picked: "B",
-                judged: true, recorded: true, answeredCount: 1, correctCount: 1
+                judged: true, recorded: true, correctCount: 1, answeredCount: 1
             ),
             dark: false
         )
@@ -112,7 +112,7 @@ final class P11ReviewSnapshotTests: XCTestCase {
         assertP11(
             P11ReviewState(
                 loading: false, items: roundItems(), index: 1, picked: "B",
-                judged: true, recorded: true, answeredCount: 1, correctCount: 1
+                judged: true, recorded: true, correctCount: 1, answeredCount: 1
             ),
             dark: true
         )
@@ -123,7 +123,7 @@ final class P11ReviewSnapshotTests: XCTestCase {
         assertP11(
             P11ReviewState(
                 loading: false, items: roundItems(), index: 2, picked: "C",
-                judged: true, recorded: true, answeredCount: 1, correctCount: 1
+                judged: true, recorded: true, correctCount: 1, answeredCount: 1
             ),
             dark: false
         )
@@ -133,7 +133,7 @@ final class P11ReviewSnapshotTests: XCTestCase {
         assertP11(
             P11ReviewState(
                 loading: false, items: roundItems(), index: 2, picked: "C",
-                judged: true, recorded: true, answeredCount: 1, correctCount: 1
+                judged: true, recorded: true, correctCount: 1, answeredCount: 1
             ),
             dark: true
         )

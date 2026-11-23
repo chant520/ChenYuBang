@@ -69,9 +69,9 @@ final class ReviewLibraryTests: XCTestCase {
         let queue = try seededQueue()
         try queue.write { db in
             try ReviewLibrary.record(db, mistakeID: "m1", result: ReviewLibrary.resultRight,
-                                     at: "2026-11-23T00:00:00Z")
+                                     reviewedAt: "2026-11-23T00:00:00Z")
             try ReviewLibrary.record(db, mistakeID: "m1", result: ReviewLibrary.resultWrong,
-                                     at: "2026-11-23T01:00:00Z")
+                                     reviewedAt: "2026-11-23T01:00:00Z")
             let logCount = try Int.fetchOne(
                 db, sql: "SELECT COUNT(*) FROM review_log WHERE mistakeId = 'm1'") ?? 0
             XCTAssertEqual(logCount, 2)
@@ -92,7 +92,7 @@ final class ReviewLibraryTests: XCTestCase {
         try queue.write { db in
             XCTAssertThrowsError(try ReviewLibrary.record(
                 db, mistakeID: "gone", result: ReviewLibrary.resultRight,
-                at: "2026-11-23T00:00:00Z"
+                reviewedAt: "2026-11-23T00:00:00Z"
             )) { error in
                 XCTAssertEqual(error as? ReviewLibrary.ReviewError, .mistakeNotFound("gone"))
             }
@@ -127,12 +127,12 @@ final class ReviewLibraryTests: XCTestCase {
             // id、userExampleId、题干快照、选项快照、myAnswer 快照、状态、录入时间
             // swiftlint:disable:next large_tuple
             let mistakes: [(String, String?, String, String, String, String, String)] = [
-                ("m1", "e1", "录入题事实源题干", "", "", "", "待复习", "2026-11-14T00:00:00Z"),
-                ("m2", "e2", "未录选项的录入题", "", "", "", "待复习", "2026-11-15T00:00:00Z"),
+                ("m1", "e1", "录入题事实源题干", "", "", "待复习", "2026-11-14T00:00:00Z"),
+                ("m2", "e2", "未录选项的录入题", "", "", "待复习", "2026-11-15T00:00:00Z"),
                 ("m3", nil, "历史导入的错题，没有对应录入题", "甲", "X", "待复习",
                  "2026-11-16T00:00:00Z"),
-                ("m4", "e1", "录入题事实源题干", "", "", "", "已掌握", "2026-11-13T00:00:00Z"),
-                ("m5", nil, "最老的历史错题", "", "", "", "待复习", "2026-11-01T00:00:00Z")
+                ("m4", "e1", "录入题事实源题干", "", "", "已掌握", "2026-11-13T00:00:00Z"),
+                ("m5", nil, "最老的历史错题", "", "", "待复习", "2026-11-01T00:00:00Z")
             ]
             for (id, exampleID, stem, optionA, myAnswer, state, createdAt) in mistakes {
                 try db.execute(sql: """
