@@ -122,7 +122,9 @@ class P10UserExampleViewModel(
         draft.copy(options = draft.options.toMutableList().also { if (index in it.indices) it[index] = value })
     }
 
-    fun addTag() = changeDraft(P10EditTransitions::addTag)
+    fun addTag() {
+        _state.value = _state.value.copy(edit = P10EditTransitions.addTag(_state.value.edit))
+    }
 
     fun addIdiom(id: String) = changeDraft { P10EditTransitions.addIdiom(it, id) }
 
