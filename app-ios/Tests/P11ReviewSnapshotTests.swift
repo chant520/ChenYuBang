@@ -208,7 +208,7 @@ final class P11ReviewSnapshotTests: XCTestCase {
                 "墨守成规、照搬照抄过去的经验",
                 "按部就班、一步一个脚印地推进",
                 "别出心裁、另辟蹊径地寻求突破",
-                "急于求成、不顾实际地强推硬推",
+                "急于求成、不顾实际地强推硬推"
             ],
             myAnswer: nil,
             createdAt: "2026-11-20T09:00:00Z"
