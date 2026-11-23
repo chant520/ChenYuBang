@@ -30,11 +30,19 @@ object ReviewScoring {
             !hasOptions(options) ->
                 ReviewJudgement(comparable = false, result = null, message = "本题未记录选项，无法比对")
             first == null ->
-                ReviewJudgement(comparable = false, result = null, message = "本题未记录你的首次作答，无法比对")
+                ReviewJudgement(
+                    comparable = false,
+                    result = null,
+                    message = "本题未记录你的首次作答，无法比对（本次选了 ${LETTERS[picked]}）",
+                )
             first == picked ->
-                ReviewJudgement(comparable = true, result = RESULT_WRONG, message = "与首次作答相同")
+                ReviewJudgement(comparable = true, result = RESULT_WRONG, message = "与首次作答一致（${LETTERS[picked]}）")
             else ->
-                ReviewJudgement(comparable = true, result = RESULT_CORRECT, message = "与首次作答不同")
+                ReviewJudgement(
+                    comparable = true,
+                    result = RESULT_CORRECT,
+                    message = "与首次作答不同：首次 ${LETTERS[first]}，本次 ${LETTERS[picked]}",
+                )
         }
     }
 }

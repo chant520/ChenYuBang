@@ -100,10 +100,10 @@ class ReviewDaoTest {
         val options = listOf("甲", "乙", "丙", "丁")
         val different = ReviewScoring.judge("B", options, 2)
         assertEquals(ReviewScoring.RESULT_CORRECT, different.result)
-        assertEquals("与首次作答不同", different.message)
+        assertEquals("与首次作答不同：首次 B，本次 C", different.message)
         val same = ReviewScoring.judge("B", options, 1)
         assertEquals(ReviewScoring.RESULT_WRONG, same.result)
-        assertEquals("与首次作答相同", same.message)
+        assertEquals("与首次作答一致（B）", same.message)
     }
 
     @Test
@@ -112,7 +112,7 @@ class ReviewDaoTest {
         val judged = ReviewScoring.judge(null, options, 0)
         assertTrue(!judged.comparable)
         assertEquals(null, judged.result)
-        assertEquals("本题未记录你的首次作答，无法比对", judged.message)
+        assertEquals("本题未记录你的首次作答，无法比对（本次选了 A）", judged.message)
         assertTrue(!ReviewScoring.judge("B", listOf(null, null, null, null), 0).comparable)
     }
 
