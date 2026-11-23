@@ -75,15 +75,18 @@ final class ReviewLibraryTests: XCTestCase {
             let logCount = try Int.fetchOne(
                 db, sql: "SELECT COUNT(*) FROM review_log WHERE mistakeId = 'm1'") ?? 0
             XCTAssertEqual(logCount, 2)
-            let results = try [String].fetchAll(
+            let results = try String.fetchAll(
                 db, sql: "SELECT result FROM review_log WHERE mistakeId = 'm1' ORDER BY at")
             XCTAssertEqual(results, ["对", "错"])
-            let stamp = try Row.fetchOne(db, sql: """
-                SELECT reviewCount, lastReviewedAt, state FROM mistake WHERE id = 'm1'
-                """)
-            XCTAssertEqual(try XCTUnwrap(stamp)[0] as Int, 2)
-            XCTAssertEqual(try XCTUnwrap(stamp)[1] as String?, "2026-11-23T01:00:00Z")
-            XCTAssertEqual(try XCTUnwrap(stamp)[2] as String, "待复习")
+            let reviewCount = try Int.fetchOne(
+                db, sql: "SELECT reviewCount FROM mistake WHERE id = 'm1'") ?? -1
+            let lastAt = try String.fetchOne(
+                db, sql: "SELECT lastReviewedAt FROM mistake WHERE id = 'm1'")
+            let state = try String.fetchOne(
+                db, sql: "SELECT state FROM mistake WHERE id = 'm1'")
+            XCTAssertEqual(reviewCount, 2)
+            XCTAssertEqual(lastAt, "2026-11-23T01:00:00Z")
+            XCTAssertEqual(state, "待复习")
         }
     }
 
