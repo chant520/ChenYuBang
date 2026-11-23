@@ -52,6 +52,7 @@ class P12ReviewSummarySnapshotTest {
             questionCount = 5,
             answerCount = 5,
             correctCount = 3,
+            wrongCount = 2,
             idioms =
                 listOf(
                     ReviewIdiom("i-1", "按部就班"),
@@ -67,6 +68,7 @@ class P12ReviewSummarySnapshotTest {
             questionCount = 2,
             answerCount = 2,
             correctCount = 1,
+            wrongCount = 1,
             idioms = listOf(ReviewIdiom("i-1", "按部就班")),
         )
 

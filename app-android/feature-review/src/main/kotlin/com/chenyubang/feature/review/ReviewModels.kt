@@ -36,8 +36,11 @@ data class ReviewSummary(
     val scopeIdiomId: String? = null,
     val scopeWord: String? = null,
     val questionCount: Int,
+    /** 本轮已作答题数（含无法比对题）：app 层用它做进入 P12 的非空校验；不可比对题不计入对/错。 */
     val answerCount: Int,
     val correctCount: Int,
+    /** 答错数＝可比对已判分题数－答对数；不可比对题只计题量，不计入对/错。 */
+    val wrongCount: Int = 0,
     val idioms: List<ReviewIdiom>,
 ) : Serializable {
     val scopeLine: String get() = scopeWord?.let { "只看『$it』" } ?: "全部待复习"
@@ -75,12 +78,14 @@ object ReviewFlow {
             } else {
                 all.filter { it.id == state.scopeIdiomId }
             }
+        val comparableCount = state.answers.values.count { it.verdict.comparable }
         return ReviewSummary(
             scopeIdiomId = state.scopeIdiomId,
             scopeWord = state.scopeWord,
             questionCount = state.total,
             answerCount = state.answerCount,
             correctCount = state.correctCount,
+            wrongCount = comparableCount - state.correctCount,
             idioms = scoped.distinctBy { it.id },
         )
     }

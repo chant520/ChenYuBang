@@ -112,6 +112,12 @@ private fun summaryResultCard(
             fontSize = Tokens.Font.n13.sp,
             modifier = Modifier.padding(top = Tokens.Space.lsubTop.dp),
         )
+        Text(
+            text = "答错 ${summary.wrongCount} 道",
+            color = colors.text2,
+            fontSize = Tokens.Font.n13.sp,
+            modifier = Modifier.padding(top = Tokens.Space.lsubTop.dp),
+        )
     }
 }
 
