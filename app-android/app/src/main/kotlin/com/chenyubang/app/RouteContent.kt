@@ -1,7 +1,6 @@
 package com.chenyubang.app
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 import com.chenyubang.feature.capture.CaptureCameraScreen
 import com.chenyubang.feature.capture.CaptureCropScreen
 import com.chenyubang.feature.capture.CaptureOcrScreen
@@ -20,7 +19,6 @@ internal fun RouteContent(
     onRoute: (RouterState) -> Unit,
     back: () -> Unit,
 ) {
-    val context = LocalContext.current
     when (entry.route) {
         Route.Scope ->
             ScopeDestination(
@@ -62,7 +60,7 @@ internal fun RouteContent(
                 viewMode = router.mistakesView,
                 revision = router.contentRevision,
                 database = deps.database,
-                actions = mistakeActions(router, onRoute, context),
+                actions = mistakeActions(router, onRoute),
             )
         Route.IdiomMistakes -> IdiomMistakesRouteContent(entry, router, deps, onRoute)
         Route.Mistake -> UserExampleRouteContent(entry, router, deps, onRoute)

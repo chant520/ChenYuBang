@@ -79,6 +79,14 @@ fun P08MistakeListContent(
         verticalArrangement = Arrangement.spacedBy(Tokens.Space.block.dp),
     ) {
         P08Header(onCapture = actions.onCapture)
+        actions.pageMessage?.let { message ->
+            CBar(
+                CBarKind.Info,
+                title = message,
+                actionText = "知道了",
+                onAction = actions.onDismissMessage,
+            )
+        }
         when {
             state.loading -> CBar(CBarKind.Info, "正在读取错题", subtitle = "只读本机题库，不联网。")
             state.failed -> CBar(CBarKind.Warn, "错题读取失败，请重试", subtitle = "再进一次本页会重新读取。")

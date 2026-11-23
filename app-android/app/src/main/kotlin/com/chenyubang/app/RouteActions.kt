@@ -1,30 +1,36 @@
 package com.chenyubang.app
 
-import android.content.Context
-import android.widget.Toast
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import com.chenyubang.feature.mistake.P08MistakeActions
 import com.chenyubang.feature.review.ReviewSummary
 
-/** P08 入口动作；队列在点击瞬间变空时停在 P08 并如实提示，正常态按钮已按待复习数置灰。 */
+/** P08 入口动作；队列在点击瞬间变空时停在 P08 给页内中性提示条，正常态按钮已按待复习数置灰。 */
+@Composable
 internal fun mistakeActions(
     router: RouterState,
     onRoute: (RouterState) -> Unit,
-    context: Context,
-): P08MistakeActions =
-    P08MistakeActions(
+): P08MistakeActions {
+    var pageMessage by remember { mutableStateOf<String?>(null) }
+    return P08MistakeActions(
         onViewModeChange = { onRoute(router.copy(mistakesView = it)) },
         onOpenIdiom = { id -> onRoute(router.push(Route.IdiomMistakes, id)) },
         onOpenMistake = { id -> onRoute(router.push(Route.Mistake, id)) },
         onCapture = { onRoute(router.startCapture()) },
         onStartReview = { count ->
             if (count <= 0) {
-                Toast.makeText(context, "今天没有待复习的错题", Toast.LENGTH_SHORT).show()
+                pageMessage = "今天没有待复习的错题"
             } else {
                 onRoute(router.startReview(count))
             }
         },
+        pageMessage = pageMessage,
+        onDismissMessage = { pageMessage = null },
     )
+}
 
 /** P11 / P12 全屏浮层的接线集中在此，避免主分发函数过长。 */
 @Composable
