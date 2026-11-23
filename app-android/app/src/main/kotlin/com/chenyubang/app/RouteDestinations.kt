@@ -208,6 +208,7 @@ internal fun ReviewQueueDestination(
         onClose = actions.onClose,
         onBackToSource = actions.onBackToSource,
         onRetry = { model.load() },
+        onRetryRecord = { model.retryRecord() },
         onFinish = { handOff(ReviewFlow.summary(state)) },
     )
 }

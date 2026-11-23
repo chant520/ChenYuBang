@@ -20,6 +20,7 @@ data class ReviewUiState(
     val answers: Map<String, ReviewAnswer> = emptyMap(),
     val loading: Boolean = true,
     val failed: Boolean = false,
+    val recordFailed: Boolean = false,
 ) {
     val total: Int get() = questions.size
     val current: ReviewQuestion? get() = questions.getOrNull(index)

@@ -50,6 +50,8 @@ dependencies {
     testImplementation("org.robolectric:robolectric:4.13")
     testImplementation("androidx.test:core:1.6.1")
     testImplementation("androidx.compose.ui:ui-test-manifest")
+    // ViewModel 的 viewModelScope 落在 Dispatchers.Main，单测用 setMain 替换调度器。
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
 }
 
 roborazzi {

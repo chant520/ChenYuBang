@@ -54,6 +54,7 @@ fun P11ReviewQueueContent(
     onClose: () -> Unit,
     onBackToSource: () -> Unit,
     onRetry: () -> Unit = {},
+    onRetryRecord: () -> Unit = {},
     onFinish: () -> Unit = {},
 ) {
     val colors = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
@@ -78,7 +79,18 @@ fun P11ReviewQueueContent(
                     onAction = onRetry,
                 )
             state.total == 0 -> reviewQueueEmpty(state, onBackToSource)
-            else -> reviewQuestionBody(state, onPick, onNext, onFinish, colors)
+            else -> {
+                if (state.recordFailed) {
+                    CBar(
+                        CBarKind.Error,
+                        title = "判分结果保存失败，请重试",
+                        subtitle = "本轮进度已保留，重试只补存这一题。",
+                        actionText = "重试",
+                        onAction = onRetryRecord,
+                    )
+                }
+                reviewQuestionBody(state, onPick, onNext, onFinish, colors)
+            }
         }
     }
 }

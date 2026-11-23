@@ -64,8 +64,32 @@ class ReviewViewModel(
         if (answer != null && answer.verdict.comparable) {
             val result = answer.verdict.result
             val mistakeId = after.current?.mistakeId
-            if (result != null && mistakeId != null) {
-                viewModelScope.launch { record(mistakeId, result, now()) }
+            if (result != null && mistakeId != null) persistResult(mistakeId, result)
+        }
+    }
+
+    /** 落库失败后的可重试入口：只补存当前题判分，不重置本轮作答与进度。 */
+    fun retryRecord() {
+        val current = _state.value.currentAnswer
+        val mistakeId = _state.value.current?.mistakeId
+        val result = current?.verdict?.result
+        if (current?.verdict?.comparable == true && mistakeId != null && result != null) {
+            persistResult(mistakeId, result)
+        }
+    }
+
+    /**
+     * 判分落库：先传播取消，再捕获业务异常置错误态；ReviewDao.record 是单事务，失败即整笔回滚，无需补偿写库。
+     */
+    private fun persistResult(mistakeId: String, result: String) {
+        viewModelScope.launch {
+            try {
+                record(mistakeId, result, now())
+                if (_state.value.recordFailed) _state.value = _state.value.copy(recordFailed = false)
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (_: Exception) {
+                _state.value = _state.value.copy(recordFailed = true)
             }
         }
     }
