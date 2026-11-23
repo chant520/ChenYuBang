@@ -76,7 +76,7 @@ final class P11ReviewSnapshotTests: XCTestCase {
         assertP11(P11ReviewState(loading: false, items: roundItems()), dark: true)
     }
 
-    /// 与首次作答一致＝答错（第 8.2 节）。
+    /// 与首次作答相同＝答错（第 8.2 节）。
     func testJudgedSameAsFirstLight() {
         assertP11(
             P11ReviewState(

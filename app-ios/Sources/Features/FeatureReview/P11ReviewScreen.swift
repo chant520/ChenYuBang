@@ -165,7 +165,8 @@ public struct P11ReviewContent: View {
         .padding(.top, Tokens.Space.lmetaTop)
     }
 
-    /// ③：判分区（P10 重做同款文案 + 口径说明；不显示「正确答案」、不渲染解析）。
+    /// ③：判分区（第 8.2 节规范串「与首次作答相同 / 不同」+「本题未记录正确答案」；
+    /// 不显示「正确答案」、不渲染解析）。
     private var judgeCard: some View {
         CCard {
             CLabel("判分")

@@ -86,14 +86,14 @@ final class P12SummarySnapshotTests: XCTestCase {
     }
 
     /// 涉及成语读取失败：本轮数字照常保留，只在该卡内给一行说明与重试。
-    func testIdiomLoadFailedLight() {
+    func testGlobalIdiomsLoadFailedLight() {
         var state = globalState()
         state.failed = true
         state.idioms = []
         assertP12(state, dark: false)
     }
 
-    func testIdiomLoadFailedDark() {
+    func testGlobalIdiomsLoadFailedDark() {
         var state = globalState()
         state.failed = true
         state.idioms = []

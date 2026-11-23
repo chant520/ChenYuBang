@@ -11,7 +11,7 @@ public struct P12SummaryState: Equatable, Sendable {
     public var total: Int
     /// 答对（与首次作答不同）。
     public var correct: Int
-    /// 答错（与首次作答一致）。
+    /// 答错（与首次作答相同）。
     public var wrong: Int
     /// 涉及成语列表（去重、按词面升序，每个可点进 P05）。
     public var idioms: [LinkedIdiom]

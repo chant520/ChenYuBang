@@ -73,7 +73,7 @@ public struct P12SummaryContent: View {
         state.scope.line
     }
 
-    /// ③：成绩卡——本轮题量 / 答对 / 答错（答错＝与首次作答一致）。
+    /// ③：成绩卡——本轮题量 / 答对 / 答错（答错＝与首次作答相同，第 8.2 节）。
     private var scoreCard: some View {
         CCard {
             HStack(alignment: .top, spacing: Tokens.Space.block) {

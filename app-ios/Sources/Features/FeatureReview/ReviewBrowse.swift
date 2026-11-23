@@ -3,12 +3,14 @@ import CangyuData
 
 /// 复习判分与文案（P11 判分区，开发规范第 8.2 节 2026-11-23 版内修订）。
 ///
-/// 录入错题没有正确答案与解析列，判分沿用 P10 重做口径：与首次「我的答案」
-/// 不同＝答对、相同＝答错；文案逐字复用 P10 重做串（FeatureMistake 不互相依赖，
-/// 各自持有同款字符串，与 `MistakeBrowse.placeholder` 先例一致）。
+/// 录入错题没有正确答案与解析列，判分口径沿用 P10 重做：与首次「我的答案」
+/// 不同＝答对、相同＝答错。判分区文案取第 8.2 节写死的规范串
+/// 「与首次作答相同 / 不同」+「本题未记录正确答案」（与 Android `ReviewScoring` 同口径），
+/// 无法比对的一条沿用 P10「本题未记录你的首次作答」口径；feature 之间不互相依赖，
+/// 字符串由本模块持有。
 public enum ReviewJudgeOutcome: Equatable, Sendable {
-    case same(letter: String)
-    case different(first: String, picked: String)
+    case same
+    case different
     case unknownFirst(picked: String)
 }
 
@@ -16,8 +18,8 @@ public enum ReviewJudgeOutcome: Equatable, Sendable {
 public enum ReviewBrowse {
     public static let letters = ["A", "B", "C", "D"]
 
-    /// 判分区口径说明一行（P10 `rerollNote` 同款，把「没有正确答案」写在页面上）。
-    public static let judgeNote = "录入题只存你填过的内容，本版未记录正确答案，这里只与你的首次作答比对。"
+    /// 判分区口径说明一行（第 8.2 节写死的规范串，把「没有正确答案」如实写在页面上）。
+    public static let judgeNote = "本题未记录正确答案"
     /// 题目一个选项都没录时的说明（如实说明、不伪造判分）。
     public static let noOptionsNote = "本题未记录选项，无法作答比对。"
 
@@ -26,16 +28,17 @@ public enum ReviewBrowse {
     public static func judge(first: String?, picked: String?) -> ReviewJudgeOutcome? {
         guard let picked, letters.contains(picked) else { return nil }
         guard let first, letters.contains(first) else { return .unknownFirst(picked: picked) }
-        return first == picked ? .same(letter: picked) : .different(first: first, picked: picked)
+        return first == picked ? .same : .different
     }
 
-    /// 判分区结果串（P10 `rerollResult` 同款文案）。
+    /// 判分区结果串：可比对两条取第 8.2 节规范串（不重复字母，与 Android 同像素），
+    /// 无法比对的一条取 P10 口径串。
     public static func resultText(_ outcome: ReviewJudgeOutcome) -> String {
         switch outcome {
-        case .same(let letter):
-            return "与首次作答一致（\(letter)）"
-        case .different(let first, let picked):
-            return "与首次作答不同：首次 \(first)，本次 \(picked)"
+        case .same:
+            return "与首次作答相同"
+        case .different:
+            return "与首次作答不同"
         case .unknownFirst(let picked):
             return "本题未记录你的首次作答，无法比对（本次选了 \(picked)）"
         }
@@ -79,7 +82,7 @@ public struct ReviewRoundOutcome: Equatable, Sendable {
         self.correct = correct
     }
 
-    /// 答错＝与首次作答一致的题数。
+    /// 答错＝与首次作答相同的题数。
     public var wrong: Int { max(answered - correct, 0) }
 }
 

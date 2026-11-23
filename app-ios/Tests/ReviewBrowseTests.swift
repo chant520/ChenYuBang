@@ -4,14 +4,14 @@ import XCTest
 @testable import ChenYuBang
 
 /// 复习判分与本轮数字（开发规范第 8.2 节 2026-11-23 版内修订）：纯函数，不碰数据库。
-/// 判分串逐字钉住并与 P10 重做串对照，防止两处文案各自漂移。
+/// 判分串逐字钉住第 8.2 节规范串；无法比对的一条与 P10 重做串对照，防止两处文案各自漂移。
 final class ReviewBrowseTests: XCTestCase {
     func testDifferentFromFirstAnswerIsCorrect() {
-        XCTAssertEqual(ReviewBrowse.judge(first: "A", picked: "C"), .different(first: "A", picked: "C"))
+        XCTAssertEqual(ReviewBrowse.judge(first: "A", picked: "C"), .different)
     }
 
     func testSameAsFirstAnswerIsWrong() {
-        XCTAssertEqual(ReviewBrowse.judge(first: "A", picked: "A"), .same(letter: "A"))
+        XCTAssertEqual(ReviewBrowse.judge(first: "A", picked: "A"), .same)
     }
 
     func testMissingFirstAnswerIsUncomparableButStillPicked() {
@@ -27,30 +27,27 @@ final class ReviewBrowseTests: XCTestCase {
         XCTAssertNil(ReviewBrowse.judge(first: "A", picked: "E"))
     }
 
-    func testResultTextsAreTheP10RerollStrings() {
-        // 三条串与 `MistakeBrowse.rerollResult` 逐字一致（第 8.2 节沿用 P10 重做口径）。
+    func testComparableResultTextsAreTheSpecStrings() {
+        // 第 8.2 节写死的规范串（与 Android `ReviewScoring` 同口径），不重复选项字母。
+        XCTAssertEqual(ReviewBrowse.resultText(.same), "与首次作答相同")
+        XCTAssertEqual(ReviewBrowse.resultText(.different), "与首次作答不同")
+    }
+
+    func testUncomparableResultTextFollowsTheP10Wording() {
+        // 无法比对的一条沿用 P10「本题未记录你的首次作答」口径（第 8.2 节）。
         XCTAssertEqual(
-            ReviewBrowse.resultText(.same(letter: "B")),
-            MistakeBrowse.rerollResult(first: 1, picked: 1)
+            ReviewBrowse.resultText(.unknownFirst(picked: "C")),
+            MistakeBrowse.rerollResult(first: nil, picked: 2)
         )
-        XCTAssertEqual(
-            ReviewBrowse.resultText(.different(first: "A", picked: "C")),
-            MistakeBrowse.rerollResult(first: 0, picked: 2)
-        )
-        XCTAssertEqual(
-            ReviewBrowse.resultText(.unknownFirst(picked: "D")),
-            MistakeBrowse.rerollResult(first: nil, picked: 3)
-        )
-        XCTAssertEqual(ReviewBrowse.resultText(.same(letter: "A")), "与首次作答一致（A）")
-        XCTAssertEqual(ReviewBrowse.resultText(.different(first: "A", picked: "B")), "与首次作答不同：首次 A，本次 B")
         XCTAssertEqual(
             ReviewBrowse.resultText(.unknownFirst(picked: "C")),
             "本题未记录你的首次作答，无法比对（本次选了 C）"
         )
     }
 
-    func testJudgeNoteDisclosesNoCorrectAnswerInThisVersion() {
-        XCTAssertEqual(ReviewBrowse.judgeNote, MistakeBrowse.rerollNote)
+    func testJudgeNoteIsTheSpecDisclosure() {
+        // 判分区说明一行是第 8.2 节的固定句；P10 重做另有一句更长的说明，两者不互抄。
+        XCTAssertEqual(ReviewBrowse.judgeNote, "本题未记录正确答案")
         XCTAssertEqual(ReviewBrowse.noOptionsNote, "本题未记录选项，无法作答比对。")
     }
 
