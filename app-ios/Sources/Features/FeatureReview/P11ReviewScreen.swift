@@ -269,13 +269,14 @@ public struct P11ReviewScreen: View {
         return COverlay(
             style: .dialog,
             title: "退出复习",
-            onDismiss: { model.cancelExit() }
-        ) {
-            Text("退出会丢弃本轮进度。")
-                .font(.system(size: Tokens.Font.n12))
-                .foregroundStyle(colors.text2)
-                .fixedSize(horizontal: false, vertical: true)
-            CButton(text: "退出", variant: .primary, action: { model.confirmExit() })
-        }
+            onDismiss: { model.cancelExit() },
+            content: {
+                Text("退出会丢弃本轮进度。")
+                    .font(.system(size: Tokens.Font.n12))
+                    .foregroundStyle(colors.text2)
+                    .fixedSize(horizontal: false, vertical: true)
+                CButton(text: "退出", variant: .primary, action: { model.confirmExit() })
+            }
+        )
     }
 }
