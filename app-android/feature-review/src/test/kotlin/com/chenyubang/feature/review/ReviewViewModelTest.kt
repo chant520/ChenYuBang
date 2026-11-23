@@ -18,13 +18,16 @@ import org.junit.Test
 class ReviewViewModelTest {
     private val options = listOf("按部就班", "墨守成规", "别出心裁", "标新立异")
 
-    private fun question() =
+    private fun question(
+        id: String = "m-1",
+        myAnswer: String? = "B",
+    ) =
         ReviewQuestion(
-            mistakeId = "m-1",
-            stem = "依次填入划横线部分最恰当的一项是：做事不可______，应当有新办法。",
+            mistakeId = id,
+            stem = "题干 $id",
             options = options,
-            myAnswer = "B",
-            idioms = listOf(ReviewIdiom("i-1", "按部就班")),
+            myAnswer = myAnswer,
+            idioms = listOf(ReviewIdiom("i-$id", "词$id")),
         )
 
     @Before
@@ -62,5 +65,36 @@ class ReviewViewModelTest {
             yield()
             assertFalse(model.state.value.recordFailed)
             assertEquals(2, calls)
+        }
+
+    @Test
+    fun uncomparableSkipsRecordAndComparableRecordsCorrectOrWrong() =
+        runBlocking {
+            val calls = mutableListOf<Pair<String, String>>()
+            val model =
+                ReviewViewModel(
+                    scopeIdiomId = null,
+                    loadQueue = {
+                        listOf(
+                            question("m-1", null), // 无首次作答，不可比对
+                            question("m-2", "B"), // 首次 B
+                            question("m-3", "B"), // 首次 B
+                        )
+                    },
+                    record = { id, result, _ -> calls += id to result },
+                )
+            model.pick(0) // 不可比对：不落库
+            yield()
+            assertEquals(0, calls.size)
+
+            model.next()
+            model.pick(2) // 首次 B、本次 C：不同＝对
+            yield()
+            assertEquals(listOf("m-2" to "对"), calls)
+
+            model.next()
+            model.pick(1) // 首次 B、本次 B：相同＝错
+            yield()
+            assertEquals(listOf("m-2" to "对", "m-3" to "错"), calls)
         }
 }
