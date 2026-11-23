@@ -20,9 +20,8 @@ data class P10EditDraft(
 data class P10EditFieldErrors(
     val answer: Boolean = false,
     val year: Boolean = false,
-    val tag: Boolean = false,
 ) {
-    val hasInvalid: Boolean get() = answer || year || tag
+    val hasInvalid: Boolean get() = answer || year
 }
 
 /** 删除二次确认的两支；可见层只有一处红（弹层中部卡片 + 危险按钮）。 */
@@ -72,7 +71,6 @@ object P10EditTransitions {
         P10EditFieldErrors(
             answer = ExampleEditRules.answerInvalid(draft.answer),
             year = ExampleEditRules.yearInvalid(draft.year),
-            tag = draft.tagDraft.isNotBlank() && ExampleEditRules.tagInvalid(draft.tagDraft.trim()),
         )
 
     /** 页面级问题点保存才提示；字段级非法由 errors 在保存前就置灰。 */
@@ -96,6 +94,17 @@ object P10EditTransitions {
         val tag = draft.tagDraft.trim()
         if (tag.isEmpty() || ExampleEditRules.tagInvalid(tag) || tag in draft.tags) return draft
         return draft.copy(tags = draft.tags + tag, tagDraft = "")
+    }
+
+    /** 加入把关：拒收不丢草稿，只给页面级中性提示；合法才追加并清空输入。 */
+    fun addTag(state: P10EditState): P10EditState {
+        val draft = state.draft ?: return state
+        val next = addTag(draft)
+        return if (next === draft) {
+            state.copy(pageMessage = HINT_TAG, errorMessage = null)
+        } else {
+            state.copy(draft = next, pageMessage = null)
+        }
     }
 
     fun addIdiom(

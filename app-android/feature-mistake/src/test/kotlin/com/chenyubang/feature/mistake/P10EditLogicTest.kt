@@ -43,7 +43,6 @@ class P10EditLogicTest {
         assertFalse(P10EditTransitions.fieldErrors(draft()).hasInvalid)
         assertTrue(P10EditTransitions.fieldErrors(draft().copy(answer = "E")).answer)
         assertTrue(P10EditTransitions.fieldErrors(draft().copy(year = "20")).year)
-        assertTrue(P10EditTransitions.fieldErrors(draft().copy(tagDraft = "九个字的超长标签内容啊")).tag)
         assertEquals("年份为 4 位数字", P10EditTransitions.HINT_YEAR)
         assertEquals("标签需为 1–8 个字", P10EditTransitions.HINT_TAG)
     }
@@ -63,6 +62,36 @@ class P10EditLogicTest {
             listOf("标签"),
             P10EditTransitions.addTag(draft().copy(tagDraft = "九个字的超长标签内容啊")).tags,
         )
+    }
+
+    /** VM 的 addTag 直接回写本纯函数结果：越界/重复拒收给中性提示，草稿原样保留。 */
+    @Test
+    fun addTagRejectionShowsNeutralMessageAndKeepsDraft() {
+        val edit = P10EditState(editing = true, draft = draft().copy(tagDraft = "九个字的超长标签内容啊"))
+        val rejected = P10EditTransitions.addTag(edit)
+        assertEquals(P10EditTransitions.HINT_TAG, rejected.pageMessage)
+        assertNull(rejected.errorMessage)
+        assertEquals("九个字的超长标签内容啊", rejected.draft!!.tagDraft)
+        assertEquals(listOf("标签"), rejected.draft!!.tags)
+
+        val duplicate =
+            P10EditTransitions.addTag(P10EditState(editing = true, draft = draft().copy(tagDraft = " 标签 ")))
+        assertEquals(P10EditTransitions.HINT_TAG, duplicate.pageMessage)
+        assertNull(duplicate.errorMessage)
+        assertEquals(" 标签 ", duplicate.draft!!.tagDraft)
+        assertEquals(listOf("标签"), duplicate.draft!!.tags)
+
+        val accepted =
+            P10EditTransitions.addTag(
+                P10EditState(
+                    editing = true,
+                    draft = draft().copy(tagDraft = " 高频 "),
+                    pageMessage = P10EditTransitions.HINT_TAG,
+                ),
+            )
+        assertNull(accepted.pageMessage)
+        assertEquals(listOf("标签", "高频"), accepted.draft!!.tags)
+        assertEquals("", accepted.draft!!.tagDraft)
     }
 
     @Test

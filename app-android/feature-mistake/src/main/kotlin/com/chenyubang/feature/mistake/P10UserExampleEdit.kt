@@ -49,7 +49,7 @@ internal fun P10EditForm(
     val errors = state.edit.errors
     P10StemOptionsCard(draft, saving, actions)
     P10AnswerEditCard(draft, errors, saving, actions)
-    if (state.isMistake) P10MistakeEditCard(draft, errors, saving, actions)
+    if (state.isMistake) P10MistakeEditCard(draft, saving, actions)
     P10SourceEditCard(draft, errors, saving, actions)
     P10IdiomEditCard(state, draft, saving, actions)
 }
@@ -103,7 +103,6 @@ private fun P10AnswerEditCard(
 @Composable
 private fun P10MistakeEditCard(
     draft: P10EditDraft,
-    errors: P10EditFieldErrors,
     saving: Boolean,
     actions: P10UserExampleActions,
 ) {
@@ -117,7 +116,7 @@ private fun P10MistakeEditCard(
             enabled = !saving,
         )
         CLabel("自定义标签", Modifier.padding(top = Tokens.Space.lmetaTop.dp))
-        P10TagEditor(draft, errors, saving, actions)
+        P10TagEditor(draft, saving, actions)
         Text(
             P10EditTransitions.HINT_TAG,
             color = c.text3,
@@ -131,7 +130,6 @@ private fun P10MistakeEditCard(
 @Composable
 private fun P10TagEditor(
     draft: P10EditDraft,
-    errors: P10EditFieldErrors,
     saving: Boolean,
     actions: P10UserExampleActions,
 ) {
@@ -141,8 +139,6 @@ private fun P10TagEditor(
             onValueChange = actions.onTagDraft,
             placeholder = "如：易混词",
             enabled = !saving,
-            error = errors.tag,
-            errorHint = P10EditTransitions.HINT_TAG.takeIf { errors.tag },
             modifier = Modifier.weight(1f),
         )
         if (!saving) {
