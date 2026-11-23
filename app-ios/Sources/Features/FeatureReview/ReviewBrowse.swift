@@ -1,16 +1,16 @@
 import Foundation
 import CangyuData
 
-/// 复习判分与文案（P11 判分区，开发规范第 8.2 节 2026-11-23 版内修订）。
+/// 复习判分与文案（P11 判分区，开发规范 v1.8 第 8.2 节）。
 ///
 /// 录入错题没有正确答案与解析列，判分口径沿用 P10 重做：与首次「我的答案」
-/// 不同＝答对、相同＝答错。判分区文案取第 8.2 节写死的规范串
-/// 「与首次作答相同 / 不同」+「本题未记录正确答案」（与 Android `ReviewScoring` 同口径），
-/// 无法比对的一条沿用 P10「本题未记录你的首次作答」口径；feature 之间不互相依赖，
-/// 字符串由本模块持有。
+/// 不同＝答对、相同＝答错。判分区逐字沿用 P10 重做串并带选项字母
+/// `与首次作答一致（X）`／`与首次作答不同：首次 X，本次 Y`／`本题未记录你的首次作答，无法比对（本次选了 X）`，
+/// 另附一句「本题未记录正确答案」（与 Android `ReviewScoring` 同口径）；
+/// feature 之间不互相依赖，字符串由本模块持有。
 public enum ReviewJudgeOutcome: Equatable, Sendable {
-    case same
-    case different
+    case same(picked: String)
+    case different(first: String, picked: String)
     case unknownFirst(picked: String)
 }
 
@@ -28,17 +28,16 @@ public enum ReviewBrowse {
     public static func judge(first: String?, picked: String?) -> ReviewJudgeOutcome? {
         guard let picked, letters.contains(picked) else { return nil }
         guard let first, letters.contains(first) else { return .unknownFirst(picked: picked) }
-        return first == picked ? .same : .different
+        return first == picked ? .same(picked: picked) : .different(first: first, picked: picked)
     }
 
-    /// 判分区结果串：可比对两条取第 8.2 节规范串（不重复字母，与 Android 同像素），
-    /// 无法比对的一条取 P10 口径串。
+    /// 判分区结果串：三条逐字沿用第 8.2 节的 P10 重做串并带选项字母。
     public static func resultText(_ outcome: ReviewJudgeOutcome) -> String {
         switch outcome {
-        case .same:
-            return "与首次作答相同"
-        case .different:
-            return "与首次作答不同"
+        case .same(let picked):
+            return "与首次作答一致（\(picked)）"
+        case .different(let first, let picked):
+            return "与首次作答不同：首次 \(first)，本次 \(picked)"
         case .unknownFirst(let picked):
             return "本题未记录你的首次作答，无法比对（本次选了 \(picked)）"
         }

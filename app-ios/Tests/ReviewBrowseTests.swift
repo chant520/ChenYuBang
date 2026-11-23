@@ -3,15 +3,15 @@ import XCTest
 
 @testable import ChenYuBang
 
-/// 复习判分与本轮数字（开发规范第 8.2 节 2026-11-23 版内修订）：纯函数，不碰数据库。
-/// 判分串逐字钉住第 8.2 节规范串；无法比对的一条与 P10 重做串对照，防止两处文案各自漂移。
+/// 复习判分与本轮数字（开发规范 v1.8 第 8.2 节）：纯函数，不碰数据库。
+/// 判分三条串逐字钉住第 8.2 节，并逐条与 P10 重做串对照，防止两处文案各自漂移。
 final class ReviewBrowseTests: XCTestCase {
     func testDifferentFromFirstAnswerIsCorrect() {
-        XCTAssertEqual(ReviewBrowse.judge(first: "A", picked: "C"), .different)
+        XCTAssertEqual(ReviewBrowse.judge(first: "A", picked: "C"), .different(first: "A", picked: "C"))
     }
 
     func testSameAsFirstAnswerIsWrong() {
-        XCTAssertEqual(ReviewBrowse.judge(first: "A", picked: "A"), .same)
+        XCTAssertEqual(ReviewBrowse.judge(first: "A", picked: "A"), .same(picked: "A"))
     }
 
     func testMissingFirstAnswerIsUncomparableButStillPicked() {
@@ -27,14 +27,19 @@ final class ReviewBrowseTests: XCTestCase {
         XCTAssertNil(ReviewBrowse.judge(first: "A", picked: "E"))
     }
 
-    func testComparableResultTextsAreTheSpecStrings() {
-        // 第 8.2 节写死的规范串（与 Android `ReviewScoring` 同口径），不重复选项字母。
-        XCTAssertEqual(ReviewBrowse.resultText(.same), "与首次作答相同")
-        XCTAssertEqual(ReviewBrowse.resultText(.different), "与首次作答不同")
+    func testComparableResultTextsAreTheP10RerollStrings() {
+        // 第 8.2 节（v1.8）写死的两条可比对串，逐字等于 P10 重做串。
+        XCTAssertEqual(ReviewBrowse.resultText(.same(picked: "B")), "与首次作答一致（B）")
+        XCTAssertEqual(ReviewBrowse.resultText(.different(first: "B", picked: "C")),
+                       "与首次作答不同：首次 B，本次 C")
+        XCTAssertEqual(ReviewBrowse.resultText(.same(picked: "B")),
+                       MistakeBrowse.rerollResult(first: 1, picked: 1))
+        XCTAssertEqual(ReviewBrowse.resultText(.different(first: "B", picked: "C")),
+                       MistakeBrowse.rerollResult(first: 1, picked: 2))
     }
 
     func testUncomparableResultTextFollowsTheP10Wording() {
-        // 无法比对的一条沿用 P10「本题未记录你的首次作答」口径（第 8.2 节）。
+        // 无法比对的一条同样逐字等于 P10 串（第 8.2 节）。
         XCTAssertEqual(
             ReviewBrowse.resultText(.unknownFirst(picked: "C")),
             MistakeBrowse.rerollResult(first: nil, picked: 2)
