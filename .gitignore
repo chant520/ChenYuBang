@@ -13,6 +13,8 @@ app-android/local.properties
 
 # iOS / Xcode
 app-ios/.build/
+app-ios/.spm-packages/
+app-ios/.xcresult/
 app-ios/DerivedData/
 **/xcuserdata/
 *.xcuserstate
