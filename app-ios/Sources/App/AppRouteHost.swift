@@ -13,7 +13,8 @@ struct AppRouteHost: View {
             VStack(spacing: 0) {
                 ZStack {
                     ForEach(AppTab.allCases, id: \.self) { tab in
-                        RetainedRouteStack(router: router, launch: launch, entries: router.entries(for: tab), tab: tab)
+                        RetainedRouteStack(router: router, launch: launch, entries: router.entries(for: tab), tab: tab,
+                                           tabActive: isActive(tab))
                             .opacity(isActive(tab) ? 1 : 0)
                             .allowsHitTesting(isActive(tab))
                             .accessibilityHidden(!isActive(tab))
@@ -21,7 +22,7 @@ struct AppRouteHost: View {
                     if !router.fullScreenEntries.isEmpty {
                         RetainedRouteStack(router: router, launch: launch,
                                            entries: router.suspendedFullScreenEntries + router.fullScreenEntries,
-                                           tab: router.selectedTab)
+                                           tab: router.selectedTab, tabActive: true)
                     }
                 }
                 if router.tabBarVisible {
@@ -80,12 +81,13 @@ private struct RetainedRouteStack: View {
     @ObservedObject var launch: FirstLaunchState
     let entries: [RouteEntry]
     let tab: AppTab
+    let tabActive: Bool
 
     var body: some View {
         ZStack {
             ForEach(entries) { entry in
                 AppRoutePage(router: router, launch: launch, entry: entry, tab: tab,
-                             isActive: entries.last?.id == entry.id)
+                             isActive: tabActive && entries.last?.id == entry.id)
                     .opacity(entries.last?.id == entry.id ? 1 : 0)
                     .allowsHitTesting(entries.last?.id == entry.id)
                     .accessibilityHidden(entries.last?.id != entry.id)
@@ -116,14 +118,18 @@ private struct AppRoutePage: View {
             )
         } else if entry.route == .library,
                   let preferences = launch.preferences,
-                  let reader = launch.libraryReader {
+                  let reader = launch.libraryReader,
+                  let updates = launch.packUpdates {
             LibraryScreen(
                 scope: preferences.scope,
                 reader: reader,
                 onOpenScope: { _ = router.push(.scope) },
                 onOpenIdiom: { id in _ = router.push(.idiomDetail, recordID: id) },
                 onSearch: { _ = router.openSearch() },
-                onBack: router.canGoBack ? { router.back() } : nil
+                onBack: router.canGoBack ? { router.back() } : nil,
+                refreshTrigger: updates,
+                refreshFailure: { updates.failureMessage },
+                isActive: isActive
             )
         } else if entry.route == .idiomDetail,
                   let reader = launch.libraryReader,
@@ -261,8 +267,11 @@ private struct AppRoutePage: View {
                 onValidated: router.prepareBackupImport,
                 onBack: { router.back() }
             )
-        } else if entry.route == .pack, let pack = launch.currentPack {
-            PackVersionScreen(pack: pack, onBack: { router.back() })
+        } else if entry.route == .pack, let updates = launch.packUpdates {
+            PackVersionRouteScreen(
+                updates: updates,
+                onBack: { router.back() }
+            )
         } else if entry.route == .queue, let reader = launch.reviewReader {
             P11ReviewScreen(
                 reader: reader,
@@ -286,7 +295,7 @@ private struct AppRoutePage: View {
                 onOpenIdiom: { id in _ = router.push(.idiomDetail, recordID: id) }
             )
         } else {
-            RoutePlaceholderPage(router: router, launch: launch, entry: entry, tab: tab)
+            RoutePlaceholderPage(router: router, launch: launch, entry: entry, tab: tab, isActive: isActive)
         }
     }
 
@@ -311,8 +320,10 @@ private struct RoutePlaceholderPage: View {
     @Environment(\.colorScheme) private var colorScheme
     @ObservedObject var router: RouterState
     @ObservedObject var launch: FirstLaunchState
+    @State private var updateFailure: String?
     let entry: RouteEntry
     let tab: AppTab
+    let isActive: Bool
 
     var body: some View {
         let colors = CangyuTheme.colors(for: colorScheme)
@@ -328,6 +339,13 @@ private struct RoutePlaceholderPage: View {
                         CButton(text: entry.route == .camera ? "取消拍照" : "返回",
                                 variant: .ghost, action: router.back)
                     }
+                    if entry.route == .examples, let updateFailure {
+                        CBar(
+                            kind: .warn,
+                            title: updateFailure,
+                            subtitle: "当前题库仍可离线浏览，版本号不变；可到题库版本页重试。"
+                        )
+                    }
                     PendingPageText(text: "页面待接入。没有真实数据时不展示题目、统计或示例详情。")
                     actions
                 }
@@ -339,6 +357,11 @@ private struct RoutePlaceholderPage: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(colors.page)
+        .task(id: isActive) {
+            guard isActive, entry.route == .examples, let updates = launch.packUpdates else { return }
+            await updates.onEnterLibrary()
+            updateFailure = updates.failureMessage
+        }
     }
 
     @ViewBuilder

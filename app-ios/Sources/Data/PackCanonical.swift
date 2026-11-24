@@ -6,6 +6,7 @@ public enum PackError: Error, Equatable {
     case limit(String)
     case json(String)
     case schema(String)
+    case unsupportedSchema
     case digestMismatch
     case database(String)
 }

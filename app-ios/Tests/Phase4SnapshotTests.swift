@@ -40,6 +40,10 @@ final class Phase4SnapshotTests: XCTestCase {
     func testP16DownloadingDark() throws { try assertPack(dark: true, status: .downloading) }
     func testP16UpdatedLight() throws { try assertPack(dark: false, status: .updated) }
     func testP16UpdatedDark() throws { try assertPack(dark: true, status: .updated) }
+    func testP16UpToDateLight() throws { try assertPack(dark: false, status: .upToDate) }
+    func testP16UpToDateDark() throws { try assertPack(dark: true, status: .upToDate) }
+    func testP16OfflineLight() throws { try assertPack(dark: false, status: .offline) }
+    func testP16OfflineDark() throws { try assertPack(dark: true, status: .offline) }
     func testP16RecoverableFailureLight() throws { try assertPack(dark: false, status: .recoverableFailure) }
     func testP16RecoverableFailureDark() throws { try assertPack(dark: true, status: .recoverableFailure) }
     func testP16MockLight() throws { try assertPack(dark: false, status: .mock) }

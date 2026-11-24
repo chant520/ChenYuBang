@@ -1,7 +1,7 @@
 import Foundation
 import GRDB
 
-/// Only content DML. Does not replace the user's database or mutate any of its six user tables.
+/// Only content DML. Does not replace the user's database or mutate user tables.
 enum PackContentWriter {
     static func replace(_ content: PackContent, in db: Database) throws {
         let incoming = Set(content.idioms.map(\.id))

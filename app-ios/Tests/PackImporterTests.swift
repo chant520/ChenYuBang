@@ -5,7 +5,10 @@ import XCTest
 
 final class PackImporterTests: PackDatabaseTestCase {
     private let contentTables = ["idiom", "example", "idiom_scope", "example_idiom", "idiom_fts"]
-    private let userTables = ["mistake", "mistake_idiom", "review_log", "idiom_state", "settings", "exam_scope"]
+    private let userTables = [
+        "user_example", "user_example_idiom", "mistake", "mistake_idiom",
+        "review_log", "idiom_state", "settings", "exam_scope",
+    ]
 
     func testPublishedCountsDigestSearchAndIdempotency() throws {
         let pack = try importer.validate(PackFixture.published())
@@ -29,7 +32,7 @@ final class PackImporterTests: PackDatabaseTestCase {
         }
     }
 
-    func testAllSixUserTablesAreFieldForFieldUntouched() throws {
+    func testAllEightUserTablesAreFieldForFieldUntouched() throws {
         let pack = try importer.validate(PackFixture.published())
         _ = try importer.importPack(pack)
         let fixture = try PackFixture()
@@ -165,6 +168,15 @@ final class PackImporterTests: PackDatabaseTestCase {
                     NULL, '望文生义', '["言语理解"]', examType, year, region, '待复习',
                     '2026-11-18T00:00:00Z', '2026-11-18T01:00:00Z', 1 FROM example ORDER BY id LIMIT 1
                 """)
+            try db.execute(sql: """
+                INSERT INTO user_example(id, imagePath, ocrText, stem, optionA, optionB, optionC, optionD,
+                    myAnswer, isMistake, examType, year, region, createdAt)
+                SELECT 'captured-user-example', NULL, NULL, stem, optionA, optionB, optionC, optionD,
+                    'A', 1, examType, year, region, '2026-11-18T00:00:00Z' FROM example ORDER BY id LIMIT 1
+                """)
+            try db.execute(sql: "UPDATE mistake SET userExampleId = 'captured-user-example'")
+            try db.execute(sql: "INSERT INTO user_example_idiom VALUES ('captured-user-example', ?)",
+                           arguments: [mistakeID])
             try db.execute(sql: "INSERT INTO mistake_idiom SELECT id, ? FROM mistake", arguments: [mistakeID])
             try db.execute(sql: "INSERT INTO review_log SELECT id, id, '忘记', '2026-11-18T01:00:00Z' FROM mistake")
             try db.execute(sql: "INSERT INTO idiom_state(idiomId, status, favorite) VALUES (?, '学过', 1)",

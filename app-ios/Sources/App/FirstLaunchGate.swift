@@ -26,7 +26,7 @@ final class FirstLaunchState: ObservableObject {
     /// P15 / P22 备份导出与恢复入口（阶段 4）：与 mistakeReader 共用同一数据库队列。
     @Published private(set) var backupService: BackupService?
     @Published private(set) var dataCleaner: UserDataCleaner?
-    @Published private(set) var currentPack: ValidatedPack?
+    @Published private(set) var packUpdates: PackVersionViewModel?
     /// P10 原图位的解析基准：Application Support/ChenYuBang，库内存的是相对路径 `images/<id>.jpg`。
     @Published private(set) var dataDirectory: URL?
     private var store: ExamScopeStore?
@@ -47,10 +47,18 @@ final class FirstLaunchState: ObservableObject {
             let queue = try DatabaseQueue(path: directory.appendingPathComponent("chenyubang.sqlite").path)
             try ChenYuBangDatabase.makeMigrator().migrate(queue)
             let initializedImporter = PackImporter(queue: queue)
-            guard let packageURL = Bundle.main.url(forResource: "pack-v1.0.0", withExtension: "zip") else {
-                throw PackError.archive("Missing built-in pack")
+            let pack: ValidatedPack
+            if let installedData = try InstalledPackStorage.load(from: directory),
+               let installedPack = try? initializedImporter.validate(installedData) {
+                pack = installedPack
+            } else {
+                guard let packageURL = Bundle.main.url(forResource: "pack-v1.0.0", withExtension: "zip") else {
+                    throw PackError.archive("Missing built-in pack")
+                }
+                let builtInData = try Data(contentsOf: packageURL)
+                pack = try initializedImporter.validate(builtInData)
+                try InstalledPackStorage.save(builtInData, to: directory)
             }
-            let pack = try initializedImporter.validate(Data(contentsOf: packageURL))
             _ = try initializedImporter.importPack(pack)
             let initializedStore = ExamScopeStore(queue: queue)
             let loaded = try initializedStore.load()
@@ -65,7 +73,12 @@ final class FirstLaunchState: ObservableObject {
             }
             store = initializedStore
             importer = initializedImporter
-            currentPack = pack
+            packUpdates = PackVersionViewModel(
+                pack: pack,
+                client: URLPackChannelClient(),
+                importer: initializedImporter,
+                storageDirectory: directory
+            )
             availableProvinces = provinces
             libraryReader = IdiomLibraryReader(queue: queue)
             exampleReader = ExampleLibraryReader(queue: queue)
@@ -79,21 +92,25 @@ final class FirstLaunchState: ObservableObject {
             preferences = LaunchPreferences(complete: loaded.complete, scope: scope)
         } catch is PackError {
             contentError = true
-            initializationError = "内置题库初始化失败，请重试；联网获取尚未接入。"
+            initializationError = "内置题库初始化失败，请重试。"
         } catch {
             initializationError = "本机数据初始化失败，请重试。"
         }
     }
 
     func save(scope: ExamScopeSelection, complete: Bool) throws {
-        guard let store, let importer, let currentPack else { throw LaunchError.notInitialized }
+        guard let store, let importer, let currentPack = packUpdates?.installedPack else {
+            throw LaunchError.notInitialized
+        }
         try store.save(scope: scope, complete: complete)
         try importer.refreshScopeLinks(currentPack)
         preferences = LaunchPreferences(complete: complete || preferences?.complete == true, scope: scope)
     }
 
     func refreshAfterBackupImport() throws {
-        guard let store, let importer, let currentPack else { throw LaunchError.notInitialized }
+        guard let store, let importer, let currentPack = packUpdates?.installedPack else {
+            throw LaunchError.notInitialized
+        }
         try importer.refreshScopeLinks(currentPack)
         let loaded = try store.load()
         let provinces = try store.availableProvinces()
