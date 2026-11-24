@@ -101,6 +101,10 @@ final class Phase4SnapshotTests: XCTestCase {
         )
         let view = PackVersionScreen(presentation: presentation, onBack: {})
             .environment(\.colorScheme, dark ? .dark : .light)
+            .transaction { transaction in
+                transaction.animation = nil
+                transaction.disablesAnimations = true
+            }
         assertSnapshot(of: view, as: .image(layout: .fixed(width: 390, height: 844)),
                        file: file, testName: testName, line: line)
     }
