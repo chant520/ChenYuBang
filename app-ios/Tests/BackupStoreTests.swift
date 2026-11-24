@@ -2,7 +2,6 @@
 import Foundation
 import GRDB
 import XCTest
-import ZIPFoundation
 
 final class BackupStoreTests: PackDatabaseTestCase {
     private let contentTables = ["idiom", "example", "exam_scope", "idiom_scope", "example_idiom", "idiom_fts"]
@@ -17,9 +16,8 @@ final class BackupStoreTests: PackDatabaseTestCase {
                               identity: BackupIdentity(appVersion: "1.2.3-beta.4", build: 42))
         }
         let archiveData = try Data(contentsOf: result.url)
-        let archive = try Archive(url: result.url, accessMode: .read)
-        XCTAssertEqual(Set(archive.map(\.path)), ["manifest.json", "data.json"])
         let files = try BackupArchive.read(archiveData)
+        XCTAssertEqual(Set(files.keys), ["manifest.json", "data.json"])
         let dataJSON = try PackFixture.json(XCTUnwrap(files["data.json"]))
         let manifestJSON = try PackFixture.json(XCTUnwrap(files["manifest.json"]))
         let payload = object(dataJSON)
