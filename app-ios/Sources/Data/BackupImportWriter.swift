@@ -1,0 +1,190 @@
+import Foundation
+import GRDB
+
+enum BackupImportWriter {
+    static func merge(_ payload: BackupDataPayload, db: Database) throws -> BackupImportSummary {
+        try db.inTransaction {
+            try insertAll(payload, db: db, keepLocalOnConflict: true)
+        }
+        return summary(.merge, payload)
+    }
+
+    /// 覆盖按规范先写临时库，再在自动留底后以单个事务替换本机用户表。
+    static func replace(_ payload: BackupDataPayload,
+                        queue: DatabaseQueue) throws -> BackupImportSummary {
+        let fileManager = FileManager.default
+        let caches = try fileManager.url(for: .cachesDirectory, in: .userDomainMask,
+                                         appropriateFor: nil, create: true)
+        let stagingURL = caches.appendingPathComponent("backup-import-\(UUID().uuidString).sqlite")
+        defer { try? fileManager.removeItem(at: stagingURL) }
+
+        let staging = try DatabaseQueue(path: stagingURL.path)
+        try ChenYuBangDatabase.makeMigrator().migrate(staging)
+        try staging.write { db in try insertAll(payload, db: db, keepLocalOnConflict: false) }
+
+        let automaticBackup = try queue.read { db in
+            try Backup.export(db: db, to: caches, date: Date())
+        }
+        try queue.write { db in
+            try db.execute(sql: "ATTACH DATABASE ? AS backup_import",
+                           arguments: StatementArguments([stagingURL.path]))
+            do {
+                try db.inTransaction {
+                    try clearUserData(db)
+                    try copyStagedData(db)
+                }
+            } catch {
+                try? db.execute(sql: "DETACH DATABASE backup_import")
+                throw error
+            }
+            try db.execute(sql: "DETACH DATABASE backup_import")
+        }
+        return summary(.replace, payload, automaticBackup: automaticBackup.url)
+    }
+
+    private static func summary(_ mode: BackupImportMode, _ payload: BackupDataPayload,
+                                automaticBackup: URL? = nil) -> BackupImportSummary {
+        BackupImportSummary(mode: mode,
+                            mistakes: payload.mistakes.count,
+                            userExamples: payload.userExamples?.count ?? 0,
+                            reviews: payload.reviews.count,
+                            idiomStates: payload.idiomStates.count,
+                            scopes: payload.scopes.count,
+                            automaticBackup: automaticBackup)
+    }
+
+    private static func insertAll(_ payload: BackupDataPayload, db: Database,
+                                  keepLocalOnConflict: Bool) throws {
+        let conflict = keepLocalOnConflict ? " OR IGNORE" : ""
+        let localExamples = keepLocalOnConflict ? try existingIDs(db, "user_example") : []
+        let localMistakes = keepLocalOnConflict ? try existingIDs(db, "mistake") : []
+        for example in payload.userExamples ?? [] {
+            guard !localExamples.contains(example.id) else { continue }
+            try execute(db, """
+                INSERT\(conflict) INTO user_example(
+                    id, imagePath, ocrText, stem, optionA, optionB, optionC, optionD, myAnswer,
+                    isMistake, examType, year, region, createdAt
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """, [
+                    example.id, example.imagePath, example.ocrText, example.stem,
+                    example.optionA, example.optionB, example.optionC, example.optionD,
+                    example.myAnswer, example.isMistake, example.examType, example.year,
+                    example.region, example.createdAt
+                ])
+            for idiomID in example.idiomIds {
+                try execute(db, "INSERT\(conflict) INTO user_example_idiom(userExampleId, idiomId) VALUES (?, ?)",
+                            [example.id, idiomID])
+            }
+        }
+        for mistake in payload.mistakes {
+            guard !localMistakes.contains(mistake.id) else { continue }
+            try execute(db, """
+                INSERT\(conflict) INTO mistake(
+                    id, userExampleId, imagePath, ocrText, stem, optionA, optionB, optionC, optionD,
+                    myAnswer, reason, tagNames, examType, year, region, state, createdAt,
+                    lastReviewedAt, reviewCount
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """, [
+                    mistake.id, mistake.userExampleId, nil, mistake.ocrText, mistake.stem,
+                    mistake.options.a, mistake.options.b, mistake.options.c, mistake.options.d,
+                    mistake.myAnswer, mistake.reason, tagJSON(mistake.tagNames), mistake.examType,
+                    mistake.year, mistake.region, mistake.state, mistake.createdAt,
+                    mistake.lastReviewedAt, mistake.reviewCount
+                ])
+            for idiomID in mistake.idiomIds {
+                try execute(db, "INSERT\(conflict) INTO mistake_idiom(mistakeId, idiomId) VALUES (?, ?)",
+                            [mistake.id, idiomID])
+            }
+        }
+        for review in payload.reviews {
+            try execute(db, "INSERT\(conflict) INTO review_log(id, mistakeId, result, at) VALUES (?, ?, ?, ?)",
+                        [review.id, review.mistakeId, review.result, review.at])
+        }
+        for state in payload.idiomStates {
+            try execute(db, "INSERT\(conflict) INTO idiom_state(idiomId, status, favorite) VALUES (?, ?, ?)",
+                        [state.idiomId, state.status, state.favorite])
+        }
+        try insertScopes(payload.scopes, db: db, keepLocalOnConflict: keepLocalOnConflict)
+    }
+
+    private static func insertScopes(_ scopes: [BackupScopePayload], db: Database,
+                                     keepLocalOnConflict: Bool) throws {
+        var keys = Set<String>()
+        if keepLocalOnConflict {
+            let rows = try Row.fetchAll(db, sql: "SELECT type, province FROM exam_scope")
+            keys = Set(rows.map { row in "\(row["type"] as String)\u{0}\(row["province"] as String? ?? "")" })
+        }
+        for scope in scopes {
+            let key = "\(scope.type)\u{0}\(scope.province ?? "")"
+            guard !keys.contains(key) else { continue }
+            try execute(db, "INSERT INTO exam_scope(id, type, province, enabled) VALUES (?, ?, ?, ?)",
+                        [UUID().uuidString, scope.type, scope.province, scope.enabled])
+            keys.insert(key)
+        }
+    }
+
+    private static func clearUserData(_ db: Database) throws {
+        try db.execute(sql: "DELETE FROM review_log")
+        try db.execute(sql: "DELETE FROM user_example_idiom")
+        try db.execute(sql: "DELETE FROM mistake_idiom")
+        try db.execute(sql: "DELETE FROM user_example")
+        try db.execute(sql: "DELETE FROM mistake")
+        try db.execute(sql: "DELETE FROM idiom_state")
+        try db.execute(sql: "DELETE FROM exam_scope")
+    }
+
+    private static func copyStagedData(_ db: Database) throws {
+        try db.execute(sql: """
+            INSERT INTO user_example(
+                id, imagePath, ocrText, stem, optionA, optionB, optionC, optionD, myAnswer,
+                isMistake, examType, year, region, createdAt
+            ) SELECT id, imagePath, ocrText, stem, optionA, optionB, optionC, optionD, myAnswer,
+                     isMistake, examType, year, region, createdAt FROM backup_import.user_example
+            """)
+        try db.execute(sql: """
+            INSERT INTO mistake(
+                id, userExampleId, imagePath, ocrText, stem, optionA, optionB, optionC, optionD,
+                myAnswer, reason, tagNames, examType, year, region, state, createdAt,
+                lastReviewedAt, reviewCount
+            ) SELECT id, userExampleId, imagePath, ocrText, stem, optionA, optionB, optionC, optionD,
+                     myAnswer, reason, tagNames, examType, year, region, state, createdAt,
+                     lastReviewedAt, reviewCount FROM backup_import.mistake
+            """)
+        try db.execute(sql: """
+            INSERT INTO review_log(id, mistakeId, result, at)
+            SELECT id, mistakeId, result, at FROM backup_import.review_log
+            """)
+        try db.execute(sql: """
+            INSERT INTO idiom_state(idiomId, status, favorite)
+            SELECT idiomId, status, favorite FROM backup_import.idiom_state
+            """)
+        try db.execute(sql: """
+            INSERT INTO exam_scope(id, type, province, enabled)
+            SELECT id, type, province, enabled FROM backup_import.exam_scope
+            """)
+        try db.execute(sql: """
+            INSERT INTO user_example_idiom(userExampleId, idiomId)
+            SELECT userExampleId, idiomId FROM backup_import.user_example_idiom
+            """)
+        try db.execute(sql: """
+            INSERT INTO mistake_idiom(mistakeId, idiomId)
+            SELECT mistakeId, idiomId FROM backup_import.mistake_idiom
+            """)
+    }
+
+    private static func existingIDs(_ db: Database, _ table: String) throws -> Set<String> {
+        let rows = try Row.fetchAll(db, sql: "SELECT id FROM \(table)")
+        return Set(rows.map { row in row["id"] as String })
+    }
+
+    private static func execute(_ db: Database, _ sql: String,
+                                _ values: [DatabaseValueConvertible?]) throws {
+        try db.execute(sql: sql, arguments: StatementArguments(values))
+    }
+
+    private static func tagJSON(_ names: [String]) -> String {
+        guard let data = try? JSONSerialization.data(withJSONObject: names),
+              let text = String(data: data, encoding: .utf8) else { return "[]" }
+        return text
+    }
+}

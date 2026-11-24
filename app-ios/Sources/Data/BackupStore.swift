@@ -351,4 +351,18 @@ public final class BackupService: @unchecked Sendable {
             try Backup.export(db: db, to: FileManager.default.temporaryDirectory, date: Date())
         }
     }
+
+    public func validate(_ data: Data) throws -> ValidatedBackup {
+        try queue.read { db in try BackupImport.validate(data, db: db) }
+    }
+
+    public func importBackup(_ validated: ValidatedBackup,
+                             mode: BackupImportMode) throws -> BackupImportSummary {
+        switch mode {
+        case .merge:
+            return try queue.write { db in try BackupImportWriter.merge(validated.payload, db: db) }
+        case .replace:
+            return try BackupImportWriter.replace(validated.payload, queue: queue)
+        }
+    }
 }
