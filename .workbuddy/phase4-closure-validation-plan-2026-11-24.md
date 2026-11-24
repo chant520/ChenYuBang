@@ -171,3 +171,14 @@
 - 未覆盖 / 未变：真机实测（按用户要求不做）；第 5 节占位串已被 97d2ed5 结果态文案收口，非本轮动作；第 6 节待拍板三项（P16 独立 mock 高保真屏、P16 退路条数 2–3 条、P15 是否另加导出按钮）仍未拍板，本轮不宣称这些态完成。
 - 用户拍板落定：P23 失败态一处红冲突保留现状，仅在证据与本计划注明偏离一处红契约；P08 深色页头对比保持现状，视为既有基线同款、非本轮差集，仅记录观察，均不改令牌、不补快照、不调口径。
 - 结论：全量门禁、1122 项单测、38 张差集快照 verify 全绿；专项覆盖已补齐；P23/P08 两项观察已按用户拍板保留现状并记录，第 6 节三项待拍板项仍挂起。
+
+### 8.4 P16 两句说明快照重录与复核（2026-11-24，qa-engineer，用户要求不真机）
+- 覆盖提交：`bd7d33a` feat(me) P16 补齐两句全状态说明（`P16PackScreen.kt` 6 行，`UpdateArea` 公共末尾新增两句，text3/n115/lineHeight 1.65）。本轮 QA 提交为含本节证据的最终提交，最终 head 以交付时 git log 为准（见回传）。
+- 重录范围：仅 P16 六态 × 深浅 = 12 张（BUILTIN / CHECKING / DOWNLOADING 42% / UPDATE_OK / RECOVERABLE_FAIL / TEST_MOCK；测试类无 UP_TO_DATE 独立用例，其分支与 BUILTIN 同构且未设基线，不在重录范围）。用现有 `P16PackContent` internal 重载注入稳定 state，未改产品文案/视觉/业务逻辑；非 P16 既有基线与 P14 两张一律不动。
+- 重录张数：12 张。重录前后 38 张基线哈希比对，仅 P16 12 张变化，P14 两张哈希不变、其余 26 张不变；无 `.1` 后缀、无 actual/compare 残留 PNG；同名多帧 `.1` 口径不变。
+- 逐图结论：12 张全部达标——两句逐字含标点与 `\n` 换行、深浅 text3/n115 令牌一致、无错位截断、无 emoji、按钮与退路未遮挡；TEST mock 3 成语 / 2 真题（fixture manifest.correct.json）与 BUILTIN 59 / 11 分离；详见 `.workbuddy/evidence/phase4-diff-snapshot-review-2026-11-24.md` 追加的「P16 两句说明重录审阅」小节。
+- 快照 verify：`cd app-android && ./gradlew :feature-me:verifyRoborazziDebug --max-workers=1` BUILD SUCCESSFUL、exit 0、无 Record mode；结果 JSON 38 张全部 `unchanged`（其中 P16 12 张），added / changed 0；src 下无残留 PNG。日志 `.workbuddy/evidence/p16-verify-2026-11-24.log`。
+- 完整门禁：`cd app-android && ./gradlew :app:assembleDebug test ktlintCheck detekt :app:lintDebug --max-workers=1` BUILD SUCCESSFUL、exit 0（2m25s）；日志 `.workbuddy/evidence/p16-full-gate-2026-11-24.log`。
+- 单测：debug 561 + release 561 = 1122 项，failures 0、errors 0、skipped 0（来源各模块 `build/test-results/test{Debug,Release}UnitTest/*.xml`，80 文件 / 变体）。
+- 未覆盖 / 未变：真机实测（按用户要求不做）；第 6 节待拍板三项（P16 独立 mock 高保真屏、P16 退路条数 2–3 条、P15 是否另加导出按钮）仍未拍板，本轮不宣称这些态完成；P23 失败态两处红、P08 页头对比按 8.3 用户拍板保留现状。
+- 结论：P16 12 张重录图逐图审阅全达标；feature-me verify、完整门禁、1122 项单测全绿；无实现缺陷上报，未自行改实现。
