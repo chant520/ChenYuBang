@@ -19,10 +19,16 @@ enum BackupOrphans {
             ? backupMistakeIDs.union(try BackupImportWriter.existingIDs(db, "mistake"))
             : backupMistakeIDs
 
-        let (mistakes, skippedMistakes, mistakeIdioms) = resolveMistakes(
-            payload.mistakes, idiomIDs: idiomIDs, exampleIDs: exampleIDs
+        var skippedMistakes = 0
+        var missingMistakeIdioms = 0
+        var missingExampleIdioms = 0
+        let mistakes = resolveMistakes(
+            payload.mistakes, idiomIDs: idiomIDs, exampleIDs: exampleIDs,
+            skipped: &skippedMistakes, missingIdioms: &missingMistakeIdioms
         )
-        let (examples, exampleIdioms) = resolveExamples(payload.userExamples ?? [], idiomIDs: idiomIDs)
+        let examples = resolveExamples(
+            payload.userExamples ?? [], idiomIDs: idiomIDs, missingIdioms: &missingExampleIdioms
+        )
         let reviews = payload.reviews.filter { mistakeIDs.contains($0.mistakeId) }
         return ResolvedBackup(
             payload: payload.copy(
@@ -32,40 +38,36 @@ enum BackupOrphans {
             ),
             report: BackupOrphanReport(
                 skippedMistakes: skippedMistakes,
-                missingMistakeIdioms: mistakeIdioms,
-                missingExampleIdioms: exampleIdioms,
+                missingMistakeIdioms: missingMistakeIdioms,
+                missingExampleIdioms: missingExampleIdioms,
                 skippedReviews: payload.reviews.count - reviews.count
             )
         )
     }
 
     private static func resolveMistakes(
-        _ rows: [BackupMistakePayload], idiomIDs: Set<String>, exampleIDs: Set<String>
-    ) -> (mistakes: [BackupMistakePayload], skipped: Int, missingIdioms: Int) {
+        _ rows: [BackupMistakePayload], idiomIDs: Set<String>, exampleIDs: Set<String>,
+        skipped: inout Int, missingIdioms: inout Int
+    ) -> [BackupMistakePayload] {
         var kept: [BackupMistakePayload] = []
-        var skipped = 0
-        var missingIdioms = 0
         for row in rows {
             if let exampleID = row.userExampleId, !exampleIDs.contains(exampleID) {
                 skipped += 1
                 continue
             }
-            let missing = row.idiomIds.filter { !idiomIDs.contains($0) }.count
-            missingIdioms += missing
+            missingIdioms += row.idiomIds.filter { !idiomIDs.contains($0) }.count
             kept.append(row.copy(idiomIds: row.idiomIds.filter { idiomIDs.contains($0) }))
         }
-        return (kept, skipped, missingIdioms)
+        return kept
     }
 
     private static func resolveExamples(
-        _ rows: [BackupUserExamplePayload], idiomIDs: Set<String>
-    ) -> (examples: [BackupUserExamplePayload], missingIdioms: Int) {
-        var missingIdioms = 0
-        let examples = rows.map { row in
+        _ rows: [BackupUserExamplePayload], idiomIDs: Set<String>, missingIdioms: inout Int
+    ) -> [BackupUserExamplePayload] {
+        rows.map { row in
             missingIdioms += row.idiomIds.filter { !idiomIDs.contains($0) }.count
             return row.copy(idiomIds: row.idiomIds.filter { idiomIDs.contains($0) })
         }
-        return (examples, missingIdioms)
     }
 
     private static func existingIdiomIDs(_ db: Database) throws -> Set<String> {
