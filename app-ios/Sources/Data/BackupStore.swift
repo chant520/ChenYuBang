@@ -53,7 +53,7 @@ struct BackupIdentity {
 
 enum Backup {
     /// 交换格式 schemaVersion，与 DB 版本各自独立编号（第 4.5 节）。
-    static let exchangeSchemaVersion = 1
+    static let exchangeSchemaVersion = 3
 
     static func export(db: Database, to directory: URL, date: Date,
                        identity: BackupIdentity = BackupIdentity(),

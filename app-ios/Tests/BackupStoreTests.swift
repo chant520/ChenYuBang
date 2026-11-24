@@ -27,7 +27,7 @@ final class BackupStoreTests: PackDatabaseTestCase {
         XCTAssertEqual(text(manifest["exportedAt"]), Backup.stamp(exportDate))
         XCTAssertEqual(text(manifest["appVersion"]), "1.2.3")
         XCTAssertEqual(integer(manifest["build"]), 42)
-        XCTAssertEqual(integer(manifest["schemaVersion"]), 1)
+        XCTAssertEqual(integer(manifest["schemaVersion"]), 3)
         XCTAssertEqual(Set(payload.keys), ["mistakes", "userExamples", "reviews", "idiomStates", "scopes", "tags"])
         XCTAssertEqual(String(data: files["data.json"] ?? Data(), encoding: .utf8), PackCanonical.text(dataJSON))
         XCTAssertEqual(result.sha256, Backup.digest(of: PackCanonical.text(dataJSON)))
