@@ -148,7 +148,7 @@ final class BackupStoreTests: PackDatabaseTestCase {
                 INSERT INTO mistake(id, userExampleId, imagePath, ocrText, stem,
                                     optionA, optionB, optionC, optionD, myAnswer, reason, tagNames,
                                     examType, year, region, state, createdAt, lastReviewedAt, reviewCount)
-                VALUES ('20000000-0000-4000-8000-000000000001'.uppercased(),
+                VALUES (\("20000000-0000-4000-8000-000000000001".uppercased()),
                         '10000000-0000-4000-8000-000000000001', 'images/user.jpg', 'OCR 文本',
                         '错题题干', '选项甲', '选项乙', '选项丙', '选项丁', 'B', '搭配不当',
                         '["褒贬误用","望文生义"]', '国考', 2026, '中央', '待复习',
@@ -163,14 +163,14 @@ final class BackupStoreTests: PackDatabaseTestCase {
                 """)
             try db.execute(sql: """
                 INSERT INTO mistake_idiom(mistakeId, idiomId)
-                VALUES ('20000000-0000-4000-8000-000000000001'.uppercased(),
+                VALUES (\("20000000-0000-4000-8000-000000000001".uppercased()),
                         '11111111-1111-4111-8111-111111111111'),
                        ('20000000-0000-4000-8000-000000000002',
                         '22222222-2222-4222-8222-222222222222')
                 """)
             try db.execute(sql: """
                 INSERT INTO review_log(id, mistakeId, result, at)
-                VALUES ('30000000-0000-4000-8000-000000000001'.uppercased(),
+                VALUES (\("30000000-0000-4000-8000-000000000001".uppercased()),
                         '20000000-0000-4000-8000-000000000001', '错', '2026-11-21T00:00:00Z')
                 """)
             try db.execute(sql: """
