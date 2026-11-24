@@ -70,46 +70,16 @@ public final class URLPackChannelClient: PackChannelClient, @unchecked Sendable 
         expectedBytes: Int?,
         progress: @Sendable @escaping (Double) -> Void
     ) async throws -> Data {
-        let delegate = ChannelSessionDelegate(
-            expectedBytes: expectedBytes,
-            maximumBytes: Int64(maximum),
-            progress: progress
-        )
-        let session = URLSession(configuration: configuration, delegate: delegate, delegateQueue: nil)
-        defer { session.invalidateAndCancel() }
         return try await withCheckedThrowingContinuation { continuation in
-            let task = session.downloadTask(with: request) { location, response, error in
-                if delegate.exceededMaximum {
-                    continuation.resume(throwing: PackChannelError.sizeMismatch)
-                    return
-                }
-                if error != nil {
-                    continuation.resume(throwing: PackChannelError.network)
-                    return
-                }
-                guard let location,
-                      let response = response as? HTTPURLResponse,
-                      (200..<300).contains(response.statusCode) else {
-                    continuation.resume(throwing: PackChannelError.invalidResponse)
-                    return
-                }
-                if let expectedBytes,
-                   response.expectedContentLength >= 0,
-                   response.expectedContentLength != Int64(expectedBytes) {
-                    continuation.resume(throwing: PackChannelError.sizeMismatch)
-                    return
-                }
-                guard let data = try? Data(contentsOf: location), data.count <= maximum else {
-                    continuation.resume(throwing: PackChannelError.sizeMismatch)
-                    return
-                }
-                if let expectedBytes, data.count != expectedBytes {
-                    continuation.resume(throwing: PackChannelError.sizeMismatch)
-                    return
-                }
-                progress(1)
-                continuation.resume(returning: data)
-            }
+            let delegate = ChannelSessionDelegate(
+                expectedBytes: expectedBytes,
+                maximumBytes: Int64(maximum),
+                progress: progress,
+                completion: { continuation.resume(with: $0) }
+            )
+            let session = URLSession(configuration: configuration, delegate: delegate, delegateQueue: nil)
+            defer { session.invalidateAndCancel() }
+            let task = session.downloadTask(with: request)
             task.resume()
         }
     }
@@ -119,23 +89,21 @@ private final class ChannelSessionDelegate: NSObject, URLSessionDownloadDelegate
     private let expectedBytes: Int?
     private let maximumBytes: Int64
     private let progress: @Sendable (Double) -> Void
+    private let completion: @Sendable (Result<Data, Error>) -> Void
     private let lock = NSLock()
     private var exceeded = false
+    private var completed = false
 
     init(
         expectedBytes: Int?,
         maximumBytes: Int64,
-        progress: @Sendable @escaping (Double) -> Void
+        progress: @Sendable @escaping (Double) -> Void,
+        completion: @Sendable @escaping (Result<Data, Error>) -> Void
     ) {
         self.expectedBytes = expectedBytes
         self.maximumBytes = maximumBytes
         self.progress = progress
-    }
-
-    var exceededMaximum: Bool {
-        lock.lock()
-        defer { lock.unlock() }
-        return exceeded
+        self.completion = completion
     }
 
     func urlSession(
@@ -158,6 +126,61 @@ private final class ChannelSessionDelegate: NSObject, URLSessionDownloadDelegate
         if denominator > 0 {
             progress(min(1, Double(totalBytesWritten) / Double(denominator)))
         }
+    }
+
+    private func finish(_ result: Result<Data, Error>) {
+        lock.lock()
+        guard !completed else {
+            lock.unlock()
+            return
+        }
+        completed = true
+        lock.unlock()
+        completion(result)
+    }
+
+    func urlSession(
+        _ session: URLSession,
+        downloadTask: URLSessionDownloadTask,
+        didFinishDownloadingTo location: URL
+    ) {
+        lock.lock()
+        let didExceed = exceeded
+        lock.unlock()
+        if didExceed {
+            finish(.failure(PackChannelError.sizeMismatch))
+            return
+        }
+        guard let response = downloadTask.response as? HTTPURLResponse,
+              (200..<300).contains(response.statusCode) else {
+            finish(.failure(PackChannelError.invalidResponse))
+            return
+        }
+        if let expectedBytes,
+           response.expectedContentLength >= 0,
+           response.expectedContentLength != Int64(expectedBytes) {
+            finish(.failure(PackChannelError.sizeMismatch))
+            return
+        }
+        guard let data = try? Data(contentsOf: location), Int64(data.count) <= maximumBytes else {
+            finish(.failure(PackChannelError.sizeMismatch))
+            return
+        }
+        if let expectedBytes, data.count != expectedBytes {
+            finish(.failure(PackChannelError.sizeMismatch))
+            return
+        }
+        progress(1)
+        finish(.success(data))
+    }
+
+    func urlSession(
+        _ session: URLSession,
+        task: URLSessionTask,
+        didCompleteWithError error: Error?
+    ) {
+        guard error != nil else { return }
+        finish(.failure(PackChannelError.network))
     }
 
     func urlSession(
