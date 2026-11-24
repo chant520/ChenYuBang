@@ -67,12 +67,12 @@ public struct COverlay<Content: View>: View {
             .background(
                 Phase4OverlaySurface(style: style)
                     .fill(colors.surface)
-                    .ignoresSafeArea(edges: style == .sheet ? .bottom : [])
+                    .ignoresSafeArea(edges: style == .sheet ? Edge.Set.bottom : Edge.Set.empty)
             )
             .overlay(
                 Phase4OverlaySurface(style: style)
                     .strokeBorder(colors.line, lineWidth: 1)
-                    .ignoresSafeArea(edges: style == .sheet ? .bottom : [])
+                    .ignoresSafeArea(edges: style == .sheet ? Edge.Set.bottom : Edge.Set.empty)
             )
             .accessibilityElement(children: .contain)
             .accessibilityAction(.escape, onDismiss)
@@ -81,10 +81,12 @@ public struct COverlay<Content: View>: View {
     }
 }
 
-private struct Phase4OverlaySurface: Shape {
+private struct Phase4OverlaySurface: InsettableShape {
     let style: COverlayStyle
+    var inset: CGFloat = 0
 
     func path(in rect: CGRect) -> Path {
+        let rect = rect.insetBy(dx: inset, dy: inset)
         guard style == .sheet else {
             return Path(roundedRect: rect, cornerRadius: Tokens.Radius.r6)
         }
@@ -98,5 +100,9 @@ private struct Phase4OverlaySurface: Shape {
         path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
         path.closeSubpath()
         return path
+    }
+
+    func inset(by amount: CGFloat) -> Phase4OverlaySurface {
+        Phase4OverlaySurface(style: style, inset: inset + amount)
     }
 }
