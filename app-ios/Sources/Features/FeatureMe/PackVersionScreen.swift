@@ -72,16 +72,14 @@ public struct PackVersionScreen: View {
                 }
                 updateArea()
 
-                if presentation.status == .builtin {
-                    Text("每次进入成语库页或例题页时自动尝试拉取一次；失败后可在本页重试或继续离线使用。")
-                        .font(.system(size: Tokens.Font.n115))
-                        .cLineHeight(1.65, size: Tokens.Font.n115)
-                        .foregroundStyle(colors.text3)
-                    Text("随安装包内置的题库作离线底座；内置包也没有时才用标注 TEST 的 mock 兜底。")
-                        .font(.system(size: Tokens.Font.n115))
-                        .cLineHeight(1.65, size: Tokens.Font.n115)
-                        .foregroundStyle(colors.text3)
-                }
+                Text("每次进入成语库页或例题页时自动尝试拉取一次；失败后可在本页重试或继续离线使用。")
+                    .font(.system(size: Tokens.Font.n115))
+                    .cLineHeight(1.65, size: Tokens.Font.n115)
+                    .foregroundStyle(colors.text3)
+                Text("随安装包内置的题库作离线底座；内置包也没有时才用标注 TEST 的 mock 兜底。")
+                    .font(.system(size: Tokens.Font.n115))
+                    .cLineHeight(1.65, size: Tokens.Font.n115)
+                    .foregroundStyle(colors.text3)
                 Text("只下载题库增量包，不改动本机学习记录。")
                     .font(.system(size: Tokens.Font.n115))
                     .cLineHeight(1.65, size: Tokens.Font.n115)
