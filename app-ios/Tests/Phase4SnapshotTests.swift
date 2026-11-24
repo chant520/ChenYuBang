@@ -93,7 +93,7 @@ final class Phase4SnapshotTests: XCTestCase {
         let fixture = try makeFixture()
         let presentation = PackVersionPresentation(
             status: status,
-            version: status == .mock ? "TEST" : fixture.pack.version,
+            version: status == .mock ? Phase4Copy.testVersion : fixture.pack.version,
             idiomCount: status == .mock ? 3 : fixture.pack.counts.idioms,
             exampleCount: status == .mock ? 2 : fixture.pack.counts.examples,
             progress: 0.42,
@@ -156,7 +156,9 @@ final class Phase4SnapshotTests: XCTestCase {
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         addTeardownBlock { try? FileManager.default.removeItem(at: directory) }
         let backupService = BackupService(queue: queue)
-        let exported = try backupService.export(to: directory)
+        let exported = try queue.read { db in
+            try Backup.export(db: db, to: directory, date: Date(timeIntervalSince1970: 1_795_496_767))
+        }
         let backup = try backupService.validate(Data(contentsOf: exported.url))
         let pack = try PackImporter(queue: queue).validate(PackFixture.published())
         return SnapshotFixture(

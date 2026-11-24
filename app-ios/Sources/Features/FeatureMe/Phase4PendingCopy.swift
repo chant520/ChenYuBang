@@ -20,5 +20,6 @@ enum Phase4Copy {
     }
     static let updateComplete = "题库已更新"
     static let continueOffline = "继续离线使用"
+    static let testVersion = "测试数据（TEST）"
     static let offlineNotice = "题库已内置，可离线使用。"
 }

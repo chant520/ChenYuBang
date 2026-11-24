@@ -137,7 +137,7 @@ public struct PackVersionScreen: View {
     private func mockVersionBlock(_ colors: TokenColors) -> some View {
         CCard {
             CLabel("当前题库版本")
-            Text(presentation.version)
+            Text(Phase4Copy.testVersion)
                 .font(.system(size: Tokens.Font.n30, weight: .bold))
                 .foregroundStyle(colors.head)
                 .padding(.top, Tokens.Space.lmetaTop)
