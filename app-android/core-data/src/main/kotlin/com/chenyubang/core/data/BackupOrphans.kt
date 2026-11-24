@@ -19,9 +19,9 @@ internal data class ResolvedBackup(
  * - review.mistakeId 无对应错题 → 跳过并上报。
  * 不猜测字段、不清理内容表。
  *
- * 边界（待拍板）：过滤掉不存在的 idiomIds 后，idiomIds 可能变成空数组，与备份 schema 的 minItems=1
- * 及「归属至少一条」冲突；本实现按开工清单「不丢弃整条录入题/错题」保留整条记录、只跳过缺失关联并上报，
- * 不猜任何 id、不造占位成语。该冲突待主控拍板（放宽 schema 或补归属）。
+ * 备份导入态例外（已拍板，见 review-decisions 五节）：过滤掉失效 idiomIds 后 idiomIds 可为空数组，
+ * 备份 schema 已放宽为 minItems=0。继续过滤失效 id、只跳过关联并保留整条错题/录入题本体，不猜 id、不造占位成语；
+ * 四类孤儿计数口径不变。该例外仅属备份导入态，正常录入仍须至少一条归属。
  */
 internal object BackupOrphans {
     fun resolve(
@@ -57,7 +57,7 @@ internal object BackupOrphans {
                 withoutUser += row.id
                 return@forEach
             }
-            // 只跳过缺失关联、保留错题本体；结果可能 idiomIds 为空（边界待拍板，见类注释）。
+            // 只跳过失效关联、保留错题本体；备份导入态允许 idiomIds 为空（见类注释）。
             val absent = row.idiomIds.filter { it !in references.idiomIds }
             if (absent.isNotEmpty()) missing[row.id] = absent
             kept += row.copy(idiomIds = row.idiomIds.filter { it in references.idiomIds })
@@ -72,7 +72,7 @@ internal object BackupOrphans {
         val missing = LinkedHashMap<String, List<String>>()
         val kept =
             rows.map { row ->
-                // 只跳过缺失关联、不丢弃整条录入题；结果可能 idiomIds 为空（边界待拍板，见类注释）。
+                // 只跳过失效关联、不丢弃录入题本体；备份导入态允许 idiomIds 为空（见类注释）。
                 val absent = row.idiomIds.filter { it !in references.idiomIds }
                 if (absent.isNotEmpty()) missing[row.id] = absent
                 row.copy(idiomIds = row.idiomIds.filter { it in references.idiomIds })

@@ -83,4 +83,21 @@ class BackupDocumentTest {
         assertEquals(0, BackupDocument.declaredCounts(legacy).userExamples)
         assertTrue(validated.snapshot.userExamples.isEmpty())
     }
+
+    @Test
+    fun emptyIdiomIdsBackupPassesValidationAndDecodesToEmptyArray() {
+        val snapshot =
+            BackupFixture.incoming().copy(
+                mistakes = listOf(BackupFixture.mistake(idiomIds = emptyList())),
+                userExamples = listOf(BackupFixture.userExample(idiomIds = emptyList())),
+            )
+        val data = BackupFixture.data(snapshot)
+        val validated =
+            importer.validate(ByteArrayInputStream(BackupFixture.zip(data, BackupFixture.manifest(snapshot, data))))
+
+        assertTrue(validated.snapshot.mistakes.single().idiomIds.isEmpty())
+        assertTrue(validated.snapshot.userExamples.single().idiomIds.isEmpty())
+        assertEquals(1, validated.counts.mistakes)
+        assertEquals(1, validated.counts.userExamples)
+    }
 }

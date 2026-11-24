@@ -166,6 +166,24 @@ class UserExampleEditorTest {
         }
 
     @Test
+    fun editWithZeroIdiomsStillRejectedWithoutAnyWrite() =
+        runBlocking {
+            val saved = saver().save(markedInput())
+            val exampleId = saved.userExampleId
+            val bodyBefore = row(exampleRowSql(exampleId))
+            val idiomRowsBefore = count("SELECT COUNT(*) FROM user_example_idiom")
+            val filesBefore = imagesDir.listFiles()?.size ?: 0
+
+            assertThrows(ExampleEditError.NoIdioms::class.java) {
+                runBlocking { editor().edit(editInput(exampleId, idiomIds = emptyList())) }
+            }
+
+            assertEquals(bodyBefore, row(exampleRowSql(exampleId)))
+            assertEquals(idiomRowsBefore, count("SELECT COUNT(*) FROM user_example_idiom"))
+            assertEquals(filesBefore, imagesDir.listFiles()?.size ?: 0)
+        }
+
+    @Test
     fun missingExampleFailsWithoutPartialWrite() =
         runBlocking {
             val saved = saver().save(markedInput())

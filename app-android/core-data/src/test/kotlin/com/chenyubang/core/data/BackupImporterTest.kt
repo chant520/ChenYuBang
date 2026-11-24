@@ -165,6 +165,52 @@ class BackupImporterTest {
             )
         }
 
+    @Test
+    fun allInvalidIdiomRefsKeepBodiesWithZeroIdiomRowsAndExactOrphans() =
+        runBlocking {
+            val deadIdiom1 = "88888888-8888-4888-8888-888888888888"
+            val deadIdiom2 = "77777777-7777-4777-8777-777777777777"
+            val missingMistake = "66666666-6666-4666-8666-666666666666"
+            val snapshot =
+                BackupSnapshot(
+                    mistakes =
+                        listOf(
+                            BackupFixture.mistake(
+                                id = BackupFixture.MISTAKE_A,
+                                userExampleId = BackupFixture.EXAMPLE_A,
+                                idiomIds = listOf(deadIdiom1, deadIdiom2),
+                            ),
+                        ),
+                    userExamples =
+                        listOf(
+                            BackupFixture.userExample(
+                                id = BackupFixture.EXAMPLE_A,
+                                idiomIds = listOf(deadIdiom1),
+                            ),
+                        ),
+                    reviews =
+                        listOf(
+                            BackupFixture.review(id = BackupFixture.REVIEW_A, mistakeId = BackupFixture.MISTAKE_A),
+                            BackupFixture.review(id = BackupFixture.REVIEW_B, mistakeId = missingMistake),
+                        ),
+                )
+            val backup = importer.validate(ByteArrayInputStream(BackupFixture.zip(snapshot)))
+            val result = importer.restore(backup, ImportMode.OVERWRITE)
+
+            assertEquals(1, BackupDb.count(database, "mistake"))
+            assertEquals(1, BackupDb.count(database, "user_example"))
+            assertEquals(0, BackupDb.count(database, "mistake_idiom"))
+            assertEquals(0, BackupDb.count(database, "user_example_idiom"))
+            assertEquals(1, BackupDb.count(database, "review_log"))
+            assertEquals(0, result.orphans.mistakesWithoutUserExample.size)
+            assertEquals(1, result.orphans.mistakeIdiomsMissing.size)
+            assertEquals(listOf(deadIdiom1, deadIdiom2), result.orphans.mistakeIdiomsMissing[BackupFixture.MISTAKE_A])
+            assertEquals(1, result.orphans.userExampleIdiomsMissing.size)
+            assertEquals(listOf(deadIdiom1), result.orphans.userExampleIdiomsMissing[BackupFixture.EXAMPLE_A])
+            assertEquals(listOf(BackupFixture.REVIEW_B), result.orphans.reviewsWithoutMistake)
+            assertEquals(BackupCounts(mistakes = 1, userExamples = 1, reviews = 1), result.imported)
+        }
+
     private fun localText(
         sql: String,
         arg: String? = null,

@@ -12,6 +12,7 @@ private const val MOCK_EXAMPLES = 2
 enum class PackVersionStatus {
     BUILTIN,
     CHECKING,
+    DOWNLOADING,
     UP_TO_DATE,
     UPDATE_OK,
     RECOVERABLE_FAIL,
@@ -32,6 +33,8 @@ data class PackVersionState(
     val mockExampleCount: Int = 0,
     val isTest: Boolean = false,
     val reason: String? = null,
+    /** DOWNLOADING 的 0..100 整数进度，仅显示用；其余态恒为 0。 */
+    val progress: Int = 0,
 ) {
     val canRetry: Boolean
         get() =
@@ -76,6 +79,20 @@ class PackVersion(
 
     /** 进更新中态：仅换 status，版本号与条数沿用当前状态。 */
     fun checking(current: PackVersionState): PackVersionState = current.copy(status = PackVersionStatus.CHECKING)
+
+    /** 进下载中态：仅换 status 与 0..100 整数进度，版本号与条数沿用当前状态，供快照注入显示。 */
+    fun downloading(
+        current: PackVersionState,
+        progress: Int,
+    ): PackVersionState =
+        current.copy(status = PackVersionStatus.DOWNLOADING, progress = progress.coerceIn(0, 100))
+
+    /**
+     * E18「继续离线使用」：回到当前内置包离线态，仅换 status/reason/progress；
+     * 不发请求、不写库、不改版本号与条数。
+     */
+    fun offline(current: PackVersionState): PackVersionState =
+        current.copy(status = PackVersionStatus.BUILTIN, reason = null, progress = 0)
 
     /** 手动「检查题库更新」。远端更高 → UPDATE_OK；相等/更低 → UP_TO_DATE；任一步失败 → 可恢复。 */
     suspend fun check(url: String?): PackVersionState =

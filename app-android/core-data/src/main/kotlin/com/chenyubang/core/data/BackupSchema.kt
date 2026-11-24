@@ -9,6 +9,8 @@ import kotlinx.serialization.json.JsonPrimitive
 /**
  * backup-data / backup-manifest schema 的显式镜像（additionalProperties:false，不用宽松解码）。
  * 只做结构与字段级硬校验；schemaVersion 上限、sha256 与 counts 一致性由 BackupImporter 判定。
+ * 备份导入态允许 mistakes[].idiomIds / userExamples[].idiomIds 为空数组（已拍板）；
+ * 该放宽仅限备份导入，正常录入仍须至少一条归属（user-examples.schema.json / UserExampleEditor）。
  */
 internal object BackupSchema {
     private const val MIN_YEAR = 2000
@@ -37,7 +39,8 @@ internal object BackupSchema {
                     "state" to choice("待复习", "已掌握"),
                     "createdAt" to utc,
                     "reviewCount" to integer(0),
-                    "idiomIds" to array(uuid, 1),
+                    // 备份导入态允许 idiomIds 为空（已拍板，见 review-decisions 五节）；正常录入仍须至少一条。
+                    "idiomIds" to array(uuid, 0),
                 ),
             optional =
                 mapOf(
@@ -61,7 +64,8 @@ internal object BackupSchema {
                     "stem" to note,
                     "isMistake" to bool,
                     "createdAt" to utc,
-                    "idiomIds" to array(uuid, 1),
+                    // 备份导入态允许 idiomIds 为空（已拍板，见 review-decisions 五节）；正常录入仍须至少一条。
+                    "idiomIds" to array(uuid, 0),
                 ),
             optional =
                 mapOf(

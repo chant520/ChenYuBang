@@ -74,7 +74,7 @@ data class BackupOptions(
     val d: String,
 )
 
-/** 一条备份错题：字段对齐 backup-data.schema.json mistakes[]。imagePath 导出原值、导入恒 NULL。 */
+/** 一条备份错题：字段对齐 backup-data.schema.json mistakes[]。imagePath 导出原值、导入恒 NULL。备份导入态允许 idiomIds 为空。 */
 @Suppress("LongParameterList")
 data class BackupMistake(
     val id: String,
@@ -96,7 +96,10 @@ data class BackupMistake(
     val idiomIds: List<String> = emptyList(),
 )
 
-/** 一条用户录入题：optionA..D 平铺、idiomIds 至少一条；未标错题只在这里。 */
+/**
+ * 一条用户录入题：optionA..D 平铺、未标错题只在这里。
+ * 备份导入态允许 idiomIds 为空（导出后关联成语全部失效时保留本体）；正常录入仍须至少一条。
+ */
 @Suppress("LongParameterList")
 data class BackupUserExample(
     val id: String,
