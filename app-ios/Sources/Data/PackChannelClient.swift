@@ -78,7 +78,7 @@ public final class URLPackChannelClient: PackChannelClient, @unchecked Sendable 
                 completion: { continuation.resume(with: $0) }
             )
             let session = URLSession(configuration: configuration, delegate: delegate, delegateQueue: nil)
-            defer { session.invalidateAndCancel() }
+            delegate.attach(session)
             let task = session.downloadTask(with: request)
             task.resume()
         }
@@ -93,6 +93,7 @@ private final class ChannelSessionDelegate: NSObject, URLSessionDownloadDelegate
     private let lock = NSLock()
     private var exceeded = false
     private var completed = false
+    private var session: URLSession?
 
     init(
         expectedBytes: Int?,
@@ -104,6 +105,10 @@ private final class ChannelSessionDelegate: NSObject, URLSessionDownloadDelegate
         self.maximumBytes = maximumBytes
         self.progress = progress
         self.completion = completion
+    }
+
+    func attach(_ session: URLSession) {
+        self.session = session
     }
 
     func urlSession(
@@ -135,7 +140,10 @@ private final class ChannelSessionDelegate: NSObject, URLSessionDownloadDelegate
             return
         }
         completed = true
+        let session = self.session
+        self.session = nil
         lock.unlock()
+        session?.finishTasksAndInvalidate()
         completion(result)
     }
 
