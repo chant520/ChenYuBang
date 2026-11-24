@@ -141,15 +141,24 @@ enum BackupImportWriter {
             try execute(db, "UPDATE mistake SET reviewCount = ?, lastReviewedAt = ? WHERE id = ?",
                         [reviews?.count ?? 0, reviews?.latest, mistake.id])
         }
-        var localStates = keepLocalOnConflict ? try existingIDs(db, "idiom_state") : []
-        for state in payload.idiomStates {
-            guard !localStates.contains(state.idiomId) else { continue }
+        inserted.idiomStates = try insertIdiomStates(payload.idiomStates, db: db,
+                                                      keepLocalOnConflict: keepLocalOnConflict)
+        inserted.scopes = try insertScopes(payload.scopes, db: db, keepLocalOnConflict: keepLocalOnConflict)
+        return inserted
+    }
+
+    private static func insertIdiomStates(_ states: [BackupIdiomStatePayload], db: Database,
+                                          keepLocalOnConflict: Bool) throws -> Int {
+        let conflict = keepLocalOnConflict ? " OR IGNORE" : ""
+        var existing = keepLocalOnConflict ? try existingIDs(db, "idiom_state") : []
+        var inserted = 0
+        for state in states {
+            guard !existing.contains(state.idiomId) else { continue }
             try execute(db, "INSERT\(conflict) INTO idiom_state(idiomId, status, favorite) VALUES (?, ?, ?)",
                         [state.idiomId, state.status, state.favorite])
-            localStates.insert(state.idiomId)
-            inserted.idiomStates += 1
+            existing.insert(state.idiomId)
+            inserted += 1
         }
-        inserted.scopes = try insertScopes(payload.scopes, db: db, keepLocalOnConflict: keepLocalOnConflict)
         return inserted
     }
 
