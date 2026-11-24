@@ -1,4 +1,4 @@
-struct Phase4MessageError: Error, Sendable {
+public struct Phase4MessageError: Error, Sendable {
     let message: String
 }
 
