@@ -109,7 +109,7 @@ public enum ReviewLibrary {
             guard exists else { throw ReviewError.mistakeNotFound(mistakeID) }
             try db.execute(
                 sql: "INSERT INTO review_log (id, mistakeId, result, at) VALUES (?, ?, ?, ?)",
-                arguments: [UUID().uuidString, mistakeID, result, reviewedAt]
+                arguments: [UUID().uuidString.lowercased(), mistakeID, result, reviewedAt]
             )
             try db.execute(
                 sql: "UPDATE mistake SET reviewCount = reviewCount + 1, lastReviewedAt = ? WHERE id = ?",

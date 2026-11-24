@@ -42,9 +42,16 @@ struct AppRouteHost: View {
                 FirstLaunchGate(launch: launch, router: router)
             }
             if let overlay = router.overlay {
+                let cancelEnabled = overlay.route == .importMode
+                    ? !router.backupImportInProgress : !router.clearInProgress
                 COverlay(style: overlay.route == .importMode ? .sheet : .dialog,
-                         title: overlay.route.title, onDismiss: router.closeOverlay) {
-                    overlayContent(overlay.route)
+                         title: overlay.route.title,
+                         description: overlay.route == .importMode
+                            ? "两种方式结果不同，选之前看清楚。"
+                            : "这一步不可撤销。清掉的是你录的东西，不是题库本身。",
+                         onDismiss: router.closeOverlay,
+                         cancelEnabled: cancelEnabled) {
+                    BackupOverlayContent(router: router, launch: launch, route: overlay.route)
                 }
             }
         }
@@ -55,17 +62,6 @@ struct AppRouteHost: View {
         router.selectedTab == tab && router.fullScreenEntries.isEmpty && !router.needsFirstLaunch
     }
 
-    @ViewBuilder
-    private func overlayContent(_ route: AppRoute) -> some View {
-        if route == .importMode {
-            PendingPageText(text: "导入业务待接入；取消不会修改本机数据。")
-            CButton(text: "合并导入（待接入）", enabled: false) {}
-            CButton(text: "覆盖导入（待接入）", enabled: false) {}
-        } else {
-            PendingPageText(text: "清空业务待接入；取消不会修改本机数据。")
-            CButton(text: "确认清空（待接入）", variant: .dangerFilled, enabled: false) {}
-        }
-    }
 }
 
 private extension AppTab {
@@ -258,6 +254,15 @@ private struct AppRoutePage: View {
                 onOpenMistakes: { _ = router.finishCapture() },
                 onContinue: { _ = router.continueCapture() }
             )
+        } else if entry.route == .backup, let service = launch.backupService {
+            BackupScreen(
+                service: service,
+                importResult: router.backupImportResult,
+                onValidated: router.prepareBackupImport,
+                onBack: { router.back() }
+            )
+        } else if entry.route == .pack, let pack = launch.currentPack {
+            PackVersionScreen(pack: pack, onBack: { router.back() })
         } else if entry.route == .queue, let reader = launch.reviewReader {
             P11ReviewScreen(
                 reader: reader,
@@ -345,6 +350,7 @@ private struct RoutePlaceholderPage: View {
             CButton(text: "搜索", variant: .ghost) { router.openSearch() }
             CButton(text: "去错题本", variant: .ghost, action: router.goToMistakes)
         case .profile:
+            if let message = router.clearResult { PendingPageText(text: message) }
             CButton(text: "考试范围", variant: .ghost) { router.push(.scope) }
             CButton(text: "备份与恢复", variant: .ghost) { router.push(.backup) }
             CButton(text: "题库版本", variant: .ghost) { router.push(.pack) }
@@ -377,7 +383,7 @@ private struct RoutePlaceholderPage: View {
     }
 }
 
-private struct PendingPageText: View {
+struct PendingPageText: View {
     @Environment(\.colorScheme) private var colorScheme
     let text: String
 

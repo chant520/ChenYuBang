@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A000000000000000000000EC /* Phase4PendingCopy.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001EC /* Phase4PendingCopy.swift */; };
 		A00000000000000000000010 /* ChenYuBangApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000100 /* ChenYuBangApp.swift */; };
 		A00000000000000000000020 /* IdiomFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000130 /* IdiomFeature.swift */; };
 		A00000000000000000000021 /* ExampleFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000131 /* ExampleFeature.swift */; };
@@ -25,6 +26,18 @@
 		A000000000000000000000D9 /* P08ReviewHintTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001D9 /* P08ReviewHintTests.swift */; };
 		A000000000000000000000DA /* RouterReviewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001DA /* RouterReviewTests.swift */; };
 		A000000000000000000000DB /* IdiomReviewEntryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001DB /* IdiomReviewEntryTests.swift */; };
+		A000000000000000000000E0 /* BackupScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001E0 /* BackupScreen.swift */; };
+		A000000000000000000000E1 /* PackVersionScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001E1 /* PackVersionScreen.swift */; };
+		A000000000000000000000E2 /* ClearDataSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001E2 /* ClearDataSheet.swift */; };
+		A000000000000000000000E3 /* RouterBackupTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001E3 /* RouterBackupTests.swift */; };
+		A000000000000000000000E4 /* Phase4SnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001E4 /* Phase4SnapshotTests.swift */; };
+		A000000000000000000000E5 /* BackupStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001E5 /* BackupStoreTests.swift */; };
+		A000000000000000000000E6 /* BackupImportTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001E6 /* BackupImportTests.swift */; };
+		A000000000000000000000E7 /* BackupImportWriterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001E7 /* BackupImportWriterTests.swift */; };
+		A000000000000000000000E8 /* UserDataCleanerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001E8 /* UserDataCleanerTests.swift */; };
+		A000000000000000000000E9 /* RouterBackupState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001E9 /* RouterBackupState.swift */; };
+		A000000000000000000000EA /* BackupOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001EA /* BackupOverlayView.swift */; };
+		A000000000000000000000EB /* BackupImportOrphanTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001EB /* BackupImportOrphanTests.swift */; };
 		A00000000000000000000024 /* MeFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000134 /* MeFeature.swift */; };
 		A00000000000000000000026 /* LibraryBrowse.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000136 /* LibraryBrowse.swift */; };
 		A00000000000000000000027 /* LibraryScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000137 /* LibraryScreen.swift */; };
@@ -140,6 +153,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		A000000000000000000001EC /* Phase4PendingCopy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Phase4PendingCopy.swift; sourceTree = "<group>"; };
 		A00000000000000000000100 /* ChenYuBangApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChenYuBangApp.swift; sourceTree = "<group>"; };
 		A00000000000000000000110 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A00000000000000000000120 /* ChenYuBang.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChenYuBang.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -160,6 +174,18 @@
 		A000000000000000000001D9 /* P08ReviewHintTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P08ReviewHintTests.swift; sourceTree = "<group>"; };
 		A000000000000000000001DA /* RouterReviewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouterReviewTests.swift; sourceTree = "<group>"; };
 		A000000000000000000001DB /* IdiomReviewEntryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdiomReviewEntryTests.swift; sourceTree = "<group>"; };
+		A000000000000000000001E0 /* BackupScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupScreen.swift; sourceTree = "<group>"; };
+		A000000000000000000001E1 /* PackVersionScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackVersionScreen.swift; sourceTree = "<group>"; };
+		A000000000000000000001E2 /* ClearDataSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClearDataSheet.swift; sourceTree = "<group>"; };
+		A000000000000000000001E3 /* RouterBackupTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouterBackupTests.swift; sourceTree = "<group>"; };
+		A000000000000000000001E4 /* Phase4SnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Phase4SnapshotTests.swift; sourceTree = "<group>"; };
+		A000000000000000000001E5 /* BackupStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupStoreTests.swift; sourceTree = "<group>"; };
+		A000000000000000000001E6 /* BackupImportTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupImportTests.swift; sourceTree = "<group>"; };
+		A000000000000000000001E7 /* BackupImportWriterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupImportWriterTests.swift; sourceTree = "<group>"; };
+		A000000000000000000001E8 /* UserDataCleanerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDataCleanerTests.swift; sourceTree = "<group>"; };
+		A000000000000000000001E9 /* RouterBackupState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouterBackupState.swift; sourceTree = "<group>"; };
+		A000000000000000000001EA /* BackupOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupOverlayView.swift; sourceTree = "<group>"; };
+		A000000000000000000001EB /* BackupImportOrphanTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupImportOrphanTests.swift; sourceTree = "<group>"; };
 		A00000000000000000000134 /* MeFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeFeature.swift; sourceTree = "<group>"; };
 		A00000000000000000000135 /* CaptureFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureFeature.swift; sourceTree = "<group>"; };
 		A00000000000000000000136 /* LibraryBrowse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryBrowse.swift; sourceTree = "<group>"; };
@@ -301,6 +327,8 @@
 				A00000000000000000000102 /* RouterState.swift */,
 				A00000000000000000000103 /* AppRouteHost.swift */,
 				A00000000000000000000104 /* FirstLaunchGate.swift */,
+				A000000000000000000001E9 /* RouterBackupState.swift */,
+				A000000000000000000001EA /* BackupOverlayView.swift */,
 				A00000000000000000000151 /* pack-v1.0.0.zip */,
 				A00000000000000000000110 /* Info.plist */,
 			);
@@ -377,8 +405,12 @@
 		A00000000000000000000335 /* FeatureMe */ = {
 			isa = PBXGroup;
 			children = (
+				A000000000000000000001EC /* Phase4PendingCopy.swift */,
 				A00000000000000000000134 /* MeFeature.swift */,
 				A00000000000000000000138 /* ExamScopeScreen.swift */,
+				A000000000000000000001E0 /* BackupScreen.swift */,
+				A000000000000000000001E1 /* PackVersionScreen.swift */,
+				A000000000000000000001E2 /* ClearDataSheet.swift */,
 			);
 			path = FeatureMe;
 			sourceTree = "<group>";
@@ -470,6 +502,13 @@
 				A000000000000000000001D9 /* P08ReviewHintTests.swift */,
 				A000000000000000000001DA /* RouterReviewTests.swift */,
 				A000000000000000000001DB /* IdiomReviewEntryTests.swift */,
+				A000000000000000000001E3 /* RouterBackupTests.swift */,
+				A000000000000000000001E4 /* Phase4SnapshotTests.swift */,
+				A000000000000000000001E5 /* BackupStoreTests.swift */,
+				A000000000000000000001E6 /* BackupImportTests.swift */,
+				A000000000000000000001E7 /* BackupImportWriterTests.swift */,
+				A000000000000000000001E8 /* UserDataCleanerTests.swift */,
+				A000000000000000000001EB /* BackupImportOrphanTests.swift */,
 				A00000000000000000000152 /* pack fixture */,
 			);
 			path = Tests;
@@ -600,11 +639,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A000000000000000000000EC /* Phase4PendingCopy.swift in Sources */,
 				A00000000000000000000010 /* ChenYuBangApp.swift in Sources */,
 				A00000000000000000000037 /* RouteRegistry.swift in Sources */,
 				A00000000000000000000038 /* RouterState.swift in Sources */,
 				A00000000000000000000039 /* AppRouteHost.swift in Sources */,
 				A0000000000000000000003A /* FirstLaunchGate.swift in Sources */,
+				A000000000000000000000E9 /* RouterBackupState.swift in Sources */,
+				A000000000000000000000EA /* BackupOverlayView.swift in Sources */,
 				A00000000000000000000020 /* IdiomFeature.swift in Sources */,
 				A00000000000000000000026 /* LibraryBrowse.swift in Sources */,
 				A00000000000000000000027 /* LibraryScreen.swift in Sources */,
@@ -633,6 +675,9 @@
 				A000000000000000000000D3 /* P12SummaryScreen.swift in Sources */,
 				A00000000000000000000024 /* MeFeature.swift in Sources */,
 				A00000000000000000000028 /* ExamScopeScreen.swift in Sources */,
+				A000000000000000000000E0 /* BackupScreen.swift in Sources */,
+				A000000000000000000000E1 /* PackVersionScreen.swift in Sources */,
+				A000000000000000000000E2 /* ClearDataSheet.swift in Sources */,
 				A00000000000000000000025 /* CaptureFeature.swift in Sources */,
 				A000000000000000000000A0 /* P17CaptureScreen.swift in Sources */,
 				A000000000000000000000A6 /* P17CaptureChrome.swift in Sources */,
@@ -717,6 +762,13 @@
 				A000000000000000000000D9 /* P08ReviewHintTests.swift in Sources */,
 				A000000000000000000000DA /* RouterReviewTests.swift in Sources */,
 				A000000000000000000000DB /* IdiomReviewEntryTests.swift in Sources */,
+				A000000000000000000000E3 /* RouterBackupTests.swift in Sources */,
+				A000000000000000000000E4 /* Phase4SnapshotTests.swift in Sources */,
+				A000000000000000000000E5 /* BackupStoreTests.swift in Sources */,
+				A000000000000000000000E6 /* BackupImportTests.swift in Sources */,
+				A000000000000000000000E7 /* BackupImportWriterTests.swift in Sources */,
+				A000000000000000000000E8 /* UserDataCleanerTests.swift in Sources */,
+				A000000000000000000000EB /* BackupImportOrphanTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -74,14 +74,14 @@ enum AppRoute: String, CaseIterable, Codable {
         case .profile: return "我的"
         case .scope: return "考试范围设置"
         case .backup: return "备份与恢复"
-        case .pack: return "题库版本"
+        case .pack: return "题库版本与更新"
         case .camera: return "拍照"
         case .crop: return "裁切"
         case .ocr: return "识别结果"
         case .match: return "匹配修正"
         case .done: return "保存成功"
-        case .importMode: return "导入方式"
-        case .clear: return "清空确认"
+        case .importMode: return "读入这份备份，用哪种方式"
+        case .clear: return "清空全部学习数据"
         }
     }
 }
