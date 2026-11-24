@@ -79,7 +79,7 @@ final class BackupImportOrphanTests: PackDatabaseTestCase {
             XCTAssertEqual(try String.fetchOne(db, sql: "SELECT stem FROM mistake WHERE id = ?",
                                                arguments: [BackupWriterFixture.sharedMistake]), "备份共享错题")
             XCTAssertEqual(try String.fetchOne(db, sql: "SELECT stem FROM user_example WHERE id = ?",
-                                               arguments: [BackupWriterFixture.extraExample]), "备份新增")
+                                               arguments: [BackupWriterFixture.extraExample]), "备份新增录入题")
         }
     }
 
