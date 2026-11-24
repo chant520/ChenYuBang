@@ -57,6 +57,10 @@ class P16PackSnapshotTest {
 
     private fun checking() = builtin().copy(status = PackVersionStatus.CHECKING)
 
+    private fun upToDate() = builtin().copy(status = PackVersionStatus.UP_TO_DATE)
+
+    private fun offline() = builtin().copy(status = PackVersionStatus.OFFLINE)
+
     private fun downloading() = builtin().copy(status = PackVersionStatus.DOWNLOADING, progress = 42)
 
     private fun updateOk() =
@@ -90,6 +94,18 @@ class P16PackSnapshotTest {
 
     @Test
     fun p16CheckingDark() = capture(night = true, state = checking())
+
+    @Test
+    fun p16UpToDateLight() = capture(night = false, state = upToDate())
+
+    @Test
+    fun p16UpToDateDark() = capture(night = true, state = upToDate())
+
+    @Test
+    fun p16OfflineLight() = capture(night = false, state = offline())
+
+    @Test
+    fun p16OfflineDark() = capture(night = true, state = offline())
 
     @Test
     fun p16Downloading42Light() = capture(night = false, state = downloading())

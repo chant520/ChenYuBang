@@ -40,11 +40,12 @@ import com.chenyubang.core.data.BackupImporter
 import com.chenyubang.core.data.ClearData
 import com.chenyubang.core.data.ExamScopeSelection
 import com.chenyubang.core.data.ExamScopeStore
+import com.chenyubang.core.data.HttpPackUpdateSource
 import com.chenyubang.core.data.LaunchPreferences
 import com.chenyubang.core.data.PackImporter
-import com.chenyubang.core.data.PackVersion
+import com.chenyubang.core.data.PackUpdateConfig
+import com.chenyubang.core.data.PackUpdateCoordinator
 import com.chenyubang.core.data.UserExampleSaver
-import com.chenyubang.core.data.ValidatedPack
 import com.chenyubang.core.ui.CButton
 import com.chenyubang.core.ui.CButtonVariant
 import com.chenyubang.core.ui.CChromeGlyph
@@ -67,12 +68,14 @@ fun AppRouteHost(database: AppDatabase) {
     val importer = remember(database) { PackImporter(database, context) }
     val backupExporter = remember(database) { BackupExporter(database) }
     val backupImporter = remember(database, context) { BackupImporter(database, context) }
-    val packVersion = remember(context) { PackVersion(context) }
+    val packUpdates =
+        remember(database, context) {
+            PackUpdateCoordinator(context, importer, HttpPackUpdateSource(PackUpdateConfig.LATEST_URL))
+        }
     val clearData = remember(database) { ClearData(database) }
     val ocrEngine = remember { PaddleOcrEngine(context) }
     val userExampleSaver =
         remember(database, context) { UserExampleSaver(database.userExampleDao(), File(context.filesDir, "images")) }
-    var currentPack by remember { mutableStateOf<ValidatedPack?>(null) }
     var preferences by remember { mutableStateOf<LaunchPreferences?>(null) }
     var loadError by remember { mutableStateOf(false) }
     var loadAttempt by remember { mutableStateOf(0) }
@@ -80,8 +83,7 @@ fun AppRouteHost(database: AppDatabase) {
     LaunchedEffect(database, loadAttempt) {
         loadError = false
         try {
-            val launch = loadInitialLaunch(context, importer, scopeStore)
-            currentPack = launch.pack
+            val launch = loadInitialLaunch(packUpdates, scopeStore, importer)
             availableProvinces = launch.provinces
             preferences = launch.preferences
         } catch (cancelled: CancellationException) {
@@ -95,8 +97,7 @@ fun AppRouteHost(database: AppDatabase) {
         InitializingScreen(loadError) { loadAttempt++ }
         return
     }
-    val pack = requireNotNull(currentPack)
-    val saver = makeScopeSaver(scopeStore, importer, pack)
+    val saver = makeScopeSaver(scopeStore, importer)
     if (!loaded.complete) {
         FirstLaunchGate(loaded.scope, availableProvinces, saver) {
             preferences = LaunchPreferences(true, it)
@@ -114,7 +115,7 @@ fun AppRouteHost(database: AppDatabase) {
             userExampleSaver = userExampleSaver,
             backupExporter = backupExporter,
             backupImporter = backupImporter,
-            packVersion = packVersion,
+            packUpdates = packUpdates,
             clearData = clearData,
         ),
     )

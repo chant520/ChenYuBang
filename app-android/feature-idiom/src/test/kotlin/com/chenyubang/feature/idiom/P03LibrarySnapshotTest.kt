@@ -26,7 +26,10 @@ class P03LibrarySnapshotTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    private fun capture(night: Boolean) {
+    private fun capture(
+        night: Boolean,
+        updateFailed: Boolean = false,
+    ) {
         composeTestRule.setContent {
             val base = LocalConfiguration.current
             val nightBits = if (night) Configuration.UI_MODE_NIGHT_YES else Configuration.UI_MODE_NIGHT_NO
@@ -34,14 +37,14 @@ class P03LibrarySnapshotTest {
             config.uiMode = (config.uiMode and Configuration.UI_MODE_NIGHT_MASK.inv()) or nightBits
             CompositionLocalProvider(LocalConfiguration provides config) {
                 ChenYuBangTheme(darkTheme = night) {
-                    P03LibraryContent(state = state())
+                    P03LibraryContent(state = state(updateFailed))
                 }
             }
         }
         composeTestRule.onRoot().captureRoboImage()
     }
 
-    private fun state(): P03LibraryUiState {
+    private fun state(updateFailed: Boolean = false): P03LibraryUiState {
         val items = SAMPLE
         return P03LibraryUiState(
             scope =
@@ -56,6 +59,7 @@ class P03LibrarySnapshotTest {
             letters = LibraryBrowse.letters(items),
             page = LibraryBrowse.page(items, LibraryDimension.Scope, null),
             loading = false,
+            updateFailed = updateFailed,
         )
     }
 
@@ -76,4 +80,10 @@ class P03LibrarySnapshotTest {
 
     @Test
     fun libraryDark() = capture(night = true)
+
+    @Test
+    fun libraryUpdateFailedLight() = capture(night = false, updateFailed = true)
+
+    @Test
+    fun libraryUpdateFailedDark() = capture(night = true, updateFailed = true)
 }

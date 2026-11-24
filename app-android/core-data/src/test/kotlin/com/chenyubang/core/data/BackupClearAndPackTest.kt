@@ -5,17 +5,14 @@ import androidx.test.core.app.ApplicationProvider
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.SQLiteMode
-import java.io.InputStream
-import java.lang.reflect.InvocationTargetException
 
-/** 验证计划第 2 节补充项 #10/#11：ClearData 只清六表、PackVersion 三级兜底与下载上限。 */
+/** ClearData 只清六表；题库启动三级兜底与更新失败保留版本。 */
 @Suppress("MagicNumber", "LongMethod", "TooManyFunctions")
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34])
@@ -58,46 +55,62 @@ class BackupClearAndPackTest {
         }
 
     @Test
-    fun packVersionKeepsFallbackOrderMockIsolationAndDownloadBound() =
+    fun packBootstrapKeepsFallbackOrderAndTestIsolation() =
         runBlocking {
             context = ApplicationProvider.getApplicationContext()
-            val builtinCalls = CountingSource(PackUpdateFetch.Unavailable)
-            val builtin = PackVersion(context, builtinCalls).load()
-            assertEquals(PackVersionStatus.BUILTIN, builtin.status)
-            assertEquals("v1.0.0", builtin.version)
-            assertEquals(PackFixtureTest.IDIOM_COUNT, builtin.idiomCount)
-            assertEquals(PackFixtureTest.EXAMPLE_COUNT, builtin.exampleCount)
-            assertEquals(0, builtinCalls.calls)
+            database = BackupDb.open(context)
+            val importer = PackImporter(database, context)
+            val source = CountingSource()
+            val builtin = PackUpdateCoordinator(context, importer, source)
+            builtin.bootstrap()
+            assertEquals(PackVersionStatus.BUILTIN, builtin.state.value?.status)
+            assertEquals("v1.0.0", builtin.state.value?.version)
+            assertEquals(PackFixtureTest.IDIOM_COUNT, builtin.state.value?.idiomCount)
+            assertEquals(PackFixtureTest.EXAMPLE_COUNT, builtin.state.value?.exampleCount)
+            assertEquals(0, source.latestCalls)
 
-            val recoverCalls = CountingSource(PackUpdateFetch.Recoverable("网络失败"))
-            val recoverable = PackVersion(context, recoverCalls).check("https://example.com/pack.zip")
-            assertEquals(PackVersionStatus.RECOVERABLE_FAIL, recoverable.status)
-            assertEquals("v1.0.0", recoverable.version)
-            assertTrue(recoverable.canRetry)
+            val recoverable = builtin.check()
+            assertEquals(PackCheckOutcome.FAILED, recoverable)
+            assertEquals(PackVersionStatus.RECOVERABLE_FAIL, builtin.state.value?.status)
+            assertEquals("v1.0.0", builtin.state.value?.version)
+            assertTrue(builtin.state.value?.canRetry == true)
+            assertEquals(1, source.latestCalls)
 
-            val remoteCalls = CountingSource(PackUpdateFetch.Success(PackFixtureTest.bytes()))
-            val remote =
-                PackVersion(context, remoteCalls, builtinAsset = "missing.zip").load("https://example.com/pack.zip")
-            assertEquals(PackVersionStatus.UPDATE_OK, remote.status)
-            assertEquals(1, remoteCalls.calls)
+            val directory = createTempDir("pack-mock")
+            try {
+                val store = PackInstallStore(context, directory, builtinAsset = "missing.zip")
+                val mock = PackUpdateCoordinator(context, importer, source, store)
+                mock.bootstrap()
+                assertEquals(PackVersionStatus.TEST_MOCK, mock.state.value?.status)
+                assertEquals("测试数据（TEST）", mock.state.value?.version)
+                assertTrue(mock.state.value?.isTest == true)
+                assertEquals(3, mock.state.value?.mockIdiomCount)
+                assertEquals(2, mock.state.value?.mockExampleCount)
+                assertEquals(3, mock.state.value?.idiomCount)
+                assertEquals(2, mock.state.value?.exampleCount)
+                assertEquals("题库未获取成功", mock.state.value?.reason)
+                assertEquals(3, BackupDb.count(database, "idiom"))
+                assertEquals(2, BackupDb.count(database, "example"))
+                assertEquals(PackCheckOutcome.FAILED, mock.check())
+                assertEquals(PackVersionStatus.RECOVERABLE_FAIL, mock.state.value?.status)
+                assertEquals("测试数据（TEST）", mock.state.value?.version)
+                mock.continueOffline()
+                assertEquals(PackVersionStatus.TEST_MOCK, mock.state.value?.status)
+                assertEquals(3, mock.state.value?.idiomCount)
+                assertEquals(2, mock.state.value?.exampleCount)
+            } finally {
+                directory.deleteRecursively()
+            }
 
-            val mockCalls = CountingSource(PackUpdateFetch.Unavailable)
-            val mock =
-                PackVersion(context, mockCalls, builtinAsset = "missing.zip").load("https://example.com/pack.zip")
-            assertEquals(PackVersionStatus.TEST_MOCK, mock.status)
-            assertEquals("测试数据（TEST）", mock.version)
-            assertTrue(mock.isTest)
-            assertEquals(3, mock.mockIdiomCount)
-            assertEquals(2, mock.mockExampleCount)
-            assertEquals(0, mock.idiomCount)
-            assertEquals(0, mock.exampleCount)
-            assertEquals("题库未获取成功", mock.reason)
-            assertEquals(PackVersionStatus.CHECKING, PackVersion(context, mockCalls).checking(mock).status)
-
-            val http = HttpPackUpdateSource().fetch("http://example.com/pack.zip")
-            assertTrue(http is PackUpdateFetch.Recoverable)
-            assertTrue((http as PackUpdateFetch.Recoverable).reason.contains("HTTPS"))
-            assertBoundedDownloadRejectsOversize()
+            var opened = 0
+            val insecure =
+                HttpPackUpdateSource("http://example.com/latest.json", connectionOpener = {
+                    opened++
+                    error("must not open HTTP")
+                }).latest()
+            assertTrue(insecure is ChannelManifestResult.Recoverable)
+            assertTrue((insecure as ChannelManifestResult.Recoverable).reason.contains("HTTPS"))
+            assertEquals(0, opened)
         }
 
     private fun seedContentAndUsers() {
@@ -140,52 +153,22 @@ class BackupClearAndPackTest {
     private fun setting(key: String): String? =
         BackupDb.nullableText(database, "SELECT value FROM settings WHERE key = ?", arrayOf(key))
 
-    private fun assertBoundedDownloadRejectsOversize() {
-        val limit = 32 * 1024 * 1024
-        val stream =
-            object : InputStream() {
-                var remaining = limit + 1
+    private class CountingSource : PackUpdateSource {
+        var latestCalls = 0
+        var downloadCalls = 0
 
-                override fun read(): Int =
-                    if (remaining > 0) {
-                        remaining--
-                        1
-                    } else {
-                        -1
-                    }
+        override suspend fun latest(): ChannelManifestResult {
+            latestCalls++
+            return ChannelManifestResult.Recoverable("网络失败")
+        }
 
-                override fun read(
-                    buffer: ByteArray,
-                    offset: Int,
-                    length: Int,
-                ): Int {
-                    if (remaining <= 0) return -1
-                    val size = minOf(length, remaining)
-                    java.util.Arrays.fill(buffer, offset, offset + size, 1.toByte())
-                    remaining -= size
-                    return size
-                }
-            }
-        val method =
-            HttpPackUpdateSource::class.java.getDeclaredMethod(
-                "readBounded",
-                InputStream::class.java,
-                Int::class.javaPrimitiveType,
-            )
-        method.isAccessible = true
-        val thrown =
-            assertThrows(InvocationTargetException::class.java) {
-                method.invoke(HttpPackUpdateSource(), stream, limit)
-            }
-        assertTrue(thrown.targetException is IllegalArgumentException)
-    }
-
-    private class CountingSource(private val result: PackUpdateFetch) : PackUpdateSource {
-        var calls = 0
-
-        override suspend fun fetch(url: String?): PackUpdateFetch {
-            calls++
-            return result
+        override suspend fun download(
+            manifest: ChannelManifest,
+            target: java.io.File,
+            onProgress: (Int) -> Unit,
+        ): PackDownloadResult {
+            downloadCalls++
+            return PackDownloadResult.Recoverable("不应下载")
         }
     }
 }

@@ -1,8 +1,10 @@
 package com.chenyubang.core.data
 
 import android.content.Context
+import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Database
+import androidx.room.Embedded
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -165,8 +167,29 @@ interface IdiomMatchDao {
  *  - [listByExample]：一个例题的关联成语 id 列表（B3 一题多成语，供 P07 关联成语区）。
  *  - [listByIdiom]：某成语关联的全部系统真题（A4，供 P05 真题区），按年份倒序、id 作次级排序保证稳定。
  */
+data class ExampleListItem(
+    @Embedded val example: ExampleEntity,
+    @ColumnInfo(name = "idiomCount") val idiomCount: Int,
+)
+
 @Dao
 interface ExampleDao {
+    @Query(
+        "SELECT example.*, COUNT(example_idiom.idiomId) AS idiomCount FROM example " +
+            "LEFT JOIN example_idiom ON example.id = example_idiom.exampleId " +
+            "GROUP BY example.id ORDER BY example.year DESC, example.id",
+    )
+    suspend fun list(): List<ExampleListItem>
+
+    @Query(
+        "SELECT example.*, COUNT(example_idiom.idiomId) AS idiomCount FROM example " +
+            "LEFT JOIN example_idiom ON example.id = example_idiom.exampleId " +
+            "WHERE EXISTS (SELECT 1 FROM example_idiom AS scoped " +
+            "JOIN idiom_scope ON scoped.idiomId = idiom_scope.idiomId WHERE scoped.exampleId = example.id) " +
+            "GROUP BY example.id ORDER BY example.year DESC, example.id",
+    )
+    suspend fun listInScope(): List<ExampleListItem>
+
     @Query("SELECT * FROM example WHERE id = :id")
     suspend fun byId(id: String): ExampleEntity?
 

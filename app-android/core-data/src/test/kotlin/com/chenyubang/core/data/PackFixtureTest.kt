@@ -71,7 +71,10 @@ internal object PackFixtureTest {
         )
     }
 
-    fun withoutIds(ids: Set<String>): ByteArray =
+    fun withoutIds(
+        ids: Set<String>,
+        version: String? = null,
+    ): ByteArray =
         mutate(
             idioms = { JsonArray(it.filterNot { row -> (row as JsonObject).string("id") in ids }) },
             examples = { rows ->
@@ -83,6 +86,7 @@ internal object PackFixtureTest {
                     }.filter { (it.getValue("idiomIds") as JsonArray).isNotEmpty() },
                 )
             },
+            manifest = { if (version == null) it else it.with("packVersion", JsonPrimitive(version)) },
         )
 }
 
