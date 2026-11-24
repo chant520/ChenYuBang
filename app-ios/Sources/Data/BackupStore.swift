@@ -56,23 +56,24 @@ enum Backup {
     static let exchangeSchemaVersion = 1
 
     static func export(db: Database, to directory: URL, date: Date,
-                       identity: BackupIdentity = BackupIdentity()) throws -> BackupExport {
+                       identity: BackupIdentity = BackupIdentity(),
+                       namePrefix: String = "backup-") throws -> BackupExport {
         let (payload, counts) = try dataJSON(db)
         let dataText = PackCanonical.text(payload)
         let digest = digest(of: dataText)
         let manifestText = PackCanonical.text(manifestJSON(counts: counts, sha256: digest,
                                                            date: date, identity: identity))
-        let target = try writeArchive(directory: directory, date: date,
+        let target = try writeArchive(directory: directory, date: date, namePrefix: namePrefix,
                                       dataText: dataText, manifestText: manifestText)
         return BackupExport(url: target, sha256: digest, counts: counts)
     }
 
-    private static func writeArchive(directory: URL, date: Date,
+    private static func writeArchive(directory: URL, date: Date, namePrefix: String,
                                      dataText: String, manifestText: String) throws -> URL {
         let fileManager = FileManager.default
         let staging = fileManager.temporaryDirectory
             .appendingPathComponent("backup-stage-\(UUID().uuidString)", isDirectory: true)
-        let target = directory.appendingPathComponent(fileName(date))
+        let target = directory.appendingPathComponent(fileName(date, prefix: namePrefix))
         do {
             try fileManager.createDirectory(at: staging, withIntermediateDirectories: true)
             try Data(dataText.utf8).write(to: staging.appendingPathComponent("data.json"), options: .atomic)
@@ -137,14 +138,14 @@ enum Backup {
             SELECT id, userExampleId, imagePath, ocrText, stem, optionA, optionB, optionC, optionD,
                    myAnswer, reason, tagNames, examType, year, region, state, createdAt,
                    lastReviewedAt, reviewCount
-            FROM mistake ORDER BY id
+            FROM mistake ORDER BY lower(id)
             """)
         let links = try links(db, "mistake_idiom", "mistakeId", "idiomId")
         return rows.map { row in
             let id: String = row["id"]
             return .object([
-                "id": .string(id),
-                "userExampleId": nullable(row, "userExampleId"),
+                "id": .string(id.lowercased()),
+                "userExampleId": nullableLowercased(row, "userExampleId"),
                 "stem": .string(row["stem"]),
                 "options": .object([
                     "A": .string(row["optionA"]),
@@ -164,7 +165,7 @@ enum Backup {
                 "createdAt": .string(row["createdAt"]),
                 "lastReviewedAt": nullable(row, "lastReviewedAt"),
                 "reviewCount": .integer(String(row["reviewCount"] as Int)),
-                "idiomIds": .array((links[id] ?? []).map { PackJSON.string($0) })
+                "idiomIds": .array((links[id.lowercased()] ?? []).map { PackJSON.string($0) })
             ])
         }
     }
@@ -173,15 +174,15 @@ enum Backup {
         let rows = try fetch(db, """
             SELECT id, imagePath, ocrText, stem, optionA, optionB, optionC, optionD, myAnswer,
                    isMistake, examType, year, region, createdAt
-            FROM user_example ORDER BY id
+            FROM user_example ORDER BY lower(id)
             """)
         let links = try linkedExampleIDs(db, mistakeRows: try fetch(db, """
-            SELECT id, userExampleId FROM mistake ORDER BY id
+            SELECT id, userExampleId FROM mistake ORDER BY lower(id)
             """))
         return rows.map { row in
             let id: String = row["id"]
             return .object([
-                "id": .string(id),
+                "id": .string(id.lowercased()),
                 "imagePath": nullable(row, "imagePath"),
                 "ocrText": nullable(row, "ocrText"),
                 "stem": .string(row["stem"]),
@@ -195,16 +196,16 @@ enum Backup {
                 "year": number(row, "year"),
                 "region": nullable(row, "region"),
                 "createdAt": .string(row["createdAt"]),
-                "idiomIds": .array((links[id] ?? []).map { PackJSON.string($0) })
+                "idiomIds": .array((links[id.lowercased()] ?? []).map { PackJSON.string($0) })
             ])
         }
     }
 
     private static func reviewObjects(_ db: Database) throws -> [PackJSON] {
-        try fetch(db, "SELECT id, mistakeId, result, at FROM review_log ORDER BY id").map { row in
+        try fetch(db, "SELECT id, mistakeId, result, at FROM review_log ORDER BY lower(id)").map { row in
             .object([
-                "id": .string(row["id"]),
-                "mistakeId": .string(row["mistakeId"]),
+                "id": .string((row["id"] as String).lowercased()),
+                "mistakeId": .string((row["mistakeId"] as String).lowercased()),
                 "result": .string(row["result"]),
                 "at": .string(row["at"])
             ])
@@ -212,9 +213,9 @@ enum Backup {
     }
 
     private static func idiomStateObjects(_ db: Database) throws -> [PackJSON] {
-        try fetch(db, "SELECT idiomId, status, favorite FROM idiom_state ORDER BY idiomId").map { row in
+        try fetch(db, "SELECT idiomId, status, favorite FROM idiom_state ORDER BY lower(idiomId)").map { row in
             .object([
-                "idiomId": .string(row["idiomId"]),
+                "idiomId": .string((row["idiomId"] as String).lowercased()),
                 "status": .string(row["status"]),
                 "favorite": .boolean(row["favorite"] as Bool)
             ])
@@ -239,8 +240,10 @@ enum Backup {
         for row in mistakeRows {
             let mistakeID: String = row["id"]
             guard let exampleID: String = row["userExampleId"] else { continue }
-            guard links[exampleID] == nil, let ids = mistakeLinks[mistakeID], !ids.isEmpty else { continue }
-            links[exampleID] = ids
+            let normalizedExampleID = exampleID.lowercased()
+            guard links[normalizedExampleID] == nil,
+                  let ids = mistakeLinks[mistakeID.lowercased()], !ids.isEmpty else { continue }
+            links[normalizedExampleID] = ids
         }
         return links
     }
@@ -272,10 +275,10 @@ enum Backup {
     private static func links(_ db: Database, _ table: String,
                               _ own: String, _ other: String) throws -> [String: [String]] {
         var map: [String: [String]] = [:]
-        for row in try fetch(db, "SELECT \(own), \(other) FROM \(table) ORDER BY \(other)") {
+        for row in try fetch(db, "SELECT \(own), \(other) FROM \(table) ORDER BY lower(\(other))") {
             let key: String = row[own]
             let value: String = row[other]
-            map[key, default: []].append(value)
+            map[key.lowercased(), default: []].append(value.lowercased())
         }
         return map
     }
@@ -284,6 +287,11 @@ enum Backup {
         let value: String? = row[column]
         guard let value else { return .null }
         return .string(value)
+    }
+
+    private static func nullableLowercased(_ row: Row, _ column: String) -> PackJSON {
+        guard let value: String = row[column] else { return .null }
+        return .string(value.lowercased())
     }
 
     private static func number(_ row: Row, _ column: String) -> PackJSON {
@@ -317,8 +325,8 @@ enum Backup {
         stampFormatter.string(from: date)
     }
 
-    static func fileName(_ date: Date) -> String {
-        "backup-\(nameFormatter.string(from: date)).zip"
+    static func fileName(_ date: Date, prefix: String = "backup-") -> String {
+        "\(prefix)\(nameFormatter.string(from: date)).zip"
     }
 
     static func normalized(appVersion: String) -> String {
@@ -346,9 +354,9 @@ public final class BackupService: @unchecked Sendable {
         self.queue = queue
     }
 
-    public func export() throws -> BackupExport {
+    public func export(to directory: URL = FileManager.default.temporaryDirectory) throws -> BackupExport {
         try queue.read { db in
-            try Backup.export(db: db, to: FileManager.default.temporaryDirectory, date: Date())
+            try Backup.export(db: db, to: directory, date: Date())
         }
     }
 

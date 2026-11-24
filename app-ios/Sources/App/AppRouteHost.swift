@@ -58,12 +58,46 @@ struct AppRouteHost: View {
     @ViewBuilder
     private func overlayContent(_ route: AppRoute) -> some View {
         if route == .importMode {
-            PendingPageText(text: "导入业务待接入；取消不会修改本机数据。")
-            CButton(text: "合并导入（待接入）", enabled: false) {}
-            CButton(text: "覆盖导入（待接入）", enabled: false) {}
+            if let service = launch.backupService, let backup = router.pendingBackup {
+                ImportModeSheet(
+                    backup: backup,
+                    service: service,
+                    inProgress: router.backupImportInProgress,
+                    error: router.backupImportError,
+                    onStart: router.beginBackupImport,
+                    onFinish: { result in
+                        switch result {
+                        case .success(let message):
+                            do {
+                                try launch.refreshAfterBackupImport()
+                                router.finishBackupImport(result: .success(message))
+                            } catch {
+                                router.finishBackupImport(result: .success(
+                                    "导入已完成，但考试范围刷新失败，请重启 App。"
+                                ))
+                            }
+                        case .failure(let message):
+                            router.finishBackupImport(result: .failure(message))
+                        }
+                    },
+                    onCancel: router.closeOverlay
+                )
+            } else {
+                PendingPageText(text: "未读到待导入备份，请返回后重新选择文件。")
+            }
         } else {
-            PendingPageText(text: "清空业务待接入；取消不会修改本机数据。")
-            CButton(text: "确认清空（待接入）", variant: .dangerFilled, enabled: false) {}
+            if let service = launch.dataCleaner {
+                ClearDataSheet(
+                    service: service,
+                    inProgress: router.clearInProgress,
+                    error: router.clearError,
+                    onStart: router.beginClearData,
+                    onFinish: router.finishClearData,
+                    onCancel: router.closeOverlay
+                )
+            } else {
+                PendingPageText(text: "本机数据库尚未就绪，无法清空数据。")
+            }
         }
     }
 }
@@ -258,6 +292,15 @@ private struct AppRoutePage: View {
                 onOpenMistakes: { _ = router.finishCapture() },
                 onContinue: { _ = router.continueCapture() }
             )
+        } else if entry.route == .backup, let service = launch.backupService {
+            BackupScreen(
+                service: service,
+                importResult: router.backupImportResult,
+                onValidated: router.prepareBackupImport,
+                onBack: { router.back() }
+            )
+        } else if entry.route == .pack, let pack = launch.currentPack {
+            PackVersionScreen(pack: pack, onBack: { router.back() })
         } else if entry.route == .queue, let reader = launch.reviewReader {
             P11ReviewScreen(
                 reader: reader,
@@ -345,6 +388,7 @@ private struct RoutePlaceholderPage: View {
             CButton(text: "搜索", variant: .ghost) { router.openSearch() }
             CButton(text: "去错题本", variant: .ghost, action: router.goToMistakes)
         case .profile:
+            if let message = router.clearResult { PendingPageText(text: message) }
             CButton(text: "考试范围", variant: .ghost) { router.push(.scope) }
             CButton(text: "备份与恢复", variant: .ghost) { router.push(.backup) }
             CButton(text: "题库版本", variant: .ghost) { router.push(.pack) }

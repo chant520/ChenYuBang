@@ -23,7 +23,7 @@ enum BackupImportWriter {
         try staging.write { db in try insertAll(payload, db: db, keepLocalOnConflict: false) }
 
         let automaticBackup = try queue.read { db in
-            try Backup.export(db: db, to: caches, date: Date())
+            try Backup.export(db: db, to: caches, date: Date(), namePrefix: "backup-before-import-")
         }
         try queue.write { db in
             try db.execute(sql: "ATTACH DATABASE ? AS backup_import",
@@ -37,7 +37,7 @@ enum BackupImportWriter {
                 try? db.execute(sql: "DETACH DATABASE backup_import")
                 throw error
             }
-            try db.execute(sql: "DETACH DATABASE backup_import")
+            try? db.execute(sql: "DETACH DATABASE backup_import")
         }
         return summary(.replace, payload, automaticBackup: automaticBackup.url)
     }
@@ -58,6 +58,7 @@ enum BackupImportWriter {
         let conflict = keepLocalOnConflict ? " OR IGNORE" : ""
         let localExamples = keepLocalOnConflict ? try existingIDs(db, "user_example") : []
         let localMistakes = keepLocalOnConflict ? try existingIDs(db, "mistake") : []
+        var localReviews = keepLocalOnConflict ? try existingIDs(db, "review_log") : []
         for example in payload.userExamples ?? [] {
             guard !localExamples.contains(example.id) else { continue }
             try execute(db, """
@@ -86,8 +87,9 @@ enum BackupImportWriter {
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, [
                     mistake.id, mistake.userExampleId, nil, mistake.ocrText, mistake.stem,
-                    mistake.options.a, mistake.options.b, mistake.options.c, mistake.options.d,
-                    mistake.myAnswer, mistake.reason, tagJSON(mistake.tagNames), mistake.examType,
+                    mistake.options.optionA, mistake.options.optionB,
+                    mistake.options.optionC, mistake.options.optionD,
+                    mistake.myAnswer, mistake.reason, tagJSON(mistake.tagNames ?? []), mistake.examType,
                     mistake.year, mistake.region, mistake.state, mistake.createdAt,
                     mistake.lastReviewedAt, mistake.reviewCount
                 ])
@@ -96,9 +98,17 @@ enum BackupImportWriter {
                             [mistake.id, idiomID])
             }
         }
+        var insertedReviewCounts: [String: Int] = [:]
         for review in payload.reviews {
+            guard !localMistakes.contains(review.mistakeId), !localReviews.contains(review.id) else { continue }
             try execute(db, "INSERT\(conflict) INTO review_log(id, mistakeId, result, at) VALUES (?, ?, ?, ?)",
                         [review.id, review.mistakeId, review.result, review.at])
+            localReviews.insert(review.id)
+            insertedReviewCounts[review.mistakeId, default: 0] += 1
+        }
+        for mistake in payload.mistakes where !localMistakes.contains(mistake.id) {
+            try execute(db, "UPDATE mistake SET reviewCount = ? WHERE id = ?",
+                        [insertedReviewCounts[mistake.id] ?? 0, mistake.id])
         }
         for state in payload.idiomStates {
             try execute(db, "INSERT\(conflict) INTO idiom_state(idiomId, status, favorite) VALUES (?, ?, ?)",
@@ -130,7 +140,9 @@ enum BackupImportWriter {
         try db.execute(sql: "DELETE FROM user_example")
         try db.execute(sql: "DELETE FROM mistake")
         try db.execute(sql: "DELETE FROM idiom_state")
+        try db.execute(sql: "DELETE FROM idiom_scope")
         try db.execute(sql: "DELETE FROM exam_scope")
+        try db.execute(sql: "DELETE FROM settings WHERE key = ?", arguments: [ExamScopeStore.provincesKey])
     }
 
     private static func copyStagedData(_ db: Database) throws {
@@ -174,7 +186,7 @@ enum BackupImportWriter {
 
     private static func existingIDs(_ db: Database, _ table: String) throws -> Set<String> {
         let rows = try Row.fetchAll(db, sql: "SELECT id FROM \(table)")
-        return Set(rows.map { row in row["id"] as String })
+        return Set(rows.map { row in (row["id"] as String).lowercased() })
     }
 
     private static func execute(_ db: Database, _ sql: String,

@@ -46,7 +46,7 @@ public struct LaunchPreferences: Equatable, Sendable {
 public final class ExamScopeStore {
     private let queue: DatabaseQueue
     private static let completeKey = "firstLaunch.complete"
-    private static let provincesKey = "examScope.provinces"
+    static let provincesKey = "examScope.provinces"
 
     public init(queue: DatabaseQueue) { self.queue = queue }
 

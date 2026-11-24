@@ -23,11 +23,14 @@ final class FirstLaunchState: ObservableObject {
     @Published private(set) var userExampleEditor: UserExampleEditor?
     /// P11 / P12 复习队列读库与成绩落库入口（阶段 3）：与 mistakeReader 同时就绪。
     @Published private(set) var reviewReader: ReviewLibraryService?
+    /// P15 / P22 备份导出与恢复入口（阶段 4）：与 mistakeReader 共用同一数据库队列。
+    @Published private(set) var backupService: BackupService?
+    @Published private(set) var dataCleaner: UserDataCleaner?
+    @Published private(set) var currentPack: ValidatedPack?
     /// P10 原图位的解析基准：Application Support/ChenYuBang，库内存的是相对路径 `images/<id>.jpg`。
     @Published private(set) var dataDirectory: URL?
     private var store: ExamScopeStore?
     private var importer: PackImporter?
-    private var currentPack: ValidatedPack?
 
     func initialize() {
         guard preferences == nil else { return }
@@ -70,6 +73,8 @@ final class FirstLaunchState: ObservableObject {
             userExampleEditor = UserExampleEditor(queue: queue, dataDirectory: directory)
             mistakeReader = MistakeLibraryReader(queue: queue)
             reviewReader = ReviewLibraryService(queue: queue)
+            backupService = BackupService(queue: queue)
+            dataCleaner = UserDataCleaner(queue: queue)
             dataDirectory = directory
             preferences = loaded
         } catch is PackError {
@@ -85,6 +90,15 @@ final class FirstLaunchState: ObservableObject {
         try store.save(scope: scope, complete: complete)
         try importer.refreshScopeLinks(currentPack)
         preferences = LaunchPreferences(complete: complete || preferences?.complete == true, scope: scope)
+    }
+
+    func refreshAfterBackupImport() throws {
+        guard let store, let importer, let currentPack else { throw LaunchError.notInitialized }
+        try importer.refreshScopeLinks(currentPack)
+        let loaded = try store.load()
+        let provinces = try store.availableProvinces()
+        preferences = loaded
+        availableProvinces = provinces
     }
 
     private enum LaunchError: Error { case notInitialized }

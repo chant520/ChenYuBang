@@ -29,7 +29,7 @@ public struct BackupImportSummary: Equatable, Sendable {
 
     public var message: String {
         let modeText = mode == .replace ? "覆盖" : "合并"
-        return "\(modeText)导入完成：\(mistakes) 条错题、\(userExamples) 条录入题、\(reviews) 条复习记录。"
+        return "\(modeText)导入完成：备份含 \(mistakes) 条错题、\(userExamples) 条录入题、\(reviews) 条复习记录。"
     }
 }
 
@@ -85,7 +85,7 @@ struct BackupMistakePayload: Decodable, Equatable, Sendable {
     let ocrText: String?
     let myAnswer: String?
     let reason: String?
-    let tagNames: [String]
+    let tagNames: [String]?
     let examType: String?
     let year: Int?
     let region: String?
@@ -97,13 +97,13 @@ struct BackupMistakePayload: Decodable, Equatable, Sendable {
 }
 
 struct BackupOptionsPayload: Decodable, Equatable, Sendable {
-    let a: String
-    let b: String
-    let c: String
-    let d: String
+    let optionA: String
+    let optionB: String
+    let optionC: String
+    let optionD: String
 
     enum CodingKeys: String, CodingKey {
-        case a = "A", b = "B", c = "C", d = "D"
+        case optionA = "A", optionB = "B", optionC = "C", optionD = "D"
     }
 }
 
@@ -153,6 +153,12 @@ enum BackupImport {
         let files = try BackupArchive.read(data)
         let manifestJSON = try parse(files["manifest.json"], "manifest.json")
         let dataJSON = try parse(files["data.json"], "data.json")
+        do {
+            try BackupSchema.manifest.check(manifestJSON, path: "manifest")
+            try BackupSchema.data.check(dataJSON, path: "data")
+        } catch {
+            throw BackupError.format("备份字段不符合共享 schema：\(error.localizedDescription)")
+        }
         let manifest = try decode(BackupManifestPayload.self, manifestJSON, "manifest.json")
         let payload = try decode(BackupDataPayload.self, dataJSON, "data.json")
         guard manifest.schemaVersion <= Backup.exchangeSchemaVersion else {
@@ -248,13 +254,33 @@ enum BackupImport {
 
 extension BackupDataPayload {
     fileprivate func validate() throws {
+        let tagNames = Set(tags.map(\.name))
+        guard tagNames.count == tags.count else { throw BackupError.format("备份中有重复标签。") }
+        let stateIDs = idiomStates.map(\.idiomId)
+        guard Set(stateIDs).count == stateIDs.count else { throw BackupError.format("备份中有重复成语学习状态。") }
+        let scopeKeys = scopes.map { "\($0.type)\u{0}\($0.province ?? "")" }
+        guard Set(scopeKeys).count == scopeKeys.count else { throw BackupError.format("备份中有重复考试范围。") }
+        let reviewCounts = Dictionary(grouping: reviews, by: \.mistakeId).mapValues(\.count)
         for mistake in mistakes {
             try mistake.validate()
             _ = try BackupImport.uniqueIDs(mistake.idiomIds, "错题成语关联")
+            let names = mistake.tagNames ?? []
+            guard names.allSatisfy({ tagNames.contains($0) }) else {
+                throw BackupError.format("错题 \(mistake.id) 的标签不在 tags 投影中。")
+            }
+            guard reviewCounts[mistake.id] ?? 0 == mistake.reviewCount else {
+                throw BackupError.format("错题 \(mistake.id) 的复习条数与复习记录不一致。")
+            }
+            if let path = mistake.imagePath, !path.hasPrefix("images/") {
+                throw BackupError.format("错题 \(mistake.id) 的原图路径不合法。")
+            }
         }
         for example in userExamples ?? [] {
             try example.validate()
             _ = try BackupImport.uniqueIDs(example.idiomIds, "录入题成语关联")
+            if let path = example.imagePath, !path.hasPrefix("images/") {
+                throw BackupError.format("录入题 \(example.id) 的原图路径不合法。")
+            }
         }
         for review in reviews {
             try BackupValidationRule.require(review.id, "复习记录 id")

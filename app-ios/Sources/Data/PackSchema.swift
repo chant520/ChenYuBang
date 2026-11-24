@@ -70,9 +70,15 @@ indirect enum PackRule {
     case array(PackRule, minimum: Int)
     case string(pattern: String?, values: Set<String>?)
     case integer(minimum: Int, maximum: Int)
+    case boolean
+    case nullable(PackRule)
 
     func check(_ value: PackJSON, path: String) throws {
         switch (self, value) {
+        case (.nullable(_), .null):
+            return
+        case let (.nullable(rule), value):
+            try rule.check(value, path: path)
         case let (.object(required, properties), .object(object)):
             try checkObject(object, required: required, properties: properties, path: path)
         case let (.array(rule, minimum), .array(array)):
@@ -84,6 +90,8 @@ indirect enum PackRule {
             guard let integer = Int(token), (minimum...maximum).contains(integer) else {
                 throw PackError.schema("Integer range: \(path)")
             }
+        case (.boolean, .boolean):
+            return
         default: throw PackError.schema("Invalid type: \(path)")
         }
     }
