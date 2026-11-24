@@ -18,7 +18,7 @@ public struct BackupScreen: View {
     private let onValidated: (ValidatedBackup) -> Bool
     private let onBack: () -> Void
 
-    public convenience init(
+    public init(
         service: BackupService,
         importResult: String?,
         onValidated: @escaping (ValidatedBackup) -> Bool,
