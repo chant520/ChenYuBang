@@ -105,8 +105,7 @@ public struct BackupScreen: View {
         status = nil
         let directory = share ? FileManager.default.temporaryDirectory : documentsDirectory()
         let task = Task.detached { () -> Result<BackupExport, String> in
-            do { return .success(try service.export(to: directory)) }
-            catch { return .failure(userMessage(for: error)) }
+            do { return .success(try service.export(to: directory)) } catch { return .failure(userMessage(for: error)) }
         }
         Task { @MainActor in
             let result = await task.value
@@ -141,8 +140,7 @@ public struct BackupScreen: View {
             return
         }
         let task = Task.detached { () -> Result<ValidatedBackup, String> in
-            do { return .success(try service.validate(data)) }
-            catch { return .failure(userMessage(for: error)) }
+            do { return .success(try service.validate(data)) } catch { return .failure(userMessage(for: error)) }
         }
         Task { @MainActor in
             let result = await task.value
@@ -171,7 +169,7 @@ public struct BackupScreen: View {
         case let error as BackupError:
             switch error {
             case .database: return "本机数据库读写失败，请重试。"
-            case .io: return "文件读写失败，请检查可用空间后重试。"
+            case .fileIO: return "文件读写失败，请检查可用空间后重试。"
             case .format: return "备份文件不完整、版本过新或校验失败。"
             }
         default:
@@ -268,11 +266,13 @@ public struct ImportModeSheet: View {
     private func importBackup(_ mode: BackupImportMode) {
         guard onStart() else { return }
         let task = Task.detached { () -> Result<String, String> in
-            do { return .success(try service.importBackup(backup, mode: mode).message) }
-            catch let error as BackupError {
+            do {
+                let summary = try service.importBackup(backup, mode: mode)
+                return .success(summary.message)
+            } catch let error as BackupError {
                 switch error {
                 case .database: return .failure("导入失败，本机数据已回滚，请重试。")
-                case .io: return .failure("导入失败，缓存留底或临时文件读写失败。")
+                case .fileIO: return .failure("导入失败，缓存留底或临时文件读写失败。")
                 case .format: return .failure("导入失败，备份内容无效。")
                 }
             } catch {

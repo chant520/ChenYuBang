@@ -47,7 +47,7 @@ final class RouterState: ObservableObject {
     @Published private(set) var selectedTab: AppTab = .idiom
     @Published private(set) var tabEntries: [AppTab: [RouteEntry]]
     @Published private(set) var fullScreenEntries: [RouteEntry] = []
-    @Published private(set) var overlay: RouteEntry?
+    @Published fileprivate(set) var overlay: RouteEntry?
     @Published private(set) var reviewSession: ReviewSession?
     @Published private(set) var captureWorkflow: CaptureWorkflow?
     @Published private(set) var needsFirstLaunch: Bool
@@ -55,13 +55,13 @@ final class RouterState: ObservableObject {
     /// 用户内容写入令牌：P10 保存 / 删除后刷新，让常驻挂载的来源页重新读库。
     /// `RetainedRouteStack` 只切透明度、不重建页面，`.task` 不会在返回时重跑（开发规范 §8.1.1「来源页列表刷新」）。
     @Published private(set) var userContentRevision = UUID()
-    @Published private(set) var pendingBackup: ValidatedBackup?
-    @Published private(set) var backupImportInProgress = false
-    @Published private(set) var backupImportResult: String?
-    @Published private(set) var backupImportError: String?
-    @Published private(set) var clearInProgress = false
-    @Published private(set) var clearResult: String?
-    @Published private(set) var clearError: String?
+    @Published fileprivate(set) var pendingBackup: ValidatedBackup?
+    @Published fileprivate(set) var backupImportInProgress = false
+    @Published fileprivate(set) var backupImportResult: String?
+    @Published fileprivate(set) var backupImportError: String?
+    @Published fileprivate(set) var clearInProgress = false
+    @Published fileprivate(set) var clearResult: String?
+    @Published fileprivate(set) var clearError: String?
     private let onboardingEntry = RouteEntry(route: .onboarding)
     @Published private(set) var suspendedFullScreenEntries: [RouteEntry] = []
 
@@ -102,59 +102,6 @@ final class RouterState: ObservableObject {
     /// 用户录入题 / 错题写入本机库后调用；来源页据此重新读库。
     func bumpUserContent() {
         userContentRevision = UUID()
-    }
-
-    @discardableResult
-    func prepareBackupImport(_ backup: ValidatedBackup) -> Bool {
-        guard currentEntry.route == .backup, overlay == nil else { return false }
-        pendingBackup = backup
-        backupImportError = nil
-        backupImportResult = nil
-        overlay = RouteEntry(route: .importMode)
-        return true
-    }
-
-    @discardableResult
-    func beginBackupImport() -> Bool {
-        guard pendingBackup != nil, !backupImportInProgress else { return false }
-        backupImportInProgress = true
-        backupImportError = nil
-        return true
-    }
-
-    func finishBackupImport(result: Result<String, String>) {
-        backupImportInProgress = false
-        switch result {
-        case .success(let message):
-            backupImportResult = message
-            backupImportError = nil
-            pendingBackup = nil
-            overlay = nil
-            bumpUserContent()
-        case .failure(let message):
-            backupImportError = message
-        }
-    }
-
-    @discardableResult
-    func beginClearData() -> Bool {
-        guard currentEntry.route == .profile, overlay?.route == .clear, !clearInProgress else { return false }
-        clearInProgress = true
-        clearError = nil
-        return true
-    }
-
-    func finishClearData(result: Result<String, String>) {
-        clearInProgress = false
-        switch result {
-        case .success(let message):
-            clearResult = message
-            clearError = nil
-            overlay = nil
-            bumpUserContent()
-        case .failure(let message):
-            clearError = message
-        }
     }
 
     func updateViewState(entryID: UUID, state: RouteViewState) {

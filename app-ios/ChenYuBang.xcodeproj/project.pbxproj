@@ -34,6 +34,8 @@
 		A000000000000000000000E6 /* BackupImportTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001E6 /* BackupImportTests.swift */; };
 		A000000000000000000000E7 /* BackupImportWriterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001E7 /* BackupImportWriterTests.swift */; };
 		A000000000000000000000E8 /* UserDataCleanerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001E8 /* UserDataCleanerTests.swift */; };
+		A000000000000000000000E9 /* RouterBackupState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001E9 /* RouterBackupState.swift */; };
+		A000000000000000000000EA /* BackupOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001EA /* BackupOverlayView.swift */; };
 		A00000000000000000000024 /* MeFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000134 /* MeFeature.swift */; };
 		A00000000000000000000026 /* LibraryBrowse.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000136 /* LibraryBrowse.swift */; };
 		A00000000000000000000027 /* LibraryScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000137 /* LibraryScreen.swift */; };
@@ -178,6 +180,8 @@
 		A000000000000000000001E6 /* BackupImportTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupImportTests.swift; sourceTree = "<group>"; };
 		A000000000000000000001E7 /* BackupImportWriterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupImportWriterTests.swift; sourceTree = "<group>"; };
 		A000000000000000000001E8 /* UserDataCleanerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDataCleanerTests.swift; sourceTree = "<group>"; };
+		A000000000000000000001E9 /* RouterBackupState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouterBackupState.swift; sourceTree = "<group>"; };
+		A000000000000000000001EA /* BackupOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupOverlayView.swift; sourceTree = "<group>"; };
 		A00000000000000000000134 /* MeFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeFeature.swift; sourceTree = "<group>"; };
 		A00000000000000000000135 /* CaptureFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureFeature.swift; sourceTree = "<group>"; };
 		A00000000000000000000136 /* LibraryBrowse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryBrowse.swift; sourceTree = "<group>"; };
@@ -319,6 +323,8 @@
 				A00000000000000000000102 /* RouterState.swift */,
 				A00000000000000000000103 /* AppRouteHost.swift */,
 				A00000000000000000000104 /* FirstLaunchGate.swift */,
+				A000000000000000000001E9 /* RouterBackupState.swift */,
+				A000000000000000000001EA /* BackupOverlayView.swift */,
 				A00000000000000000000151 /* pack-v1.0.0.zip */,
 				A00000000000000000000110 /* Info.plist */,
 			);
@@ -632,6 +638,8 @@
 				A00000000000000000000038 /* RouterState.swift in Sources */,
 				A00000000000000000000039 /* AppRouteHost.swift in Sources */,
 				A0000000000000000000003A /* FirstLaunchGate.swift in Sources */,
+				A000000000000000000000E9 /* RouterBackupState.swift in Sources */,
+				A000000000000000000000EA /* BackupOverlayView.swift in Sources */,
 				A00000000000000000000020 /* IdiomFeature.swift in Sources */,
 				A00000000000000000000026 /* LibraryBrowse.swift in Sources */,
 				A00000000000000000000027 /* LibraryScreen.swift in Sources */,

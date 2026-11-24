@@ -102,7 +102,7 @@ enum BackupImportWriter {
         for review in payload.reviews {
             guard !localMistakes.contains(review.mistakeId), !localReviews.contains(review.id) else { continue }
             try execute(db, "INSERT\(conflict) INTO review_log(id, mistakeId, result, at) VALUES (?, ?, ?, ?)",
-                        [review.id, review.mistakeId, review.result, review.at])
+                        [review.id, review.mistakeId, review.result, review.reviewedAt])
             localReviews.insert(review.id)
             insertedReviewCounts[review.mistakeId, default: 0] += 1
         }

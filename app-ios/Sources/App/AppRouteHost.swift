@@ -44,7 +44,7 @@ struct AppRouteHost: View {
             if let overlay = router.overlay {
                 COverlay(style: overlay.route == .importMode ? .sheet : .dialog,
                          title: overlay.route.title, onDismiss: router.closeOverlay) {
-                    overlayContent(overlay.route)
+                    BackupOverlayContent(route: overlay.route, router: router, launch: launch)
                 }
             }
         }
@@ -55,51 +55,6 @@ struct AppRouteHost: View {
         router.selectedTab == tab && router.fullScreenEntries.isEmpty && !router.needsFirstLaunch
     }
 
-    @ViewBuilder
-    private func overlayContent(_ route: AppRoute) -> some View {
-        if route == .importMode {
-            if let service = launch.backupService, let backup = router.pendingBackup {
-                ImportModeSheet(
-                    backup: backup,
-                    service: service,
-                    inProgress: router.backupImportInProgress,
-                    error: router.backupImportError,
-                    onStart: router.beginBackupImport,
-                    onFinish: { result in
-                        switch result {
-                        case .success(let message):
-                            do {
-                                try launch.refreshAfterBackupImport()
-                                router.finishBackupImport(result: .success(message))
-                            } catch {
-                                router.finishBackupImport(result: .success(
-                                    "导入已完成，但考试范围刷新失败，请重启 App。"
-                                ))
-                            }
-                        case .failure(let message):
-                            router.finishBackupImport(result: .failure(message))
-                        }
-                    },
-                    onCancel: router.closeOverlay
-                )
-            } else {
-                PendingPageText(text: "未读到待导入备份，请返回后重新选择文件。")
-            }
-        } else {
-            if let service = launch.dataCleaner {
-                ClearDataSheet(
-                    service: service,
-                    inProgress: router.clearInProgress,
-                    error: router.clearError,
-                    onStart: router.beginClearData,
-                    onFinish: router.finishClearData,
-                    onCancel: router.closeOverlay
-                )
-            } else {
-                PendingPageText(text: "本机数据库尚未就绪，无法清空数据。")
-            }
-        }
-    }
 }
 
 private extension AppTab {
