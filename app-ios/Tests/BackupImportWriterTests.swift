@@ -184,7 +184,6 @@ final class BackupImportWriterTests: PackDatabaseTestCase {
                        before.filter { BackupWriterFixture.contentTables.contains($0.key) })
         try assertReplacedSettings()
     }
-
 }
 
 private extension BackupImportWriterTests {
