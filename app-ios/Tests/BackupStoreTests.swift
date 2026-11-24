@@ -70,7 +70,10 @@ final class BackupStoreTests: PackDatabaseTestCase {
 
     func testExportRejectsUserExampleWithoutIdiom() throws {
         try seedExportData()
-        try queue.write { db in try db.execute(sql: "DELETE FROM user_example_idiom") }
+        try queue.write { db in
+            try db.execute(sql: "DELETE FROM user_example_idiom")
+            try db.execute(sql: "DELETE FROM mistake_idiom")
+        }
         let directory = try makeDirectory()
         XCTAssertThrowsError(try queue.read { db in
             try Backup.export(db: db, to: directory, date: exportDate)
@@ -84,8 +87,13 @@ final class BackupStoreTests: PackDatabaseTestCase {
 
     func testCanonicalHelpersUseUTCAndNormalizeIdentity() {
         let date = Date(timeIntervalSince1970: 1_795_496_767)
+        let localFormatter = DateFormatter()
+        localFormatter.locale = Locale(identifier: "en_US_POSIX")
+        localFormatter.timeZone = .current
+        localFormatter.dateFormat = "yyyyMMdd-HHmmss"
+
         XCTAssertEqual(Backup.stamp(date), "2026-11-24T05:06:07Z")
-        XCTAssertEqual(Backup.fileName(date), "backup-20261124-050607.zip")
+        XCTAssertEqual(Backup.fileName(date), "backup-\(localFormatter.string(from: date)).zip")
         XCTAssertEqual(Backup.digest(of: "{}"), "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a")
         XCTAssertEqual(Backup.normalized(appVersion: "2.10.0.7"), "2.10.0")
         XCTAssertEqual(Backup.normalized(appVersion: "beta"), "0.0.0")

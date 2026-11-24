@@ -12,18 +12,9 @@ private struct BackupInsertedCounts {
 enum BackupImportWriter {
 
     static func merge(_ payload: BackupDataPayload, db: Database) throws -> BackupImportSummary {
-        var resolvedPayload = payload
-        var report = BackupOrphanReport(skippedMistakes: 0, missingMistakeIdioms: 0,
-                                        missingExampleIdioms: 0, skippedReviews: 0)
-        var inserted = BackupInsertedCounts()
-        try db.inTransaction {
-            let resolved = try BackupOrphans.resolve(payload, db: db, includeLocalUserReferences: true)
-            resolvedPayload = resolved.payload
-            report = resolved.report
-            inserted = try insertAll(resolved.payload, db: db, keepLocalOnConflict: true)
-            return .commit
-        }
-        return summary(.merge, resolvedPayload, inserted: inserted, orphans: report)
+        let resolved = try BackupOrphans.resolve(payload, db: db, includeLocalUserReferences: true)
+        let inserted = try insertAll(resolved.payload, db: db, keepLocalOnConflict: true)
+        return summary(.merge, resolved.payload, inserted: inserted, orphans: resolved.report)
     }
 
     /// 覆盖按规范先写临时库，再在自动留底后以单个事务替换本机用户表。
