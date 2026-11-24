@@ -114,7 +114,7 @@ final class PackUpdateTests: PackDatabaseTestCase {
 
     func testImportFailureRestoresPreviousArchiveAndDatabase() async throws {
         let base = try importer.validate(PackFixture.published())
-        try queue.write { db in
+        try await queue.write { db in
             try db.execute(sql: "INSERT INTO exam_scope (id, type, province, enabled) VALUES (?, ?, NULL, 1)",
                            arguments: ["rollback-scope", "国考"])
         }
