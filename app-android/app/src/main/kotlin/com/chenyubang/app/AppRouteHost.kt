@@ -31,11 +31,18 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import com.chenyubang.core.data.AppDatabase
+import com.chenyubang.core.data.BackupExporter
+import com.chenyubang.core.data.BackupImporter
+import com.chenyubang.core.data.ClearData
 import com.chenyubang.core.data.ExamScopeSelection
 import com.chenyubang.core.data.ExamScopeStore
 import com.chenyubang.core.data.LaunchPreferences
 import com.chenyubang.core.data.PackImporter
+import com.chenyubang.core.data.PackVersion
 import com.chenyubang.core.data.UserExampleSaver
 import com.chenyubang.core.data.ValidatedPack
 import com.chenyubang.core.ui.CButton
@@ -44,9 +51,11 @@ import com.chenyubang.core.ui.CChromeGlyph
 import com.chenyubang.core.ui.CChromeIcon
 import com.chenyubang.core.ui.CFab
 import com.chenyubang.core.ui.CInput
-import com.chenyubang.core.ui.COverlay
 import com.chenyubang.core.ui.tokens.Tokens
 import com.chenyubang.feature.me.ExamScopeSaver
+import com.chenyubang.feature.me.P15BackupViewModel
+import com.chenyubang.feature.me.P22ImportModeSheet
+import com.chenyubang.feature.me.P23ClearDialogRoute
 import com.chenyubang.ocr.PaddleOcrEngine
 import kotlinx.coroutines.CancellationException
 import java.io.File
@@ -57,6 +66,10 @@ fun AppRouteHost(database: AppDatabase) {
     val context = LocalContext.current.applicationContext
     val scopeStore = remember(database) { ExamScopeStore(database) }
     val importer = remember(database) { PackImporter(database, context) }
+    val backupExporter = remember(database) { BackupExporter(database) }
+    val backupImporter = remember(database, context) { BackupImporter(database, context) }
+    val packVersion = remember(context) { PackVersion(context) }
+    val clearData = remember(database) { ClearData(database) }
     val ocrEngine = remember { PaddleOcrEngine(context) }
     val userExampleSaver =
         remember(database, context) { UserExampleSaver(database.userExampleDao(), File(context.filesDir, "images")) }
@@ -104,6 +117,10 @@ fun AppRouteHost(database: AppDatabase) {
             onScopeSaved = { preferences = loaded.copy(scope = it) },
             ocrEngine = ocrEngine,
             userExampleSaver = userExampleSaver,
+            backupExporter = backupExporter,
+            backupImporter = backupImporter,
+            packVersion = packVersion,
+            clearData = clearData,
         ),
     )
 }
@@ -114,6 +131,17 @@ private fun RouterShell(deps: RouteDeps) {
     var confirmExit by remember { mutableStateOf(false) }
     val holder = rememberSaveableStateHolder()
     val colors = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
+    // P15 页面与 P22 sheet 共用同一 ViewModel：校验结果、导入方式选择、结果条都在同一状态机里。
+    val appContext = LocalContext.current.applicationContext
+    val backupVmFactory =
+        remember(deps.backupExporter, deps.backupImporter, appContext) {
+            viewModelFactory {
+                initializer {
+                    P15BackupViewModel(appContext, deps.backupExporter, deps.backupImporter)
+                }
+            }
+        }
+    val backupVm: P15BackupViewModel = viewModel(key = "p15-backup", factory = backupVmFactory)
     val back = {
         val previous = router.stack.getOrNull(router.stack.lastIndex - 1)?.route
         // 首轮进队列退出要二次确认；「再复习一轮」退回小结不算丢进度。
@@ -132,7 +160,7 @@ private fun RouterShell(deps: RouteDeps) {
             Box(Modifier.weight(1f)) {
                 val entry = router.current
                 holder.SaveableStateProvider("${router.tab.name}:${entry.instance}") {
-                    RouteContent(entry, router, deps, { router = it }, back)
+                    RouteContent(entry, router, deps, backupVm, { router = it }, back)
                 }
             }
             if (router.showTabs) {
@@ -140,7 +168,13 @@ private fun RouterShell(deps: RouteDeps) {
             }
         }
         if (router.showFab) CaptureShortcut { router = router.startCapture() }
-        RouterModal(router, { router = router.dismissModal() })
+        RouterModal(
+            router = router,
+            onDismiss = { router = router.dismissModal() },
+            onDataChanged = { router = router.bumpContentRevision() },
+            deps = deps,
+            backupVm = backupVm,
+        )
         if (confirmExit) {
             ExitReviewOverlay(
                 onDismiss = { confirmExit = false },
@@ -293,20 +327,30 @@ private fun RouteScopeLine(scope: ExamScopeSelection) {
 @Composable
 private fun RouterModal(
     router: RouterState,
-    cancel: () -> Unit,
+    onDismiss: () -> Unit,
+    onDataChanged: () -> Unit,
+    deps: RouteDeps,
+    backupVm: P15BackupViewModel,
 ) {
-    val modal = router.modal ?: return
-    val colors = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
-    COverlay(modal.title, modal == Route.Clear, cancel) {
-        if (modal == Route.Clear) {
-            Text("将清空错题、收藏、学习状态；成语库与例题库不受影响。", color = colors.text2, fontSize = Tokens.Font.n12.sp)
-            CButton("确认清空（数据操作待接入）", {}, variant = CButtonVariant.DangerFilled, enabled = false)
-        } else {
-            com.chenyubang.core.ui.CBadge("覆盖", com.chenyubang.core.ui.CBadgeKind.Error)
-            Text("覆盖会替换本机数据；合并保留本机记录。恢复待接入，不会执行导入。", color = colors.text2, fontSize = Tokens.Font.n12.sp)
-            com.chenyubang.core.ui.CTag("合并")
-            CButton("覆盖 / 合并（恢复待接入）", {}, enabled = false)
-        }
-        CButton("取消", cancel, variant = CButtonVariant.Ghost)
+    when (router.modal) {
+        Route.Clear ->
+            P23ClearDialogRoute(
+                database = deps.database,
+                clearData = deps.clearData,
+                onCleared = {
+                    onDataChanged()
+                    onDismiss()
+                },
+                onCancel = onDismiss,
+            )
+        Route.ImportMode ->
+            P22ImportModeSheet(
+                vm = backupVm,
+                onFinished = { imported ->
+                    if (imported) onDataChanged()
+                    onDismiss()
+                },
+            )
+        else -> Unit
     }
 }

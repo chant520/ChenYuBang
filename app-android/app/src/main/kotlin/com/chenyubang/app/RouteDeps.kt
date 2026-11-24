@@ -1,7 +1,11 @@
 package com.chenyubang.app
 
 import com.chenyubang.core.data.AppDatabase
+import com.chenyubang.core.data.BackupExporter
+import com.chenyubang.core.data.BackupImporter
+import com.chenyubang.core.data.ClearData
 import com.chenyubang.core.data.ExamScopeSelection
+import com.chenyubang.core.data.PackVersion
 import com.chenyubang.core.data.UserExampleSaver
 import com.chenyubang.feature.me.ExamScopeSaver
 import com.chenyubang.ocr.OcrEngine
@@ -15,4 +19,8 @@ internal data class RouteDeps(
     val onScopeSaved: (ExamScopeSelection) -> Unit,
     val ocrEngine: OcrEngine,
     val userExampleSaver: UserExampleSaver,
+    val backupExporter: BackupExporter,
+    val backupImporter: BackupImporter,
+    val packVersion: PackVersion,
+    val clearData: ClearData,
 )

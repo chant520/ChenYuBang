@@ -21,7 +21,7 @@ enum class Route(val key: String, val title: String, val owner: RouteOwner, val 
     Me("tab/me", "我的", RouteOwner.Me, Presentation.Root),
     Scope("settings/scope", "考试范围设置", RouteOwner.Me, Presentation.Push),
     Backup("settings/backup", "备份与恢复", RouteOwner.Me, Presentation.Push),
-    Pack("settings/pack", "题库版本", RouteOwner.Me, Presentation.Push),
+    Pack("settings/pack", "题库版本与更新", RouteOwner.Me, Presentation.Push),
     Camera("capture/camera", "拍照", RouteOwner.Capture, Presentation.FullScreen),
     Crop("capture/crop", "裁切", RouteOwner.Capture, Presentation.FullScreen),
     Ocr("capture/ocr", "识别结果", RouteOwner.Capture, Presentation.FullScreen),
