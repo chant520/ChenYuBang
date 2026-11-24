@@ -107,3 +107,11 @@ P22 超版、sha256 不符、字段异常属于校验硬拒绝，不弹模式选
 - verify：双模块 BUILD SUCCESSFUL、无 Record mode；feature-me unchanged 38 / feature-mistake unchanged 48，added / changed 0；record 残留 34 张已清理、无新增残留 PNG。本轮均单帧 capture，无同名多帧、未产生 `.1` 后缀，保留 `.1` 口径不变。日志 `.workbuddy/evidence/phase4-diff-snapshot-verify-2026-11-24.log`。
 - 用户拍板：P23 失败态「行内红字 + 红填充确认按钮」两处红保留现状，仅在证据注明偏离一处红契约；P08 深色页头浅绿字配浅灰底对比偏弱保持现状，视为既有基线同款，不改令牌、不补快照。
 - 未覆盖：真机实测按用户要求不做；P16 独立 mock 高保真屏、P16 退路条数 2–3 条、P15 是否另加导出按钮仍待拍板，不宣称完成。
+
+### 8.1 P16 两句说明补齐（2026-11-24，用户追加项）
+- 验证 head：`e340547`。本轮追加提交链：`bd7d33a` feat(me) P16 补齐两句全状态说明 → `e340547` test(phase4) 重录 P16 说明快照并复核门禁；均带 scope 与 `Generated-by: WorkBuddy`，未暂存 Qoder 既有脏文件。最终 head 以交付时 git log 为准。
+- 实现：`P16PackScreen.kt` UpdateArea 公共末尾新增两句逐字说明（进入成语库页/例题页自动拉取一次、失败可在 P16 重试或继续离线；内置包作离线底座、无内置包才用 TEST mock 兜底），七态共用一次渲染，text3/n115 令牌；按钮、更新状态区、CheckNote、退路与 TEST/BUILTIN 条数分离口径未动。
+- 快照：仅 P16 六态 × 深浅 12 张重录（无 UP_TO_DATE 独立用例）；38 张基线哈希比对仅这 12 张变化，P14 两张与其余 26 张不变，无 .1 后缀、无残留 PNG。12 张逐图审阅全达标，结论见 `.workbuddy/evidence/phase4-diff-snapshot-review-2026-11-24.md` 追加小节。
+- verify：`:feature-me:verifyRoborazziDebug` BUILD SUCCESSFUL、无 Record mode、38 unchanged、added/changed 0，日志 `.workbuddy/evidence/p16-verify-2026-11-24.log`。
+- 门禁：完整命令同第八节，BUILD SUCCESSFUL、exit 0；单测 debug 561 + release 561 = 1122 项，failed/error/skipped 0；日志 `.workbuddy/evidence/p16-full-gate-2026-11-24.log`。
+- 验证计划 8.4 已定稿；未覆盖与待拍板三项口径不变，真机实测按要求不做。
