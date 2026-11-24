@@ -197,6 +197,12 @@ private fun UpdateArea(
         color = colors.text3,
         fontSize = Tokens.Font.n115.sp,
     )
+    Text(
+        text = "每次进入成语库页或例题页时自动尝试拉取一次，失败后可在 P16 重试或继续离线使用。\n随安装包内置的题库作离线底座，内置包也没有时才用标注 TEST 的 mock 兜底。",
+        color = colors.text3,
+        fontSize = Tokens.Font.n115.sp,
+        lineHeight = (Tokens.Font.n115 * NOTE_LINE_HEIGHT).sp,
+    )
 }
 
 @Composable
