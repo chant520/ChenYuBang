@@ -84,8 +84,7 @@ class PackVersion(
     fun downloading(
         current: PackVersionState,
         progress: Int,
-    ): PackVersionState =
-        current.copy(status = PackVersionStatus.DOWNLOADING, progress = progress.coerceIn(0, 100))
+    ): PackVersionState = current.copy(status = PackVersionStatus.DOWNLOADING, progress = progress.coerceIn(0, 100))
 
     /**
      * E18「继续离线使用」：回到当前内置包离线态，仅换 status/reason/progress；
