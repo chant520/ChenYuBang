@@ -75,8 +75,9 @@ indirect enum PackRule {
 
     func check(_ value: PackJSON, path: String) throws {
         switch (self, value) {
-        case .nullable:
-            try checkNullable(value, path: path)
+        case let (.nullable(rule), value):
+            guard value != .null else { return }
+            try rule.check(value, path: path)
         case let (.object(required, properties), .object(object)):
             try checkObject(object, required: required, properties: properties, path: path)
         case let (.array(rule, minimum), .array(array)):
@@ -91,17 +92,6 @@ indirect enum PackRule {
         case (.boolean, .boolean):
             return
         default: throw PackError.schema("Invalid type: \(path)")
-        }
-    }
-
-    private func checkNullable(_ value: PackJSON, path: String) throws {
-        switch (self, value) {
-        case (.nullable, .null):
-            return
-        case let (.nullable(rule), value):
-            try rule.check(value, path: path)
-        default:
-            throw PackError.schema("Invalid nullable rule: \(path)")
         }
     }
 
