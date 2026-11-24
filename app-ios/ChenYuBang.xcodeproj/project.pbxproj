@@ -28,6 +28,7 @@
 		A000000000000000000000DB /* IdiomReviewEntryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001DB /* IdiomReviewEntryTests.swift */; };
 		A000000000000000000000E0 /* BackupScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001E0 /* BackupScreen.swift */; };
 		A000000000000000000000E1 /* PackVersionScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001E1 /* PackVersionScreen.swift */; };
+		A000000000000000000001F5 /* PackVersionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000002F5 /* PackVersionModel.swift */; };
 		A000000000000000000000E2 /* ClearDataSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001E2 /* ClearDataSheet.swift */; };
 		A000000000000000000000E3 /* RouterBackupTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001E3 /* RouterBackupTests.swift */; };
 		A000000000000000000000E4 /* Phase4SnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001E4 /* Phase4SnapshotTests.swift */; };
@@ -53,6 +54,7 @@
 		A00000000000000000000037 /* RouteRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000101 /* RouteRegistry.swift */; };
 		A00000000000000000000038 /* RouterState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000102 /* RouterState.swift */; };
 		A00000000000000000000039 /* AppRouteHost.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000103 /* AppRouteHost.swift */; };
+		A0000000000000000000003ED /* RoutePlaceholderPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001ED /* RoutePlaceholderPage.swift */; };
 		A0000000000000000000003A /* FirstLaunchGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000104 /* FirstLaunchGate.swift */; };
 		A0000000000000000000003B /* RouterStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000142 /* RouterStateTests.swift */; };
 		A0000000000000000000003C /* ExamScopeStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000143 /* ExamScopeStoreTests.swift */; };
@@ -62,9 +64,13 @@
 		A00000000000000000000040 /* PackSchemaTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000147 /* PackSchemaTests.swift */; };
 		A00000000000000000000041 /* PackScopeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000148 /* PackScopeTests.swift */; };
 		A00000000000000000000042 /* PackTestSupportTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000149 /* PackTestSupportTests.swift */; };
+		A00000000000000000000201 /* PackUpdateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000202 /* PackUpdateTests.swift */; };
+		A000000000000000000001F6 /* PackMockFallbackTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000002F6 /* PackMockFallbackTests.swift */; };
 		A00000000000000000000048 /* CButtonSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000014A /* CButtonSnapshotTests.swift */; };
 		A00000000000000000000043 /* pack-v1.0.0.zip in Resources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000151 /* pack-v1.0.0.zip */; };
+		A000000000000000000001F3 /* pack-mock-v0.0.1.zip in Resources */ = {isa = PBXBuildFile; fileRef = A000000000000000000002F3 /* pack-mock-v0.0.1.zip */; };
 		A00000000000000000000044 /* pack fixture in Resources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000152 /* pack fixture */; };
+		A000000000000000000001F4 /* mock pack fixture in Resources */ = {isa = PBXBuildFile; fileRef = A000000000000000000002F4 /* mock pack fixture */; };
 		A00000000000000000000045 /* GRDB in Frameworks */ = {isa = PBXBuildFile; productRef = A00000000000000000000660 /* GRDB */; };
 		A00000000000000000000046 /* GRDB in Frameworks */ = {isa = PBXBuildFile; productRef = A00000000000000000000680 /* GRDB */; };
 		A00000000000000000000047 /* SnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = A00000000000000000000700 /* SnapshotTesting */; };
@@ -176,6 +182,7 @@
 		A000000000000000000001DB /* IdiomReviewEntryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdiomReviewEntryTests.swift; sourceTree = "<group>"; };
 		A000000000000000000001E0 /* BackupScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupScreen.swift; sourceTree = "<group>"; };
 		A000000000000000000001E1 /* PackVersionScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackVersionScreen.swift; sourceTree = "<group>"; };
+		A000000000000000000002F5 /* PackVersionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackVersionModel.swift; sourceTree = "<group>"; };
 		A000000000000000000001E2 /* ClearDataSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClearDataSheet.swift; sourceTree = "<group>"; };
 		A000000000000000000001E3 /* RouterBackupTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouterBackupTests.swift; sourceTree = "<group>"; };
 		A000000000000000000001E4 /* Phase4SnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Phase4SnapshotTests.swift; sourceTree = "<group>"; };
@@ -197,6 +204,7 @@
 		A00000000000000000000101 /* RouteRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteRegistry.swift; sourceTree = "<group>"; };
 		A00000000000000000000102 /* RouterState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouterState.swift; sourceTree = "<group>"; };
 		A00000000000000000000103 /* AppRouteHost.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRouteHost.swift; sourceTree = "<group>"; };
+		A000000000000000000001ED /* RoutePlaceholderPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutePlaceholderPage.swift; sourceTree = "<group>"; };
 		A00000000000000000000104 /* FirstLaunchGate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstLaunchGate.swift; sourceTree = "<group>"; };
 		A00000000000000000000142 /* RouterStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouterStateTests.swift; sourceTree = "<group>"; };
 		A00000000000000000000143 /* ExamScopeStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExamScopeStoreTests.swift; sourceTree = "<group>"; };
@@ -206,9 +214,13 @@
 		A00000000000000000000147 /* PackSchemaTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackSchemaTests.swift; sourceTree = "<group>"; };
 		A00000000000000000000148 /* PackScopeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackScopeTests.swift; sourceTree = "<group>"; };
 		A00000000000000000000149 /* PackTestSupportTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackTestSupportTests.swift; sourceTree = "<group>"; };
+		A00000000000000000000202 /* PackUpdateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackUpdateTests.swift; sourceTree = "<group>"; };
+		A000000000000000000002F6 /* PackMockFallbackTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackMockFallbackTests.swift; sourceTree = "<group>"; };
 		A0000000000000000000014A /* CButtonSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CButtonSnapshotTests.swift; sourceTree = "<group>"; };
 		A00000000000000000000151 /* pack-v1.0.0.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = Resources/pack-v1.0.0.zip; sourceTree = "<group>"; };
+		A000000000000000000002F3 /* pack-mock-v0.0.1.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = Resources/pack-mock-v0.0.1.zip; sourceTree = "<group>"; };
 		A00000000000000000000152 /* pack fixture */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = Fixtures/pack/pack-v1.0.0.zip; sourceTree = "<group>"; };
+		A000000000000000000002F4 /* mock pack fixture */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = Fixtures/pack/pack-mock-v0.0.1.zip; sourceTree = "<group>"; };
 		A00000000000000000000180 /* CTagSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CTagSnapshotTests.swift; sourceTree = "<group>"; };
 		A00000000000000000000181 /* CBadgeSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBadgeSnapshotTests.swift; sourceTree = "<group>"; };
 		A00000000000000000000182 /* CInputSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CInputSnapshotTests.swift; sourceTree = "<group>"; };
@@ -326,10 +338,12 @@
 				A00000000000000000000101 /* RouteRegistry.swift */,
 				A00000000000000000000102 /* RouterState.swift */,
 				A00000000000000000000103 /* AppRouteHost.swift */,
+				A000000000000000000001ED /* RoutePlaceholderPage.swift */,
 				A00000000000000000000104 /* FirstLaunchGate.swift */,
 				A000000000000000000001E9 /* RouterBackupState.swift */,
 				A000000000000000000001EA /* BackupOverlayView.swift */,
 				A00000000000000000000151 /* pack-v1.0.0.zip */,
+				A000000000000000000002F3 /* pack-mock-v0.0.1.zip */,
 				A00000000000000000000110 /* Info.plist */,
 			);
 			path = Sources/App;
@@ -410,6 +424,7 @@
 				A00000000000000000000138 /* ExamScopeScreen.swift */,
 				A000000000000000000001E0 /* BackupScreen.swift */,
 				A000000000000000000001E1 /* PackVersionScreen.swift */,
+				A000000000000000000002F5 /* PackVersionModel.swift */,
 				A000000000000000000001E2 /* ClearDataSheet.swift */,
 			);
 			path = FeatureMe;
@@ -460,6 +475,8 @@
 				A00000000000000000000147 /* PackSchemaTests.swift */,
 				A00000000000000000000148 /* PackScopeTests.swift */,
 				A00000000000000000000149 /* PackTestSupportTests.swift */,
+				A00000000000000000000202 /* PackUpdateTests.swift */,
+				A000000000000000000002F6 /* PackMockFallbackTests.swift */,
 				A0000000000000000000014A /* CButtonSnapshotTests.swift */,
 				A00000000000000000000180 /* CTagSnapshotTests.swift */,
 				A00000000000000000000181 /* CBadgeSnapshotTests.swift */,
@@ -510,6 +527,7 @@
 				A000000000000000000001E8 /* UserDataCleanerTests.swift */,
 				A000000000000000000001EB /* BackupImportOrphanTests.swift */,
 				A00000000000000000000152 /* pack fixture */,
+				A000000000000000000002F4 /* mock pack fixture */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -621,6 +639,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A00000000000000000000043 /* pack-v1.0.0.zip in Resources */,
+				A000000000000000000001F3 /* pack-mock-v0.0.1.zip in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -629,6 +648,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A00000000000000000000044 /* pack fixture in Resources */,
+				A000000000000000000001F4 /* mock pack fixture in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -644,6 +664,7 @@
 				A00000000000000000000037 /* RouteRegistry.swift in Sources */,
 				A00000000000000000000038 /* RouterState.swift in Sources */,
 				A00000000000000000000039 /* AppRouteHost.swift in Sources */,
+				A0000000000000000000003ED /* RoutePlaceholderPage.swift in Sources */,
 				A0000000000000000000003A /* FirstLaunchGate.swift in Sources */,
 				A000000000000000000000E9 /* RouterBackupState.swift in Sources */,
 				A000000000000000000000EA /* BackupOverlayView.swift in Sources */,
@@ -677,6 +698,7 @@
 				A00000000000000000000028 /* ExamScopeScreen.swift in Sources */,
 				A000000000000000000000E0 /* BackupScreen.swift in Sources */,
 				A000000000000000000000E1 /* PackVersionScreen.swift in Sources */,
+				A000000000000000000001F5 /* PackVersionModel.swift in Sources */,
 				A000000000000000000000E2 /* ClearDataSheet.swift in Sources */,
 				A00000000000000000000025 /* CaptureFeature.swift in Sources */,
 				A000000000000000000000A0 /* P17CaptureScreen.swift in Sources */,
@@ -720,6 +742,8 @@
 				A00000000000000000000040 /* PackSchemaTests.swift in Sources */,
 				A00000000000000000000041 /* PackScopeTests.swift in Sources */,
 				A00000000000000000000042 /* PackTestSupportTests.swift in Sources */,
+				A00000000000000000000201 /* PackUpdateTests.swift in Sources */,
+				A000000000000000000001F6 /* PackMockFallbackTests.swift in Sources */,
 				A00000000000000000000048 /* CButtonSnapshotTests.swift in Sources */,
 				A00000000000000000000080 /* CTagSnapshotTests.swift in Sources */,
 				A00000000000000000000081 /* CBadgeSnapshotTests.swift in Sources */,

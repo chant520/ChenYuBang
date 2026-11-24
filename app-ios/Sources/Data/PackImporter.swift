@@ -4,6 +4,7 @@ import GRDB
 /// Opaque validated capability: no public or internal initializer can bypass validate.
 public struct ValidatedPack {
     public let version: String
+    public let builtAt: String
     public let counts: PackCounts
     public let sha256: String
     fileprivate let content: PackContent
@@ -33,9 +34,9 @@ public final class PackImporter {
         let manifestJSON = try json("manifest.json")
         let idioms = try json("idioms.json")
         let examples = try json("examples.json")
-        try PackSchema.manifest.check(manifestJSON, path: "manifest")
         let manifest = try PackObject(manifestJSON)
-        guard try manifest.integer("schemaVersion") == 1 else { throw PackError.schema("Unsupported schemaVersion") }
+        guard try manifest.integer("schemaVersion") == 1 else { throw PackError.unsupportedSchema }
+        try PackSchema.manifest.check(manifestJSON, path: "manifest")
         let digest = PackCanonical.digest(idioms: idioms, examples: examples)
         guard try digest == manifest.string("sha256") else { throw PackError.digestMismatch }
         let content = try PackSchema.content(idioms: idioms, examples: examples)
@@ -47,7 +48,8 @@ public final class PackImporter {
         }
         try PackDatabaseValidation.check(content, counts: counts)
         return try ValidatedPack(
-            version: manifest.string("packVersion"), counts: counts, sha256: digest, content: content
+            version: manifest.string("packVersion"), builtAt: manifest.string("builtAt"),
+            counts: counts, sha256: digest, content: content
         )
     }
 

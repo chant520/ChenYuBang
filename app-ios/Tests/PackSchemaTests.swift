@@ -13,7 +13,9 @@ final class PackSchemaTests: PackDatabaseTestCase {
             XCTAssertEqual($0 as? PackError, .digestMismatch)
         }
         fixture.manifest["schemaVersion"] = 2
-        try rejectSchema(fixture)
+        XCTAssertThrowsError(try importer.validate(try fixture.zip())) {
+            XCTAssertEqual($0 as? PackError, .unsupportedSchema)
+        }
         XCTAssertEqual(try snapshot(["idiom", "example", "idiom_fts", "settings"]), before)
     }
 

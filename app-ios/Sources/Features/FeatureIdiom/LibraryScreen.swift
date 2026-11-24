@@ -31,40 +31,47 @@ public final class LibraryViewModel: ObservableObject {
     @Published public private(set) var page = LibraryPage(sections: [])
     @Published public private(set) var loading = true
     @Published public private(set) var failed = false
+    @Published public private(set) var updateFailure: String?
 
     public var scopeEmpty: Bool { scope.isEmpty }
 
     private let reader: IdiomLibraryReading
     private let refreshTrigger: LibraryRefreshTrigger
+    private let refreshFailure: (() -> String?)?
     private var items: [LibraryIdiom] = []
 
     public init(
         scope: ExamScopeSelection,
         reader: IdiomLibraryReading,
-        refreshTrigger: LibraryRefreshTrigger = NoLibraryRefreshTrigger()
+        refreshTrigger: LibraryRefreshTrigger = NoLibraryRefreshTrigger(),
+        refreshFailure: (() -> String?)? = nil
     ) {
         self.scope = scope
         self.reader = reader
         self.refreshTrigger = refreshTrigger
+        self.refreshFailure = refreshFailure
     }
 
-    /// 进页 / 范围变更时重新读取：先走刷新触发点（阶段 1 空操作），再读全量。
+    /// 先发布本机内容，再异步检查更新；网络等待不阻塞浏览。
     public func load(_ scope: ExamScopeSelection) async {
         self.scope = scope
         loading = true
         failed = false
-        await refreshTrigger.onEnterLibrary()
+        updateFailure = nil
         do {
-            items = try reader.load()
-            letters = LibraryBrowse.letters(items)
-            page = LibraryBrowse.page(items, dimension: dimension, letter: selectedLetter)
-            loading = false
+            try publishLocalContent()
         } catch {
-            items = []
-            page = LibraryPage(sections: [])
-            loading = false
-            failed = true
+            showLocalFailure()
         }
+        await refreshTrigger.onEnterLibrary()
+        if refreshFailure?() == nil {
+            do {
+                try publishLocalContent()
+            } catch {
+                showLocalFailure()
+            }
+        }
+        updateFailure = refreshFailure?()
     }
 
     public func selectDimension(_ dimension: LibraryDimension) {
@@ -89,6 +96,21 @@ public final class LibraryViewModel: ObservableObject {
         await load(scope)
     }
 
+    private func publishLocalContent() throws {
+        items = try reader.load()
+        letters = LibraryBrowse.letters(items)
+        page = LibraryBrowse.page(items, dimension: dimension, letter: selectedLetter)
+        loading = false
+        failed = false
+    }
+
+    private func showLocalFailure() {
+        items = []
+        page = LibraryPage(sections: [])
+        loading = false
+        failed = true
+    }
+
     private func applyPage() {
         page = LibraryBrowse.page(items, dimension: dimension, letter: selectedLetter)
     }
@@ -103,6 +125,7 @@ public struct LibraryScreen: View {
     private let onOpenIdiom: (String) -> Void
     private let onSearch: () -> Void
     private let onBack: (() -> Void)?
+    private let isActive: Bool
 
     @MainActor
     public init(
@@ -111,13 +134,22 @@ public struct LibraryScreen: View {
         onOpenScope: @escaping () -> Void,
         onOpenIdiom: @escaping (String) -> Void,
         onSearch: @escaping () -> Void,
-        onBack: (() -> Void)? = nil
+        onBack: (() -> Void)? = nil,
+        refreshTrigger: LibraryRefreshTrigger = NoLibraryRefreshTrigger(),
+        refreshFailure: (() -> String?)? = nil,
+        isActive: Bool = true
     ) {
-        _model = StateObject(wrappedValue: LibraryViewModel(scope: scope, reader: reader))
+        _model = StateObject(wrappedValue: LibraryViewModel(
+            scope: scope,
+            reader: reader,
+            refreshTrigger: refreshTrigger,
+            refreshFailure: refreshFailure
+        ))
         self.onOpenScope = onOpenScope
         self.onOpenIdiom = onOpenIdiom
         self.onSearch = onSearch
         self.onBack = onBack
+        self.isActive = isActive
     }
 
     public var body: some View {
@@ -150,7 +182,9 @@ public struct LibraryScreen: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(colors.page)
-        .task { await model.load(model.scope) }
+        .task(id: isActive) {
+            if isActive { await model.load(model.scope) }
+        }
     }
 
     private func header(_ colors: TokenColors) -> some View {
@@ -212,26 +246,34 @@ public struct LibraryScreen: View {
                 .foregroundColor(colors.text)
     }
 
-    @ViewBuilder
     private func content(_ colors: TokenColors) -> some View {
-        if model.failed {
-            CBar(
-                kind: .warn,
-                title: "成语库读取失败，请重试",
-                subtitle: "内置题库仍可继续浏览；重试只重新读取本机数据。",
-                actionTitle: "重试",
-                onAction: { Task { await model.retry() } }
-            )
-        } else if model.loading {
-            HStack {
-                Spacer(minLength: 0)
-                CSpinner()
-                Spacer(minLength: 0)
+        Group {
+            if let failure = model.updateFailure {
+                CBar(
+                    kind: .warn,
+                    title: failure,
+                    subtitle: "当前题库仍可离线浏览，版本号不变；可到题库版本页重试。"
+                )
             }
-        } else if model.page.isEmpty {
-            emptyState
-        } else {
-            idiomList(colors)
+            if model.failed {
+                CBar(
+                    kind: .warn,
+                    title: "成语库读取失败，请重试",
+                    subtitle: "内置题库仍可继续浏览；重试只重新读取本机数据。",
+                    actionTitle: "重试",
+                    onAction: { Task { await model.retry() } }
+                )
+            } else if model.loading {
+                HStack {
+                    Spacer(minLength: 0)
+                    CSpinner()
+                    Spacer(minLength: 0)
+                }
+            } else if model.page.isEmpty {
+                emptyState
+            } else {
+                idiomList(colors)
+            }
         }
     }
 

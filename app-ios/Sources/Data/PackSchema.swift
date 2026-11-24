@@ -128,6 +128,22 @@ enum PackSchema {
     private static let word = "^[\\u4e00-\\u9fa5]{2,8}$"
     private static let examTypes: Set<String> = ["国考", "省考", "事业编", "教师编"]
 
+    static let channel: PackRule = .object(
+        required: ["schemaVersion", "packVersion", "builtAt", "counts", "sha256", "sizeBytes", "packFile"],
+        properties: [
+            "schemaVersion": .integer(minimum: 1, maximum: Int.max),
+            "packVersion": pattern("^v\\d+\\.\\d+\\.\\d+$"),
+            "builtAt": pattern("^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"),
+            "sha256": pattern("^[0-9a-f]{64}$"),
+            "sizeBytes": .integer(minimum: 1, maximum: Int.max),
+            "packFile": pattern("^pack-v\\d+\\.\\d+\\.\\d+\\.zip$"),
+            "counts": .object(required: ["idioms", "examples"], properties: [
+                "idioms": .integer(minimum: 1, maximum: Int.max),
+                "examples": .integer(minimum: 1, maximum: Int.max)
+            ])
+        ]
+    )
+
     static let manifest: PackRule = .object(
         required: ["schemaVersion", "packVersion", "builtAt", "counts", "sha256"], properties: [
             "schemaVersion": .integer(minimum: 1, maximum: Int.max),
