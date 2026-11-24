@@ -1,3 +1,7 @@
+struct Phase4MessageError: Error, Sendable {
+    let message: String
+}
+
 // 高保真稿未给出的阶段 4 文案；收口前必须由用户逐字拍板后替换。
 enum Phase4PendingCopy {
     static let exportSuccess = "导出完成（待拍板）"

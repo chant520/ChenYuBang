@@ -121,11 +121,11 @@ public struct BackupScreen: View {
         status = nil
         let service = self.service
         let directory = share ? FileManager.default.temporaryDirectory : documentsDirectory()
-        let task = Task.detached { () -> Result<BackupExport, String> in
+        let task = Task.detached { () -> Result<BackupExport, Phase4MessageError> in
             do {
                 return .success(try service.export(to: directory))
             } catch {
-                return .failure(backupUserMessage(for: error))
+                return .failure(Phase4MessageError(message: backupUserMessage(for: error)))
             }
         }
         Task { @MainActor in
@@ -141,8 +141,8 @@ public struct BackupScreen: View {
                     + "考试范围 \(exported.counts.scopes) 条。"
                     + (share ? "可在系统面板中另存。" : "已存到手机本地：\(exported.url.lastPathComponent)")
                 failed = false
-            case .failure(let message):
-                showFailure(message)
+            case .failure(let error):
+                showFailure(error.message)
             }
         }
     }
@@ -162,8 +162,10 @@ public struct BackupScreen: View {
             return
         }
         let service = self.service
-        let task = Task.detached { () -> Result<ValidatedBackup, String> in
-            do { return .success(try service.validate(data)) } catch { return .failure(backupUserMessage(for: error)) }
+        let task = Task.detached { () -> Result<ValidatedBackup, Phase4MessageError> in
+            do { return .success(try service.validate(data)) } catch {
+                return .failure(Phase4MessageError(message: backupUserMessage(for: error)))
+            }
         }
         Task { @MainActor in
             let result = await task.value
@@ -174,8 +176,8 @@ public struct BackupScreen: View {
                     showFailure(Phase4PendingCopy.importStartFailure)
                     return
                 }
-            case .failure(let message):
-                showFailure(message)
+            case .failure(let error):
+                showFailure(error.message)
             }
         }
     }
@@ -213,7 +215,7 @@ public struct ImportModeSheet: View {
     private let inProgress: Bool
     private let error: String?
     private let onStart: () -> Bool
-    private let onFinish: (Result<String, String>) -> Void
+    private let onFinish: (Result<String, Phase4MessageError>) -> Void
 
     public init(
         backup: ValidatedBackup,
@@ -221,7 +223,7 @@ public struct ImportModeSheet: View {
         inProgress: Bool,
         error: String?,
         onStart: @escaping () -> Bool,
-        onFinish: @escaping (Result<String, String>) -> Void
+        onFinish: @escaping (Result<String, Phase4MessageError>) -> Void
     ) {
         self.backup = backup
         self.service = service
@@ -287,18 +289,18 @@ public struct ImportModeSheet: View {
         guard onStart() else { return }
         let service = self.service
         let backup = self.backup
-        let task = Task.detached { () -> Result<String, String> in
+        let task = Task.detached { () -> Result<String, Phase4MessageError> in
             do {
                 let summary = try service.importBackup(backup, mode: mode)
                 return .success(summary.message)
             } catch let error as BackupError {
                 switch error {
-                case .database: return .failure(Phase4PendingCopy.importFailure)
-                case .fileIO: return .failure(Phase4PendingCopy.importFailure)
-                case .format: return .failure(Phase4PendingCopy.importFailure)
+                case .database: return .failure(Phase4MessageError(message: Phase4PendingCopy.importFailure))
+                case .fileIO: return .failure(Phase4MessageError(message: Phase4PendingCopy.importFailure))
+                case .format: return .failure(Phase4MessageError(message: Phase4PendingCopy.importFailure))
                 }
             } catch {
-                return .failure(Phase4PendingCopy.importFailure)
+                return .failure(Phase4MessageError(message: Phase4PendingCopy.importFailure))
             }
         }
         Task { @MainActor in onFinish(await task.value) }

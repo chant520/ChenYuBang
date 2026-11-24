@@ -19,7 +19,7 @@ extension RouterState {
         return true
     }
 
-    func finishBackupImport(result: Result<String, String>) {
+    func finishBackupImport(result: Result<String, Phase4MessageError>) {
         backupImportInProgress = false
         switch result {
         case .success(let message):
@@ -28,8 +28,8 @@ extension RouterState {
             pendingBackup = nil
             overlay = nil
             bumpUserContent()
-        case .failure(let message):
-            backupImportError = message
+        case .failure(let error):
+            backupImportError = error.message
         }
     }
 
@@ -41,7 +41,7 @@ extension RouterState {
         return true
     }
 
-    func finishClearData(result: Result<String, String>) {
+    func finishClearData(result: Result<String, Phase4MessageError>) {
         clearInProgress = false
         switch result {
         case .success(let message):
@@ -49,8 +49,8 @@ extension RouterState {
             clearError = nil
             overlay = nil
             bumpUserContent()
-        case .failure(let message):
-            clearError = message
+        case .failure(let error):
+            clearError = error.message
         }
     }
 }

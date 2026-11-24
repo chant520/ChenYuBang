@@ -23,11 +23,11 @@ struct BackupOverlayContent: View {
                                 router.finishBackupImport(result: .success(message))
                             } catch {
                                 router.finishBackupImport(result: .success(
-                                    "导入已完成，但考试范围刷新失败（待拍板），请重启 App。"
+                                    Phase4PendingCopy.refreshFailure
                                 ))
                             }
-                        case .failure(let message):
-                            router.finishBackupImport(result: .failure(message))
+                        case .failure(let error):
+                            router.finishBackupImport(result: .failure(error))
                         }
                     }
                 )

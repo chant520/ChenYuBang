@@ -12,7 +12,7 @@ public struct ClearDataSheet: View {
     private let inProgress: Bool
     private let error: String?
     private let onStart: () -> Bool
-    private let onFinish: (Result<String, String>) -> Void
+    private let onFinish: (Result<String, Phase4MessageError>) -> Void
 
     public init(
         service: UserDataCleaner,
@@ -20,7 +20,7 @@ public struct ClearDataSheet: View {
         error: String?,
         counts: ClearDataCounts? = nil,
         onStart: @escaping () -> Bool,
-        onFinish: @escaping (Result<String, String>) -> Void
+        onFinish: @escaping (Result<String, Phase4MessageError>) -> Void
     ) {
         self.service = service
         self.inProgress = inProgress
@@ -80,12 +80,12 @@ public struct ClearDataSheet: View {
         guard onStart() else { return }
         counts = try? service.counts()
         let service = self.service
-        let task = Task.detached { () -> Result<String, String> in
+        let task = Task.detached { () -> Result<String, Phase4MessageError> in
             do {
                 _ = try service.clear()
                 return .success(Phase4PendingCopy.clearSuccess)
             } catch {
-                return .failure(Phase4PendingCopy.clearFailure)
+                return .failure(Phase4MessageError(message: Phase4PendingCopy.clearFailure))
             }
         }
         Task { @MainActor in onFinish(await task.value) }
