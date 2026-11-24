@@ -1,8 +1,10 @@
 import Foundation
 
 extension Backup {
-    private static let stampFormatter: DateFormatter = dayFormatter(with: "yyyy-MM-dd'T'HH:mm:ss'Z'")
-    private static let nameFormatter: DateFormatter = dayFormatter(with: "yyyyMMdd-HHmmss")
+    private static let stampFormatter: DateFormatter = dayFormatter(
+        with: "yyyy-MM-dd'T'HH:mm:ss'Z'", timeZone: TimeZone(secondsFromGMT: 0)
+    )
+    private static let nameFormatter: DateFormatter = dayFormatter(with: "yyyyMMdd-HHmmss", timeZone: .current)
 
     static func stamp(_ date: Date) -> String {
         stampFormatter.string(from: date)
@@ -28,10 +30,10 @@ extension Backup {
         Int((Bundle.main.infoDictionary?["CFBundleVersion"] as? String) ?? "") ?? 1
     }
 
-    private static func dayFormatter(with format: String) -> DateFormatter {
+    private static func dayFormatter(with format: String, timeZone: TimeZone?) -> DateFormatter {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.timeZone = TimeZone(identifier: "UTC")
+        formatter.timeZone = timeZone
         formatter.dateFormat = format
         return formatter
     }
