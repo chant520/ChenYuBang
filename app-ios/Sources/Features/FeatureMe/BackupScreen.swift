@@ -34,55 +34,68 @@ public struct BackupScreen: View {
         let colors = CangyuTheme.colors(for: colorScheme)
         ScrollView {
             VStack(alignment: .leading, spacing: Tokens.Space.block) {
-                Text("备份与恢复")
-                    .font(.system(size: Tokens.Font.n20, weight: .semibold))
-                    .foregroundStyle(colors.text)
-                    .accessibilityAddTraits(.isHeader)
-                CButton(text: "返回", variant: .ghost, action: onBack)
-
-                CCard {
-                    Text("导出备份")
-                        .font(.system(size: Tokens.Font.n15, weight: .semibold))
+                HStack(spacing: Tokens.Space.lt1Gap) {
+                    Button(action: onBack) {
+                        CIcon(.back, size: Tokens.Icon.n21, strokeWidth: 1.8, color: colors.text)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("返回")
+                    Text("备份与恢复")
+                        .font(.system(size: Tokens.Font.n20, weight: .semibold))
                         .foregroundStyle(colors.text)
-                    Text("包含错题、复习记录、考试范围与录入题；不含成语库和原图。")
-                        .font(.system(size: Tokens.Font.n12))
-                        .cLineHeight(1.6, size: Tokens.Font.n12)
-                        .foregroundStyle(colors.text2)
-                        .padding(.top, Tokens.Space.lsubTop)
-                    CButton(text: busy ? "正在导出…" : "存到手机本地", loading: busy) { export(share: false) }
-                        .padding(.top, Tokens.Space.block)
-                    CButton(text: "通过系统分享面板另存到网盘", variant: .ghost, loading: busy) { export(share: true) }
-                        .padding(.top, Tokens.Space.block)
+                        .accessibilityAddTraits(.isHeader)
                 }
 
                 CCard {
-                    Text("导入备份")
-                        .font(.system(size: Tokens.Font.n15, weight: .semibold))
-                        .foregroundStyle(colors.text)
-                    Text("从手机本地或网盘选择 backup-YYYYMMDD-HHMMSS.zip。读取成功后再选择合并或覆盖。")
-                        .font(.system(size: Tokens.Font.n12))
-                        .cLineHeight(1.6, size: Tokens.Font.n12)
+                    CLabel("导出备份")
+                    Text("导出的内容：错题、收藏、学习状态。不含题库本身。")
+                        .font(.system(size: Tokens.Font.n13))
+                        .cLineHeight(1.7, size: Tokens.Font.n13)
                         .foregroundStyle(colors.text2)
                         .padding(.top, Tokens.Space.lsubTop)
-                    CButton(text: busy ? "正在读取…" : "从手机本地选文件", loading: busy) { showingImporter = true }
-                        .padding(.top, Tokens.Space.block)
-                    CButton(text: "从网盘选文件", variant: .ghost, loading: busy) { showingImporter = true }
-                        .padding(.top, Tokens.Space.block)
+                    Phase4MenuRow(title: "存到手机本地", action: { export(share: false) },
+                                  showsDivider: true, disabled: busy)
+                    Phase4MenuRow(title: "通过系统文件 / 分享面板另存到网盘",
+                                  action: { export(share: true) }, showsDivider: false, disabled: busy)
+                }
+
+                CCard {
+                    CLabel("导入备份")
+                    Text("读入前会先问你：覆盖还是合并（见 P22）。")
+                        .font(.system(size: Tokens.Font.n13))
+                        .cLineHeight(1.7, size: Tokens.Font.n13)
+                        .foregroundStyle(colors.text2)
+                        .padding(.top, Tokens.Space.lsubTop)
+                    Phase4MenuRow(title: "从手机本地选文件", action: { showingImporter = true },
+                                  showsDivider: true, disabled: busy)
+                    Phase4MenuRow(title: "从网盘选文件", action: { showingImporter = true },
+                                  showsDivider: false, disabled: busy)
                 }
 
                 CCard(soft: true) {
-                    Text("全程不登录、不上传、不代传：文件只在你和网盘之间走。")
-                        .font(.system(size: Tokens.Font.n12))
-                        .cLineHeight(1.6, size: Tokens.Font.n12)
-                        .foregroundStyle(colors.text2)
+                    HStack {
+                        Text("最近一次备份时间")
+                            .font(.system(size: Tokens.Font.n13, weight: .semibold))
+                            .foregroundStyle(colors.text)
+                        Spacer()
+                        CTag(text: "进阶位", style: .disabled)
+                    }
+                    Text(Phase4PendingCopy.lastBackup)
+                        .font(.system(size: Tokens.Font.n115))
+                        .foregroundStyle(colors.text3)
+                        .padding(.top, Tokens.Space.lsubTop)
                 }
 
+                Text("全程不登录、不上传、不代传：文件只在你和网盘之间走。")
+                    .font(.system(size: Tokens.Font.n115))
+                    .cLineHeight(1.65, size: Tokens.Font.n115)
+                    .foregroundStyle(colors.text3)
+
                 if let message = status ?? importResult {
-                    Text(message)
-                        .font(.system(size: Tokens.Font.n13))
-                        .foregroundStyle(failed ? colors.errfg : colors.tintfg)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .accessibilityLabel(message)
+                    let successTitle = status == nil ? Phase4PendingCopy.importSuccess : Phase4PendingCopy.exportSuccess
+                    CBar(kind: failed ? .error : .info,
+                         title: failed ? message : successTitle,
+                         subtitle: failed ? nil : message)
                 }
             }
             .padding(.horizontal, Tokens.Space.pageX)
@@ -96,7 +109,7 @@ public struct BackupScreen: View {
             case .failure(let error) where (error as? CocoaError)?.code == .userCancelled:
                 break
             case .failure:
-                showFailure("无法读取所选文件，请重新选择。")
+                showFailure(Phase4PendingCopy.importFailure)
             }
         }
         .sheet(item: $shareItem) { item in ActivityView(url: item.url) }
@@ -122,10 +135,11 @@ public struct BackupScreen: View {
             case .success(let exported):
                 if share {
                     shareItem = ShareItem(url: exported.url)
-                    status = "备份已生成，可在系统面板中另存。"
-                } else {
-                    status = "已存到手机本地：\(exported.url.lastPathComponent)"
                 }
+                status = "错题 \(exported.counts.mistakes) 条、录入题 \(exported.counts.userExamples) 条、"
+                    + "复习记录 \(exported.counts.reviews) 条、学习状态 \(exported.counts.idiomStates) 条、"
+                    + "考试范围 \(exported.counts.scopes) 条。"
+                    + (share ? "可在系统面板中另存。" : "已存到手机本地：\(exported.url.lastPathComponent)")
                 failed = false
             case .failure(let message):
                 showFailure(message)
@@ -144,7 +158,7 @@ public struct BackupScreen: View {
             data = try Data(contentsOf: url)
         } catch {
             busy = false
-            showFailure("无法读取所选文件，请重新选择。")
+            showFailure(Phase4PendingCopy.importFailure)
             return
         }
         let service = self.service
@@ -156,7 +170,10 @@ public struct BackupScreen: View {
             busy = false
             switch result {
             case .success(let backup):
-                guard onValidated(backup) else { showFailure("当前页面无法打开导入方式，请重试。"); return }
+                guard onValidated(backup) else {
+                    showFailure(Phase4PendingCopy.importStartFailure)
+                    return
+                }
             case .failure(let message):
                 showFailure(message)
             }
@@ -179,12 +196,12 @@ private func backupUserMessage(for error: Error) -> String {
     switch error {
     case let error as BackupError:
         switch error {
-        case .database: return "本机数据库读写失败，请重试。"
-        case .fileIO: return "文件读写失败，请检查可用空间后重试。"
-        case .format: return "备份文件不完整、版本过新或校验失败。"
+        case .database: return Phase4PendingCopy.importFailure
+        case .fileIO: return Phase4PendingCopy.exportFailure
+        case .format: return Phase4PendingCopy.importFailure
         }
     default:
-        return "备份处理失败，请重试。"
+        return Phase4PendingCopy.importFailure
     }
 }
 
@@ -217,56 +234,53 @@ public struct ImportModeSheet: View {
     public var body: some View {
         let colors = CangyuTheme.colors(for: colorScheme)
         VStack(alignment: .leading, spacing: Tokens.Space.block) {
-            CCard(soft: true) {
-                Text("这份备份包含 \(backup.counts.mistakes) 条错题、"
-                     + "\(backup.counts.userExamples) 条录入题、\(backup.counts.reviews) 条复习记录。")
-                    .font(.system(size: Tokens.Font.n12))
-                    .cLineHeight(1.6, size: Tokens.Font.n12)
-                    .foregroundStyle(colors.text2)
-            }
-
-            CCard {
-                HStack {
-                    Text("覆盖")
-                        .font(.system(size: Tokens.Font.n15, weight: .semibold))
-                        .foregroundStyle(colors.text)
-                    Spacer()
-                    CBadge(text: "会丢现有数据", kind: .error)
+            Button { importBackup(.replace) } label: {
+                CCard(soft: true) {
+                    HStack {
+                        Text("覆盖")
+                            .font(.system(size: Tokens.Font.n13, weight: .semibold))
+                            .foregroundStyle(colors.text)
+                        Spacer()
+                        CBadge(text: "会丢现有数据", kind: .error)
+                    }
+                    Text("用备份文件替换本机现有记录。本机现在的错题、收藏、学习状态都会被清掉，之后无法找回。")
+                        .font(.system(size: Tokens.Font.n13))
+                        .cLineHeight(1.7, size: Tokens.Font.n13)
+                        .foregroundStyle(colors.text2)
+                        .padding(.top, Tokens.Space.lsubTop)
                 }
-                Text("用备份替换本机错题、录入题和复习记录。导入前自动在缓存留底，失败会回滚。")
-                    .font(.system(size: Tokens.Font.n12))
-                    .cLineHeight(1.6, size: Tokens.Font.n12)
-                    .foregroundStyle(colors.text2)
-                    .padding(.top, Tokens.Space.lsubTop)
-                CButton(text: inProgress ? "正在覆盖…" : "覆盖导入", variant: .dangerFilled,
-                        loading: inProgress) { importBackup(.replace) }
-                    .padding(.top, Tokens.Space.block)
             }
+            .buttonStyle(CPressDimStyle())
+            .disabled(inProgress)
 
-            CCard {
-                HStack {
-                    Text("合并")
-                        .font(.system(size: Tokens.Font.n15, weight: .semibold))
-                        .foregroundStyle(colors.text)
-                    Spacer()
-                    CTag(text: "保留本机", style: .solid)
+            Button { importBackup(.merge) } label: {
+                CCard(soft: true) {
+                    HStack {
+                        Text("合并")
+                            .font(.system(size: Tokens.Font.n13, weight: .semibold))
+                            .foregroundStyle(colors.text)
+                        Spacer()
+                        CTag(text: "保留本机", style: .solid)
+                    }
+                    Text("把文件里的记录并入本机，同一道题以本机记录为准，重复的不会叠加。")
+                        .font(.system(size: Tokens.Font.n13))
+                        .cLineHeight(1.7, size: Tokens.Font.n13)
+                        .foregroundStyle(colors.text2)
+                        .padding(.top, Tokens.Space.lsubTop)
                 }
-                Text("同一条记录保留本机版本，其余记录合并进来；不会删除本机数据。")
-                    .font(.system(size: Tokens.Font.n12))
-                    .cLineHeight(1.6, size: Tokens.Font.n12)
-                    .foregroundStyle(colors.text2)
-                    .padding(.top, Tokens.Space.lsubTop)
-                CButton(text: inProgress ? "正在合并…" : "合并导入", loading: inProgress) { importBackup(.merge) }
-                    .padding(.top, Tokens.Space.block)
             }
+            .buttonStyle(CPressDimStyle())
+            .disabled(inProgress)
 
+            if inProgress {
+                CBar(kind: .info, title: Phase4PendingCopy.importBusy)
+            }
             if let error {
-                Text(error)
-                    .font(.system(size: Tokens.Font.n13))
-                    .foregroundStyle(colors.errfg)
-                    .accessibilityLabel(error)
+                CBar(kind: .error, title: error)
             }
         }
+        .accessibilityLabel("这份备份包含 \(backup.counts.mistakes) 条错题、"
+            + "\(backup.counts.userExamples) 条录入题、\(backup.counts.reviews) 条复习记录")
     }
 
     private func importBackup(_ mode: BackupImportMode) {
@@ -279,15 +293,45 @@ public struct ImportModeSheet: View {
                 return .success(summary.message)
             } catch let error as BackupError {
                 switch error {
-                case .database: return .failure("导入失败，本机数据已回滚，请重试。")
-                case .fileIO: return .failure("导入失败，缓存留底或临时文件读写失败。")
-                case .format: return .failure("导入失败，备份内容无效。")
+                case .database: return .failure(Phase4PendingCopy.importFailure)
+                case .fileIO: return .failure(Phase4PendingCopy.importFailure)
+                case .format: return .failure(Phase4PendingCopy.importFailure)
                 }
             } catch {
-                return .failure("导入失败，本机数据已回滚，请重试。")
+                return .failure(Phase4PendingCopy.importFailure)
             }
         }
         Task { @MainActor in onFinish(await task.value) }
+    }
+}
+
+private struct Phase4MenuRow: View {
+    @Environment(\.colorScheme) private var colorScheme
+    let title: String
+    let action: () -> Void
+    let showsDivider: Bool
+    var disabled = false
+
+    var body: some View {
+        let colors = CangyuTheme.colors(for: colorScheme)
+        Button(action: action) {
+            HStack {
+                Text(title)
+                    .font(.system(size: Tokens.Font.n14, weight: .semibold))
+                    .foregroundStyle(colors.text)
+                    .multilineTextAlignment(.leading)
+                Spacer()
+                CIcon(.chevron, size: Tokens.Icon.n15, strokeWidth: 1.8, color: colors.accent)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.vertical, Tokens.Space.lrowY)
+            .contentShape(Rectangle())
+            if showsDivider {
+                Rectangle().fill(colors.line2).frame(height: 1)
+            }
+        }
+        .buttonStyle(CPressDimStyle())
+        .disabled(disabled)
     }
 }
 

@@ -57,7 +57,9 @@ final class Phase4SnapshotTests: XCTestCase {
             onStart: { true },
             onFinish: { _ in }
         )
-        let view = COverlay(style: .sheet, title: "读入这份备份，用哪种方式", onDismiss: {}, content: {
+        let view = COverlay(style: .sheet, title: "读入这份备份，用哪种方式",
+                            description: "两种方式结果不同，选之前看清楚。",
+                            onDismiss: {}, content: {
             content
         })
         .environment(\.colorScheme, dark ? .dark : .light)
@@ -72,10 +74,13 @@ final class Phase4SnapshotTests: XCTestCase {
             service: fixture.cleaner,
             inProgress: false,
             error: nil,
+            counts: try fixture.cleaner.counts(),
             onStart: { true },
             onFinish: { _ in }
         )
-        let view = COverlay(style: .dialog, title: "清空全部学习数据", onDismiss: {}, content: {
+        let view = COverlay(style: .dialog, title: "清空全部学习数据",
+                            description: "这一步不可撤销。清掉的是你录的东西，不是题库本身。",
+                            onDismiss: {}, content: {
             content
         })
         .environment(\.colorScheme, dark ? .dark : .light)

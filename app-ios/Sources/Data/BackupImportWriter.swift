@@ -6,6 +6,8 @@ enum BackupImportWriter {
         var mistakes = 0
         var userExamples = 0
         var reviews = 0
+        var idiomStates = 0
+        var scopes = 0
     }
 
     static func merge(_ payload: BackupDataPayload, db: Database) throws -> BackupImportSummary {
@@ -37,7 +39,7 @@ enum BackupImportWriter {
         }
         let staging = try DatabaseQueue(path: stagingURL.path)
         try ChenYuBangDatabase.makeMigrator().migrate(staging)
-        try staging.write { _ = try insertAll(resolved.payload, db: db, keepLocalOnConflict: false) }
+        try staging.write { db in _ = try insertAll(resolved.payload, db: db, keepLocalOnConflict: false) }
 
         let automaticBackup = try queue.read { db in
             try Backup.export(db: db, to: caches, date: Date(), namePrefix: "backup-before-import-")
@@ -67,8 +69,8 @@ enum BackupImportWriter {
                             mistakes: inserted?.mistakes ?? payload.mistakes.count,
                             userExamples: inserted?.userExamples ?? payload.userExamples?.count ?? 0,
                             reviews: inserted?.reviews ?? payload.reviews.count,
-                            idiomStates: payload.idiomStates.count,
-                            scopes: payload.scopes.count,
+                            idiomStates: inserted?.idiomStates ?? payload.idiomStates.count,
+                            scopes: inserted?.scopes ?? payload.scopes.count,
                             automaticBackup: automaticBackup,
                             orphans: orphans)
     }
@@ -139,17 +141,22 @@ enum BackupImportWriter {
             try execute(db, "UPDATE mistake SET reviewCount = ?, lastReviewedAt = ? WHERE id = ?",
                         [reviews?.count ?? 0, reviews?.latest, mistake.id])
         }
+        var localStates = keepLocalOnConflict ? try existingIDs(db, "idiom_state") : []
         for state in payload.idiomStates {
+            guard !localStates.contains(state.idiomId) else { continue }
             try execute(db, "INSERT\(conflict) INTO idiom_state(idiomId, status, favorite) VALUES (?, ?, ?)",
                         [state.idiomId, state.status, state.favorite])
+            localStates.insert(state.idiomId)
+            inserted.idiomStates += 1
         }
-        try insertScopes(payload.scopes, db: db, keepLocalOnConflict: keepLocalOnConflict)
+        inserted.scopes = try insertScopes(payload.scopes, db: db, keepLocalOnConflict: keepLocalOnConflict)
         return inserted
     }
 
     private static func insertScopes(_ scopes: [BackupScopePayload], db: Database,
-                                     keepLocalOnConflict: Bool) throws {
+                                     keepLocalOnConflict: Bool) throws -> Int {
         var keys = Set<String>()
+        var insertedCount = 0
         if keepLocalOnConflict {
             let rows = try Row.fetchAll(db, sql: "SELECT type, province FROM exam_scope")
             keys = Set(rows.map { row in "\(row["type"] as String)\u{0}\(row["province"] as String? ?? "")" })
@@ -160,12 +167,14 @@ enum BackupImportWriter {
             guard !keys.contains(key) else { continue }
             try execute(db, "INSERT INTO exam_scope(id, type, province, enabled) VALUES (?, ?, ?, ?)",
                         [UUID().uuidString, scope.type, scope.province, scope.enabled])
+            insertedCount += 1
             if scope.type == "省考", scope.enabled, let province = scope.province {
                 insertedProvinces.insert(province)
             }
             keys.insert(key)
         }
         if keepLocalOnConflict { try mergeProvinceCache(insertedProvinces, db: db) }
+        return insertedCount
     }
 
     private static func mergeProvinceCache(_ inserted: Set<String>, db: Database) throws {

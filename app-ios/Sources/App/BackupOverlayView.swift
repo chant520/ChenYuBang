@@ -23,7 +23,7 @@ struct BackupOverlayContent: View {
                                 router.finishBackupImport(result: .success(message))
                             } catch {
                                 router.finishBackupImport(result: .success(
-                                    "导入已完成，但考试范围刷新失败，请重启 App。"
+                                    "导入已完成，但考试范围刷新失败（待拍板），请重启 App。"
                                 ))
                             }
                         case .failure(let message):

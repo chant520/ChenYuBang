@@ -11,13 +11,11 @@ enum BackupOrphans {
                         includeLocalUserReferences: Bool) throws -> ResolvedBackup {
         let idiomIDs = try existingIdiomIDs(db)
         let backupExampleIDs = Set(payload.userExamples?.map(\.id) ?? [])
-        let backupMistakeIDs = Set(payload.mistakes.map(\.id))
         let exampleIDs = includeLocalUserReferences
             ? backupExampleIDs.union(try BackupImportWriter.existingIDs(db, "user_example"))
             : backupExampleIDs
-        let mistakeIDs = includeLocalUserReferences
-            ? backupMistakeIDs.union(try BackupImportWriter.existingIDs(db, "mistake"))
-            : backupMistakeIDs
+        let mistakeIDs: Set<String> = includeLocalUserReferences
+            ? try BackupImportWriter.existingIDs(db, "mistake") : []
 
         var skippedMistakes = 0
         var missingMistakeIdioms = 0
@@ -29,7 +27,8 @@ enum BackupOrphans {
         let examples = resolveExamples(
             payload.userExamples ?? [], idiomIDs: idiomIDs, missingIdioms: &missingExampleIdioms
         )
-        let reviews = payload.reviews.filter { mistakeIDs.contains($0.mistakeId) }
+        let resolvedMistakeIDs = mistakeIDs.union(mistakes.map(\.id))
+        let reviews = payload.reviews.filter { resolvedMistakeIDs.contains($0.mistakeId) }
         return ResolvedBackup(
             payload: payload.copy(
                 mistakes: mistakes,

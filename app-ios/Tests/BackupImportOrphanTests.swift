@@ -16,7 +16,7 @@ final class BackupImportOrphanTests: PackDatabaseTestCase {
         XCTAssertEqual(summary.orphans.skippedMistakes, 1)
         XCTAssertEqual(summary.orphans.missingMistakeIdioms, 1)
         XCTAssertEqual(summary.orphans.missingExampleIdioms, 1)
-        XCTAssertEqual(summary.orphans.skippedReviews, 1)
+        XCTAssertEqual(summary.orphans.skippedReviews, 2)
         XCTAssertTrue(summary.message.contains("过滤缺失成语关联 2 处"))
         try queue.read { db in
             XCTAssertEqual(try String.fetchOne(db, sql: "SELECT stem FROM mistake WHERE id = ?",
@@ -30,6 +30,8 @@ final class BackupImportOrphanTests: PackDatabaseTestCase {
                            BackupWriterFixture.localExtraMistake)
             XCTAssertNil(try String.fetchOne(db, sql: "SELECT id FROM review_log WHERE id = ?",
                                              arguments: [BackupWriterFixture.extraReview]))
+            XCTAssertNil(try String.fetchOne(db, sql: "SELECT id FROM review_log WHERE id = ?",
+                                             arguments: ["30000000-0000-4000-8000-000000000005"]))
         }
     }
 
@@ -46,7 +48,7 @@ final class BackupImportOrphanTests: PackDatabaseTestCase {
         XCTAssertEqual(summary.orphans.skippedMistakes, 1)
         XCTAssertEqual(summary.orphans.missingMistakeIdioms, 1)
         XCTAssertEqual(summary.orphans.missingExampleIdioms, 1)
-        XCTAssertEqual(summary.orphans.skippedReviews, 2)
+        XCTAssertEqual(summary.orphans.skippedReviews, 3)
         try queue.read { db in
             XCTAssertEqual(try String.fetchOne(db, sql: "SELECT stem FROM mistake WHERE id = ?",
                                                arguments: [BackupWriterFixture.sharedMistake]), "备份共享错题")
@@ -58,6 +60,8 @@ final class BackupImportOrphanTests: PackDatabaseTestCase {
                            [BackupWriterFixture.idiomA, BackupWriterFixture.idiomB])
             XCTAssertNil(try String.fetchOne(db, sql: "SELECT id FROM review_log WHERE id = ?",
                                              arguments: [BackupWriterFixture.localReviewFromBackup]))
+            XCTAssertNil(try String.fetchOne(db, sql: "SELECT id FROM review_log WHERE id = ?",
+                                             arguments: ["30000000-0000-4000-8000-000000000005"]))
         }
     }
 }
@@ -103,10 +107,17 @@ private extension BackupImportOrphanTests {
             )
         }
         let orphanReview = try XCTUnwrap(payload.reviews.first { $0.id == BackupWriterFixture.extraReview })
-        let reviews = payload.reviews.map { $0.id == orphanReview.id
-            ? BackupReviewPayload(id: $0.id, mistakeId: missingID, result: $0.result, reviewedAt: $0.reviewedAt)
-            : $0
-        } + [BackupReviewPayload(id: BackupWriterFixture.localReviewFromBackup,
+        let skippedMistakeReviewID = "30000000-0000-4000-8000-000000000005"
+        let reviews = payload.reviews.map {
+            if $0.id == orphanReview.id {
+                return BackupReviewPayload(id: $0.id, mistakeId: missingID,
+                                           result: $0.result, reviewedAt: $0.reviewedAt)
+            }
+            return $0
+        } + [BackupReviewPayload(id: skippedMistakeReviewID,
+                                 mistakeId: BackupWriterFixture.extraMistake,
+                                 result: "错", reviewedAt: "2026-11-24T00:00:00Z"),
+             BackupReviewPayload(id: BackupWriterFixture.localReviewFromBackup,
                                  mistakeId: BackupWriterFixture.localExtraMistake,
                                  result: "对", reviewedAt: "2026-11-24T00:00:00Z")]
         return BackupDataPayload(mistakes: mistakes, userExamples: examples, reviews: reviews,

@@ -18,63 +18,58 @@ public struct PackVersionScreen: View {
         let colors = CangyuTheme.colors(for: colorScheme)
         ScrollView {
             VStack(alignment: .leading, spacing: Tokens.Space.block) {
-                Text("题库版本与更新")
-                    .font(.system(size: Tokens.Font.n20, weight: .semibold))
-                    .foregroundStyle(colors.text)
-                    .accessibilityAddTraits(.isHeader)
-                CButton(text: "返回", variant: .ghost, action: onBack)
+                HStack(spacing: Tokens.Space.lt1Gap) {
+                    Button(action: onBack) {
+                        CIcon(.back, size: Tokens.Icon.n21, strokeWidth: 1.8, color: colors.text)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("返回")
+                    Text("题库版本与更新")
+                        .font(.system(size: Tokens.Font.n20, weight: .semibold))
+                        .foregroundStyle(colors.text)
+                        .accessibilityAddTraits(.isHeader)
+                }
 
                 CCard {
-                    Text("当前题库版本")
-                        .font(.system(size: Tokens.Font.n12))
-                        .foregroundStyle(colors.text2)
+                    CLabel("当前题库版本")
                     Text("v\(pack.version)")
                         .font(.system(size: Tokens.Font.n30, weight: .bold))
-                        .foregroundStyle(colors.text)
+                        .foregroundStyle(colors.head)
                         .padding(.top, Tokens.Space.lmetaTop)
                     Text("内置版本，装好即可离线用")
-                        .font(.system(size: Tokens.Font.n12))
+                        .font(.system(size: Tokens.Font.n115))
+                        .cLineHeight(1.65, size: Tokens.Font.n115)
                         .foregroundStyle(colors.text3)
                         .padding(.top, Tokens.Space.lsubTop)
                 }
 
                 CCard {
-                    Text("收录说明")
-                        .font(.system(size: Tokens.Font.n12))
-                        .foregroundStyle(colors.text2)
-                    Text("成语 \(formatted(pack.counts.idioms)) 条，真题 \(formatted(pack.counts.examples)) 条")
+                    CLabel("收录说明")
+                    (Text("成语 ") + Text(formatted(pack.counts.idioms)).bold()
+                        + Text(" 条 · 真题 ") + Text(formatted(pack.counts.examples)).bold() + Text(" 条"))
                         .font(.system(size: Tokens.Font.n13))
-                        .foregroundStyle(colors.text)
+                        .cLineHeight(1.7, size: Tokens.Font.n13)
+                        .foregroundStyle(colors.text2)
                         .padding(.top, Tokens.Space.lmetaTop)
                     Text("覆盖国考 / 省考 / 事业编，按范围筛选后可用的条数会随之变化。")
-                        .font(.system(size: Tokens.Font.n12))
-                        .cLineHeight(1.6, size: Tokens.Font.n12)
+                        .font(.system(size: Tokens.Font.n13))
+                        .cLineHeight(1.7, size: Tokens.Font.n13)
                         .foregroundStyle(colors.text2)
                         .padding(.top, Tokens.Space.lsubTop)
-                    Text("条数以当前题库定稿为准。")
-                        .font(.system(size: Tokens.Font.n12))
+                    Text("条数为排版示意，实际以题库定稿为准。")
+                        .font(.system(size: Tokens.Font.n115))
+                        .cLineHeight(1.65, size: Tokens.Font.n115)
                         .foregroundStyle(colors.text3)
                         .padding(.top, Tokens.Space.lsubTop)
                 }
 
-                CButton(text: "检查题库更新", enabled: false) {}
-                Text("当前为离线题库，暂未接入联网检查。")
-                    .font(.system(size: Tokens.Font.n12))
+                Text("只下载题库增量包，不改动本机学习记录。")
+                    .font(.system(size: Tokens.Font.n115))
+                    .cLineHeight(1.65, size: Tokens.Font.n115)
                     .foregroundStyle(colors.text3)
-
-                CCard(soft: true) {
-                    HStack {
-                        Text("更新状态")
-                            .font(.system(size: Tokens.Font.n12))
-                            .foregroundStyle(colors.text2)
-                        Spacer()
-                        CTag(text: "离线题库", style: .neutral)
-                    }
-                    Text("只下载题库增量包，不改动本机学习记录。")
-                        .font(.system(size: Tokens.Font.n12))
-                        .foregroundStyle(colors.text3)
-                        .padding(.top, Tokens.Space.lsubTop)
-                }
+                Text(Phase4PendingCopy.offlineNotice)
+                    .font(.system(size: Tokens.Font.n115))
+                    .foregroundStyle(colors.text3)
             }
             .padding(.horizontal, Tokens.Space.pageX)
             .padding(.vertical, Tokens.Space.contentTop)

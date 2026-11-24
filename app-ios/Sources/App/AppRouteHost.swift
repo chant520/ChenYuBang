@@ -46,6 +46,9 @@ struct AppRouteHost: View {
                     ? !router.backupImportInProgress : !router.clearInProgress
                 COverlay(style: overlay.route == .importMode ? .sheet : .dialog,
                          title: overlay.route.title,
+                         description: overlay.route == .importMode
+                            ? "两种方式结果不同，选之前看清楚。"
+                            : "这一步不可撤销。清掉的是你录的东西，不是题库本身。",
                          cancelEnabled: cancelEnabled,
                          onDismiss: router.closeOverlay) {
                     BackupOverlayContent(route: overlay.route, router: router, launch: launch)
