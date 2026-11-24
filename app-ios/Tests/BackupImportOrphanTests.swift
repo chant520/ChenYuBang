@@ -6,8 +6,9 @@ import XCTest
 final class BackupImportOrphanTests: PackDatabaseTestCase {
     func testMergeResolvesOrphansAndReportsSkippedRows() throws {
         try BackupWriterFixture.seedDestination(queue)
+        let payload = try makeOrphanPayload()
         let summary = try queue.write { db in
-            try BackupImportWriter.merge(makeOrphanPayload(), db: db)
+            try BackupImportWriter.merge(payload, db: db)
         }
 
         XCTAssertEqual(summary.mistakes, 1)
