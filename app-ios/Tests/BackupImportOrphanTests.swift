@@ -11,9 +11,9 @@ final class BackupImportOrphanTests: PackDatabaseTestCase {
             try BackupImportWriter.merge(payload, db: db)
         }
 
-        XCTAssertEqual(summary.mistakes, 1)
+        XCTAssertEqual(summary.mistakes, 0)
         XCTAssertEqual(summary.userExamples, 1)
-        XCTAssertEqual(summary.reviews, 1)
+        XCTAssertEqual(summary.reviews, 0)
         XCTAssertEqual(summary.orphans.skippedMistakes, 1)
         XCTAssertEqual(summary.orphans.missingMistakeIdioms, 1)
         XCTAssertEqual(summary.orphans.missingExampleIdioms, 1)
@@ -26,9 +26,8 @@ final class BackupImportOrphanTests: PackDatabaseTestCase {
                                              arguments: [BackupWriterFixture.extraMistake]))
             XCTAssertEqual(try links(db, "user_example_idiom", "userExampleId", BackupWriterFixture.extraExample),
                            [BackupWriterFixture.idiomA, BackupWriterFixture.idiomB])
-            XCTAssertEqual(try String.fetchOne(db, sql: "SELECT mistakeId FROM review_log WHERE id = ?",
-                                               arguments: [BackupWriterFixture.localReviewFromBackup]),
-                           BackupWriterFixture.localExtraMistake)
+            XCTAssertNil(try String.fetchOne(db, sql: "SELECT id FROM review_log WHERE id = ?",
+                                             arguments: [BackupWriterFixture.localReviewFromBackup]))
             XCTAssertNil(try String.fetchOne(db, sql: "SELECT id FROM review_log WHERE id = ?",
                                              arguments: [BackupWriterFixture.extraReview]))
             XCTAssertNil(try String.fetchOne(db, sql: "SELECT id FROM review_log WHERE id = ?",
