@@ -157,7 +157,6 @@ final class BackupImportWriterTests: PackDatabaseTestCase {
                 BEGIN SELECT RAISE(ABORT, 'replace rollback test'); END
                 """)
         }
-        addTeardownBlock { try? self.queue.write { db in try db.execute(sql: "DROP TRIGGER reject_backup_link") } }
 
         XCTAssertThrowsError(try BackupService(queue: queue).importBackup(fixture, mode: .replace)) { error in
             XCTAssertTrue(String(describing: error).contains("replace rollback test"))
