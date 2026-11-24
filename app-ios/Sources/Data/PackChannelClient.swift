@@ -13,7 +13,7 @@ public final class URLPackChannelClient: PackChannelClient, @unchecked Sendable 
     private let configuration: URLSessionConfiguration
 
     public init(configuration: URLSessionConfiguration = .ephemeral) {
-        let configured = configuration.copy() as! URLSessionConfiguration
+        let configured = configuration.copy() as? URLSessionConfiguration ?? .ephemeral
         configured.timeoutIntervalForRequest = 10
         configured.timeoutIntervalForResource = 30
         configured.requestCachePolicy = .reloadIgnoringLocalCacheData

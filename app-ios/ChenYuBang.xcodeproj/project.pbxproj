@@ -53,6 +53,7 @@
 		A00000000000000000000037 /* RouteRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000101 /* RouteRegistry.swift */; };
 		A00000000000000000000038 /* RouterState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000102 /* RouterState.swift */; };
 		A00000000000000000000039 /* AppRouteHost.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000103 /* AppRouteHost.swift */; };
+		A0000000000000000000003ED /* RoutePlaceholderPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001ED /* RoutePlaceholderPage.swift */; };
 		A0000000000000000000003A /* FirstLaunchGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000104 /* FirstLaunchGate.swift */; };
 		A0000000000000000000003B /* RouterStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000142 /* RouterStateTests.swift */; };
 		A0000000000000000000003C /* ExamScopeStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000143 /* ExamScopeStoreTests.swift */; };
@@ -198,6 +199,7 @@
 		A00000000000000000000101 /* RouteRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteRegistry.swift; sourceTree = "<group>"; };
 		A00000000000000000000102 /* RouterState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouterState.swift; sourceTree = "<group>"; };
 		A00000000000000000000103 /* AppRouteHost.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRouteHost.swift; sourceTree = "<group>"; };
+		A000000000000000000001ED /* RoutePlaceholderPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutePlaceholderPage.swift; sourceTree = "<group>"; };
 		A00000000000000000000104 /* FirstLaunchGate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstLaunchGate.swift; sourceTree = "<group>"; };
 		A00000000000000000000142 /* RouterStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouterStateTests.swift; sourceTree = "<group>"; };
 		A00000000000000000000143 /* ExamScopeStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExamScopeStoreTests.swift; sourceTree = "<group>"; };
@@ -328,6 +330,7 @@
 				A00000000000000000000101 /* RouteRegistry.swift */,
 				A00000000000000000000102 /* RouterState.swift */,
 				A00000000000000000000103 /* AppRouteHost.swift */,
+				A000000000000000000001ED /* RoutePlaceholderPage.swift */,
 				A00000000000000000000104 /* FirstLaunchGate.swift */,
 				A000000000000000000001E9 /* RouterBackupState.swift */,
 				A000000000000000000001EA /* BackupOverlayView.swift */,
@@ -647,6 +650,7 @@
 				A00000000000000000000037 /* RouteRegistry.swift in Sources */,
 				A00000000000000000000038 /* RouterState.swift in Sources */,
 				A00000000000000000000039 /* AppRouteHost.swift in Sources */,
+				A0000000000000000000003ED /* RoutePlaceholderPage.swift in Sources */,
 				A0000000000000000000003A /* FirstLaunchGate.swift in Sources */,
 				A000000000000000000000E9 /* RouterBackupState.swift in Sources */,
 				A000000000000000000000EA /* BackupOverlayView.swift in Sources */,

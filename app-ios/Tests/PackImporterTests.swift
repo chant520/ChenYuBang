@@ -7,7 +7,7 @@ final class PackImporterTests: PackDatabaseTestCase {
     private let contentTables = ["idiom", "example", "idiom_scope", "example_idiom", "idiom_fts"]
     private let userTables = [
         "user_example", "user_example_idiom", "mistake", "mistake_idiom",
-        "review_log", "idiom_state", "settings", "exam_scope",
+        "review_log", "idiom_state", "settings", "exam_scope"
     ]
 
     func testPublishedCountsDigestSearchAndIdempotency() throws {
