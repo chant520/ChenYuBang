@@ -1,20 +1,21 @@
 import Foundation
 import GRDB
 
+private struct BackupInsertedCounts {
+    var mistakes = 0
+    var userExamples = 0
+    var reviews = 0
+    var idiomStates = 0
+    var scopes = 0
+}
+
 enum BackupImportWriter {
-    private struct InsertedCounts {
-        var mistakes = 0
-        var userExamples = 0
-        var reviews = 0
-        var idiomStates = 0
-        var scopes = 0
-    }
 
     static func merge(_ payload: BackupDataPayload, db: Database) throws -> BackupImportSummary {
         var resolvedPayload = payload
         var report = BackupOrphanReport(skippedMistakes: 0, missingMistakeIdioms: 0,
                                         missingExampleIdioms: 0, skippedReviews: 0)
-        var inserted = InsertedCounts()
+        var inserted = BackupInsertedCounts()
         try db.inTransaction {
             let resolved = try BackupOrphans.resolve(payload, db: db, includeLocalUserReferences: true)
             resolvedPayload = resolved.payload
@@ -63,7 +64,7 @@ enum BackupImportWriter {
     }
 
     private static func summary(_ mode: BackupImportMode, _ payload: BackupDataPayload,
-                                inserted: InsertedCounts? = nil, automaticBackup: URL? = nil,
+                                inserted: BackupInsertedCounts? = nil, automaticBackup: URL? = nil,
                                 orphans: BackupOrphanReport) -> BackupImportSummary {
         BackupImportSummary(mode: mode,
                             mistakes: inserted?.mistakes ?? payload.mistakes.count,
@@ -76,8 +77,8 @@ enum BackupImportWriter {
     }
 
     private static func insertAll(_ payload: BackupDataPayload, db: Database,
-                                  keepLocalOnConflict: Bool) throws -> InsertedCounts {
-        var inserted = InsertedCounts()
+                                  keepLocalOnConflict: Bool) throws -> BackupInsertedCounts {
+        var inserted = BackupInsertedCounts()
         let conflict = keepLocalOnConflict ? " OR IGNORE" : ""
         let localExamples = keepLocalOnConflict ? try existingIDs(db, "user_example") : []
         let localMistakes = keepLocalOnConflict ? try existingIDs(db, "mistake") : []
