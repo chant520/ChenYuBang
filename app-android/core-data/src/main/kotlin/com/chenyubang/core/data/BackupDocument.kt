@@ -20,7 +20,12 @@ internal object BackupDocument {
                 "reviews" to JsonArray(snapshot.reviews.map { reviewJson(it) }),
                 "idiomStates" to JsonArray(snapshot.idiomStates.map { idiomStateJson(it) }),
                 "scopes" to JsonArray(snapshot.scopes.map { scopeJson(it) }),
-                "tags" to JsonArray(snapshot.tags.map { tagJson(it) }),
+                "tags" to
+                    JsonArray(
+                        snapshot.tags.map { tag ->
+                            JsonObject(linkedMapOf<String, JsonElement>("name" to JsonPrimitive(tag.name)))
+                        },
+                    ),
             ),
         )
 
@@ -154,7 +159,4 @@ internal object BackupDocument {
                 "enabled" to JsonPrimitive(scope.enabled),
             ),
         )
-
-    private fun tagJson(tag: BackupTag): JsonObject =
-        JsonObject(linkedMapOf<String, JsonElement>("name" to JsonPrimitive(tag.name)))
 }

@@ -34,8 +34,9 @@ data class PackVersionState(
     val reason: String? = null,
 ) {
     val canRetry: Boolean
-        get() = status == PackVersionStatus.RECOVERABLE_FAIL ||
-            status == PackVersionStatus.TEST_MOCK
+        get() =
+            status == PackVersionStatus.RECOVERABLE_FAIL ||
+                status == PackVersionStatus.TEST_MOCK
 }
 
 /** mock 条数取 shared/fixtures 样例实际数（3 成语 / 2 真题），不冒充真实题库。 */
@@ -116,8 +117,7 @@ class PackVersion(
     private fun recoverable(
         base: PackVersionState?,
         reason: String,
-    ): PackVersionState =
-        base?.copy(status = PackVersionStatus.RECOVERABLE_FAIL, reason = reason) ?: mockState()
+    ): PackVersionState = base?.copy(status = PackVersionStatus.RECOVERABLE_FAIL, reason = reason) ?: mockState()
 
     private fun remoteState(
         remote: ValidatedPack,

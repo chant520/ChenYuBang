@@ -36,12 +36,16 @@ class HttpPackUpdateSource(
     private val connectTimeoutMs: Int = 10_000,
     private val readTimeoutMs: Int = 30_000,
 ) : PackUpdateSource {
-    override suspend fun fetch(url: String?): PackUpdateFetch {
-        if (url.isNullOrBlank()) return PackUpdateFetch.Unavailable
-        if (!url.startsWith("https://", ignoreCase = true)) {
-            return PackUpdateFetch.Recoverable("题库更新仅支持 HTTPS 地址")
+    override suspend fun fetch(url: String?): PackUpdateFetch =
+        when {
+            url.isNullOrBlank() -> PackUpdateFetch.Unavailable
+            !url.startsWith("https://", ignoreCase = true) ->
+                PackUpdateFetch.Recoverable("题库更新仅支持 HTTPS 地址")
+            else -> download(url)
         }
-        return withContext(Dispatchers.IO) {
+
+    private suspend fun download(url: String): PackUpdateFetch =
+        withContext(Dispatchers.IO) {
             var connection: HttpURLConnection? = null
             try {
                 connection =
@@ -57,12 +61,11 @@ class HttpPackUpdateSource(
                 }
                 PackUpdateFetch.Success(readBounded(connection.inputStream, MAX_DOWNLOAD_BYTES))
             } catch (error: IOException) {
-                PackUpdateFetch.Recoverable("题库下载中断")
+                PackUpdateFetch.Recoverable("题库下载中断：${error.message ?: error.javaClass.simpleName}")
             } finally {
                 connection?.disconnect()
             }
         }
-    }
 
     private fun readBounded(
         input: InputStream,

@@ -10,7 +10,6 @@ import com.chenyubang.feature.capture.P20FormDeps
 import com.chenyubang.feature.capture.P20FormScreen
 import com.chenyubang.feature.capture.P21DoneScreen
 import com.chenyubang.feature.me.P15BackupRoute
-import com.chenyubang.feature.me.P15BackupViewModel
 import com.chenyubang.feature.me.P16PackRoute
 
 /** 按当前路由渲染目标页；P04/P05 的返回与跳转与其余路由同口径。 */
@@ -19,10 +18,10 @@ internal fun RouteContent(
     entry: RouteEntry,
     router: RouterState,
     deps: RouteDeps,
-    backupVm: P15BackupViewModel,
     onRoute: (RouterState) -> Unit,
     back: () -> Unit,
 ) {
+    val backupVm = requireNotNull(deps.backupVm)
     when (entry.route) {
         Route.Scope ->
             ScopeDestination(

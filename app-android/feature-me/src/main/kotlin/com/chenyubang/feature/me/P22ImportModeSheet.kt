@@ -48,51 +48,18 @@ fun P22ImportModeSheet(
             lineHeight = (Tokens.Font.n12 * DESC_LINE_HEIGHT).sp,
         )
 
-        CCard(
-            soft = true,
-            modifier = Modifier.clickable { vm.confirmImport(ImportMode.OVERWRITE, onFinished) },
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = "覆盖",
-                    color = colors.head,
-                    fontSize = Tokens.Font.n13.sp,
-                    fontWeight = FontWeight.W700,
-                )
-                Spacer(Modifier.size(Tokens.Space.chkGap.dp))
-                CBadge("会丢现有数据", CBadgeKind.Error)
-            }
-            Spacer(Modifier.size(Tokens.Space.lsubTop.dp))
-            Text(
-                text = "用备份文件替换本机现有记录。本机现在的错题、收藏、学习状态都会被清掉，之后无法找回。",
-                color = colors.text2,
-                fontSize = Tokens.Font.n13.sp,
-                lineHeight = (Tokens.Font.n13 * DESC_LINE_HEIGHT).sp,
-            )
-        }
-
-        CCard(
-            soft = true,
-            modifier = Modifier.clickable { vm.confirmImport(ImportMode.MERGE, onFinished) },
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = "合并",
-                    color = colors.head,
-                    fontSize = Tokens.Font.n13.sp,
-                    fontWeight = FontWeight.W700,
-                )
-                Spacer(Modifier.size(Tokens.Space.chkGap.dp))
-                CTag("保留本机")
-            }
-            Spacer(Modifier.size(Tokens.Space.lsubTop.dp))
-            Text(
-                text = "把文件里的记录并入本机，同一道题以本机记录为准，重复的不会叠加。",
-                color = colors.text2,
-                fontSize = Tokens.Font.n13.sp,
-                lineHeight = (Tokens.Font.n13 * DESC_LINE_HEIGHT).sp,
-            )
-        }
+        ModeCard(
+            title = "覆盖",
+            description = "用备份文件替换本机现有记录。本机现在的错题、收藏、学习状态都会被清掉，之后无法找回。",
+            marker = { CBadge("会丢现有数据", CBadgeKind.Error) },
+            onClick = { vm.confirmImport(ImportMode.OVERWRITE, onFinished) },
+        )
+        ModeCard(
+            title = "合并",
+            description = "把文件里的记录并入本机，同一道题以本机记录为准，重复的不会叠加。",
+            marker = { CTag("保留本机") },
+            onClick = { vm.confirmImport(ImportMode.MERGE, onFinished) },
+        )
 
         CButton(
             text = "取消",
@@ -101,6 +68,35 @@ fun P22ImportModeSheet(
                 onFinished(false)
             },
             variant = CButtonVariant.Ghost,
+        )
+    }
+}
+
+@Composable
+private fun ModeCard(
+    title: String,
+    description: String,
+    marker: @Composable () -> Unit,
+    onClick: () -> Unit,
+) {
+    val colors = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
+    CCard(soft = true, modifier = Modifier.clickable(onClick = onClick)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = title,
+                color = colors.head,
+                fontSize = Tokens.Font.n13.sp,
+                fontWeight = FontWeight.W700,
+            )
+            Spacer(Modifier.size(Tokens.Space.chkGap.dp))
+            marker()
+        }
+        Spacer(Modifier.size(Tokens.Space.lsubTop.dp))
+        Text(
+            text = description,
+            color = colors.text2,
+            fontSize = Tokens.Font.n13.sp,
+            lineHeight = (Tokens.Font.n13 * DESC_LINE_HEIGHT).sp,
         )
     }
 }

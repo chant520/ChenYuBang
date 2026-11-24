@@ -6,9 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.chenyubang.core.data.BackupCounts
 import com.chenyubang.core.data.BackupExporter
-import com.chenyubang.core.data.BackupImporter
 import com.chenyubang.core.data.BackupImportResult
-import com.chenyubang.core.data.DataError
+import com.chenyubang.core.data.BackupImporter
 import com.chenyubang.core.data.ImportMode
 import com.chenyubang.core.data.ValidatedBackup
 import kotlinx.coroutines.CancellationException
@@ -23,25 +22,33 @@ import java.io.File
 // ===== 待拍板占位串（视觉契约第 7 节 / 第 6 节第 1、2、3 项；仅替文字，颜色/字号仍走 Tokens）=====
 // 待拍板：P15 导出成功条逐字措辞未出稿，收口轮须替换。
 const val P15_EXPORT_SUCCESS_TITLE_PLACEHOLDER = "备份完成（占位·待拍板）"
+
 // 待拍板：P15 导出失败红硬错误条逐字串未出稿，收口轮须替换。
 const val P15_EXPORT_FAILURE_TITLE_PLACEHOLDER = "导出失败（占位·待拍板）"
+
 // 待拍板：P22 超版 / sha256 不符 / 字段异常硬错误拒绝逐字串未出稿，收口轮须替换。
 const val P22_REJECT_TITLE_PLACEHOLDER = "备份无法读取（占位·待拍板）"
+
 // 待拍板：P15 导入写库失败红硬错误条逐字串未出稿，收口轮须替换。
 const val P15_IMPORT_FAILURE_TITLE_PLACEHOLDER = "导入失败（占位·待拍板）"
+
 // 待拍板：P15 导入完成结果条逐字串未出稿，收口轮须替换。
 const val P15_IMPORT_DONE_TITLE_PLACEHOLDER = "导入完成（占位·待拍板）"
+
 // 待拍板：P15「最近一次备份时间」值位逐字串未出稿，收口轮须替换。
 const val P15_LAST_BACKUP_VALUE_PLACEHOLDER = "暂无备份记录（占位·待拍板）"
 
 /** 待拍板：导出成功条条数格式，开工清单第 36 行只要求「成功给条数」，稿未给模板（视觉契约第 6 节第 1 项）。 */
 fun p15ExportCountsPlaceholder(c: BackupCounts): String =
-    "错题 ${c.mistakes} · 录入题 ${c.userExamples} · 复习 ${c.reviews} · 学习状态 ${c.idiomStates} · 考试范围 ${c.scopes}（占位·待拍板）"
+    "错题 ${c.mistakes} · 录入题 ${c.userExamples} · 复习 ${c.reviews} · " +
+        "学习状态 ${c.idiomStates} · 考试范围 ${c.scopes}（占位·待拍板）"
 
 /** 待拍板：导入完成结果条条数与 orphans / safetyCopy 呈现格式稿未给（视觉契约第 1.2 节未覆盖）。 */
 fun p15ImportDetailPlaceholder(result: BackupImportResult): String {
     val c = result.imported
-    val written = "写入：错题 ${c.mistakes} · 录入题 ${c.userExamples} · 复习 ${c.reviews} · 学习状态 ${c.idiomStates} · 考试范围 ${c.scopes}"
+    val written =
+        "写入：错题 ${c.mistakes} · 录入题 ${c.userExamples} · 复习 ${c.reviews} · " +
+            "学习状态 ${c.idiomStates} · 考试范围 ${c.scopes}"
     val o = result.orphans
     val orphan =
         if (o.isEmpty) {
@@ -100,26 +107,25 @@ class P15BackupViewModel(
     fun exportToUri(uri: Uri) {
         viewModelScope.launch {
             _state.value = _state.value.copy(banner = null)
-            try {
-                val result =
-                    withContext(Dispatchers.IO) {
-                        val out =
-                            appContext.contentResolver.openOutputStream(uri)
-                                ?: error("无法写入所选位置")
-                        try {
-                            exporter.exportTo(out)
-                        } finally {
-                            out.close()
-                        }
+            runCatching {
+                withContext(Dispatchers.IO) {
+                    val out =
+                        appContext.contentResolver.openOutputStream(uri)
+                            ?: error("无法写入所选位置")
+                    try {
+                        exporter.exportTo(out)
+                    } finally {
+                        out.close()
                     }
-                _state.value = _state.value.copy(banner = P15Banner.Exported(result.counts, result.fileName))
-            } catch (cancelled: CancellationException) {
-                throw cancelled
-            } catch (error: Exception) {
+                }
+            }.onFailure { error ->
+                if (error is CancellationException) throw error
                 _state.value =
                     _state.value.copy(
                         banner = P15Banner.HardError(P15_EXPORT_FAILURE_TITLE_PLACEHOLDER, error.message.orEmpty()),
                     )
+            }.onSuccess { result ->
+                _state.value = _state.value.copy(banner = P15Banner.Exported(result.counts, result.fileName))
             }
         }
     }
@@ -131,21 +137,20 @@ class P15BackupViewModel(
     ) {
         viewModelScope.launch {
             _state.value = _state.value.copy(banner = null)
-            try {
-                val result =
-                    withContext(Dispatchers.IO) {
-                        if (!directory.exists()) directory.mkdirs()
-                        exporter.exportToFile(directory)
-                    }
-                _state.value = _state.value.copy(banner = P15Banner.Exported(result.counts, result.fileName))
-                result.file?.let(onFileReady)
-            } catch (cancelled: CancellationException) {
-                throw cancelled
-            } catch (error: Exception) {
+            runCatching {
+                withContext(Dispatchers.IO) {
+                    if (!directory.exists()) directory.mkdirs()
+                    exporter.exportToFile(directory)
+                }
+            }.onFailure { error ->
+                if (error is CancellationException) throw error
                 _state.value =
                     _state.value.copy(
                         banner = P15Banner.HardError(P15_EXPORT_FAILURE_TITLE_PLACEHOLDER, error.message.orEmpty()),
                     )
+            }.onSuccess { result ->
+                _state.value = _state.value.copy(banner = P15Banner.Exported(result.counts, result.fileName))
+                result.file?.let(onFileReady)
             }
         }
     }
@@ -160,32 +165,26 @@ class P15BackupViewModel(
     ) {
         viewModelScope.launch {
             _state.value = _state.value.copy(banner = null, pendingBackup = null)
-            try {
-                val backup =
-                    withContext(Dispatchers.IO) {
-                        val input =
-                            appContext.contentResolver.openInputStream(uri)
-                                ?: error("无法读取所选文件")
-                        try {
-                            importer.validate(input)
-                        } finally {
-                            input.close()
-                        }
+            runCatching {
+                withContext(Dispatchers.IO) {
+                    val input =
+                        appContext.contentResolver.openInputStream(uri)
+                            ?: error("无法读取所选文件")
+                    try {
+                        importer.validate(input)
+                    } finally {
+                        input.close()
                     }
-                _state.value = _state.value.copy(pendingBackup = backup)
-                onValidated()
-            } catch (cancelled: CancellationException) {
-                throw cancelled
-            } catch (hard: DataError.Hard) {
-                _state.value =
-                    _state.value.copy(
-                        banner = P15Banner.HardError(P22_REJECT_TITLE_PLACEHOLDER, hard.message.orEmpty()),
-                    )
-            } catch (error: Exception) {
+                }
+            }.onFailure { error ->
+                if (error is CancellationException) throw error
                 _state.value =
                     _state.value.copy(
                         banner = P15Banner.HardError(P22_REJECT_TITLE_PLACEHOLDER, error.message.orEmpty()),
                     )
+            }.onSuccess { backup ->
+                _state.value = _state.value.copy(pendingBackup = backup)
+                onValidated()
             }
         }
     }
@@ -197,24 +196,24 @@ class P15BackupViewModel(
     ) {
         val backup = _state.value.pendingBackup ?: return
         viewModelScope.launch {
-            try {
-                val result = importer.restore(backup, mode)
-                _state.value =
-                    _state.value.copy(
-                        banner = P15Banner.Imported(result),
-                        pendingBackup = null,
-                    )
-                onFinished(true)
-            } catch (cancelled: CancellationException) {
-                throw cancelled
-            } catch (error: Exception) {
-                _state.value =
-                    _state.value.copy(
-                        banner = P15Banner.HardError(P15_IMPORT_FAILURE_TITLE_PLACEHOLDER, error.message.orEmpty()),
-                        pendingBackup = null,
-                    )
-                onFinished(false)
-            }
+            runCatching { importer.restore(backup, mode) }
+                .onFailure { error ->
+                    if (error is CancellationException) throw error
+                    _state.value =
+                        _state.value.copy(
+                            banner = P15Banner.HardError(P15_IMPORT_FAILURE_TITLE_PLACEHOLDER, error.message.orEmpty()),
+                            pendingBackup = null,
+                        )
+                    onFinished(false)
+                }
+                .onSuccess { result ->
+                    _state.value =
+                        _state.value.copy(
+                            banner = P15Banner.Imported(result),
+                            pendingBackup = null,
+                        )
+                    onFinished(true)
+                }
         }
     }
 

@@ -40,6 +40,7 @@ import com.chenyubang.core.ui.tokens.Tokens
 
 // 待拍板：P16 更新中 / 下载中带进度逐字串未出稿（视觉契约第 6 节第 4 项）；「正在保存…」是保存串，禁止挪用。
 const val P16_CHECKING_PLACEHOLDER = "题库检查中（占位·待拍板）"
+
 // 待拍板：P16 远端更新已落地的独立成功串未出稿（视觉契约第 6 节第 5 项）；「已是最新版本」只用于版本相等。
 const val P16_UPDATE_OK_PLACEHOLDER = "题库已更新（占位·待拍板）"
 
@@ -92,7 +93,7 @@ private fun RealVersionBlock(state: PackVersionState) {
     )
 
     CLabel("收录说明")
-    Text(text = CountsLine(state.idiomCount, state.exampleCount), color = colors.text2, fontSize = Tokens.Font.n13.sp)
+    Text(text = countsLine(state.idiomCount, state.exampleCount), color = colors.text2, fontSize = Tokens.Font.n13.sp)
     Text(
         text = "覆盖国考 / 省考 / 事业编，按范围筛选后可用的条数会随之变化。",
         color = colors.text2,
@@ -119,7 +120,7 @@ private fun MockVersionBlock(state: PackVersionState) {
         lineHeight = Tokens.Font.n30.sp,
     )
     Text(
-        text = CountsLine(state.mockIdiomCount, state.mockExampleCount),
+        text = countsLine(state.mockIdiomCount, state.mockExampleCount),
         color = colors.text2,
         fontSize = Tokens.Font.n13.sp,
     )
@@ -141,33 +142,7 @@ private fun UpdateArea(
             CButton(text = P16_CHECKING_PLACEHOLDER, onClick = {}, loading = true)
             CheckNote()
         }
-        PackVersionStatus.RECOVERABLE_FAIL -> {
-            CBar(
-                kind = CBarKind.Warn,
-                title = "检查失败，请检查网络后重试",
-                subtitle = "当前版本号不变，仍是 ${state.version}；题库本身可离线继续用。",
-            )
-            CButton(text = "重试", onClick = onCheck)
-            Text(
-                text = "失败不影响本机学习记录",
-                color = colors.text3,
-                fontSize = Tokens.Font.n115.sp,
-            )
-            CCard(soft = true) {
-                CLabel("重试前可以确认")
-                Text(
-                    text = "是否连上了网络；下载中断时，重新点一次通常就能接上。",
-                    color = colors.text2,
-                    fontSize = Tokens.Font.n13.sp,
-                    lineHeight = (Tokens.Font.n13 * NOTE_LINE_HEIGHT).sp,
-                )
-                Text(
-                    text = "只下载题库增量包，不改动错题、收藏与学习状态。",
-                    color = colors.text3,
-                    fontSize = Tokens.Font.n115.sp,
-                )
-            }
-        }
+        PackVersionStatus.RECOVERABLE_FAIL -> RecoverableArea(state, onCheck)
         PackVersionStatus.UPDATE_OK -> {
             CLabel("更新状态")
             CTag(P16_UPDATE_OK_PLACEHOLDER)
@@ -211,6 +186,39 @@ private fun UpdateArea(
 }
 
 @Composable
+private fun RecoverableArea(
+    state: PackVersionState,
+    onCheck: () -> Unit,
+) {
+    val colors = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
+    CBar(
+        kind = CBarKind.Warn,
+        title = "检查失败，请检查网络后重试",
+        subtitle = "当前版本号不变，仍是 ${state.version}；题库本身可离线继续用。",
+    )
+    CButton(text = "重试", onClick = onCheck)
+    Text(
+        text = "失败不影响本机学习记录",
+        color = colors.text3,
+        fontSize = Tokens.Font.n115.sp,
+    )
+    CCard(soft = true) {
+        CLabel("重试前可以确认")
+        Text(
+            text = "是否连上了网络；下载中断时，重新点一次通常就能接上。",
+            color = colors.text2,
+            fontSize = Tokens.Font.n13.sp,
+            lineHeight = (Tokens.Font.n13 * NOTE_LINE_HEIGHT).sp,
+        )
+        Text(
+            text = "只下载题库增量包，不改动错题、收藏与学习状态。",
+            color = colors.text3,
+            fontSize = Tokens.Font.n115.sp,
+        )
+    }
+}
+
+@Composable
 private fun CheckNote() {
     val colors = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
     Text(
@@ -221,7 +229,7 @@ private fun CheckNote() {
 }
 
 /** 「成语 N 条 · 真题 M 条」，数字按稿面 <b> 加粗。 */
-private fun CountsLine(
+private fun countsLine(
     idioms: Int,
     examples: Int,
 ): AnnotatedString =

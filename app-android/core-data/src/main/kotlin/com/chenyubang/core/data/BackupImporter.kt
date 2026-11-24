@@ -7,6 +7,7 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
+import java.io.IOException
 import java.io.InputStream
 
 /**
@@ -23,19 +24,31 @@ class BackupImporter(
 
     /** 只读校验，不碰数据库；返回可安全导入的 ValidatedBackup。 */
     fun validate(input: InputStream): ValidatedBackup {
-        val files =
-            try {
-                BackupArchive.read(input)
-            } catch (error: Exception) {
-                throw DataError.Hard("备份文件损坏或 ZIP 条目异常", error)
+        val files = guarded("备份文件损坏或 ZIP 条目异常") { BackupArchive.read(input) }
+        return guarded("备份文件字段异常或校验失败") { verify(files) }
+    }
+
+    /** 把解析/校验的已知异常统一包装为硬错误；硬错误本身原样透传。 */
+    private inline fun <T> guarded(
+        message: String,
+        block: () -> T,
+    ): T {
+        val outcome = runCatching(block)
+        val failure = outcome.exceptionOrNull()
+        if (failure == null) return outcome.getOrThrow()
+        val error =
+            if (failure is DataError.Hard) {
+                failure
+            } else if (
+                failure is IOException ||
+                failure is IllegalArgumentException ||
+                failure is IllegalStateException
+            ) {
+                DataError.Hard(message, failure)
+            } else {
+                failure
             }
-        return try {
-            verify(files)
-        } catch (error: DataError.Hard) {
-            throw error
-        } catch (error: Exception) {
-            throw DataError.Hard("备份文件字段异常或校验失败", error)
-        }
+        throw error
     }
 
     /** 按 P22 选择写入：覆盖会先留安全副本，合并按 id / 业务键保留本机。全程离线。 */
@@ -53,7 +66,9 @@ class BackupImporter(
                         } else {
                             BackupWriter.merge(database, backup)
                         }
-                    } catch (error: Exception) {
+                    } catch (error: android.database.SQLException) {
+                        throw DataError.Hard("导入写库失败，已回滚；请用自动留存的备份副本恢复", error)
+                    } catch (error: IllegalStateException) {
                         throw DataError.Hard("导入写库失败，已回滚；请用自动留存的备份副本恢复", error)
                     }
                 BackupImportResult(mode, written.counts, written.report, safety)
@@ -81,13 +96,17 @@ class BackupImporter(
         val manifest = BackupSchema.validateManifest(PackJson.parse(files.getValue(BackupSpec.MANIFEST)))
         val data = BackupSchema.validateData(PackJson.parse(files.getValue(BackupSpec.DATA)))
         val version = manifest.integer("schemaVersion")
-        if (version > BackupSpec.SCHEMA_VERSION) {
-            throw DataError.Hard("备份版本 $version 高于当前支持的 ${BackupSpec.SCHEMA_VERSION}，无法安全读取")
-        }
         val sha = manifest.string("sha256")
-        if (sha != BackupDocument.sha256(data)) throw DataError.Hard("备份 sha256 重算不符，文件已损坏或被改动")
         val declared = BackupDocument.declaredCounts(manifest)
-        if (declared != BackupDocument.counts(data)) throw DataError.Hard("备份 counts 与实际条数不符")
+        val mismatch =
+            when {
+                version > BackupSpec.SCHEMA_VERSION ->
+                    "备份版本 $version 高于当前支持的 ${BackupSpec.SCHEMA_VERSION}，无法安全读取"
+                sha != BackupDocument.sha256(data) -> "备份 sha256 重算不符，文件已损坏或被改动"
+                declared != BackupDocument.counts(data) -> "备份 counts 与实际条数不符"
+                else -> null
+            }
+        if (mismatch != null) throw DataError.Hard(mismatch)
         return ValidatedBackup(
             version,
             manifest.string("appVersion"),

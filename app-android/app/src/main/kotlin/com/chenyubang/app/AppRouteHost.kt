@@ -52,7 +52,6 @@ import com.chenyubang.core.ui.CChromeIcon
 import com.chenyubang.core.ui.CFab
 import com.chenyubang.core.ui.CInput
 import com.chenyubang.core.ui.tokens.Tokens
-import com.chenyubang.feature.me.ExamScopeSaver
 import com.chenyubang.feature.me.P15BackupViewModel
 import com.chenyubang.feature.me.P22ImportModeSheet
 import com.chenyubang.feature.me.P23ClearDialogRoute
@@ -97,11 +96,7 @@ fun AppRouteHost(database: AppDatabase) {
         return
     }
     val pack = requireNotNull(currentPack)
-    val saver =
-        ExamScopeSaver { scope, complete ->
-            scopeStore.save(scope, complete = complete)
-            importer.refreshScopeLinks(pack)
-        }
+    val saver = makeScopeSaver(scopeStore, importer, pack)
     if (!loaded.complete) {
         FirstLaunchGate(loaded.scope, availableProvinces, saver) {
             preferences = LaunchPreferences(true, it)
@@ -160,7 +155,7 @@ private fun RouterShell(deps: RouteDeps) {
             Box(Modifier.weight(1f)) {
                 val entry = router.current
                 holder.SaveableStateProvider("${router.tab.name}:${entry.instance}") {
-                    RouteContent(entry, router, deps, backupVm, { router = it }, back)
+                    RouteContent(entry, router, deps.copy(backupVm = backupVm), { router = it }, back)
                 }
             }
             if (router.showTabs) {

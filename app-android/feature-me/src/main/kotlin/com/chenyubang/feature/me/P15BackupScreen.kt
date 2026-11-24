@@ -26,10 +26,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
-import com.chenyubang.core.ui.CBar
-import com.chenyubang.core.ui.CBarKind
 import com.chenyubang.core.ui.CBadge
 import com.chenyubang.core.ui.CBadgeKind
+import com.chenyubang.core.ui.CBar
+import com.chenyubang.core.ui.CBarKind
 import com.chenyubang.core.ui.CCard
 import com.chenyubang.core.ui.CChromeGlyph
 import com.chenyubang.core.ui.CChromeIcon
@@ -71,39 +71,11 @@ fun P15BackupRoute(
             .padding(horizontal = Tokens.Space.pageX.dp, vertical = Tokens.Space.contentTop.dp),
         verticalArrangement = Arrangement.spacedBy(Tokens.Space.block.dp),
     ) {
-        CCard {
-            CLabel("导出备份")
-            Spacer(Modifier.size(Tokens.Space.lsubTop.dp))
-            Text(
-                text = "导出的内容：错题、收藏、学习状态。不含题库本身。",
-                color = colors.text2,
-                fontSize = Tokens.Font.n13.sp,
-                lineHeight = (Tokens.Font.n13 * TEXT_LINE_HEIGHT).sp,
-            )
-            Spacer(Modifier.size(Tokens.Space.lmetaTop.dp))
-            CList {
-                ActionRow("存到手机本地") { createLocal.launch("backup.zip") }
-                ActionRow("通过系统文件 / 分享面板另存到网盘", showDivider = false) {
-                    vm.exportToFile(shareDir) { file -> launchSystemShare(context, file) }
-                }
-            }
-        }
-
-        CCard {
-            CLabel("导入备份")
-            Spacer(Modifier.size(Tokens.Space.lsubTop.dp))
-            Text(
-                text = "读入前会先问你：覆盖还是合并（见 P22）。",
-                color = colors.text2,
-                fontSize = Tokens.Font.n13.sp,
-                lineHeight = (Tokens.Font.n13 * TEXT_LINE_HEIGHT).sp,
-            )
-            Spacer(Modifier.size(Tokens.Space.lmetaTop.dp))
-            CList {
-                ActionRow("从手机本地选文件") { openImport.launch(IMPORT_MIME) }
-                ActionRow("从网盘选文件", showDivider = false) { openImport.launch(IMPORT_MIME) }
-            }
-        }
+        ExportCard(
+            onLocal = { createLocal.launch("backup.zip") },
+            onShare = { vm.exportToFile(shareDir) { file -> launchSystemShare(context, file) } },
+        )
+        ImportCard(onPick = { openImport.launch(IMPORT_MIME) })
 
         CCard(soft = true) {
             CLabel("最近一次备份时间")
@@ -126,6 +98,49 @@ fun P15BackupRoute(
             lineHeight = (Tokens.Font.n115 * TEXT_LINE_HEIGHT).sp,
         )
         Spacer(Modifier.size(Tokens.Space.fabBottom.dp))
+    }
+}
+
+@Composable
+private fun ExportCard(
+    onLocal: () -> Unit,
+    onShare: () -> Unit,
+) {
+    val colors = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
+    CCard {
+        CLabel("导出备份")
+        Spacer(Modifier.size(Tokens.Space.lsubTop.dp))
+        Text(
+            text = "导出的内容：错题、收藏、学习状态。不含题库本身。",
+            color = colors.text2,
+            fontSize = Tokens.Font.n13.sp,
+            lineHeight = (Tokens.Font.n13 * TEXT_LINE_HEIGHT).sp,
+        )
+        Spacer(Modifier.size(Tokens.Space.lmetaTop.dp))
+        CList {
+            ActionRow("存到手机本地", onClick = onLocal)
+            ActionRow("通过系统文件 / 分享面板另存到网盘", showDivider = false, onClick = onShare)
+        }
+    }
+}
+
+@Composable
+private fun ImportCard(onPick: () -> Unit) {
+    val colors = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
+    CCard {
+        CLabel("导入备份")
+        Spacer(Modifier.size(Tokens.Space.lsubTop.dp))
+        Text(
+            text = "读入前会先问你：覆盖还是合并（见 P22）。",
+            color = colors.text2,
+            fontSize = Tokens.Font.n13.sp,
+            lineHeight = (Tokens.Font.n13 * TEXT_LINE_HEIGHT).sp,
+        )
+        Spacer(Modifier.size(Tokens.Space.lmetaTop.dp))
+        CList {
+            ActionRow("从手机本地选文件", onClick = onPick)
+            ActionRow("从网盘选文件", showDivider = false, onClick = onPick)
+        }
     }
 }
 
