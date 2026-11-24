@@ -7,6 +7,7 @@ import kotlinx.coroutines.withContext
 private const val VERSION_PARTS = 3
 private const val MOCK_IDIOMS = 3
 private const val MOCK_EXAMPLES = 2
+private const val PROGRESS_MAX = 100
 
 /** P16 更新状态；同一时刻只取一个值，CHECKING 不改动已展示的版本与条数。 */
 enum class PackVersionStatus {
@@ -84,7 +85,11 @@ class PackVersion(
     fun downloading(
         current: PackVersionState,
         progress: Int,
-    ): PackVersionState = current.copy(status = PackVersionStatus.DOWNLOADING, progress = progress.coerceIn(0, 100))
+    ): PackVersionState =
+        current.copy(
+            status = PackVersionStatus.DOWNLOADING,
+            progress = progress.coerceIn(0, PROGRESS_MAX),
+        )
 
     /**
      * E18「继续离线使用」：回到当前内置包离线态，仅换 status/reason/progress；
