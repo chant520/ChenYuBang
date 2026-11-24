@@ -37,20 +37,17 @@ public final class UserDataCleaner: @unchecked Sendable {
         let clearedAt = Date()
         do {
             try queue.write { db in
-                try db.inTransaction {
-                    try db.execute(sql: "DELETE FROM review_log")
-                    try db.execute(sql: "DELETE FROM user_example_idiom")
-                    try db.execute(sql: "DELETE FROM mistake_idiom")
-                    try db.execute(sql: "DELETE FROM user_example")
-                    try db.execute(sql: "DELETE FROM mistake")
-                    try db.execute(sql: "DELETE FROM idiom_state")
-                    let stamp = Backup.stamp(clearedAt)
-                    try db.execute(
-                        sql: "INSERT OR REPLACE INTO settings(key, value) VALUES (?, ?)",
-                        arguments: ["lastClearedAt", stamp]
-                    )
-                    return .commit
-                }
+                try db.execute(sql: "DELETE FROM review_log")
+                try db.execute(sql: "DELETE FROM user_example_idiom")
+                try db.execute(sql: "DELETE FROM mistake_idiom")
+                try db.execute(sql: "DELETE FROM user_example")
+                try db.execute(sql: "DELETE FROM mistake")
+                try db.execute(sql: "DELETE FROM idiom_state")
+                let stamp = Backup.stamp(clearedAt)
+                try db.execute(
+                    sql: "INSERT OR REPLACE INTO settings(key, value) VALUES (?, ?)",
+                    arguments: ["lastClearedAt", stamp]
+                )
             }
         } catch {
             throw ClearDataError.database(String(describing: error))

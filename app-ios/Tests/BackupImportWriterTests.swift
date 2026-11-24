@@ -42,8 +42,10 @@ final class BackupImportWriterTests: PackDatabaseTestCase {
         XCTAssertEqual(try snapshot(BackupWriterFixture.userTables), merged, "merge must be idempotent")
         XCTAssertEqual(try snapshot(BackupWriterFixture.contentTables), contentBefore)
         let settingsAfter = try snapshot(["settings"])
-        XCTAssertEqual(settingsAfter.filter { $0.key != ExamScopeStore.provincesKey },
-                       settingsBefore.filter { $0.key != ExamScopeStore.provincesKey })
+        let stableSettings = { (values: [String: [Row]]) in
+            values.mapValues { rows in rows.filter { ($0["key"] as String) != ExamScopeStore.provincesKey } }
+        }
+        XCTAssertEqual(stableSettings(settingsAfter), stableSettings(settingsBefore))
         let provinceJSON = try XCTUnwrap(queue.read { db in
             try String.fetchOne(db, sql: "SELECT value FROM settings WHERE key = ?",
                                 arguments: [ExamScopeStore.provincesKey])

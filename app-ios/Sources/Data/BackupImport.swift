@@ -193,7 +193,7 @@ enum BackupImport {
             try BackupSchema.manifest.check(manifestJSON, path: "manifest")
             try BackupSchema.data.check(dataJSON, path: "data")
         } catch {
-            throw BackupError.format("备份字段不符合共享 schema：\(error.localizedDescription)")
+            throw BackupError.format("备份字段不符合共享 schema：\(error)")
         }
         let manifest = try decode(BackupManifestPayload.self, manifestJSON, "manifest.json")
         let payload = try decode(BackupDataPayload.self, dataJSON, "data.json")
@@ -219,7 +219,7 @@ enum BackupImport {
         do {
             return try reader.read()
         } catch {
-            throw BackupError.format("\(name) 不是合法 JSON：\(error.localizedDescription)")
+            throw BackupError.format("\(name) 不是合法 JSON：\(error)")
         }
     }
 

@@ -62,7 +62,7 @@ enum Backup {
         do {
             try BackupSchema.data.check(payload, path: "data")
         } catch {
-            throw BackupError.format("本机数据不符合备份格式：\(error.localizedDescription)")
+            throw BackupError.format("本机数据不符合备份格式：\(error)")
         }
         let dataText = PackCanonical.text(payload)
         let digest = digest(of: dataText)
