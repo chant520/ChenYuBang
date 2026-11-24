@@ -57,9 +57,9 @@ final class Phase4SnapshotTests: XCTestCase {
             onStart: { true },
             onFinish: { _ in }
         )
-        let view = COverlay(style: .sheet, title: "读入这份备份，用哪种方式", onDismiss: {}) {
+        let view = COverlay(style: .sheet, title: "读入这份备份，用哪种方式", onDismiss: {}, content: {
             content
-        }
+        })
         .environment(\.colorScheme, dark ? .dark : .light)
         assertSnapshot(of: view, as: .image(layout: .fixed(width: 390, height: 844)),
                        file: file, testName: testName, line: line)
@@ -75,9 +75,9 @@ final class Phase4SnapshotTests: XCTestCase {
             onStart: { true },
             onFinish: { _ in }
         )
-        let view = COverlay(style: .dialog, title: "清空全部学习数据", onDismiss: {}) {
+        let view = COverlay(style: .dialog, title: "清空全部学习数据", onDismiss: {}, content: {
             content
-        }
+        })
         .environment(\.colorScheme, dark ? .dark : .light)
         assertSnapshot(of: view, as: .image(layout: .fixed(width: 390, height: 844)),
                        file: file, testName: testName, line: line)

@@ -119,12 +119,11 @@ enum BackupImportWriter {
             try execute(db, "INSERT\(conflict) INTO idiom_state(idiomId, status, favorite) VALUES (?, ?, ?)",
                         [state.idiomId, state.status, state.favorite])
         }
-        let insertedProvinces = try insertScopes(payload.scopes, db: db, keepLocalOnConflict: keepLocalOnConflict)
-        if keepLocalOnConflict { try mergeProvinceCache(insertedProvinces, db: db) }
+        try insertScopes(payload.scopes, db: db, keepLocalOnConflict: keepLocalOnConflict)
     }
 
     private static func insertScopes(_ scopes: [BackupScopePayload], db: Database,
-                                     keepLocalOnConflict: Bool) throws -> Set<String> {
+                                     keepLocalOnConflict: Bool) throws {
         var keys = Set<String>()
         if keepLocalOnConflict {
             let rows = try Row.fetchAll(db, sql: "SELECT type, province FROM exam_scope")
@@ -141,7 +140,7 @@ enum BackupImportWriter {
             }
             keys.insert(key)
         }
-        return insertedProvinces
+        if keepLocalOnConflict { try mergeProvinceCache(insertedProvinces, db: db) }
     }
 
     private static func mergeProvinceCache(_ inserted: Set<String>, db: Database) throws {
