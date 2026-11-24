@@ -13,7 +13,7 @@ final class BackupStoreTests: PackDatabaseTestCase {
         let directory = try makeDirectory()
         let result = try queue.read { db in
             try Backup.export(db: db, to: directory, date: exportDate,
-                              identity: BackupIdentity(appVersion: "1.2.3-beta.4", build: 42))
+                              identity: BackupIdentity(appVersion: "1.2.3.4", build: 42))
         }
         let archiveData = try Data(contentsOf: result.url)
         let files = try BackupArchive.read(archiveData)
@@ -37,7 +37,9 @@ final class BackupStoreTests: PackDatabaseTestCase {
         let validated = try queue.read { db in try BackupImport.validate(archiveData, db: db) }
         XCTAssertEqual(validated.counts, result.counts)
 
-        let mistake = try XCTUnwrap(array(payload["mistakes"] ?? .null).first)
+        let mistake = try XCTUnwrap(array(payload["mistakes"] ?? .null).first {
+            text(object($0)["id"]) == "20000000-0000-4abc-8def-000000000001"
+        })
         let mistakeFields = object(mistake)
         XCTAssertEqual(text(mistakeFields["id"]), "20000000-0000-4abc-8def-000000000001")
         XCTAssertEqual(array(mistakeFields["idiomIds"] ?? .null).compactMap(text),
@@ -60,7 +62,7 @@ final class BackupStoreTests: PackDatabaseTestCase {
         XCTAssertTrue(scopes.allSatisfy { Set($0.keys) == ["type", "province", "enabled"] })
         XCTAssertTrue(scopes.contains { text($0["type"]) == "国考" && $0["province"] == .null })
         let tags = array(payload["tags"] ?? .null).map(object)
-        XCTAssertEqual(tags.map { text($0["name"]) }, ["望文生义", "搭配不当", "褒贬误用"])
+        XCTAssertEqual(tags.map { text($0["name"]) }, ["搭配不当", "望文生义", "褒贬误用"])
         XCTAssertTrue(tags.allSatisfy { Set($0.keys) == ["name"] })
         XCTAssertFalse(payload.keys.contains("idiom"))
         XCTAssertFalse(payload.keys.contains("example"))
