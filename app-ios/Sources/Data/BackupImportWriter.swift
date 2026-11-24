@@ -151,7 +151,9 @@ enum BackupImportWriter {
     private static func insertIdiomStates(_ states: [BackupIdiomStatePayload], db: Database,
                                           keepLocalOnConflict: Bool) throws -> Int {
         let conflict = keepLocalOnConflict ? " OR IGNORE" : ""
-        var existing = keepLocalOnConflict ? try existingIDs(db, "idiom_state") : []
+        var existing = keepLocalOnConflict
+            ? try Set(try String.fetchAll(db, sql: "SELECT idiomId FROM idiom_state").map { $0.lowercased() })
+            : []
         var inserted = 0
         for state in states {
             guard !existing.contains(state.idiomId) else { continue }
