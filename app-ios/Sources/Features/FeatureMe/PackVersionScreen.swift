@@ -32,7 +32,7 @@ public struct PackVersionScreen: View {
 
                 CCard {
                     CLabel("当前题库版本")
-                    Text("v\(pack.version)")
+                    Text(pack.version)
                         .font(.system(size: Tokens.Font.n30, weight: .bold))
                         .foregroundStyle(colors.head)
                         .padding(.top, Tokens.Space.lmetaTop)
