@@ -4,7 +4,7 @@ enum class RouteOwner { App, Idiom, Example, Mistake, Review, Me, Capture }
 
 enum class Presentation { Root, Push, FullScreen, Sheet, Dialog }
 
-/** 顺序、键和归属严格按开发规范 §3 / §5.1。归属不是 feature 之间的依赖。 */
+/** 顺序、键和归属严格按开发规范第 3 节 / 第 5.1 节。归属不是 feature 之间的依赖。 */
 enum class Route(val key: String, val title: String, val owner: RouteOwner, val presentation: Presentation) {
     Onboarding("onboarding", "考试范围", RouteOwner.App, Presentation.FullScreen),
     Recommend("tab/recommend", "推荐", RouteOwner.Idiom, Presentation.Root),

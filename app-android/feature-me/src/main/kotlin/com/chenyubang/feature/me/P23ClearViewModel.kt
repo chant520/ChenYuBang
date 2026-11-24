@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-// 待拍板：P23 清空失败逐字串稿未给（视觉契约 §4 只覆盖确认主态），收口轮须替换。
+// 待拍板：P23 清空失败逐字串稿未给（视觉契约第 4 节只覆盖确认主态），收口轮须替换。
 const val P23_CLEAR_FAILURE_PLACEHOLDER = "清空未成功（占位·待拍板）"
 
 data class P23ClearUiState(

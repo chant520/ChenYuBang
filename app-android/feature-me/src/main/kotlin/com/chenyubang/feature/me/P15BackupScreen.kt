@@ -40,7 +40,7 @@ import com.chenyubang.core.ui.tokens.Tokens
 import java.io.File
 
 /**
- * P15 备份与恢复（路由 settings/backup）。主态逐字文案见视觉契约 §1.1。
+ * P15 备份与恢复（路由 settings/backup）。主态逐字文案见视觉契约第 1.1 节。
  * 存本地走 SAF CreateDocument → exportTo；另存网盘走 exportToFile(cacheDir/backups) →
  * FileProvider + ACTION_SEND/CHOOSER，不接账号、不写相册、全程零上传。
  */

@@ -23,7 +23,7 @@ import com.chenyubang.core.ui.CTag
 import com.chenyubang.core.ui.tokens.Tokens
 
 /**
- * P22 导入方式（底部 sheet，路由 sheet/import-mode）。逐字文案见视觉契约 §2.1。
+ * P22 导入方式（底部 sheet，路由 sheet/import-mode）。逐字文案见视觉契约第 2.1 节。
  * 覆盖用红徽标「会丢现有数据」、合并用绿标签「保留本机」；取消 / 遮罩不改数据。
  */
 @Composable

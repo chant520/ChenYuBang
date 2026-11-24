@@ -26,7 +26,7 @@ import com.chenyubang.core.ui.COverlay
 import com.chenyubang.core.ui.tokens.Tokens
 
 /**
- * P23 清空数据确认（居中对话框，路由 dialog/clear）。逐字文案见视觉契约 §4。
+ * P23 清空数据确认（居中对话框，路由 dialog/clear）。逐字文案见视觉契约第 4 节。
  * 本页唯一红是「确认清空」红填充按钮；点取消 / 遮罩关闭且数据不动。
  */
 @Composable

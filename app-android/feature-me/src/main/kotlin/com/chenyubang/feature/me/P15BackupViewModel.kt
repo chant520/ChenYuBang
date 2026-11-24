@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
-// ===== 待拍板占位串（视觉契约 §7 / §6-1、§6-2、§6-3；仅替文字，颜色/字号仍走 Tokens）=====
+// ===== 待拍板占位串（视觉契约第 7 节 / 第 6 节第 1、2、3 项；仅替文字，颜色/字号仍走 Tokens）=====
 // 待拍板：P15 导出成功条逐字措辞未出稿，收口轮须替换。
 const val P15_EXPORT_SUCCESS_TITLE_PLACEHOLDER = "备份完成（占位·待拍板）"
 // 待拍板：P15 导出失败红硬错误条逐字串未出稿，收口轮须替换。
@@ -34,11 +34,11 @@ const val P15_IMPORT_DONE_TITLE_PLACEHOLDER = "导入完成（占位·待拍板�
 // 待拍板：P15「最近一次备份时间」值位逐字串未出稿，收口轮须替换。
 const val P15_LAST_BACKUP_VALUE_PLACEHOLDER = "暂无备份记录（占位·待拍板）"
 
-/** 待拍板：导出成功条条数格式，开工清单第 36 行只要求「成功给条数」，稿未给模板（视觉契约 §6-1）。 */
+/** 待拍板：导出成功条条数格式，开工清单第 36 行只要求「成功给条数」，稿未给模板（视觉契约第 6 节第 1 项）。 */
 fun p15ExportCountsPlaceholder(c: BackupCounts): String =
     "错题 ${c.mistakes} · 录入题 ${c.userExamples} · 复习 ${c.reviews} · 学习状态 ${c.idiomStates} · 考试范围 ${c.scopes}（占位·待拍板）"
 
-/** 待拍板：导入完成结果条条数与 orphans / safetyCopy 呈现格式稿未给（视觉契约 §1.2 未覆盖）。 */
+/** 待拍板：导入完成结果条条数与 orphans / safetyCopy 呈现格式稿未给（视觉契约第 1.2 节未覆盖）。 */
 fun p15ImportDetailPlaceholder(result: BackupImportResult): String {
     val c = result.imported
     val written = "写入：错题 ${c.mistakes} · 录入题 ${c.userExamples} · 复习 ${c.reviews} · 学习状态 ${c.idiomStates} · 考试范围 ${c.scopes}"

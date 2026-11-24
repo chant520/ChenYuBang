@@ -38,12 +38,12 @@ import com.chenyubang.core.ui.CLabel
 import com.chenyubang.core.ui.CTag
 import com.chenyubang.core.ui.tokens.Tokens
 
-// 待拍板：P16 更新中 / 下载中带进度逐字串未出稿（视觉契约 §6-4）；「正在保存…」是保存串，禁止挪用。
+// 待拍板：P16 更新中 / 下载中带进度逐字串未出稿（视觉契约第 6 节第 4 项）；「正在保存…」是保存串，禁止挪用。
 const val P16_CHECKING_PLACEHOLDER = "题库检查中（占位·待拍板）"
-// 待拍板：P16 远端更新已落地的独立成功串未出稿（视觉契约 §6-5）；「已是最新版本」只用于版本相等。
+// 待拍板：P16 远端更新已落地的独立成功串未出稿（视觉契约第 6 节第 5 项）；「已是最新版本」只用于版本相等。
 const val P16_UPDATE_OK_PLACEHOLDER = "题库已更新（占位·待拍板）"
 
-/** P16 题库版本与更新（路由 settings/pack）。主态逐字文案见视觉契约 §3.1。 */
+/** P16 题库版本与更新（路由 settings/pack）。主态逐字文案见视觉契约第 3.1 节。 */
 @Composable
 fun P16PackRoute(packVersion: PackVersion) {
     val factory =
@@ -106,7 +106,7 @@ private fun RealVersionBlock(state: PackVersionState) {
     )
 }
 
-/** TEST mock 条数单独显示，不与真实题库条数混写、不冒充真实真题（视觉契约 §3.2）。 */
+/** TEST mock 条数单独显示，不与真实题库条数混写、不冒充真实真题（视觉契约第 3.2 节）。 */
 @Composable
 private fun MockVersionBlock(state: PackVersionState) {
     val colors = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
