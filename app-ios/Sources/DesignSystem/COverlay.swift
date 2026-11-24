@@ -67,12 +67,12 @@ public struct COverlay<Content: View>: View {
             .background(
                 Phase4OverlaySurface(style: style)
                     .fill(colors.surface)
-                    .ignoresSafeArea(edges: style == .sheet ? Edge.Set.bottom : Edge.Set.empty)
+                    .ignoresSafeArea(edges: style == .sheet ? Edge.Set.bottom : ([] as Edge.Set))
             )
             .overlay(
                 Phase4OverlaySurface(style: style)
                     .strokeBorder(colors.line, lineWidth: 1)
-                    .ignoresSafeArea(edges: style == .sheet ? Edge.Set.bottom : Edge.Set.empty)
+                    .ignoresSafeArea(edges: style == .sheet ? Edge.Set.bottom : ([] as Edge.Set))
             )
             .accessibilityElement(children: .contain)
             .accessibilityAction(.escape, onDismiss)
