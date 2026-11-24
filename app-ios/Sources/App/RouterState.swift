@@ -47,7 +47,7 @@ final class RouterState: ObservableObject {
     @Published private(set) var selectedTab: AppTab = .idiom
     @Published private(set) var tabEntries: [AppTab: [RouteEntry]]
     @Published private(set) var fullScreenEntries: [RouteEntry] = []
-    @Published fileprivate(set) var overlay: RouteEntry?
+    @Published internal(set) var overlay: RouteEntry?
     @Published private(set) var reviewSession: ReviewSession?
     @Published private(set) var captureWorkflow: CaptureWorkflow?
     @Published private(set) var needsFirstLaunch: Bool
@@ -55,13 +55,13 @@ final class RouterState: ObservableObject {
     /// 用户内容写入令牌：P10 保存 / 删除后刷新，让常驻挂载的来源页重新读库。
     /// `RetainedRouteStack` 只切透明度、不重建页面，`.task` 不会在返回时重跑（开发规范 §8.1.1「来源页列表刷新」）。
     @Published private(set) var userContentRevision = UUID()
-    @Published fileprivate(set) var pendingBackup: ValidatedBackup?
-    @Published fileprivate(set) var backupImportInProgress = false
-    @Published fileprivate(set) var backupImportResult: String?
-    @Published fileprivate(set) var backupImportError: String?
-    @Published fileprivate(set) var clearInProgress = false
-    @Published fileprivate(set) var clearResult: String?
-    @Published fileprivate(set) var clearError: String?
+    @Published internal(set) var pendingBackup: ValidatedBackup?
+    @Published internal(set) var backupImportInProgress = false
+    @Published internal(set) var backupImportResult: String?
+    @Published internal(set) var backupImportError: String?
+    @Published internal(set) var clearInProgress = false
+    @Published internal(set) var clearResult: String?
+    @Published internal(set) var clearError: String?
     private let onboardingEntry = RouteEntry(route: .onboarding)
     @Published private(set) var suspendedFullScreenEntries: [RouteEntry] = []
 
