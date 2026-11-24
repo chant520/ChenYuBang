@@ -27,7 +27,6 @@ struct PackVersionPresentation: Equatable {
                                 idiomCount: pack.counts.idioms, exampleCount: pack.counts.examples)
     }
 }
-
 @MainActor
 final class PackVersionViewModel: ObservableObject, LibraryRefreshTrigger {
     @Published private(set) var presentation: PackVersionPresentation
@@ -132,8 +131,11 @@ final class PackVersionViewModel: ObservableObject, LibraryRefreshTrigger {
                   pack.counts == manifest.counts else {
                 throw PackChannelError.manifestMismatch
             }
-            let previous = try InstalledPackStorage.load(from: storageDirectory)
-            try InstalledPackStorage.save(data, to: storageDirectory)
+            let previous: Data?
+            do {
+                previous = try InstalledPackStorage.load(from: storageDirectory)
+                try InstalledPackStorage.save(data, to: storageDirectory)
+            } catch { throw PackChannelError.storage }
             do {
                 _ = try importer.importPack(pack)
             } catch {

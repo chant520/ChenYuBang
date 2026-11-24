@@ -246,33 +246,34 @@ public struct LibraryScreen: View {
                 .foregroundColor(colors.text)
     }
 
-    @ViewBuilder
-    private func content(_ colors: TokenColors) some View {
-        if let failure = model.updateFailure {
-            CBar(
-                kind: .warn,
-                title: failure,
-                subtitle: "当前题库仍可离线浏览，版本号不变；可到题库版本页重试。"
-            )
-        }
-        if model.failed {
-            CBar(
-                kind: .warn,
-                title: "成语库读取失败，请重试",
-                subtitle: "内置题库仍可继续浏览；重试只重新读取本机数据。",
-                actionTitle: "重试",
-                onAction: { Task { await model.retry() } }
-            )
-        } else if model.loading {
-            HStack {
-                Spacer(minLength: 0)
-                CSpinner()
-                Spacer(minLength: 0)
+    private func content(_ colors: TokenColors) -> some View {
+        Group {
+            if let failure = model.updateFailure {
+                CBar(
+                    kind: .warn,
+                    title: failure,
+                    subtitle: "当前题库仍可离线浏览，版本号不变；可到题库版本页重试。"
+                )
             }
-        } else if model.page.isEmpty {
-            emptyState
-        } else {
-            idiomList(colors)
+            if model.failed {
+                CBar(
+                    kind: .warn,
+                    title: "成语库读取失败，请重试",
+                    subtitle: "内置题库仍可继续浏览；重试只重新读取本机数据。",
+                    actionTitle: "重试",
+                    onAction: { Task { await model.retry() } }
+                )
+            } else if model.loading {
+                HStack {
+                    Spacer(minLength: 0)
+                    CSpinner()
+                    Spacer(minLength: 0)
+                }
+            } else if model.page.isEmpty {
+                emptyState
+            } else {
+                idiomList(colors)
+            }
         }
     }
 

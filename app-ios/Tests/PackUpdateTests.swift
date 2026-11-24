@@ -247,20 +247,28 @@ final class PackUpdateTests: PackDatabaseTestCase {
     }
 }
 
-@MainActor
-private final class SignalingLibraryReader: IdiomLibraryReading {
+private final class SignalingLibraryReader: IdiomLibraryReading, @unchecked Sendable {
     let loaded = XCTestExpectation(description: "local library read")
-    private(set) var loadCalls = 0
+    private let lock = NSLock()
+    private var storedLoadCalls = 0
     private let items = [
         LibraryIdiom(id: "local", word: "步步为营", pinyin: "bu bu wei ying", initials: "bbwy", frequency: 5)
     ]
+
+    var loadCalls: Int {
+        lock.lock()
+        defer { lock.unlock() }
+        return storedLoadCalls
+    }
 
     init() {
         loaded.assertForOverFulfill = false
     }
 
     func load() throws -> [LibraryIdiom] {
-        loadCalls += 1
+        lock.lock()
+        storedLoadCalls += 1
+        lock.unlock()
         loaded.fulfill()
         return items
     }
