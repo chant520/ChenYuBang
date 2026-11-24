@@ -54,16 +54,28 @@ import com.chenyubang.core.ui.tokens.Tokens
 /** 骨架屏行数：与首屏一屏内可见的列表行数大致对齐，避免加载态跳动。 */
 private const val SKELETON_ROWS = 3
 
-/** P03 路由入口：装配 ViewModel、进页触发一次题库拉取（阶段 1 为空操作）。 */
+data class P03LibraryEntry(
+    val instance: Long,
+    val epoch: Int,
+)
+
+data class P03LibraryActions(
+    val onOpenScope: () -> Unit,
+    val onOpenPack: () -> Unit,
+    val onOpenIdiom: (String) -> Unit,
+)
+
+/** P03 路由入口：真实进入先读本机库，再检查共享题库更新；范围变化只重读本机。 */
 @Composable
 fun P03LibraryRoute(
     scope: ExamScopeSelection,
     database: AppDatabase,
-    onOpenScope: () -> Unit,
-    onOpenIdiom: (String) -> Unit,
+    entry: P03LibraryEntry,
+    refreshTrigger: LibraryRefreshTrigger,
+    actions: P03LibraryActions,
 ) {
     val factory =
-        remember(database) {
+        remember(database, refreshTrigger) {
             viewModelFactory {
                 initializer {
                     P03LibraryViewModel(
@@ -72,22 +84,24 @@ fun P03LibraryRoute(
                                 LibraryIdiom(row.id, row.word, row.pinyin, row.initials, row.frequency)
                             }
                         },
+                        refreshTrigger = refreshTrigger,
                     )
                 }
             }
         }
-    val library: P03LibraryViewModel = viewModel(key = "p03-library", factory = factory)
+    val library: P03LibraryViewModel = viewModel(key = "p03-library-${entry.instance}", factory = factory)
     val state by library.state.collectAsState()
-    // 进页 / 范围变更都重新读取：范围保存后 idiom_scope 已按新范围重建（§4.6）。
-    LaunchedEffect(scope) { library.load(scope) }
+    LaunchedEffect(entry.instance, entry.epoch) { library.enter(scope, entry.epoch) }
+    LaunchedEffect(scope) { library.reload(scope) }
     P03LibraryContent(
         state = state,
         onDimension = library::selectDimension,
         onLetter = library::selectLetter,
         onClearConditions = library::clearConditions,
-        onOpenScope = onOpenScope,
+        onOpenScope = actions.onOpenScope,
         onRetry = library::retry,
-        onOpenIdiom = onOpenIdiom,
+        onOpenPack = actions.onOpenPack,
+        onOpenIdiom = actions.onOpenIdiom,
     )
 }
 
@@ -104,6 +118,7 @@ fun P03LibraryContent(
     onClearConditions: () -> Unit = {},
     onOpenScope: () -> Unit = {},
     onRetry: () -> Unit = {},
+    onOpenPack: () -> Unit = {},
     onOpenIdiom: (String) -> Unit = {},
 ) {
     val colors = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
@@ -114,6 +129,9 @@ fun P03LibraryContent(
             verticalArrangement = Arrangement.spacedBy(Tokens.Space.block.dp),
         ) {
             RangeCard(state, onOpenScope)
+            if (state.updateFailed) {
+                LibraryUpdateFailureBar(onOpenPack)
+            }
             DimensionSwitch(state, onDimension)
             when {
                 state.failed ->
@@ -157,6 +175,17 @@ fun P03LibraryContent(
             }
         }
     }
+}
+
+@Composable
+private fun LibraryUpdateFailureBar(onOpenPack: () -> Unit) {
+    CBar(
+        kind = CBarKind.Warn,
+        title = "题库更新失败，当前题库仍可离线浏览",
+        subtitle = "请到题库版本页手动重试。",
+        actionText = "去题库版本",
+        onAction = onOpenPack,
+    )
 }
 
 @Composable

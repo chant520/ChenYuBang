@@ -43,6 +43,8 @@ data class RouterState(
     val captureDraft: OcrDraft? = null,
     val sequence: Long = 1,
     val rootTopEpoch: Map<AppTab, Int> = AppTab.entries.associateWith { 0 },
+    /** 只标识真实切到主标签根页；P06 据此进页检查，不参与滚动位置保留。 */
+    val tabEntryEpoch: Map<AppTab, Int> = AppTab.entries.associateWith { 0 },
     /** P08 当前视图（分组 / 时间 / 考试类型）；跟着路由一起保存，返回不重置，默认分组。 */
     val mistakesView: MistakeViewMode = MistakeViewMode.ByIdiom,
     /** 用户数据变动计数：保存 / 删除 / 拍照录入成功后自增，来源页据此重新读库。 */
@@ -59,9 +61,13 @@ data class RouterState(
             copy(
                 stacks = stacks + (tab to listOf(stack.first())),
                 rootTopEpoch = rootTopEpoch + (tab to (rootTopEpoch.getValue(tab) + 1)),
+                tabEntryEpoch = tabEntryEpoch + (tab to (tabEntryEpoch.getValue(tab) + 1)),
             )
         } else {
-            copy(tab = target)
+            copy(
+                tab = target,
+                tabEntryEpoch = tabEntryEpoch + (target to (tabEntryEpoch.getValue(target) + 1)),
+            )
         }
     }
 

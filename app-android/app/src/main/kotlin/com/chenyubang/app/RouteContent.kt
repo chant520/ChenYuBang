@@ -34,13 +34,8 @@ internal fun RouteContent(
                 },
                 onBack = { onRoute(router.back()) },
             )
-        Route.Library ->
-            LibraryDestination(
-                scope = deps.scope,
-                database = deps.database,
-                onOpenScope = { onRoute(router.push(Route.Scope)) },
-                onOpenIdiom = { id -> onRoute(router.push(Route.Idiom, id)) },
-            )
+        Route.Library -> LibraryRouteContent(entry, router, deps, onRoute)
+        Route.Examples -> ExamplesRouteContent(router, deps, onRoute)
         Route.Search ->
             SearchDestination(deps.database, { onRoute(router.back()) }) {
                 onRoute(router.push(Route.Idiom, it))
@@ -73,7 +68,7 @@ internal fun RouteContent(
                 vm = backupVm,
                 onPresentImportMode = { onRoute(router.present(Route.ImportMode)) },
             )
-        Route.Pack -> P16PackRoute(deps.packVersion)
+        Route.Pack -> P16PackRoute(deps.packUpdates)
         else -> CaptureRouteContent(entry, router, deps, onRoute)
     }
 }

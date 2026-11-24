@@ -3,6 +3,7 @@ package com.chenyubang.feature.idiom
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.chenyubang.core.data.ExamScopeSelection
+import com.chenyubang.core.data.PackCheckOutcome
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,6 +19,7 @@ data class P03LibraryUiState(
     val page: LibraryPage = LibraryPage(emptyList()),
     val loading: Boolean = true,
     val failed: Boolean = false,
+    val updateFailed: Boolean = false,
 ) {
     val scopeEmpty: Boolean get() = scope.isEmpty
     val conditionCleared: Boolean get() = dimension == LibraryDimension.Scope && selectedLetter == null
@@ -38,32 +40,63 @@ class P03LibraryViewModel(
     val state: StateFlow<P03LibraryUiState> = _state.asStateFlow()
 
     private var items: List<LibraryIdiom> = emptyList()
+    private var entered = false
+    private var lastEntryEpoch = -1
 
-    /** 进入本页时调用；[scope] 变化时同样重取（范围保存后 `idiom_scope` 已重建）。 */
-    fun load(scope: ExamScopeSelection) {
-        _state.value = _state.value.copy(scope = scope, loading = true, failed = false)
+    /** 每次真实进入检查一次；切标签返回沿用 epoch，组合重建不额外检查。 */
+    fun enter(
+        scope: ExamScopeSelection,
+        entryEpoch: Int = 0,
+    ) {
+        if (entered && lastEntryEpoch == entryEpoch) return
+        entered = true
+        lastEntryEpoch = entryEpoch
+        _state.value = _state.value.copy(scope = scope, loading = true, failed = false, updateFailed = false)
         viewModelScope.launch {
-            try {
-                refreshTrigger.onEnterLibrary()
-            } catch (cancelled: CancellationException) {
-                throw cancelled
-            } catch (_: Exception) {
-                // 拉取失败只影响题库版本，回落内置包；浏览不阻断（§4.4），重试入口在 P16。
-            }
-            try {
-                items = loadIdioms()
-                _state.value =
-                    _state.value.copy(
-                        letters = LibraryBrowse.letters(items),
-                        page = LibraryBrowse.page(items, _state.value.dimension, _state.value.selectedLetter),
-                        loading = false,
-                    )
-            } catch (cancelled: CancellationException) {
-                throw cancelled
-            } catch (_: Exception) {
-                items = emptyList()
-                _state.value = _state.value.copy(loading = false, failed = true, page = LibraryPage(emptyList()))
-            }
+            readLocal()
+            val outcome =
+                try {
+                    refreshTrigger.onEnterLibrary()
+                } catch (cancelled: CancellationException) {
+                    throw cancelled
+                } catch (_: Exception) {
+                    PackCheckOutcome.FAILED
+                }
+            _state.value = _state.value.copy(updateFailed = outcome == PackCheckOutcome.FAILED)
+            if (outcome == PackCheckOutcome.UPDATED) readLocal()
+        }
+    }
+
+    /** 范围变化只重读本机数据，不额外触发更新；组合重建也不会再次进页检查。 */
+    fun reload(scope: ExamScopeSelection) {
+        if (!entered || _state.value.scope == scope) return
+        _state.value = _state.value.copy(scope = scope)
+        reloadLocal()
+    }
+
+    /** 本机读取重试与 P16 联网重试严格分离。 */
+    fun retry() = reloadLocal()
+
+    private fun reloadLocal() {
+        _state.value = _state.value.copy(loading = true, failed = false)
+        viewModelScope.launch { readLocal() }
+    }
+
+    private suspend fun readLocal() {
+        try {
+            items = loadIdioms()
+            _state.value =
+                _state.value.copy(
+                    letters = LibraryBrowse.letters(items),
+                    page = LibraryBrowse.page(items, _state.value.dimension, _state.value.selectedLetter),
+                    loading = false,
+                    failed = false,
+                )
+        } catch (cancelled: CancellationException) {
+            throw cancelled
+        } catch (_: Exception) {
+            items = emptyList()
+            _state.value = _state.value.copy(loading = false, failed = true, page = LibraryPage(emptyList()))
         }
     }
 
@@ -84,8 +117,6 @@ class P03LibraryViewModel(
         _state.value = _state.value.copy(dimension = LibraryDimension.Scope, selectedLetter = null)
         applyPage()
     }
-
-    fun retry() = load(_state.value.scope)
 
     private fun applyPage() {
         val current = _state.value

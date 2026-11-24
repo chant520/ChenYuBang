@@ -12,7 +12,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -27,7 +26,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.chenyubang.core.data.PackVersion
+import com.chenyubang.core.data.PackUpdateController
 import com.chenyubang.core.data.PackVersionState
 import com.chenyubang.core.data.PackVersionStatus
 import com.chenyubang.core.ui.CBar
@@ -41,15 +40,13 @@ import com.chenyubang.core.ui.tokens.Tokens
 
 /** P16 题库版本与更新（路由 settings/pack）。主态逐字文案见视觉契约第 3.1 节。 */
 @Composable
-fun P16PackRoute(packVersion: PackVersion) {
+fun P16PackRoute(packUpdates: PackUpdateController) {
     val factory =
-        remember(packVersion) {
-            viewModelFactory { initializer { P16PackViewModel(packVersion) } }
+        remember(packUpdates) {
+            viewModelFactory { initializer { P16PackViewModel(packUpdates) } }
         }
     val vm: P16PackViewModel = viewModel(key = "p16-pack", factory = factory)
     val state by vm.state.collectAsState()
-    LaunchedEffect(Unit) { vm.load() }
-
     val current = state ?: return
     P16PackContent(
         state = current,
@@ -96,7 +93,7 @@ private fun RealVersionBlock(state: PackVersionState) {
         lineHeight = Tokens.Font.n30.sp,
     )
     Text(
-        text = "内置版本，装好即可离线用",
+        text = "当前安装包，装好即可离线用",
         color = colors.text3,
         fontSize = Tokens.Font.n115.sp,
     )
@@ -108,11 +105,6 @@ private fun RealVersionBlock(state: PackVersionState) {
         color = colors.text2,
         fontSize = Tokens.Font.n13.sp,
         lineHeight = (Tokens.Font.n13 * NOTE_LINE_HEIGHT).sp,
-    )
-    Text(
-        text = "条数为排版示意，实际以题库定稿为准。",
-        color = colors.text3,
-        fontSize = Tokens.Font.n115.sp,
     )
 }
 
@@ -179,11 +171,11 @@ private fun UpdateArea(
             CButton(text = "重试", onClick = onCheck)
             CheckNote()
         }
-        PackVersionStatus.BUILTIN -> {
+        PackVersionStatus.BUILTIN, PackVersionStatus.OFFLINE -> {
             CLabel("更新状态")
-            CTag("已是最新版本")
+            CTag("当前离线")
             Text(
-                text = "失败时会在这里显示「检查失败，请检查网络后重试」，版本号不变，可点重试。",
+                text = "当前使用本机题库，可随时检查更新。",
                 color = colors.text3,
                 fontSize = Tokens.Font.n115.sp,
                 lineHeight = (Tokens.Font.n115 * NOTE_LINE_HEIGHT).sp,
@@ -193,7 +185,7 @@ private fun UpdateArea(
         }
     }
     Text(
-        text = "只下载题库增量包，不改动本机学习记录。",
+        text = "联网只用于获取或更新题库内容，不改动本机学习记录。",
         color = colors.text3,
         fontSize = Tokens.Font.n115.sp,
     )
@@ -233,7 +225,7 @@ private fun RecoverableArea(
             lineHeight = (Tokens.Font.n13 * NOTE_LINE_HEIGHT).sp,
         )
         Text(
-            text = "只下载题库增量包，不改动错题、收藏与学习状态。",
+            text = "只获取或更新题库内容，不改动错题、收藏与学习状态。",
             color = colors.text3,
             fontSize = Tokens.Font.n115.sp,
         )
@@ -244,7 +236,7 @@ private fun RecoverableArea(
 private fun CheckNote() {
     val colors = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
     Text(
-        text = "这是全 App 唯一的主动联网入口之一",
+        text = "检查更新只获取题库，不改动本机学习记录。",
         color = colors.text3,
         fontSize = Tokens.Font.n11.sp,
     )

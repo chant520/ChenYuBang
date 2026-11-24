@@ -12,6 +12,7 @@ class PackImporter(private val database: AppDatabase, context: Context) {
     private val context = context.applicationContext
     private val operations = Mutex()
     private var installedSHA256: String? = null
+    private var installedPack: ValidatedPack? = null
 
     fun validate(input: InputStream): ValidatedPack = ValidatedPack.readValidated(input)
 
@@ -47,18 +48,20 @@ class PackImporter(private val database: AppDatabase, context: Context) {
                         )
                     }
                 installedSHA256 = pack.sha256
+                installedPack = pack
                 result
             }
         }
 
-    suspend fun refreshScopeLinks(pack: ValidatedPack): Unit =
+    suspend fun refreshScopeLinks(pack: ValidatedPack? = null): Unit =
         withContext(Dispatchers.IO) {
             operations.withLock {
-                require(installedSHA256 == pack.sha256) { "Refresh requires this importer's committed pack" }
-                val idioms = PackRows.idioms(pack)
-                val examples = PackRows.examples(pack)
+                val current = pack ?: requireNotNull(installedPack) { "No committed pack" }
+                require(installedSHA256 == current.sha256) { "Refresh requires this importer's committed pack" }
+                val idioms = PackRows.idioms(current)
+                val examples = PackRows.examples(current)
                 database.withTransaction {
-                    PackVerification.verify(database, pack, idioms, examples)
+                    PackVerification.verify(database, current, idioms, examples)
                     PackContent.refreshScopes(database.openHelper.writableDatabase, idioms, examples)
                 }
             }
