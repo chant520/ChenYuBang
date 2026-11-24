@@ -1,4 +1,5 @@
 @testable import CangyuData
+@testable import ChenYuBang
 import Foundation
 import GRDB
 import XCTest
@@ -34,6 +35,9 @@ final class BackupStoreTests: PackDatabaseTestCase {
         XCTAssertEqual(text(manifest["sha256"]), result.sha256)
         XCTAssertEqual(result.counts, BackupCounts(mistakes: 2, userExamples: 1, reviews: 1,
                                                    idiomStates: 2, scopes: 2))
+        XCTAssertTrue(BackupScreen.exportMessage(result, share: false).hasPrefix(
+            "错题 2 · 录入题 1 · 复习 1 · 学习状态 2 · 考试范围 2"
+        ))
         let validated = try queue.read { db in try BackupImport.validate(archiveData, db: db) }
         XCTAssertEqual(validated.counts, result.counts)
 
@@ -70,21 +74,21 @@ final class BackupStoreTests: PackDatabaseTestCase {
         XCTAssertEqual(try snapshot(contentTables), contentBefore, "export must be read-only")
     }
 
-    func testExportRejectsUserExampleWithoutIdiom() throws {
+    func testExportRoundTripsImportedRowsWithoutIdioms() throws {
         try seedExportData()
         try queue.write { db in
             try db.execute(sql: "DELETE FROM user_example_idiom")
             try db.execute(sql: "DELETE FROM mistake_idiom")
         }
         let directory = try makeDirectory()
-        XCTAssertThrowsError(try queue.read { db in
+        let result = try queue.read { db in
             try Backup.export(db: db, to: directory, date: exportDate)
-        }) { error in
-            guard case let BackupError.format(message) = error else {
-                return XCTFail("Expected backup format error, got \(error)")
-            }
-            XCTAssertTrue(message.contains("idiomIds"))
         }
+        let validated = try queue.read { db in
+            try BackupImport.validate(Data(contentsOf: result.url), db: db)
+        }
+        XCTAssertEqual(validated.payload.mistakes.first?.idiomIds, [])
+        XCTAssertEqual(validated.payload.userExamples?.first?.idiomIds, [])
     }
 
     func testCanonicalHelpersUseUTCAndNormalizeIdentity() {

@@ -23,7 +23,7 @@ struct BackupOverlayContent: View {
                                 router.finishBackupImport(result: .success(message))
                             } catch {
                                 router.finishBackupImport(result: .success(
-                                    Phase4PendingCopy.refreshFailure
+                                    Phase4Copy.refreshFailure
                                 ))
                             }
                         case .failure(let error):

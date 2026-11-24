@@ -35,6 +35,54 @@ final class BackupImportOrphanTests: PackDatabaseTestCase {
         }
     }
 
+    func testReplaceKeepsRowsWhenAllIdiomReferencesAreFilteredOut() throws {
+        try BackupWriterFixture.seedDestination(queue)
+        let (caches, cacheBefore) = try cacheSnapshot()
+        defer { try? removeNewCacheFiles(caches, cacheBefore) }
+        let original = try makeOrphanPayload()
+        let missingID = "99999999-9999-4999-8999-999999999999"
+        let mistakes = original.mistakes.map { mistake -> BackupMistakePayload in
+            guard mistake.id == BackupWriterFixture.sharedMistake else { return mistake }
+            return BackupMistakePayload(
+                id: mistake.id, userExampleId: mistake.userExampleId, stem: mistake.stem,
+                options: mistake.options, imagePath: mistake.imagePath, ocrText: mistake.ocrText,
+                myAnswer: mistake.myAnswer, reason: mistake.reason, tagNames: mistake.tagNames,
+                examType: mistake.examType, year: mistake.year, region: mistake.region,
+                state: mistake.state, createdAt: mistake.createdAt,
+                lastReviewedAt: mistake.lastReviewedAt, reviewCount: mistake.reviewCount,
+                idiomIds: [missingID]
+            )
+        }
+        let examples = try XCTUnwrap(original.userExamples).map { example -> BackupUserExamplePayload in
+            guard example.id == BackupWriterFixture.extraExample else { return example }
+            return BackupUserExamplePayload(
+                id: example.id, imagePath: example.imagePath, ocrText: example.ocrText, stem: example.stem,
+                optionA: example.optionA, optionB: example.optionB, optionC: example.optionC,
+                optionD: example.optionD, myAnswer: example.myAnswer, isMistake: example.isMistake,
+                examType: example.examType, year: example.year, region: example.region,
+                createdAt: example.createdAt, idiomIds: [missingID]
+            )
+        }
+        let payload = BackupDataPayload(mistakes: mistakes, userExamples: examples,
+                                        reviews: original.reviews, idiomStates: original.idiomStates,
+                                        scopes: original.scopes, tags: original.tags)
+
+        let summary = try BackupImportWriter.replace(payload, queue: queue)
+
+        XCTAssertEqual(summary.mistakes, 1)
+        XCTAssertEqual(summary.userExamples, 2)
+        XCTAssertEqual(summary.orphans.missingMistakeIdioms, 1)
+        XCTAssertEqual(summary.orphans.missingExampleIdioms, 1)
+        try queue.read { db in
+            XCTAssertEqual(try links(db, "mistake_idiom", "mistakeId", BackupWriterFixture.sharedMistake), [])
+            XCTAssertEqual(try links(db, "user_example_idiom", "userExampleId", BackupWriterFixture.extraExample), [])
+            XCTAssertEqual(try String.fetchOne(db, sql: "SELECT stem FROM mistake WHERE id = ?",
+                                               arguments: [BackupWriterFixture.sharedMistake]), "备份共享错题")
+            XCTAssertEqual(try String.fetchOne(db, sql: "SELECT stem FROM user_example WHERE id = ?",
+                                               arguments: [BackupWriterFixture.extraExample]), "备份新增录入题")
+        }
+    }
+
     func testReplaceUsesOnlyBackupReferencesWhenResolvingOrphans() throws {
         try BackupWriterFixture.seedDestination(queue)
         let (caches, cacheBefore) = try cacheSnapshot()

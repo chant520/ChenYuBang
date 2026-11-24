@@ -38,8 +38,8 @@ final class MistakeBrowseTests: XCTestCase {
         XCTAssertEqual(view.idiomsText, "按部就班、墨守成规")
     }
 
-    func testMissingIdiomWordsFallBackToPlaceholder() {
-        XCTAssertEqual(MistakeBrowse.idiomsText([]), MistakeBrowse.placeholder)
+    func testMissingIdiomWordsShowImportStateHint() {
+        XCTAssertEqual(MistakeBrowse.idiomsText([]), "暂未关联成语")
         XCTAssertEqual(MistakeBrowse.idiomsText(["", "按部就班"]), "按部就班")
     }
 
