@@ -103,7 +103,7 @@ final class PackUpdateTests: PackDatabaseTestCase {
         await model.retry()
         XCTAssertEqual(model.presentation.status, .recoverableFailure)
         XCTAssertEqual(model.presentation.version, "v1.0.0")
-        XCTAssertEqual(try InstalledPackStorage.load(from: directory), baseData())
+        XCTAssertEqual(try InstalledPackStorage.load(from: directory), try baseData())
         XCTAssertEqual(try count("idiom"), base.counts.idioms)
     }
 
@@ -114,7 +114,7 @@ final class PackUpdateTests: PackDatabaseTestCase {
         let (model, directory) = try makeModel(
             base, client: FakeChannelClient(manifest: manifest, zip: zip)
         )
-        try queue.write { db in
+        try await queue.write { db in
             try db.execute(sql: """
                 CREATE TRIGGER pack_update_abort BEFORE INSERT ON idiom_scope
                 BEGIN SELECT RAISE(ABORT, 'pack update rollback test'); END
@@ -124,7 +124,7 @@ final class PackUpdateTests: PackDatabaseTestCase {
         await model.retry()
         XCTAssertEqual(model.presentation.status, .recoverableFailure)
         XCTAssertEqual(model.presentation.version, "v1.0.0")
-        XCTAssertEqual(try InstalledPackStorage.load(from: directory), baseData())
+        XCTAssertEqual(try InstalledPackStorage.load(from: directory), try baseData())
         XCTAssertEqual(try count("idiom"), base.counts.idioms)
     }
 
