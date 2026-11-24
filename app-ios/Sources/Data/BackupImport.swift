@@ -237,7 +237,7 @@ enum BackupImport {
         }
     }
 
-    fileprivate static func uniqueIDs(_ ids: [String], _ label: String) throws -> Set<String> {
+    static func uniqueIDs(_ ids: [String], _ label: String) throws -> Set<String> {
         guard Set(ids).count == ids.count else { throw BackupError.format("备份中有重复的\(label) id。") }
         return Set(ids)
     }

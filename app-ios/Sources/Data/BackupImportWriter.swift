@@ -5,6 +5,7 @@ enum BackupImportWriter {
     static func merge(_ payload: BackupDataPayload, db: Database) throws -> BackupImportSummary {
         try db.inTransaction {
             try insertAll(payload, db: db, keepLocalOnConflict: true)
+            return .commit
         }
         return summary(.merge, payload)
     }
@@ -32,6 +33,7 @@ enum BackupImportWriter {
                 try db.inTransaction {
                     try clearUserData(db)
                     try copyStagedData(db)
+                    return .commit
                 }
             } catch {
                 try? db.execute(sql: "DETACH DATABASE backup_import")

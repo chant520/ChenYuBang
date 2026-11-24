@@ -240,17 +240,17 @@ enum Backup {
     /// v3 之前的历史录入题可能没有关联行，回落错题快照的归属；仍为空则如实导出空数组。
     private static func linkedExampleIDs(_ db: Database,
                                          mistakeRows: [Row]) throws -> [String: [String]] {
-        var links = try links(db, "user_example_idiom", "userExampleId", "idiomId")
+        var exampleLinks = try links(db, "user_example_idiom", "userExampleId", "idiomId")
         let mistakeLinks = try links(db, "mistake_idiom", "mistakeId", "idiomId")
         for row in mistakeRows {
             let mistakeID: String = row["id"]
             guard let exampleID: String = row["userExampleId"] else { continue }
             let normalizedExampleID = exampleID.lowercased()
-            guard links[normalizedExampleID] == nil,
+            guard exampleLinks[normalizedExampleID] == nil,
                   let ids = mistakeLinks[mistakeID.lowercased()], !ids.isEmpty else { continue }
-            links[normalizedExampleID] = ids
+            exampleLinks[normalizedExampleID] = ids
         }
-        return links
+        return exampleLinks
     }
 
     private static func collectedTags(_ rows: [Row]) -> [PackJSON] {
