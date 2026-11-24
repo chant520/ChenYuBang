@@ -136,7 +136,7 @@ private extension BackupImportOrphanTests {
     }
 
     private func removeNewCacheFiles(_ directory: URL, _ previous: Set<String>) throws {
-        for name in try FileManager.default.contentsOfDirectory(atPath: directory.path).subtracting(previous)
+        for name in Set(try FileManager.default.contentsOfDirectory(atPath: directory.path)).subtracting(previous)
             where name.hasPrefix("backup-") {
             try? FileManager.default.removeItem(at: directory.appendingPathComponent(name))
         }

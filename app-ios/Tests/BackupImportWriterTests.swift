@@ -44,7 +44,10 @@ final class BackupImportWriterTests: PackDatabaseTestCase {
         let settingsAfter = try snapshot(["settings"])
         XCTAssertEqual(settingsAfter.filter { $0.key != ExamScopeStore.provincesKey },
                        settingsBefore.filter { $0.key != ExamScopeStore.provincesKey })
-        let provinceJSON = try XCTUnwrap(settingsAfter[ExamScopeStore.provincesKey])
+        let provinceJSON = try XCTUnwrap(queue.read { db in
+            try String.fetchOne(db, sql: "SELECT value FROM settings WHERE key = ?",
+                                arguments: [ExamScopeStore.provincesKey])
+        })
         XCTAssertEqual(try JSONDecoder().decode([String].self, from: Data(provinceJSON.utf8)), ["广东", "湖北"])
     }
 

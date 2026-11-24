@@ -50,7 +50,7 @@ final class Phase4SnapshotTests: XCTestCase {
                               testName: String = #function, line: UInt = #line) throws {
         let fixture = try makeFixture()
         let content = ImportModeSheet(
-            backup: fixture.backup,
+            backup: fixture.backupPayload,
             service: fixture.backup,
             inProgress: false,
             error: nil,

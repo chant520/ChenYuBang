@@ -5,8 +5,8 @@ import XCTest
 
 final class BackupImportTests: PackDatabaseTestCase {
     private struct BackupFiles {
-        let manifest: [String: Any]
-        let data: Data
+        var manifest: [String: Any]
+        var data: Data
 
         func archive() throws -> Data {
             let manifestData = try JSONSerialization.data(withJSONObject: manifest)
