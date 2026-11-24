@@ -63,14 +63,15 @@ internal object BackupDocument {
         )
     }
 
+    /** 旧备份 manifest.counts 可缺 userExamples，按 0 兼容；与 data 缺数组时的 counts() 对齐。 */
     fun declaredCounts(manifest: JsonObject): BackupCounts {
         val counts = manifest.getValue("counts") as JsonObject
         return BackupCounts(
-            counts.integer("mistakes"),
-            counts.integer("userExamples"),
-            counts.integer("reviews"),
-            counts.integer("idiomStates"),
-            counts.integer("scopes"),
+            mistakes = counts.integer("mistakes"),
+            userExamples = counts.optionalString("userExamples")?.toIntOrNull() ?: 0,
+            reviews = counts.integer("reviews"),
+            idiomStates = counts.integer("idiomStates"),
+            scopes = counts.integer("scopes"),
         )
     }
 

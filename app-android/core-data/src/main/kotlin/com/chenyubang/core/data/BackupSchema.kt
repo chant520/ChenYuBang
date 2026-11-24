@@ -100,15 +100,17 @@ internal object BackupSchema {
             optional = mapOf("province" to optText),
         )
     private val tag = shape(mapOf("name" to tagName))
+    // 旧备份（schemaVersion=1）manifest.counts 无 userExamples 键，兼容为可选；新导出仍写五项。
     private val counts =
         shape(
-            mapOf(
-                "mistakes" to integer(0),
-                "userExamples" to integer(0),
-                "reviews" to integer(0),
-                "idiomStates" to integer(0),
-                "scopes" to integer(0),
-            ),
+            required =
+                mapOf(
+                    "mistakes" to integer(0),
+                    "reviews" to integer(0),
+                    "idiomStates" to integer(0),
+                    "scopes" to integer(0),
+                ),
+            optional = mapOf("userExamples" to integer(0)),
         )
     private val manifest =
         shape(
