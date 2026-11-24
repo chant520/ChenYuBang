@@ -9,6 +9,8 @@ import com.chenyubang.feature.capture.OcrScreenActions
 import com.chenyubang.feature.capture.P20FormDeps
 import com.chenyubang.feature.capture.P20FormScreen
 import com.chenyubang.feature.capture.P21DoneScreen
+import com.chenyubang.feature.me.P15BackupRoute
+import com.chenyubang.feature.me.P16PackRoute
 
 /** 按当前路由渲染目标页；P04/P05 的返回与跳转与其余路由同口径。 */
 @Composable
@@ -19,6 +21,7 @@ internal fun RouteContent(
     onRoute: (RouterState) -> Unit,
     back: () -> Unit,
 ) {
+    val backupVm = requireNotNull(deps.backupVm)
     when (entry.route) {
         Route.Scope ->
             ScopeDestination(
@@ -65,6 +68,12 @@ internal fun RouteContent(
         Route.IdiomMistakes -> IdiomMistakesRouteContent(entry, router, deps, onRoute)
         Route.Mistake -> UserExampleRouteContent(entry, router, deps, onRoute)
         Route.Queue, Route.Summary -> ReviewRouteContent(entry, router, deps, onRoute, back)
+        Route.Backup ->
+            P15BackupRoute(
+                vm = backupVm,
+                onPresentImportMode = { onRoute(router.present(Route.ImportMode)) },
+            )
+        Route.Pack -> P16PackRoute(deps.packVersion)
         else -> CaptureRouteContent(entry, router, deps, onRoute)
     }
 }
