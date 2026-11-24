@@ -165,8 +165,9 @@
 - 专项快照：新增 30 张（P15 10 / P16 10 / P22 2 / P23 6 / P08 2），更新 6 张既有基线（P15 浅深主态、P22 浅深 sheet、P23 浅深主态，因 97d2ed5 文案变更），差集合计 36 张；P14 两张基线 sha256 前后一致（d27b7951… / 03400601…）未覆盖，P08/P09/P10 既有基线未动。
 - 覆盖矩阵：P15 主态/导出成功/导出失败/导入中/导入成功/备份无法读取 × 深浅；P16 BUILTIN(59/11)/CHECKING/DOWNLOADING 42%/UPDATE_OK/RECOVERABLE_FAIL/TEST_MOCK(3/2) × 深浅；P22 合并/覆盖 + 导入失败 × 深浅；P23 主态(含真实录入题 userExamples=7)/清空中/失败/成功 × 深浅；P08 空关联导入样本 × 深浅。TEST mock 3 成语/2 真题（fixture manifest.correct.json）与 BUILTIN 59/11 状态字段分离，逐图确认不混用。
 - 逐图审阅：36 张变化图 + P16 BUILTIN 两张复核，文案逐字、深浅令牌、无空白错位、无 emoji 全达标；P16 非 TEST 与 TEST 态区分达标；P22 一处红、P23 主态/清空中/成功一处红达标；P08 显示「暂未关联成语」达标。逐图结论 `.workbuddy/evidence/phase4-diff-snapshot-review-2026-11-24.md`。
-- 观察项（不改口径，待主控判断）：P23 失败态出现「行内红字 CInlineError + 红填充确认按钮」两处红，与视觉契约第 0/4 节「一处红 / 确认清空为唯一红」字面张力，系 97d2ed5 既有实现；P08 深色页头浅绿字配浅灰底对比偏弱，与既有已审阅基线同款，非本轮引入。
+- 两项拍板（2026-11-24 用户结论，均保留现状、不改基线/令牌/产品口径）：P23 失败态两处红（行内红字 CInlineError + 红填充确认按钮）保留，作为偏离视觉契约第 0/4 节「一处红 / 确认清空为唯一红」的既定事实记录，不补快照、不改实现；P08 深色页头浅绿字配浅灰底对比偏弱保持现状，视为既有基线同款、非本轮差集，仅记录观察，不改令牌、不补快照。
 - 快照 verify：`./gradlew :feature-me:verifyRoborazziDebug :feature-mistake:verifyRoborazziDebug --max-workers=1` BUILD SUCCESSFUL、exit 0，无 Record mode；结果 JSON feature-me unchanged 38、feature-mistake unchanged 48，added/changed 0；`*_actual.png` / `*_compare.png` 等 record 残留 34 张已清理，仅留新增基线，verify 无残留新 PNG。日志 `.workbuddy/evidence/phase4-diff-snapshot-verify-2026-11-24.log`。
 - 同名多帧：本轮均单帧 capture，无 .1 后缀产生；保留 .1 口径不改名丢帧不变。
 - 未覆盖 / 未变：真机实测（按用户要求不做）；第 5 节占位串已被 97d2ed5 结果态文案收口，非本轮动作；第 6 节待拍板三项（P16 独立 mock 高保真屏、P16 退路条数 2–3 条、P15 是否另加导出按钮）仍未拍板，本轮不宣称这些态完成。
-- 结论：全量门禁、1122 项单测、38 张差集快照 verify 全绿；专项覆盖已补齐，占位/待拍板项按原口径挂起。
+- 用户拍板落定：P23 失败态一处红冲突保留现状，仅在证据与本计划注明偏离一处红契约；P08 深色页头对比保持现状，视为既有基线同款、非本轮差集，仅记录观察，均不改令牌、不补快照、不调口径。
+- 结论：全量门禁、1122 项单测、38 张差集快照 verify 全绿；专项覆盖已补齐；P23/P08 两项观察已按用户拍板保留现状并记录，第 6 节三项待拍板项仍挂起。

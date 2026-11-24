@@ -99,7 +99,7 @@ P22 超版、sha256 不符、字段异常属于校验硬拒绝，不弹模式选
 
 ## 八、交付证据回填（2026-11-24，WorkBuddy）
 
-- 验证 head：`cfb031e`；证据回填提交 `cdd7507`，最终 head `cdd7507`。本轮提交链：`d3b7429` docs(phase4) → `d780d8b` fix(backup) → `97d2ed5` feat(me) → `e177cc5` style(core-data) → `320ab56` fix(core-data) → `cfb031e` test(phase4) → `cdd7507` docs(phase4)；均带 scope 与 `Generated-by: WorkBuddy`，未暂存 Qoder 既有脏文件。
+- 验证 head：`cfb031e`；证据回填提交 `cdd7507`。本轮功能与验证提交链（不含本文件后续同步提交）：`d3b7429` docs(phase4) → `d780d8b` fix(backup) → `97d2ed5` feat(me) → `e177cc5` style(core-data) → `320ab56` fix(core-data) → `cfb031e` test(phase4) → `cdd7507` docs(phase4)；均带 scope 与 `Generated-by: WorkBuddy`，未暂存 Qoder 既有脏文件。最终 head 以交付时 git log 为准。
 - Android 门禁：`cd app-android && ./gradlew :app:assembleDebug test ktlintCheck detekt :app:lintDebug --max-workers=1` BUILD SUCCESSFUL、exit 0（9m20s），日志 `.workbuddy/evidence/phase4-diff-full-gate-2026-11-24.log`。中途两次红灯均来自 backend `PackVersion.kt` 静态违规，已由 `e177cc5` / `320ab56` 修复后转绿。
 - 单测：debug 561 + release 561 = 1122 项，failed 0、error 0、skipped 0。
 - 专项正反证据（`d780d8b`）：空 `idiomIds` 备份通过校验并解码为 `[]`；错题与录入题成语引用全失效后本体保留、关联表零行、四类孤儿计数正确；正常录入零成语仍被拒绝且不写库、不写文件，未用同一断言混证。
