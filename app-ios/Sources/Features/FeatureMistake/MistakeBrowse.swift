@@ -108,10 +108,10 @@ public enum MistakeBrowse {
         return "\(digits.prefix(10)) 录入"
     }
 
-    /// 关联成语串：多个以「、」连接，无关联归「暂无」。
+    /// 关联成语串：多个以「、」连接，导入态无关联时明确提示。
     public static func idiomsText(_ words: [String]) -> String {
         let present = words.filter { !$0.isEmpty }
-        return present.isEmpty ? placeholder : present.joined(separator: "、")
+        return present.isEmpty ? "暂未关联成语" : present.joined(separator: "、")
     }
 
     /// 复习按钮文案（高保真稿 B P08）：`开始复习 · 7 道待复习`。

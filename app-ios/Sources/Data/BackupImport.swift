@@ -29,7 +29,7 @@ public struct BackupOrphanReport: Equatable, Sendable {
         guard !isEmpty else { return "" }
         let idioms = missingMistakeIdioms + missingExampleIdioms
         return "已跳过缺失录入题的错题 \(skippedMistakes) 条、缺失对应错题的复习记录 \(skippedReviews) 条，"
-            + "过滤缺失成语关联 \(idioms) 处（待拍板）。"
+            + "过滤缺失成语关联 \(idioms) 处。"
     }
 }
 
@@ -57,7 +57,7 @@ public struct BackupImportSummary: Equatable, Sendable {
 
     public var message: String {
         let modeText = mode == .replace ? "覆盖" : "合并"
-        let result = "\(modeText)导入完成（待拍板）：写入 \(mistakes) 条错题、"
+        let result = "\(modeText)导入完成：写入 \(mistakes) 条错题、"
             + "\(userExamples) 条录入题、\(reviews) 条复习记录、"
             + "\(idiomStates) 条学习状态、\(scopes) 条考试范围。"
         return orphans.isEmpty ? result : result + orphans.message

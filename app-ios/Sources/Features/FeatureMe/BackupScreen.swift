@@ -18,16 +18,36 @@ public struct BackupScreen: View {
     private let onValidated: (ValidatedBackup) -> Bool
     private let onBack: () -> Void
 
-    public init(
+    public convenience init(
         service: BackupService,
         importResult: String?,
         onValidated: @escaping (ValidatedBackup) -> Bool,
         onBack: @escaping () -> Void
     ) {
+        self.init(service: service, importResult: importResult, onValidated: onValidated, onBack: onBack)
+    }
+
+    init(
+        service: BackupService,
+        importResult: String?,
+        onValidated: @escaping (ValidatedBackup) -> Bool,
+        onBack: @escaping () -> Void,
+        initialStatus: String? = nil,
+        initialFailed: Bool = false
+    ) {
         self.service = service
         self.importResult = importResult
         self.onValidated = onValidated
         self.onBack = onBack
+        _status = State(initialValue: initialStatus)
+        _failed = State(initialValue: initialFailed)
+    }
+
+    static func exportMessage(_ exported: BackupExport, share: Bool) -> String {
+        "错题 \(exported.counts.mistakes) · 录入题 \(exported.counts.userExamples) · "
+            + "复习 \(exported.counts.reviews) · 学习状态 \(exported.counts.idiomStates) · "
+            + "考试范围 \(exported.counts.scopes)"
+            + (share ? "。可在系统面板中另存。" : "。已存到手机本地：\(exported.url.lastPathComponent)")
     }
 
     public var body: some View {
@@ -48,7 +68,7 @@ public struct BackupScreen: View {
 
                 CCard {
                     CLabel("导出备份")
-                    Text("导出的内容：错题、收藏、学习状态。不含题库本身。")
+                    Text("导出的内容：错题、录入题、收藏、学习状态。不含题库本身。")
                         .font(.system(size: Tokens.Font.n13))
                         .cLineHeight(1.7, size: Tokens.Font.n13)
                         .foregroundStyle(colors.text2)
@@ -80,7 +100,7 @@ public struct BackupScreen: View {
                         Spacer()
                         CTag(text: "进阶位", style: .disabled)
                     }
-                    Text(Phase4PendingCopy.lastBackup)
+                    Text(Phase4Copy.lastBackup)
                         .font(.system(size: Tokens.Font.n115))
                         .foregroundStyle(colors.text3)
                         .padding(.top, Tokens.Space.lsubTop)
@@ -92,7 +112,7 @@ public struct BackupScreen: View {
                     .foregroundStyle(colors.text3)
 
                 if let message = status ?? importResult {
-                    let successTitle = status == nil ? Phase4PendingCopy.importSuccess : Phase4PendingCopy.exportSuccess
+                    let successTitle = status == nil ? Phase4Copy.importSuccess : Phase4Copy.exportSuccess
                     CBar(kind: failed ? .error : .info,
                          title: failed ? message : successTitle,
                          subtitle: failed ? nil : message)
@@ -109,7 +129,7 @@ public struct BackupScreen: View {
             case .failure(let error) where (error as? CocoaError)?.code == .userCancelled:
                 break
             case .failure:
-                showFailure(Phase4PendingCopy.importFailure)
+                showFailure(Phase4Copy.importFailure)
             }
         }
         .sheet(item: $shareItem) { item in ActivityView(url: item.url) }
@@ -125,7 +145,7 @@ public struct BackupScreen: View {
             do {
                 return .success(try service.export(to: directory))
             } catch {
-                return .failure(Phase4MessageError(message: backupUserMessage(for: error)))
+                return .failure(Phase4MessageError(message: Phase4Copy.exportFailure))
             }
         }
         Task { @MainActor in
@@ -136,10 +156,7 @@ public struct BackupScreen: View {
                 if share {
                     shareItem = ShareItem(url: exported.url)
                 }
-                status = "错题 \(exported.counts.mistakes) 条、录入题 \(exported.counts.userExamples) 条、"
-                    + "复习记录 \(exported.counts.reviews) 条、学习状态 \(exported.counts.idiomStates) 条、"
-                    + "考试范围 \(exported.counts.scopes) 条。"
-                    + (share ? "可在系统面板中另存。" : "已存到手机本地：\(exported.url.lastPathComponent)")
+                status = Self.exportMessage(exported, share: share)
                 failed = false
             case .failure(let error):
                 showFailure(error.message)
@@ -158,13 +175,13 @@ public struct BackupScreen: View {
             data = try Data(contentsOf: url)
         } catch {
             busy = false
-            showFailure(Phase4PendingCopy.importFailure)
+            showFailure(Phase4Copy.backupUnreadable)
             return
         }
         let service = self.service
         let task = Task.detached { () -> Result<ValidatedBackup, Phase4MessageError> in
             do { return .success(try service.validate(data)) } catch {
-                return .failure(Phase4MessageError(message: backupUserMessage(for: error)))
+                return .failure(Phase4MessageError(message: backupImportUserMessage(for: error)))
             }
         }
         Task { @MainActor in
@@ -173,7 +190,7 @@ public struct BackupScreen: View {
             switch result {
             case .success(let backup):
                 guard onValidated(backup) else {
-                    showFailure(Phase4PendingCopy.importStartFailure)
+                    showFailure(Phase4Copy.importFailure)
                     return
                 }
             case .failure(let error):
@@ -194,17 +211,9 @@ public struct BackupScreen: View {
 
 }
 
-private func backupUserMessage(for error: Error) -> String {
-    switch error {
-    case let error as BackupError:
-        switch error {
-        case .database: return Phase4PendingCopy.importFailure
-        case .fileIO: return Phase4PendingCopy.exportFailure
-        case .format: return Phase4PendingCopy.importFailure
-        }
-    default:
-        return Phase4PendingCopy.importFailure
-    }
+private func backupImportUserMessage(for error: Error) -> String {
+    if case BackupError.format = error { return Phase4Copy.backupUnreadable }
+    return Phase4Copy.importFailure
 }
 
 public struct ImportModeSheet: View {
@@ -245,7 +254,7 @@ public struct ImportModeSheet: View {
                         Spacer()
                         CBadge(text: "会丢现有数据", kind: .error)
                     }
-                    Text("用备份文件替换本机现有记录。本机现在的错题、收藏、学习状态都会被清掉，之后无法找回。")
+                    Text("用备份文件替换本机现有记录。本机现在的错题、录入题、收藏、学习状态都会被清掉，之后无法找回。")
                         .font(.system(size: Tokens.Font.n13))
                         .cLineHeight(1.7, size: Tokens.Font.n13)
                         .foregroundStyle(colors.text2)
@@ -275,7 +284,7 @@ public struct ImportModeSheet: View {
             .disabled(inProgress)
 
             if inProgress {
-                CBar(kind: .info, title: Phase4PendingCopy.importBusy)
+                CBar(kind: .info, title: Phase4Copy.importBusy)
             }
             if let error {
                 CBar(kind: .error, title: error)
@@ -295,12 +304,12 @@ public struct ImportModeSheet: View {
                 return .success(summary.message)
             } catch let error as BackupError {
                 switch error {
-                case .database: return .failure(Phase4MessageError(message: Phase4PendingCopy.importFailure))
-                case .fileIO: return .failure(Phase4MessageError(message: Phase4PendingCopy.importFailure))
-                case .format: return .failure(Phase4MessageError(message: Phase4PendingCopy.importFailure))
+                case .database: return .failure(Phase4MessageError(message: Phase4Copy.importFailure))
+                case .fileIO: return .failure(Phase4MessageError(message: Phase4Copy.importFailure))
+                case .format: return .failure(Phase4MessageError(message: Phase4Copy.importFailure))
                 }
             } catch {
-                return .failure(Phase4MessageError(message: Phase4PendingCopy.importFailure))
+                return .failure(Phase4MessageError(message: Phase4Copy.importFailure))
             }
         }
         Task { @MainActor in onFinish(await task.value) }

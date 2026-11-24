@@ -50,7 +50,7 @@ enum BackupSchema {
             "state": enumeration(["待复习", "已掌握"]),
             "createdAt": pattern(timestamp), "lastReviewedAt": .nullable(plainString),
             "reviewCount": .integer(minimum: 0, maximum: Int.max),
-            "idiomIds": .array(pattern(uuid), minimum: 1)
+            "idiomIds": .array(pattern(uuid), minimum: 0)
         ]
     )
 
@@ -64,7 +64,7 @@ enum BackupSchema {
             "examType": .nullable(enumeration(examTypes)),
             "year": .nullable(.integer(minimum: 2_000, maximum: 2_100)),
             "region": .nullable(plainString), "createdAt": pattern(timestamp),
-            "idiomIds": .array(pattern(uuid), minimum: 1)
+            "idiomIds": .array(pattern(uuid), minimum: 0)
         ]
     )
 

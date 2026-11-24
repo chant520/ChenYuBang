@@ -51,7 +51,7 @@ final class P08MistakeSnapshotTests: XCTestCase {
         )
     }
 
-    /// ③「按录入时间」：题干 + 录入时间 + 关联成语（P10 在工作包 2.7，行不可点）。
+    /// ③「按录入时间」：题干 + 录入时间 + 关联成语。
     private func flatState() -> MistakeBookState {
         MistakeBookState(
             loading: false,
@@ -71,12 +71,29 @@ final class P08MistakeSnapshotTests: XCTestCase {
                     dateText: "2026-11-09 录入",
                     idiomsText: "按部就班"
                 ),
-                // 关联成语为空（「暂无」）在 2.6 不可达：标错至少挑一个成语，故快照只取有归属的行，空值由单元测试覆盖。
                 MistakeEntryView(
                     id: "m3",
                     stem: "文段中三处成语使用，哪一处不当",
                     dateText: "2026-10-28 录入",
                     idiomsText: "别出心裁"
+                )
+            ]
+        )
+    }
+
+    private func importedFlatState() -> MistakeBookState {
+        MistakeBookState(
+            loading: false,
+            dimension: .createdAt,
+            total: 1,
+            pending: 1,
+            entries: [
+                MistakeEntryView(
+                    id: "imported-m1",
+                    userExampleID: "imported-u1",
+                    stem: "导入后全部成语关联失效的错题",
+                    dateText: "2026-11-24 录入",
+                    idiomsText: MistakeBrowse.idiomsText([])
                 )
             ]
         )
@@ -114,6 +131,14 @@ final class P08MistakeSnapshotTests: XCTestCase {
 
     func testFlatDark() {
         assertP08(flatState(), dark: true)
+    }
+
+    func testImportedFlatLight() {
+        assertP08(importedFlatState(), dark: false)
+    }
+
+    func testImportedFlatDark() {
+        assertP08(importedFlatState(), dark: true)
     }
 
     func testEmptyLight() {

@@ -1,4 +1,5 @@
 @testable import CangyuData
+@testable import ChenYuBang
 import Foundation
 import GRDB
 import XCTest
@@ -34,6 +35,9 @@ final class BackupStoreTests: PackDatabaseTestCase {
         XCTAssertEqual(text(manifest["sha256"]), result.sha256)
         XCTAssertEqual(result.counts, BackupCounts(mistakes: 2, userExamples: 1, reviews: 1,
                                                    idiomStates: 2, scopes: 2))
+        XCTAssertTrue(BackupScreen.exportMessage(result, share: false).hasPrefix(
+            "错题 2 · 录入题 1 · 复习 1 · 学习状态 2 · 考试范围 2"
+        ))
         let validated = try queue.read { db in try BackupImport.validate(archiveData, db: db) }
         XCTAssertEqual(validated.counts, result.counts)
 

@@ -55,16 +55,16 @@ public struct ClearDataSheet: View {
             if let error {
                 CBar(kind: .error, title: error)
             }
-            CButton(text: inProgress ? Phase4PendingCopy.clearBusy : "确认清空",
+            CButton(text: inProgress ? Phase4Copy.clearBusy : "确认清空",
                     variant: .dangerFilled, loading: inProgress) { clear() }
         }
         .onAppear { loadCounts() }
     }
 
     private var impactText: String {
-        guard let counts else { return "正在读取学习数据条数（待拍板）" }
+        guard let counts else { return "正在读取学习数据条数" }
         return "错题 \(counts.mistakes) 道 · 录入题 \(counts.userExamples) 条 · "
-            + "收藏 \(counts.favorites) 个 · 学习状态（待拍板）"
+            + "收藏 \(counts.favorites) 个 · 学习状态"
     }
 
     private func loadCounts() {
@@ -83,9 +83,9 @@ public struct ClearDataSheet: View {
         let task = Task.detached { () -> Result<String, Phase4MessageError> in
             do {
                 _ = try service.clear()
-                return .success(Phase4PendingCopy.clearSuccess)
+                return .success(Phase4Copy.clearSuccess)
             } catch {
-                return .failure(Phase4MessageError(message: Phase4PendingCopy.clearFailure))
+                return .failure(Phase4MessageError(message: Phase4Copy.clearFailure))
             }
         }
         Task { @MainActor in onFinish(await task.value) }

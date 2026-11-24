@@ -91,6 +91,27 @@ final class BackupImportTests: PackDatabaseTestCase {
                        ["99999999-9999-4999-8999-999999999999"])
     }
 
+    func testValidationAcceptsEmptyIdiomIdsForImportState() throws {
+        try seedReferencedIdioms(count: 2)
+        let files = try generatedFiles()
+        var payload = try dataDictionary(files)
+        var mistakes = try XCTUnwrap(payload["mistakes"] as? [[String: Any]])
+        var mistake = try XCTUnwrap(mistakes.first)
+        mistake["idiomIds"] = []
+        mistakes[0] = mistake
+        var examples = try XCTUnwrap(payload["userExamples"] as? [[String: Any]])
+        var example = try XCTUnwrap(examples.first)
+        example["idiomIds"] = []
+        examples[0] = example
+        payload["mistakes"] = mistakes
+        payload["userExamples"] = examples
+
+        let validated = try validate(try rehashed(files, payload: payload))
+
+        XCTAssertEqual(validated.payload.mistakes.first?.idiomIds, [])
+        XCTAssertEqual(validated.payload.userExamples?.first?.idiomIds, [])
+    }
+
     func testValidationRejectsDuplicateAndNFCCollidingJSONKeys() throws {
         try seedReferencedIdioms(count: 2)
         let files = try generatedFiles()
