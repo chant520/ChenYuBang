@@ -66,7 +66,7 @@ enum BackupImportWriter {
                     isMistake, examType, year, region, createdAt
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, [
-                    example.id, example.imagePath, example.ocrText, example.stem,
+                    example.id, nil, example.ocrText, example.stem,
                     example.optionA, example.optionB, example.optionC, example.optionD,
                     example.myAnswer, example.isMistake, example.examType, example.year,
                     example.region, example.createdAt
