@@ -132,6 +132,7 @@ struct BackupReviewPayload: Decodable, Equatable, Sendable {
     let reviewedAt: String
 
     enum CodingKeys: String, CodingKey {
+        case id, mistakeId, result
         case reviewedAt = "at"
     }
 }
