@@ -2,6 +2,7 @@ package com.chenyubang.core.data
 
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 
@@ -157,6 +158,9 @@ private fun array(
 
 internal fun JsonObject.string(key: String): String = (getValue(key) as JsonPrimitive).content
 
-internal fun JsonObject.optionalString(key: String): String? = (get(key) as? JsonPrimitive)?.content
+internal fun JsonObject.optionalString(key: String): String? =
+    (get(key) as? JsonPrimitive)
+        ?.takeIf { it !is JsonNull }
+        ?.content
 
 internal fun JsonObject.integer(key: String): Int = string(key).toInt()
