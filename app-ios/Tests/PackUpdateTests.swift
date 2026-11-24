@@ -52,8 +52,12 @@ final class PackUpdateTests: PackDatabaseTestCase {
     func testRemoteEqualOrOlderSkipsZipDownload() async throws {
         let base = try importer.validate(PackFixture.published())
         _ = try importer.importPack(base)
-        let (_, update) = try update()
-        let client = FakeChannelClient(manifest: update)
+        let equal = ChannelManifest(
+            schemaVersion: 1, packVersion: base.version, builtAt: base.builtAt,
+            counts: base.counts, sha256: base.sha256,
+            sizeBytes: try PackFixture.published().count, packFile: "pack-\(base.version).zip"
+        )
+        let client = FakeChannelClient(manifest: equal)
         let (model, _) = try makeModel(base, client: client)
         await model.retry()
         XCTAssertEqual(model.presentation.status, .upToDate)
@@ -61,6 +65,7 @@ final class PackUpdateTests: PackDatabaseTestCase {
         let initialDownloadCalls = await client.downloadCalls
         XCTAssertEqual(initialDownloadCalls, 0)
 
+        let (_, update) = try update()
         let older = ChannelManifest(
             schemaVersion: 1, packVersion: "v0.9.0", builtAt: update.builtAt,
             counts: update.counts, sha256: update.sha256, sizeBytes: update.sizeBytes,
@@ -109,6 +114,10 @@ final class PackUpdateTests: PackDatabaseTestCase {
 
     func testImportFailureRestoresPreviousArchiveAndDatabase() async throws {
         let base = try importer.validate(PackFixture.published())
+        try queue.write { db in
+            try db.execute(sql: "INSERT INTO exam_scope (id, type, province, enabled) VALUES (?, ?, NULL, 1)",
+                           arguments: ["rollback-scope", "国考"])
+        }
         _ = try importer.importPack(base)
         let (zip, manifest) = try update()
         let (model, directory) = try makeModel(
