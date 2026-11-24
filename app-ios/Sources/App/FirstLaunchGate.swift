@@ -48,16 +48,23 @@ final class FirstLaunchState: ObservableObject {
             try ChenYuBangDatabase.makeMigrator().migrate(queue)
             let initializedImporter = PackImporter(queue: queue)
             let pack: ValidatedPack
-            if let installedData = try InstalledPackStorage.load(from: directory),
+            let usesMock: Bool
+            if let installedData = try? InstalledPackStorage.load(from: directory),
                let installedPack = try? initializedImporter.validate(installedData) {
                 pack = installedPack
-            } else {
-                guard let packageURL = Bundle.main.url(forResource: "pack-v1.0.0", withExtension: "zip") else {
-                    throw PackError.archive("Missing built-in pack")
-                }
-                let builtInData = try Data(contentsOf: packageURL)
-                pack = try initializedImporter.validate(builtInData)
+                usesMock = false
+            } else if let packageURL = Bundle.main.url(forResource: "pack-v1.0.0", withExtension: "zip"),
+                      let builtInData = try? Data(contentsOf: packageURL),
+                      let builtInPack = try? initializedImporter.validate(builtInData) {
+                pack = builtInPack
+                usesMock = false
                 try InstalledPackStorage.save(builtInData, to: directory)
+            } else {
+                guard let mockURL = Bundle.main.url(forResource: "pack-mock-v0.0.1", withExtension: "zip") else {
+                    throw PackError.archive("Missing built-in and mock packs")
+                }
+                pack = try initializedImporter.validate(Data(contentsOf: mockURL))
+                usesMock = true
             }
             _ = try initializedImporter.importPack(pack)
             let initializedStore = ExamScopeStore(queue: queue)
@@ -77,7 +84,8 @@ final class FirstLaunchState: ObservableObject {
                 pack: pack,
                 client: URLPackChannelClient(),
                 importer: initializedImporter,
-                storageDirectory: directory
+                storageDirectory: directory,
+                usesMock: usesMock
             )
             availableProvinces = provinces
             libraryReader = IdiomLibraryReader(queue: queue)

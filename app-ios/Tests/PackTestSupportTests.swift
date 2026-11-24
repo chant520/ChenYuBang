@@ -23,6 +23,18 @@ struct PackFixture {
         return try Data(contentsOf: sourceURL)
     }
 
+    static func mock() throws -> Data {
+        let bundle = Bundle(for: PackDatabaseTestCase.self)
+        for directory in ["Fixtures/pack", "pack", ""] {
+            if let url = bundle.url(forResource: "pack-mock-v0.0.1", withExtension: "zip", subdirectory: directory) {
+                return try Data(contentsOf: url)
+            }
+        }
+        let sourceURL = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
+            .appendingPathComponent("Fixtures/pack/pack-mock-v0.0.1.zip")
+        return try Data(contentsOf: sourceURL)
+    }
+
     init() throws {
         let files = try PackArchive.read(Self.published())
         idioms = try Self.decode(files, "idioms.json", as: [[String: Any]].self)

@@ -275,7 +275,7 @@ private final class SignalingLibraryReader: IdiomLibraryReading, @unchecked Send
     }
 }
 
-private actor FakeChannelClient: PackChannelClient {
+actor FakeChannelClient: PackChannelClient {
     private(set) var latestCalls = 0
     private(set) var downloadCalls = 0
     private let manifest: ChannelManifest?

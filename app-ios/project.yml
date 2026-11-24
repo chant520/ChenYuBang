@@ -60,6 +60,8 @@ targets:
           - Fixtures
       - path: Tests/Fixtures/pack/pack-v1.0.0.zip
         buildPhase: resources
+      - path: Tests/Fixtures/pack/pack-mock-v0.0.1.zip
+        buildPhase: resources
     dependencies:
       - target: ChenYuBang
       - package: ChenYuBangKit
