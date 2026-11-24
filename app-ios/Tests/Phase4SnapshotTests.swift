@@ -1,4 +1,5 @@
 @testable import CangyuData
+import CangyuDesignSystem
 import Foundation
 import GRDB
 import SnapshotTesting
@@ -48,15 +49,17 @@ final class Phase4SnapshotTests: XCTestCase {
     private func assertImport(dark: Bool, file: StaticString = #filePath,
                               testName: String = #function, line: UInt = #line) throws {
         let fixture = try makeFixture()
-        let view = ImportModeSheet(
+        let content = ImportModeSheet(
             backup: fixture.backup,
             service: fixture.backup,
             inProgress: false,
             error: nil,
             onStart: { true },
-            onFinish: { _ in },
-            onCancel: {}
+            onFinish: { _ in }
         )
+        let view = COverlay(style: .sheet, title: "读入这份备份，用哪种方式", onDismiss: {}) {
+            content
+        }
         .environment(\.colorScheme, dark ? .dark : .light)
         assertSnapshot(of: view, as: .image(layout: .fixed(width: 390, height: 844)),
                        file: file, testName: testName, line: line)
@@ -65,14 +68,16 @@ final class Phase4SnapshotTests: XCTestCase {
     private func assertClear(dark: Bool, file: StaticString = #filePath,
                              testName: String = #function, line: UInt = #line) throws {
         let fixture = try makeFixture()
-        let view = ClearDataSheet(
+        let content = ClearDataSheet(
             service: fixture.cleaner,
             inProgress: false,
             error: nil,
             onStart: { true },
-            onFinish: { _ in },
-            onCancel: {}
+            onFinish: { _ in }
         )
+        let view = COverlay(style: .dialog, title: "清空全部学习数据", onDismiss: {}) {
+            content
+        }
         .environment(\.colorScheme, dark ? .dark : .light)
         assertSnapshot(of: view, as: .image(layout: .fixed(width: 390, height: 844)),
                        file: file, testName: testName, line: line)

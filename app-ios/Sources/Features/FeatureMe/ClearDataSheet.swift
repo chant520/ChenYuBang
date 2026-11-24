@@ -11,22 +11,19 @@ public struct ClearDataSheet: View {
     private let error: String?
     private let onStart: () -> Bool
     private let onFinish: (Result<String, String>) -> Void
-    private let onCancel: () -> Void
 
     public init(
         service: UserDataCleaner,
         inProgress: Bool,
         error: String?,
         onStart: @escaping () -> Bool,
-        onFinish: @escaping (Result<String, String>) -> Void,
-        onCancel: @escaping () -> Void
+        onFinish: @escaping (Result<String, String>) -> Void
     ) {
         self.service = service
         self.inProgress = inProgress
         self.error = error
         self.onStart = onStart
         self.onFinish = onFinish
-        self.onCancel = onCancel
     }
 
     public var body: some View {
@@ -64,12 +61,12 @@ public struct ClearDataSheet: View {
             }
             CButton(text: inProgress ? "正在清空…" : "确认清空", variant: .dangerFilled,
                     loading: inProgress) { clear() }
-            CButton(text: "取消", variant: .ghost, enabled: !inProgress, action: onCancel)
         }
     }
 
     private func clear() {
         guard onStart() else { return }
+        let service = self.service
         let task = Task.detached { () -> Result<String, String> in
             do {
                 _ = try service.clear()

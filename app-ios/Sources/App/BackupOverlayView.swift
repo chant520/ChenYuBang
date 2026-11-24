@@ -29,8 +29,7 @@ struct BackupOverlayContent: View {
                         case .failure(let message):
                             router.finishBackupImport(result: .failure(message))
                         }
-                    },
-                    onCancel: router.closeOverlay
+                    }
                 )
             } else {
                 PendingPageText(text: "未读到待导入备份，请返回后重新选择文件。")
@@ -41,8 +40,7 @@ struct BackupOverlayContent: View {
                 inProgress: router.clearInProgress,
                 error: router.clearError,
                 onStart: router.beginClearData,
-                onFinish: router.finishClearData,
-                onCancel: router.closeOverlay
+                onFinish: router.finishClearData
             )
         } else {
             PendingPageText(text: "本机数据库尚未就绪，无法清空数据。")

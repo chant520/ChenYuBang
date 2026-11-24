@@ -93,7 +93,10 @@ public struct BackupScreen: View {
         .fileImporter(isPresented: $showingImporter, allowedContentTypes: [.zip]) { result in
             switch result {
             case .success(let url): loadBackup(url)
-            case .failure: showFailure("无法读取所选文件，请重新选择。")
+            case .failure(let error) where (error as? CocoaError)?.code == .userCancelled:
+                break
+            case .failure:
+                showFailure("无法读取所选文件，请重新选择。")
             }
         }
         .sheet(item: $shareItem) { item in ActivityView(url: item.url) }
@@ -103,9 +106,14 @@ public struct BackupScreen: View {
         guard !busy else { return }
         busy = true
         status = nil
+        let service = self.service
         let directory = share ? FileManager.default.temporaryDirectory : documentsDirectory()
         let task = Task.detached { () -> Result<BackupExport, String> in
-            do { return .success(try service.export(to: directory)) } catch { return .failure(userMessage(for: error)) }
+            do {
+                return .success(try service.export(to: directory))
+            } catch {
+                return .failure(backupUserMessage(for: error))
+            }
         }
         Task { @MainActor in
             let result = await task.value
@@ -139,8 +147,9 @@ public struct BackupScreen: View {
             showFailure("无法读取所选文件，请重新选择。")
             return
         }
+        let service = self.service
         let task = Task.detached { () -> Result<ValidatedBackup, String> in
-            do { return .success(try service.validate(data)) } catch { return .failure(userMessage(for: error)) }
+            do { return .success(try service.validate(data)) } catch { return .failure(backupUserMessage(for: error)) }
         }
         Task { @MainActor in
             let result = await task.value
@@ -164,17 +173,18 @@ public struct BackupScreen: View {
             ?? FileManager.default.temporaryDirectory
     }
 
-    private static func userMessage(for error: Error) -> String {
+}
+
+private func backupUserMessage(for error: Error) -> String {
+    switch error {
+    case let error as BackupError:
         switch error {
-        case let error as BackupError:
-            switch error {
-            case .database: return "本机数据库读写失败，请重试。"
-            case .fileIO: return "文件读写失败，请检查可用空间后重试。"
-            case .format: return "备份文件不完整、版本过新或校验失败。"
-            }
-        default:
-            return "备份处理失败，请重试。"
+        case .database: return "本机数据库读写失败，请重试。"
+        case .fileIO: return "文件读写失败，请检查可用空间后重试。"
+        case .format: return "备份文件不完整、版本过新或校验失败。"
         }
+    default:
+        return "备份处理失败，请重试。"
     }
 }
 
@@ -187,7 +197,6 @@ public struct ImportModeSheet: View {
     private let error: String?
     private let onStart: () -> Bool
     private let onFinish: (Result<String, String>) -> Void
-    private let onCancel: () -> Void
 
     public init(
         backup: ValidatedBackup,
@@ -195,8 +204,7 @@ public struct ImportModeSheet: View {
         inProgress: Bool,
         error: String?,
         onStart: @escaping () -> Bool,
-        onFinish: @escaping (Result<String, String>) -> Void,
-        onCancel: @escaping () -> Void
+        onFinish: @escaping (Result<String, String>) -> Void
     ) {
         self.backup = backup
         self.service = service
@@ -204,7 +212,6 @@ public struct ImportModeSheet: View {
         self.error = error
         self.onStart = onStart
         self.onFinish = onFinish
-        self.onCancel = onCancel
     }
 
     public var body: some View {
@@ -259,12 +266,13 @@ public struct ImportModeSheet: View {
                     .foregroundStyle(colors.errfg)
                     .accessibilityLabel(error)
             }
-            CButton(text: "取消", variant: .ghost, enabled: !inProgress, action: onCancel)
         }
     }
 
     private func importBackup(_ mode: BackupImportMode) {
         guard onStart() else { return }
+        let service = self.service
+        let backup = self.backup
         let task = Task.detached { () -> Result<String, String> in
             do {
                 let summary = try service.importBackup(backup, mode: mode)

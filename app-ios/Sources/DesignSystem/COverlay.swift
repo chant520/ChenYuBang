@@ -11,17 +11,20 @@ public struct COverlay<Content: View>: View {
     private let style: COverlayStyle
     private let title: String
     private let onDismiss: () -> Void
+    private let cancelEnabled: Bool
     private let content: Content
 
     public init(
         style: COverlayStyle,
         title: String,
         onDismiss: @escaping () -> Void,
+        cancelEnabled: Bool = true,
         @ViewBuilder content: () -> Content
     ) {
         self.style = style
         self.title = title
         self.onDismiss = onDismiss
+        self.cancelEnabled = cancelEnabled
         self.content = content()
     }
 
@@ -42,7 +45,9 @@ public struct COverlay<Content: View>: View {
                     .foregroundStyle(colors.text)
                     .accessibilityAddTraits(.isHeader)
                 content
-                CButton(text: "取消", variant: .ghost, action: onDismiss)
+                if cancelEnabled {
+                    CButton(text: "取消", variant: .ghost, action: onDismiss)
+                }
             }
             .padding(Tokens.Space.pageX)
             .frame(maxWidth: style == .dialog ? Tokens.Space.modalWidth : .infinity)

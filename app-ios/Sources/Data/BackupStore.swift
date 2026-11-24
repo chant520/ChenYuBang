@@ -8,7 +8,7 @@ import ZIPFoundation
 /// 不含原图、不含题库本身，但用户录入题 `userExamples[]` 必须导出。
 public enum BackupError: Error, Equatable {
     case database(String)
-    case io(String)
+    case fileIO(String)
     case format(String)
 }
 
@@ -59,6 +59,11 @@ enum Backup {
                        identity: BackupIdentity = BackupIdentity(),
                        namePrefix: String = "backup-") throws -> BackupExport {
         let (payload, counts) = try dataJSON(db)
+        do {
+            try BackupSchema.data.check(payload, path: "data")
+        } catch {
+            throw BackupError.format("本机数据不符合备份格式：\(error.localizedDescription)")
+        }
         let dataText = PackCanonical.text(payload)
         let digest = digest(of: dataText)
         let manifestText = PackCanonical.text(manifestJSON(counts: counts, sha256: digest,

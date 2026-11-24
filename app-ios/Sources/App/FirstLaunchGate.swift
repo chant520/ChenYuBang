@@ -55,10 +55,10 @@ final class FirstLaunchState: ObservableObject {
             let initializedStore = ExamScopeStore(queue: queue)
             let loaded = try initializedStore.load()
             let provinces = try initializedStore.availableProvinces()
+            var scope = loaded.scope
             if !loaded.complete {
                 // P01 首次启动即按产品默认写入 exam_scope（国考 + 省考 + 事业编，省考省份默认全选）；
                 // 库中已有范围行时 loaded.scope 就是既有值，原样写回，不覆盖用户设置。
-                var scope = loaded.scope
                 if scope == ExamScopeSelection() { scope.provinces = Set(provinces) }
                 try initializedStore.save(scope: scope, complete: false)
                 try initializedImporter.refreshScopeLinks(pack)
@@ -76,7 +76,7 @@ final class FirstLaunchState: ObservableObject {
             backupService = BackupService(queue: queue)
             dataCleaner = UserDataCleaner(queue: queue)
             dataDirectory = directory
-            preferences = loaded
+            preferences = LaunchPreferences(complete: loaded.complete, scope: scope)
         } catch is PackError {
             contentError = true
             initializationError = "内置题库初始化失败，请重试；联网获取尚未接入。"

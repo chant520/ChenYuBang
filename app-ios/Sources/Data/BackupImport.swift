@@ -265,13 +265,24 @@ enum BackupArchive {
 
     static func read(_ data: Data) throws -> [String: Data] {
         guard data.count <= maximumInput else { throw BackupError.format("备份文件过大。") }
+        let metadata: [String: ZIPEntryMetadata]
+        do {
+            metadata = try ZIPDirectory(data: data, names: names, maximumInput: maximumInput,
+                                        maximumFile: maximumFile, maximumExpanded: maximumExpanded).inspect()
+        } catch let error as ZIPDirectoryError {
+            switch error {
+            case .invalid(let message): throw BackupError.format("备份包结构不合法：\(message)")
+            case .limit(let message): throw BackupError.format("备份包超出大小限制：\(message)")
+            }
+        }
         let archive = try Archive(data: data, accessMode: .read)
         let entries = Array(archive)
         guard entries.count == 2 else { throw BackupError.format("备份包必须只含 manifest.json 与 data.json。") }
         var files: [String: Data] = [:]
         var total = 0
         for entry in entries {
-            guard entry.type == .file, names.contains(entry.path), files[entry.path] == nil,
+            guard entry.type == .file, names.contains(entry.path), let expected = metadata[entry.path],
+                  files[entry.path] == nil,
                   entry.uncompressedSize <= UInt32(maximumFile),
                   entry.uncompressedSize <= UInt32(maximumExpanded - total) else {
                 throw BackupError.format("备份包目录或条目大小不合法。")
@@ -284,7 +295,8 @@ enum BackupArchive {
                 }
                 file.append(chunk)
             }
-            guard file.count == Int(entry.uncompressedSize), checksum == entry.crc else {
+            guard file.count == expected.size, file.count == Int(entry.uncompressedSize),
+                  checksum == expected.crc else {
                 throw BackupError.format("备份条目 CRC 或大小校验失败。")
             }
             files[entry.path] = file

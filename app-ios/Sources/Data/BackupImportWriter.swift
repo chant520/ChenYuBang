@@ -25,7 +25,7 @@ enum BackupImportWriter {
         let automaticBackup = try queue.read { db in
             try Backup.export(db: db, to: caches, date: Date(), namePrefix: "backup-before-import-")
         }
-        try queue.write { db in
+        try queue.writeWithoutTransaction { db in
             try db.execute(sql: "ATTACH DATABASE ? AS backup_import",
                            arguments: StatementArguments([stagingURL.path]))
             do {
@@ -98,39 +98,70 @@ enum BackupImportWriter {
                             [mistake.id, idiomID])
             }
         }
-        var insertedReviewCounts: [String: Int] = [:]
+        var insertedReviews: [String: (count: Int, latest: String)] = [:]
         for review in payload.reviews {
             guard !localMistakes.contains(review.mistakeId), !localReviews.contains(review.id) else { continue }
             try execute(db, "INSERT\(conflict) INTO review_log(id, mistakeId, result, at) VALUES (?, ?, ?, ?)",
                         [review.id, review.mistakeId, review.result, review.reviewedAt])
             localReviews.insert(review.id)
-            insertedReviewCounts[review.mistakeId, default: 0] += 1
+            let previous = insertedReviews[review.mistakeId]
+            insertedReviews[review.mistakeId] = (
+                count: (previous?.count ?? 0) + 1,
+                latest: previous.map { max($0.latest, review.reviewedAt) } ?? review.reviewedAt
+            )
         }
         for mistake in payload.mistakes where !localMistakes.contains(mistake.id) {
-            try execute(db, "UPDATE mistake SET reviewCount = ? WHERE id = ?",
-                        [insertedReviewCounts[mistake.id] ?? 0, mistake.id])
+            let reviews = insertedReviews[mistake.id]
+            try execute(db, "UPDATE mistake SET reviewCount = ?, lastReviewedAt = ? WHERE id = ?",
+                        [reviews?.count ?? 0, reviews?.latest, mistake.id])
         }
         for state in payload.idiomStates {
             try execute(db, "INSERT\(conflict) INTO idiom_state(idiomId, status, favorite) VALUES (?, ?, ?)",
                         [state.idiomId, state.status, state.favorite])
         }
-        try insertScopes(payload.scopes, db: db, keepLocalOnConflict: keepLocalOnConflict)
+        let insertedProvinces = try insertScopes(payload.scopes, db: db, keepLocalOnConflict: keepLocalOnConflict)
+        if keepLocalOnConflict { try mergeProvinceCache(insertedProvinces, db: db) }
     }
 
     private static func insertScopes(_ scopes: [BackupScopePayload], db: Database,
-                                     keepLocalOnConflict: Bool) throws {
+                                     keepLocalOnConflict: Bool) throws -> Set<String> {
         var keys = Set<String>()
         if keepLocalOnConflict {
             let rows = try Row.fetchAll(db, sql: "SELECT type, province FROM exam_scope")
             keys = Set(rows.map { row in "\(row["type"] as String)\u{0}\(row["province"] as String? ?? "")" })
         }
+        var insertedProvinces = Set<String>()
         for scope in scopes {
             let key = "\(scope.type)\u{0}\(scope.province ?? "")"
             guard !keys.contains(key) else { continue }
             try execute(db, "INSERT INTO exam_scope(id, type, province, enabled) VALUES (?, ?, ?, ?)",
                         [UUID().uuidString, scope.type, scope.province, scope.enabled])
+            if scope.type == "省考", scope.enabled, let province = scope.province {
+                insertedProvinces.insert(province)
+            }
             keys.insert(key)
         }
+        return insertedProvinces
+    }
+
+    private static func mergeProvinceCache(_ inserted: Set<String>, db: Database) throws {
+        guard !inserted.isEmpty else { return }
+        let saved = try String.fetchOne(
+            db, sql: "SELECT value FROM settings WHERE key = ?", arguments: [ExamScopeStore.provincesKey]
+        )
+        let selected: Set<String>
+        if let saved {
+            selected = Set(try JSONDecoder().decode([String].self, from: Data(saved.utf8)))
+        } else {
+            let rows = try Row.fetchAll(db, sql: "SELECT province FROM exam_scope WHERE type = '省考' AND enabled = 1")
+            selected = Set(rows.compactMap { $0["province"] as String? })
+        }
+        let data = try JSONEncoder().encode(selected.union(inserted).sorted())
+        guard let json = String(data: data, encoding: .utf8) else {
+            throw BackupError.format("考试范围省份设置无法编码。")
+        }
+        try db.execute(sql: "INSERT OR REPLACE INTO settings(key, value) VALUES (?, ?)",
+                       arguments: [ExamScopeStore.provincesKey, json])
     }
 
     private static func clearUserData(_ db: Database) throws {

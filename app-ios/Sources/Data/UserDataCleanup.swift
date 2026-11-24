@@ -22,7 +22,7 @@ public final class UserDataCleaner: @unchecked Sendable {
                 try db.execute(sql: "DELETE FROM user_example")
                 try db.execute(sql: "DELETE FROM mistake")
                 try db.execute(sql: "DELETE FROM idiom_state")
-                let stamp = BackupStore.stamp(clearedAt)
+                let stamp = Backup.stamp(clearedAt)
                 try db.execute(
                     sql: "INSERT OR REPLACE INTO settings(key, value) VALUES (?, ?)",
                     arguments: ["lastClearedAt", stamp]

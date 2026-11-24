@@ -70,6 +70,20 @@ final class BackupStoreTests: PackDatabaseTestCase {
         XCTAssertEqual(try snapshot(contentTables), contentBefore, "export must be read-only")
     }
 
+    func testExportRejectsUserExampleWithoutIdiom() throws {
+        try seedExportData()
+        try queue.write { db in try db.execute(sql: "DELETE FROM user_example_idiom") }
+        let directory = try makeDirectory()
+        XCTAssertThrowsError(try queue.read { db in
+            try Backup.export(db: db, to: directory, date: exportDate)
+        }) { error in
+            guard case let BackupError.format(message) = error else {
+                return XCTFail("Expected backup format error, got \(error)")
+            }
+            XCTAssertTrue(message.contains("idiomIds"))
+        }
+    }
+
     func testCanonicalHelpersUseUTCAndNormalizeIdentity() {
         let date = Date(timeIntervalSince1970: 1_795_496_767)
         XCTAssertEqual(Backup.stamp(date), "2026-11-24T05:06:07Z")

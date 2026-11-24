@@ -45,6 +45,17 @@ final class BackupImportTests: PackDatabaseTestCase {
         XCTAssertNil(payload["userExamples"])
     }
 
+    func testValidationRejectsLocalCentralHeaderMismatch() throws {
+        try seedReferencedIdioms(count: 2)
+        var archive = try generatedFiles().archive()
+        archive[30] ^= 1
+        XCTAssertThrowsError(try queue.read { db in
+            try BackupImport.validate(archive, db: db)
+        }) { error in
+            XCTAssertTrue(String(describing: error).contains("备份包结构不合法"))
+        }
+    }
+
     func testValidationRejectsHigherSchemaAndDigestMismatch() throws {
         try seedReferencedIdioms(count: 2)
         let files = try generatedFiles()

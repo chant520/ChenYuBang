@@ -42,8 +42,12 @@ struct AppRouteHost: View {
                 FirstLaunchGate(launch: launch, router: router)
             }
             if let overlay = router.overlay {
+                let cancelEnabled = overlay.route == .importMode
+                    ? !router.backupImportInProgress : !router.clearInProgress
                 COverlay(style: overlay.route == .importMode ? .sheet : .dialog,
-                         title: overlay.route.title, onDismiss: router.closeOverlay) {
+                         title: overlay.route.title,
+                         cancelEnabled: cancelEnabled,
+                         onDismiss: router.closeOverlay) {
                     BackupOverlayContent(route: overlay.route, router: router, launch: launch)
                 }
             }

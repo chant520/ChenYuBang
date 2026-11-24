@@ -38,7 +38,11 @@ final class BackupImportWriterTests: PackDatabaseTestCase {
         _ = try service.importBackup(fixture, mode: .merge)
         XCTAssertEqual(try snapshot(BackupWriterFixture.userTables), merged, "merge must be idempotent")
         XCTAssertEqual(try snapshot(BackupWriterFixture.contentTables), contentBefore)
-        XCTAssertEqual(try snapshot(["settings"]), settingsBefore)
+        let settingsAfter = try snapshot(["settings"])
+        XCTAssertEqual(settingsAfter.filter { $0.key != ExamScopeStore.provincesKey },
+                       settingsBefore.filter { $0.key != ExamScopeStore.provincesKey })
+        let provinceJSON = try XCTUnwrap(settingsAfter[ExamScopeStore.provincesKey])
+        XCTAssertEqual(try JSONDecoder().decode([String].self, from: Data(provinceJSON.utf8)), ["广东", "湖北"])
     }
 
     func testMergeSkipsReviewIDCollisionAndKeepsCountsConsistent() throws {
@@ -55,6 +59,8 @@ final class BackupImportWriterTests: PackDatabaseTestCase {
                            BackupWriterFixture.localExtraMistake)
             XCTAssertEqual(try String.fetchOne(db, sql: "SELECT result FROM review_log WHERE id = ?",
                                                arguments: [BackupWriterFixture.localExtraReview]), "错")
+            XCTAssertNil(try String.fetchOne(db, sql: "SELECT lastReviewedAt FROM mistake WHERE id = ?",
+                                             arguments: [BackupWriterFixture.extraMistake]))
         }
         let merged = try snapshot(BackupWriterFixture.userTables)
         _ = try service.importBackup(fixture, mode: .merge)

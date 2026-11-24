@@ -27,7 +27,7 @@ final class UserDataCleanerTests: PackDatabaseTestCase {
         let values = Dictionary(uniqueKeysWithValues: settings.map { ($0["key"] as String, $0["value"] as String) })
         XCTAssertEqual(values["theme"], "dark")
         XCTAssertEqual(values["keep"], "yes")
-        XCTAssertEqual(values["lastClearedAt"], BackupStore.stamp(clearedAt))
+        XCTAssertEqual(values["lastClearedAt"], Backup.stamp(clearedAt))
         let storedDate = try XCTUnwrap(ISO8601DateFormatter().date(from: try XCTUnwrap(values["lastClearedAt"])))
         XCTAssertLessThan(abs(storedDate.timeIntervalSince(clearedAt)), 1)
         try assertNoOrphans()
