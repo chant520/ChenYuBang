@@ -35,6 +35,7 @@ internal object PackCanonical {
             is JsonPrimitive -> primitiveText(value)
         }
 
+    /** 题库包合并摘要：按文件名序（examples < idioms）拼接两份规范化文本后取 SHA-256。 */
     fun digest(
         idioms: JsonElement,
         examples: JsonElement,
@@ -42,8 +43,21 @@ internal object PackCanonical {
         val digest = MessageDigest.getInstance("SHA-256")
         digest.update(text(examples).toByteArray(Charsets.UTF_8))
         digest.update(text(idioms).toByteArray(Charsets.UTF_8))
-        return digest.digest().joinToString("") { "%02x".format(it.toInt() and DIGEST_BYTE_MASK) }
+        return hex(digest.digest())
     }
+
+    /**
+     * 单文档摘要（备份 data.json）：与 tools/canonical.py:sha256_of 同口径——
+     * 只走本文件的规范化 [text]，不另写 JSON 序列化。
+     */
+    fun digest(document: JsonElement): String {
+        val digest = MessageDigest.getInstance("SHA-256")
+        digest.update(text(document).toByteArray(Charsets.UTF_8))
+        return hex(digest.digest())
+    }
+
+    private fun hex(bytes: ByteArray): String =
+        bytes.joinToString("") { "%02x".format(it.toInt() and DIGEST_BYTE_MASK) }
 
     fun integer(number: String): String {
         require(number.length <= MAX_NUMBER_LENGTH) { "JSON number too long" }
