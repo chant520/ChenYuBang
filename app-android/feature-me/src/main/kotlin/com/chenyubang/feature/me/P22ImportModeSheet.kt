@@ -31,15 +31,27 @@ fun P22ImportModeSheet(
     vm: P15BackupViewModel,
     onFinished: (Boolean) -> Unit,
 ) {
+    P22ImportModeSheetContent(
+        onConfirm = { vm.confirmImport(it, onFinished) },
+        onCancel = {
+            vm.discardImport()
+            onFinished(false)
+        },
+    )
+}
+
+/** 可测性最小重构：Sheet 主体改由回调注入，视觉/文案/令牌与业务逻辑均不变。 */
+@Composable
+internal fun P22ImportModeSheetContent(
+    onConfirm: (ImportMode) -> Unit = {},
+    onCancel: () -> Unit = {},
+) {
     val colors = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
 
     COverlay(
         title = "读入这份备份，用哪种方式",
         centered = false,
-        onCancel = {
-            vm.discardImport()
-            onFinished(false)
-        },
+        onCancel = onCancel,
     ) {
         Text(
             text = "两种方式结果不同，选之前看清楚。",
@@ -52,21 +64,18 @@ fun P22ImportModeSheet(
             title = "覆盖",
             description = "用备份文件替换本机现有记录。本机现在的错题、收藏、学习状态都会被清掉，之后无法找回。",
             marker = { CBadge("会丢现有数据", CBadgeKind.Error) },
-            onClick = { vm.confirmImport(ImportMode.OVERWRITE, onFinished) },
+            onClick = { onConfirm(ImportMode.OVERWRITE) },
         )
         ModeCard(
             title = "合并",
             description = "把文件里的记录并入本机，同一道题以本机记录为准，重复的不会叠加。",
             marker = { CTag("保留本机") },
-            onClick = { vm.confirmImport(ImportMode.MERGE, onFinished) },
+            onClick = { onConfirm(ImportMode.MERGE) },
         )
 
         CButton(
             text = "取消",
-            onClick = {
-                vm.discardImport()
-                onFinished(false)
-            },
+            onClick = onCancel,
             variant = CButtonVariant.Ghost,
         )
     }

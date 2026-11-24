@@ -44,6 +44,20 @@ fun P23ClearDialogRoute(
     val state by vm.state.collectAsState()
     LaunchedEffect(Unit) { vm.loadCounts() }
 
+    P23ClearDialogContent(
+        state = state,
+        onConfirm = { vm.clear(onCleared) },
+        onCancel = onCancel,
+    )
+}
+
+/** 可测性最小重构：Route 与快照共用同一主体，视觉/文案/令牌与业务逻辑均不变。 */
+@Composable
+internal fun P23ClearDialogContent(
+    state: P23ClearUiState,
+    onConfirm: () -> Unit = {},
+    onCancel: () -> Unit = {},
+) {
     val colors = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
     COverlay(title = "清空全部学习数据", centered = true, onCancel = onCancel) {
         Text(
@@ -79,7 +93,7 @@ fun P23ClearDialogRoute(
 
         CButton(
             text = "确认清空",
-            onClick = { vm.clear(onCleared) },
+            onClick = onConfirm,
             variant = CButtonVariant.DangerFilled,
             loading = state.clearing,
         )

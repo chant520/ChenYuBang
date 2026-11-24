@@ -55,8 +55,17 @@ fun P16PackRoute(packVersion: PackVersion) {
     val state by vm.state.collectAsState()
     LaunchedEffect(Unit) { vm.load() }
 
-    val colors = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
     val current = state ?: return
+    P16PackContent(state = current, onCheck = vm::check)
+}
+
+/** 可测性最小重构：Route 与快照共用同一主体，视觉/文案/占位串/令牌与业务逻辑均不变。 */
+@Composable
+internal fun P16PackContent(
+    state: PackVersionState,
+    onCheck: () -> Unit = {},
+) {
+    val colors = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
     Column(
         Modifier
             .fillMaxSize()
@@ -65,12 +74,12 @@ fun P16PackRoute(packVersion: PackVersion) {
             .paddingScreen(),
         verticalArrangement = Arrangement.spacedBy(Tokens.Space.block.dp),
     ) {
-        if (current.isTest) {
-            MockVersionBlock(current)
+        if (state.isTest) {
+            MockVersionBlock(state)
         } else {
-            RealVersionBlock(current)
+            RealVersionBlock(state)
         }
-        UpdateArea(current, vm::check)
+        UpdateArea(state, onCheck)
         Spacer(Modifier.size(Tokens.Space.fabBottom.dp))
     }
 }

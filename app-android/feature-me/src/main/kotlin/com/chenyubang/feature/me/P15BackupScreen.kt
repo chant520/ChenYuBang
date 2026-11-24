@@ -50,7 +50,6 @@ fun P15BackupRoute(
     onPresentImportMode: () -> Unit,
 ) {
     val context = LocalContext.current
-    val colors = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
     val state by vm.state.collectAsState()
 
     val createLocal =
@@ -63,6 +62,23 @@ fun P15BackupRoute(
         }
     val shareDir = remember { File(context.cacheDir, "backups") }
 
+    P15BackupContent(
+        state = state,
+        onLocal = { createLocal.launch("backup.zip") },
+        onShare = { vm.exportToFile(shareDir) { file -> launchSystemShare(context, file) } },
+        onPick = { openImport.launch(IMPORT_MIME) },
+    )
+}
+
+/** 可测性最小重构：Route 与快照共用同一主体，视觉/文案/占位串/令牌与业务逻辑均不变。 */
+@Composable
+internal fun P15BackupContent(
+    state: P15BackupUiState,
+    onLocal: () -> Unit = {},
+    onShare: () -> Unit = {},
+    onPick: () -> Unit = {},
+) {
+    val colors = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
     Column(
         Modifier
             .fillMaxSize()
@@ -71,11 +87,8 @@ fun P15BackupRoute(
             .padding(horizontal = Tokens.Space.pageX.dp, vertical = Tokens.Space.contentTop.dp),
         verticalArrangement = Arrangement.spacedBy(Tokens.Space.block.dp),
     ) {
-        ExportCard(
-            onLocal = { createLocal.launch("backup.zip") },
-            onShare = { vm.exportToFile(shareDir) { file -> launchSystemShare(context, file) } },
-        )
-        ImportCard(onPick = { openImport.launch(IMPORT_MIME) })
+        ExportCard(onLocal = onLocal, onShare = onShare)
+        ImportCard(onPick = onPick)
 
         CCard(soft = true) {
             CLabel("最近一次备份时间")
