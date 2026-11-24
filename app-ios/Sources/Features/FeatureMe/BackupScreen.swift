@@ -43,7 +43,7 @@ public struct BackupScreen: View {
         _failed = State(initialValue: initialFailed)
     }
 
-    static func exportMessage(_ exported: BackupExport, share: Bool) -> String {
+    nonisolated static func exportMessage(_ exported: BackupExport, share: Bool) -> String {
         "错题 \(exported.counts.mistakes) · 录入题 \(exported.counts.userExamples) · "
             + "复习 \(exported.counts.reviews) · 学习状态 \(exported.counts.idiomStates) · "
             + "考试范围 \(exported.counts.scopes)"
