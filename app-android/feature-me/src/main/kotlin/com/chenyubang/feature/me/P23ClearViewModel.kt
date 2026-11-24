@@ -13,14 +13,18 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-// 待拍板：P23 清空失败逐字串稿未给（视觉契约第 4 节只覆盖确认主态），收口轮须替换。
-const val P23_CLEAR_FAILURE_PLACEHOLDER = "清空未成功（占位·待拍板）"
+// ===== 已拍板正式结果态文案（视觉契约第 8 节；仅替文字，颜色/字号仍走 Tokens）=====
+const val P23_CLEAR_FAILURE = "清空失败，本机数据未变更"
+const val P23_CLEAR_SUCCESS = "学习数据已清空"
+const val P23_CLEARING = "正在清空"
 
 data class P23ClearUiState(
     val mistakes: Int = 0,
+    val userExamples: Int = 0,
     val favorites: Int = 0,
     val clearing: Boolean = false,
     val failed: Boolean = false,
+    val cleared: Boolean = false,
 )
 
 /**
@@ -34,7 +38,7 @@ class P23ClearViewModel(
     private val _state = MutableStateFlow(P23ClearUiState())
     val state: StateFlow<P23ClearUiState> = _state.asStateFlow()
 
-    /** 影响卡数字取实时条数（稿面 12 / 4 为排版示意）。只读查询，不改数据层。 */
+    /** 影响卡数字取实时条数（稿面 12 / 4 为排版示意）；只读查询，不改数据层。 */
     fun loadCounts() {
         viewModelScope.launch {
             try {
@@ -42,10 +46,16 @@ class P23ClearViewModel(
                     withContext(Dispatchers.IO) {
                         val sqlite = database.openHelper.readableDatabase
                         val mistakes = scalar(sqlite, "SELECT COUNT(*) FROM mistake")
+                        val userExamples = scalar(sqlite, "SELECT COUNT(*) FROM user_example")
                         val favorites = scalar(sqlite, "SELECT COUNT(*) FROM idiom_state WHERE favorite = 1")
-                        mistakes to favorites
+                        Triple(mistakes, userExamples, favorites)
                     }
-                _state.value = _state.value.copy(mistakes = counts.first, favorites = counts.second)
+                _state.value =
+                    _state.value.copy(
+                        mistakes = counts.first,
+                        userExamples = counts.second,
+                        favorites = counts.third,
+                    )
             } catch (cancelled: CancellationException) {
                 throw cancelled
             } catch (_: Exception) {
@@ -56,10 +66,11 @@ class P23ClearViewModel(
 
     fun clear(onCleared: () -> Unit) {
         if (_state.value.clearing) return
-        _state.value = _state.value.copy(clearing = true, failed = false)
+        _state.value = _state.value.copy(clearing = true, failed = false, cleared = false)
         viewModelScope.launch {
             try {
                 clearData.clear()
+                _state.value = _state.value.copy(clearing = false, cleared = true)
                 onCleared()
             } catch (cancelled: CancellationException) {
                 throw cancelled

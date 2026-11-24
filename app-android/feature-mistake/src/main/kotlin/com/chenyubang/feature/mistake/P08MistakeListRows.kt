@@ -174,8 +174,12 @@ private fun MistakeRow(
             verticalArrangement = Arrangement.spacedBy(Tokens.Space.lmetaGap.dp),
         ) {
             Text(text = item.recordedAt, color = c.text3, fontSize = Tokens.Font.n11.sp)
-            item.idiomWords.forEach { word ->
-                Text(text = word, color = c.text3, fontSize = Tokens.Font.n11.sp)
+            if (item.idiomWords.isEmpty()) {
+                Text(text = "暂未关联成语", color = c.text3, fontSize = Tokens.Font.n11.sp)
+            } else {
+                item.idiomWords.forEach { word ->
+                    Text(text = word, color = c.text3, fontSize = Tokens.Font.n11.sp)
+                }
             }
         }
     }

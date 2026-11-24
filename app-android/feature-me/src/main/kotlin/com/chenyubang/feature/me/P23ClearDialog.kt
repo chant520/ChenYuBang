@@ -17,6 +17,8 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.chenyubang.core.data.AppDatabase
 import com.chenyubang.core.data.ClearData
+import com.chenyubang.core.ui.CBar
+import com.chenyubang.core.ui.CBarKind
 import com.chenyubang.core.ui.CButton
 import com.chenyubang.core.ui.CButtonVariant
 import com.chenyubang.core.ui.CCard
@@ -71,7 +73,7 @@ internal fun P23ClearDialogContent(
             CLabel("会清空")
             Spacer(Modifier.size(Tokens.Space.lsubTop.dp))
             Text(
-                text = "错题 ${state.mistakes} 道 · 收藏 ${state.favorites} 个 · 学习状态",
+                text = "错题 ${state.mistakes} 道 · 录入题 ${state.userExamples} 条 · 收藏 ${state.favorites} 个 · 学习状态",
                 color = colors.text2,
                 fontSize = Tokens.Font.n13.sp,
             )
@@ -88,11 +90,14 @@ internal fun P23ClearDialogContent(
         }
 
         if (state.failed) {
-            CInlineError(P23_CLEAR_FAILURE_PLACEHOLDER)
+            CInlineError(P23_CLEAR_FAILURE)
+        }
+        if (state.cleared) {
+            CBar(kind = CBarKind.Info, title = P23_CLEAR_SUCCESS)
         }
 
         CButton(
-            text = "确认清空",
+            text = if (state.clearing) P23_CLEARING else "确认清空",
             onClick = onConfirm,
             variant = CButtonVariant.DangerFilled,
             loading = state.clearing,

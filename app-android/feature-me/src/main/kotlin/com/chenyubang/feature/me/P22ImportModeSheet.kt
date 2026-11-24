@@ -62,7 +62,7 @@ internal fun P22ImportModeSheetContent(
 
         ModeCard(
             title = "覆盖",
-            description = "用备份文件替换本机现有记录。本机现在的错题、收藏、学习状态都会被清掉，之后无法找回。",
+            description = "用备份文件替换本机现有记录。本机现在的错题、录入题、收藏、学习状态都会被清掉，之后无法找回。",
             marker = { CBadge("会丢现有数据", CBadgeKind.Error) },
             onClick = { onConfirm(ImportMode.OVERWRITE) },
         )

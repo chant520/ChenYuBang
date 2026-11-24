@@ -19,32 +19,22 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
-// ===== 待拍板占位串（视觉契约第 7 节 / 第 6 节第 1、2、3 项；仅替文字，颜色/字号仍走 Tokens）=====
-// 待拍板：P15 导出成功条逐字措辞未出稿，收口轮须替换。
-const val P15_EXPORT_SUCCESS_TITLE_PLACEHOLDER = "备份完成（占位·待拍板）"
+// ===== 已拍板正式结果态文案（视觉契约第 8 节；仅替文字，颜色/字号仍走 Tokens）=====
+const val P15_EXPORT_SUCCESS_TITLE = "导出完成"
+const val P15_EXPORT_FAILURE_TITLE = "导出失败，请重试"
+const val P15_REJECT_TITLE = "备份无法读取，请更换文件后重试"
+const val P15_IMPORT_FAILURE_TITLE = "导入失败，请检查备份文件后重试"
+const val P15_IMPORT_DONE_TITLE = "导入完成"
+const val P15_LAST_BACKUP_VALUE = "暂无备份记录"
+const val P15_IMPORTING = "正在导入"
 
-// 待拍板：P15 导出失败红硬错误条逐字串未出稿，收口轮须替换。
-const val P15_EXPORT_FAILURE_TITLE_PLACEHOLDER = "导出失败（占位·待拍板）"
-
-// 待拍板：P22 超版 / sha256 不符 / 字段异常硬错误拒绝逐字串未出稿，收口轮须替换。
-const val P22_REJECT_TITLE_PLACEHOLDER = "备份无法读取（占位·待拍板）"
-
-// 待拍板：P15 导入写库失败红硬错误条逐字串未出稿，收口轮须替换。
-const val P15_IMPORT_FAILURE_TITLE_PLACEHOLDER = "导入失败（占位·待拍板）"
-
-// 待拍板：P15 导入完成结果条逐字串未出稿，收口轮须替换。
-const val P15_IMPORT_DONE_TITLE_PLACEHOLDER = "导入完成（占位·待拍板）"
-
-// 待拍板：P15「最近一次备份时间」值位逐字串未出稿，收口轮须替换。
-const val P15_LAST_BACKUP_VALUE_PLACEHOLDER = "暂无备份记录（占位·待拍板）"
-
-/** 待拍板：导出成功条条数格式，开工清单第 36 行只要求「成功给条数」，稿未给模板（视觉契约第 6 节第 1 项）。 */
-fun p15ExportCountsPlaceholder(c: BackupCounts): String =
+/** 导出成功条条数：错题 X · 录入题 X · 复习 X · 学习状态 X · 考试范围 X（真实写入量）。 */
+fun p15ExportCounts(c: BackupCounts): String =
     "错题 ${c.mistakes} · 录入题 ${c.userExamples} · 复习 ${c.reviews} · " +
-        "学习状态 ${c.idiomStates} · 考试范围 ${c.scopes}（占位·待拍板）"
+        "学习状态 ${c.idiomStates} · 考试范围 ${c.scopes}"
 
-/** 待拍板：导入完成结果条条数与 orphans / safetyCopy 呈现格式稿未给（视觉契约第 1.2 节未覆盖）。 */
-fun p15ImportDetailPlaceholder(result: BackupImportResult): String {
+/** 导入完成结果条：真实写入量、四类孤儿计数与安全副本说明。 */
+fun p15ImportDetail(result: BackupImportResult): String {
     val c = result.imported
     val written =
         "写入：错题 ${c.mistakes} · 录入题 ${c.userExamples} · 复习 ${c.reviews} · " +
@@ -65,15 +55,18 @@ fun p15ImportDetailPlaceholder(result: BackupImportResult): String {
     val safety =
         result.safetyCopy?.let { "已自动留存导入前副本：$it" }
             ?: "合并模式未生成安全副本"
-    return "$written；$orphan；$safety（占位·待拍板）"
+    return "$written；$orphan；$safety"
 }
 
-/** P15 结果区（同一时刻只显示一条）。HardError 的 title 为占位串、detail 为底层诊断。 */
+/** P15 结果区（同一时刻只显示一条）。HardError 的 title 为用户文案、detail 为底层诊断。 */
 sealed interface P15Banner {
     data class Exported(
         val counts: BackupCounts,
         val fileName: String,
     ) : P15Banner
+
+    /** 导入进行态：restore 前置位，结束由结果条替换。 */
+    data object Importing : P15Banner
 
     data class HardError(
         val title: String,
@@ -122,7 +115,7 @@ class P15BackupViewModel(
                 if (error is CancellationException) throw error
                 _state.value =
                     _state.value.copy(
-                        banner = P15Banner.HardError(P15_EXPORT_FAILURE_TITLE_PLACEHOLDER, error.message.orEmpty()),
+                        banner = P15Banner.HardError(P15_EXPORT_FAILURE_TITLE, error.message.orEmpty()),
                     )
             }.onSuccess { result ->
                 _state.value = _state.value.copy(banner = P15Banner.Exported(result.counts, result.fileName))
@@ -146,7 +139,7 @@ class P15BackupViewModel(
                 if (error is CancellationException) throw error
                 _state.value =
                     _state.value.copy(
-                        banner = P15Banner.HardError(P15_EXPORT_FAILURE_TITLE_PLACEHOLDER, error.message.orEmpty()),
+                        banner = P15Banner.HardError(P15_EXPORT_FAILURE_TITLE, error.message.orEmpty()),
                     )
             }.onSuccess { result ->
                 _state.value = _state.value.copy(banner = P15Banner.Exported(result.counts, result.fileName))
@@ -156,7 +149,7 @@ class P15BackupViewModel(
     }
 
     /**
-     * 选文件后同步校验：超版 / sha256 不符 / 字段异常均为 DataError.Hard，停在 P15 红条不进 P22。
+     * 选文件后同步校验：超版 / sha256 不符 / 字段异常均为硬错误，停在 P15 红条不进 P22。
      * 校验通过才置 pendingBackup 并回调页面 present(Route.ImportMode)。
      */
     fun pickImport(
@@ -180,7 +173,7 @@ class P15BackupViewModel(
                 if (error is CancellationException) throw error
                 _state.value =
                     _state.value.copy(
-                        banner = P15Banner.HardError(P22_REJECT_TITLE_PLACEHOLDER, error.message.orEmpty()),
+                        banner = P15Banner.HardError(P15_REJECT_TITLE, error.message.orEmpty()),
                     )
             }.onSuccess { backup ->
                 _state.value = _state.value.copy(pendingBackup = backup)
@@ -189,19 +182,20 @@ class P15BackupViewModel(
         }
     }
 
-    /** P22 选覆盖 / 合并：结果回 P15 结果区；onFinished(true) 时由 app bumpContentRevision。 */
+    /** P22 选覆盖 / 合并：restore 前先置进行态，结束替换为结果；onFinished(true) 时由 app bumpContentRevision。 */
     fun confirmImport(
         mode: ImportMode,
         onFinished: (Boolean) -> Unit,
     ) {
         val backup = _state.value.pendingBackup ?: return
         viewModelScope.launch {
+            _state.value = _state.value.copy(banner = P15Banner.Importing)
             runCatching { importer.restore(backup, mode) }
                 .onFailure { error ->
                     if (error is CancellationException) throw error
                     _state.value =
                         _state.value.copy(
-                            banner = P15Banner.HardError(P15_IMPORT_FAILURE_TITLE_PLACEHOLDER, error.message.orEmpty()),
+                            banner = P15Banner.HardError(P15_IMPORT_FAILURE_TITLE, error.message.orEmpty()),
                             pendingBackup = null,
                         )
                     onFinished(false)

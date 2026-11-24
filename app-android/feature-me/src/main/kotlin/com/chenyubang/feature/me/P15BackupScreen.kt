@@ -70,7 +70,7 @@ fun P15BackupRoute(
     )
 }
 
-/** 可测性最小重构：Route 与快照共用同一主体，视觉/文案/占位串/令牌与业务逻辑均不变。 */
+/** 可测性最小重构：Route 与快照共用同一主体，视觉/文案/令牌与业务逻辑均不变。 */
 @Composable
 internal fun P15BackupContent(
     state: P15BackupUiState,
@@ -96,7 +96,7 @@ internal fun P15BackupContent(
             CBadge("进阶位", CBadgeKind.Neutral)
             Spacer(Modifier.size(Tokens.Space.lsubTop.dp))
             Text(
-                text = P15_LAST_BACKUP_VALUE_PLACEHOLDER,
+                text = P15_LAST_BACKUP_VALUE,
                 color = colors.text3,
                 fontSize = Tokens.Font.n12.sp,
             )
@@ -124,7 +124,7 @@ private fun ExportCard(
         CLabel("导出备份")
         Spacer(Modifier.size(Tokens.Space.lsubTop.dp))
         Text(
-            text = "导出的内容：错题、收藏、学习状态。不含题库本身。",
+            text = "导出的内容：错题、录入题、收藏、学习状态。不含题库本身。",
             color = colors.text2,
             fontSize = Tokens.Font.n13.sp,
             lineHeight = (Tokens.Font.n13 * TEXT_LINE_HEIGHT).sp,
@@ -187,9 +187,11 @@ private fun P15BannerBar(banner: P15Banner) {
         is P15Banner.Exported ->
             CBar(
                 kind = CBarKind.Info,
-                title = P15_EXPORT_SUCCESS_TITLE_PLACEHOLDER,
-                subtitle = "${p15ExportCountsPlaceholder(banner.counts)} · ${banner.fileName}",
+                title = P15_EXPORT_SUCCESS_TITLE,
+                subtitle = p15ExportCounts(banner.counts),
             )
+        is P15Banner.Importing ->
+            CBar(kind = CBarKind.Info, title = P15_IMPORTING)
         is P15Banner.HardError ->
             CBar(
                 kind = CBarKind.Error,
@@ -199,8 +201,8 @@ private fun P15BannerBar(banner: P15Banner) {
         is P15Banner.Imported ->
             CBar(
                 kind = CBarKind.Info,
-                title = P15_IMPORT_DONE_TITLE_PLACEHOLDER,
-                subtitle = p15ImportDetailPlaceholder(banner.result),
+                title = P15_IMPORT_DONE_TITLE,
+                subtitle = p15ImportDetail(banner.result),
             )
     }
 }

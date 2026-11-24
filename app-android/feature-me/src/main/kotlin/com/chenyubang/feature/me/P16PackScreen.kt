@@ -33,16 +33,11 @@ import com.chenyubang.core.data.PackVersionStatus
 import com.chenyubang.core.ui.CBar
 import com.chenyubang.core.ui.CBarKind
 import com.chenyubang.core.ui.CButton
+import com.chenyubang.core.ui.CButtonVariant
 import com.chenyubang.core.ui.CCard
 import com.chenyubang.core.ui.CLabel
 import com.chenyubang.core.ui.CTag
 import com.chenyubang.core.ui.tokens.Tokens
-
-// 待拍板：P16 更新中 / 下载中带进度逐字串未出稿（视觉契约第 6 节第 4 项）；「正在保存…」是保存串，禁止挪用。
-const val P16_CHECKING_PLACEHOLDER = "题库检查中（占位·待拍板）"
-
-// 待拍板：P16 远端更新已落地的独立成功串未出稿（视觉契约第 6 节第 5 项）；「已是最新版本」只用于版本相等。
-const val P16_UPDATE_OK_PLACEHOLDER = "题库已更新（占位·待拍板）"
 
 /** P16 题库版本与更新（路由 settings/pack）。主态逐字文案见视觉契约第 3.1 节。 */
 @Composable
@@ -56,14 +51,19 @@ fun P16PackRoute(packVersion: PackVersion) {
     LaunchedEffect(Unit) { vm.load() }
 
     val current = state ?: return
-    P16PackContent(state = current, onCheck = vm::check)
+    P16PackContent(
+        state = current,
+        onCheck = vm::check,
+        onContinueOffline = vm::continueOffline,
+    )
 }
 
-/** 可测性最小重构：Route 与快照共用同一主体，视觉/文案/占位串/令牌与业务逻辑均不变。 */
+/** 可测性最小重构：Route 与快照共用同一主体，视觉/文案/令牌与业务逻辑均不变。 */
 @Composable
 internal fun P16PackContent(
     state: PackVersionState,
     onCheck: () -> Unit = {},
+    onContinueOffline: () -> Unit = {},
 ) {
     val colors = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
     Column(
@@ -79,7 +79,7 @@ internal fun P16PackContent(
         } else {
             RealVersionBlock(state)
         }
-        UpdateArea(state, onCheck)
+        UpdateArea(state, onCheck, onContinueOffline)
         Spacer(Modifier.size(Tokens.Space.fabBottom.dp))
     }
 }
@@ -144,17 +144,22 @@ private fun MockVersionBlock(state: PackVersionState) {
 private fun UpdateArea(
     state: PackVersionState,
     onCheck: () -> Unit,
+    onContinueOffline: () -> Unit,
 ) {
     val colors = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
     when (state.status) {
         PackVersionStatus.CHECKING -> {
-            CButton(text = P16_CHECKING_PLACEHOLDER, onClick = {}, loading = true)
+            CButton(text = "正在检查题库更新", onClick = {}, loading = true)
             CheckNote()
         }
-        PackVersionStatus.RECOVERABLE_FAIL -> RecoverableArea(state, onCheck)
+        PackVersionStatus.DOWNLOADING -> {
+            CButton(text = "正在下载题库更新（${state.progress}%）", onClick = {}, loading = true)
+            CheckNote()
+        }
+        PackVersionStatus.RECOVERABLE_FAIL -> RecoverableArea(state, onCheck, onContinueOffline)
         PackVersionStatus.UPDATE_OK -> {
             CLabel("更新状态")
-            CTag(P16_UPDATE_OK_PLACEHOLDER)
+            CTag("题库已更新")
             CButton(text = "检查题库更新", onClick = onCheck)
             CheckNote()
         }
@@ -198,6 +203,7 @@ private fun UpdateArea(
 private fun RecoverableArea(
     state: PackVersionState,
     onCheck: () -> Unit,
+    onContinueOffline: () -> Unit,
 ) {
     val colors = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
     CBar(
@@ -206,6 +212,7 @@ private fun RecoverableArea(
         subtitle = "当前版本号不变，仍是 ${state.version}；题库本身可离线继续用。",
     )
     CButton(text = "重试", onClick = onCheck)
+    CButton(text = "继续离线使用", onClick = onContinueOffline, variant = CButtonVariant.Ghost)
     Text(
         text = "失败不影响本机学习记录",
         color = colors.text3,
