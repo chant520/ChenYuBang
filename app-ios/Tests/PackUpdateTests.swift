@@ -6,15 +6,18 @@ import XCTest
 
 @MainActor
 final class PackUpdateTests: PackDatabaseTestCase {
-    func testChannelClientRejectsHTTPBeforeStartingRequest() async {
+    func testChannelClientRejectsInsecureOrCredentialedURLs() async throws {
         let client = URLPackChannelClient()
-        do {
-            _ = try await client.latest(from: URL(string: "http://example.com/latest.json")!)
-            XCTFail("HTTP channel URL must be rejected")
-        } catch let error as PackChannelError {
-            XCTAssertEqual(error, .invalidResponse)
-        } catch {
-            XCTFail("Unexpected error: \(error)")
+        for value in ["http://example.com/latest.json", "https://user:pass@example.com/latest.json"] {
+            let url = try XCTUnwrap(URL(string: value))
+            do {
+                _ = try await client.latest(from: url)
+                XCTFail("Unsafe channel URL must be rejected")
+            } catch let error as PackChannelError {
+                XCTAssertEqual(error, .invalidResponse)
+            } catch {
+                XCTFail("Unexpected error: \(error)")
+            }
         }
     }
 

@@ -254,11 +254,11 @@ public struct PackVersionScreen: View {
                     .font(.system(size: Tokens.Font.n115))
                     .cLineHeight(1.65, size: Tokens.Font.n115)
                     .foregroundStyle(colors.text3)
-                Text("随安装包内置的题库作离线底座；内置包也没有时才用标注 TEST 的 mock 兜底。")
+                Text("随安装包内置的题库作离线底座，联网获取成功即更新、失败回落内置包（版本号不变、可重试）；内置包也没有时才用标注 TEST 的 mock 兜底。")
                     .font(.system(size: Tokens.Font.n115))
                     .cLineHeight(1.65, size: Tokens.Font.n115)
                     .foregroundStyle(colors.text3)
-                Text("只下载题库增量包，不改动本机学习记录。")
+                Text("联网只用于获取/更新题库内容，不改动本机学习记录。")
                     .font(.system(size: Tokens.Font.n115))
                     .cLineHeight(1.65, size: Tokens.Font.n115)
                     .foregroundStyle(colors.text3)
@@ -283,9 +283,7 @@ public struct PackVersionScreen: View {
                     .font(.system(size: Tokens.Font.n30, weight: .bold))
                     .foregroundStyle(colors.head)
                     .padding(.top, Tokens.Space.lmetaTop)
-                Text(presentation.status == .updated || presentation.status == .upToDate
-                     || presentation.status == .offline
-                     ? "当前已安装版本，可离线使用" : "内置版本，装好即可离线用")
+                Text("当前已安装版本，可离线使用")
                     .font(.system(size: Tokens.Font.n115))
                     .cLineHeight(1.65, size: Tokens.Font.n115)
                     .foregroundStyle(colors.text3)
@@ -336,9 +334,26 @@ public struct PackVersionScreen: View {
     @ViewBuilder
     private func updateArea() -> some View {
         switch presentation.status {
-        case .builtin, .upToDate, .offline:
+        case .builtin, .offline:
             CButton(text: "检查题库更新", action: onRetry)
-            Text("这是全 App 唯一的主动联网入口之一")
+            Text("手动重试入口")
+                .font(.system(size: Tokens.Font.n11))
+                .foregroundStyle(CangyuTheme.colors(for: colorScheme).text3)
+            CCard {
+                HStack {
+                    CLabel("更新状态")
+                    Spacer()
+                    CTag(text: "离线可用")
+                }
+                Text("当前已安装题库可离线使用；检查失败不会改变版本号。")
+                    .font(.system(size: Tokens.Font.n115))
+                    .cLineHeight(1.65, size: Tokens.Font.n115)
+                    .foregroundStyle(CangyuTheme.colors(for: colorScheme).text3)
+                    .padding(.top, Tokens.Space.lsubTop)
+            }
+        case .upToDate:
+            CButton(text: "检查题库更新", action: onRetry)
+            Text("手动重试入口")
                 .font(.system(size: Tokens.Font.n11))
                 .foregroundStyle(CangyuTheme.colors(for: colorScheme).text3)
             CCard {
@@ -361,7 +376,7 @@ public struct PackVersionScreen: View {
             CLabel("更新状态")
             CTag(text: Phase4Copy.updateComplete)
             CButton(text: "检查题库更新", action: onRetry)
-            Text("这是全 App 唯一的主动联网入口之一")
+            Text("手动重试入口")
                 .font(.system(size: Tokens.Font.n11))
                 .foregroundStyle(CangyuTheme.colors(for: colorScheme).text3)
         case .recoverableFailure:

@@ -1,4 +1,5 @@
 import SwiftUI
+import CangyuData
 import CangyuDesignSystem
 import CangyuTokens
 

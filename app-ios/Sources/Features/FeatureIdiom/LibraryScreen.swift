@@ -247,7 +247,6 @@ public struct LibraryScreen: View {
     }
 
     @ViewBuilder
-    @ViewBuilder
     private func content(_ colors: TokenColors) some View {
         if let failure = model.updateFailure {
             CBar(

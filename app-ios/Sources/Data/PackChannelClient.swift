@@ -168,6 +168,7 @@ private final class ChannelSessionDelegate: NSObject, URLSessionTaskDelegate, @u
         completionHandler: @escaping (URLRequest?) -> Void
     ) {
         guard let original = task.originalRequest?.url, let redirected = request.url,
+              redirected.user == nil, redirected.password == nil,
               isSameOrigin(original, redirected) else {
             completionHandler(nil)
             return
