@@ -7,6 +7,31 @@ public enum BackupImportMode: String, CaseIterable, Sendable {
     case replace
 }
 
+public struct BackupOrphanReport: Equatable, Sendable {
+    public let skippedMistakes: Int
+    public let missingMistakeIdioms: Int
+    public let missingExampleIdioms: Int
+    public let skippedReviews: Int
+
+    public init(skippedMistakes: Int, missingMistakeIdioms: Int,
+                missingExampleIdioms: Int, skippedReviews: Int) {
+        self.skippedMistakes = skippedMistakes
+        self.missingMistakeIdioms = missingMistakeIdioms
+        self.missingExampleIdioms = missingExampleIdioms
+        self.skippedReviews = skippedReviews
+    }
+
+    public var isEmpty: Bool {
+        skippedMistakes == 0 && missingMistakeIdioms == 0 && missingExampleIdioms == 0 && skippedReviews == 0
+    }
+
+    public var message: String {
+        guard !isEmpty else { return "" }
+        let idioms = missingMistakeIdioms + missingExampleIdioms
+        return "已跳过缺失录入题的错题 \(skippedMistakes) 条、缺失对应错题的复习记录 \(skippedReviews) 条，过滤缺失成语关联 \(idioms) 处。"
+    }
+}
+
 public struct BackupImportSummary: Equatable, Sendable {
     public let mode: BackupImportMode
     public let mistakes: Int
@@ -15,9 +40,10 @@ public struct BackupImportSummary: Equatable, Sendable {
     public let idiomStates: Int
     public let scopes: Int
     public let automaticBackup: URL?
+    public let orphans: BackupOrphanReport
 
     public init(mode: BackupImportMode, mistakes: Int, userExamples: Int, reviews: Int,
-                idiomStates: Int, scopes: Int, automaticBackup: URL?) {
+                idiomStates: Int, scopes: Int, automaticBackup: URL?, orphans: BackupOrphanReport) {
         self.mode = mode
         self.mistakes = mistakes
         self.userExamples = userExamples
@@ -25,15 +51,17 @@ public struct BackupImportSummary: Equatable, Sendable {
         self.idiomStates = idiomStates
         self.scopes = scopes
         self.automaticBackup = automaticBackup
+        self.orphans = orphans
     }
 
     public var message: String {
         let modeText = mode == .replace ? "覆盖" : "合并"
-        return "\(modeText)导入完成：备份含 \(mistakes) 条错题、\(userExamples) 条录入题、\(reviews) 条复习记录。"
+        let result = "\(modeText)导入完成：写入 \(mistakes) 条错题、\(userExamples) 条录入题、\(reviews) 条复习记录。"
+        return orphans.isEmpty ? result : result + orphans.message
     }
 }
 
-/// 已通过 schemaVersion、sha256、结构、引用关系校验，可安全进入 P22 选择导入方式。
+/// 已通过版本、摘要、结构及 id 唯一性校验；引用孤儿在导入事务中解析并上报。
 public struct ValidatedBackup: Equatable, Sendable {
     internal let manifest: BackupManifestPayload
     internal let payload: BackupDataPayload
@@ -178,7 +206,7 @@ enum BackupImport {
         }
         try payload.validate()
         try validateCounts(manifest.counts, payload)
-        try validateReferences(payload, db)
+        try validateIDs(payload)
         return ValidatedBackup(manifest: manifest, payload: payload)
     }
 
@@ -212,48 +240,15 @@ enum BackupImport {
         }
     }
 
-    private static func validateReferences(_ payload: BackupDataPayload, _ db: Database) throws {
-        let mistakeIDs = try uniqueIDs(payload.mistakes.map(\.id), "错题")
-        let exampleIDs = try uniqueIDs(payload.userExamples?.map(\.id) ?? [], "录入题")
+    private static func validateIDs(_ payload: BackupDataPayload) throws {
+        _ = try uniqueIDs(payload.mistakes.map(\.id), "错题")
+        _ = try uniqueIDs(payload.userExamples?.map(\.id) ?? [], "录入题")
         _ = try uniqueIDs(payload.reviews.map(\.id), "复习记录")
-        let idiomIDs = try existingIdiomIDs(payload, db)
-        for mistake in payload.mistakes {
-            guard mistake.idiomIds.allSatisfy({ idiomIDs.contains($0) }) else {
-                throw BackupError.format("错题 \(mistake.id) 引用了不存在的成语。")
-            }
-            if let exampleID = mistake.userExampleId, !exampleIDs.contains(exampleID) {
-                throw BackupError.format("错题 \(mistake.id) 找不到对应录入题。")
-            }
-        }
-        for example in payload.userExamples ?? [] {
-            guard example.idiomIds.allSatisfy({ idiomIDs.contains($0) }) else {
-                throw BackupError.format("录入题 \(example.id) 引用了不存在的成语。")
-            }
-        }
-        for review in payload.reviews {
-            guard mistakeIDs.contains(review.mistakeId) else {
-                throw BackupError.format("复习记录 \(review.id) 找不到对应错题。")
-            }
-        }
     }
 
     static func uniqueIDs(_ ids: [String], _ label: String) throws -> Set<String> {
         guard Set(ids).count == ids.count else { throw BackupError.format("备份中有重复的\(label) id。") }
         return Set(ids)
-    }
-
-    private static func existingIdiomIDs(_ payload: BackupDataPayload,
-                                         _ db: Database) throws -> Set<String> {
-        let referenced = Set((payload.mistakes.flatMap(\.idiomIds)
-            + (payload.userExamples ?? []).flatMap(\.idiomIds)
-            + payload.idiomStates.map(\.idiomId)))
-        guard !referenced.isEmpty else { return [] }
-        let placeholders = referenced.map { _ in "?" }.joined(separator: ",")
-        let rows = try Row.fetchAll(db, sql: "SELECT id FROM idiom WHERE id IN (\(placeholders))",
-                                    arguments: StatementArguments(Array(referenced)))
-        let existing = Set(rows.map { row in row["id"] as String })
-        guard existing == referenced else { throw BackupError.format("备份引用了本机不存在的成语。") }
-        return existing
     }
 }
 

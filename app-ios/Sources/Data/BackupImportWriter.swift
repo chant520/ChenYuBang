@@ -2,12 +2,25 @@ import Foundation
 import GRDB
 
 enum BackupImportWriter {
+    private struct InsertedCounts {
+        var mistakes = 0
+        var userExamples = 0
+        var reviews = 0
+    }
+
     static func merge(_ payload: BackupDataPayload, db: Database) throws -> BackupImportSummary {
+        var resolvedPayload = payload
+        var report = BackupOrphanReport(skippedMistakes: 0, missingMistakeIdioms: 0,
+                                        missingExampleIdioms: 0, skippedReviews: 0)
+        var inserted = InsertedCounts()
         try db.inTransaction {
-            try insertAll(payload, db: db, keepLocalOnConflict: true)
+            let resolved = try BackupOrphans.resolve(payload, db: db, includeLocalUserReferences: true)
+            resolvedPayload = resolved.payload
+            report = resolved.report
+            inserted = try insertAll(resolved.payload, db: db, keepLocalOnConflict: true)
             return .commit
         }
-        return summary(.merge, payload)
+        return summary(.merge, resolvedPayload, inserted: inserted, orphans: report)
     }
 
     /// 覆盖按规范先写临时库，再在自动留底后以单个事务替换本机用户表。
@@ -19,9 +32,12 @@ enum BackupImportWriter {
         let stagingURL = caches.appendingPathComponent("backup-import-\(UUID().uuidString).sqlite")
         defer { try? fileManager.removeItem(at: stagingURL) }
 
+        let resolved = try queue.read { db in
+            try BackupOrphans.resolve(payload, db: db, includeLocalUserReferences: false)
+        }
         let staging = try DatabaseQueue(path: stagingURL.path)
         try ChenYuBangDatabase.makeMigrator().migrate(staging)
-        try staging.write { db in try insertAll(payload, db: db, keepLocalOnConflict: false) }
+        try staging.write { _ = try insertAll(resolved.payload, db: db, keepLocalOnConflict: false) }
 
         let automaticBackup = try queue.read { db in
             try Backup.export(db: db, to: caches, date: Date(), namePrefix: "backup-before-import-")
@@ -41,22 +57,25 @@ enum BackupImportWriter {
             }
             try? db.execute(sql: "DETACH DATABASE backup_import")
         }
-        return summary(.replace, payload, automaticBackup: automaticBackup.url)
+        return summary(.replace, resolved.payload, automaticBackup: automaticBackup.url, orphans: resolved.report)
     }
 
     private static func summary(_ mode: BackupImportMode, _ payload: BackupDataPayload,
-                                automaticBackup: URL? = nil) -> BackupImportSummary {
+                                inserted: InsertedCounts? = nil, automaticBackup: URL? = nil,
+                                orphans: BackupOrphanReport) -> BackupImportSummary {
         BackupImportSummary(mode: mode,
-                            mistakes: payload.mistakes.count,
-                            userExamples: payload.userExamples?.count ?? 0,
-                            reviews: payload.reviews.count,
+                            mistakes: inserted?.mistakes ?? payload.mistakes.count,
+                            userExamples: inserted?.userExamples ?? payload.userExamples?.count ?? 0,
+                            reviews: inserted?.reviews ?? payload.reviews.count,
                             idiomStates: payload.idiomStates.count,
                             scopes: payload.scopes.count,
-                            automaticBackup: automaticBackup)
+                            automaticBackup: automaticBackup,
+                            orphans: orphans)
     }
 
     private static func insertAll(_ payload: BackupDataPayload, db: Database,
-                                  keepLocalOnConflict: Bool) throws {
+                                  keepLocalOnConflict: Bool) throws -> InsertedCounts {
+        var inserted = InsertedCounts()
         let conflict = keepLocalOnConflict ? " OR IGNORE" : ""
         let localExamples = keepLocalOnConflict ? try existingIDs(db, "user_example") : []
         let localMistakes = keepLocalOnConflict ? try existingIDs(db, "mistake") : []
@@ -78,6 +97,7 @@ enum BackupImportWriter {
                 try execute(db, "INSERT\(conflict) INTO user_example_idiom(userExampleId, idiomId) VALUES (?, ?)",
                             [example.id, idiomID])
             }
+            inserted.userExamples += 1
         }
         for mistake in payload.mistakes {
             guard !localMistakes.contains(mistake.id) else { continue }
@@ -99,6 +119,7 @@ enum BackupImportWriter {
                 try execute(db, "INSERT\(conflict) INTO mistake_idiom(mistakeId, idiomId) VALUES (?, ?)",
                             [mistake.id, idiomID])
             }
+            inserted.mistakes += 1
         }
         var insertedReviews: [String: (count: Int, latest: String)] = [:]
         for review in payload.reviews {
@@ -111,6 +132,7 @@ enum BackupImportWriter {
                 count: (previous?.count ?? 0) + 1,
                 latest: previous.map { max($0.latest, review.reviewedAt) } ?? review.reviewedAt
             )
+            inserted.reviews += 1
         }
         for mistake in payload.mistakes where !localMistakes.contains(mistake.id) {
             let reviews = insertedReviews[mistake.id]
@@ -122,6 +144,7 @@ enum BackupImportWriter {
                         [state.idiomId, state.status, state.favorite])
         }
         try insertScopes(payload.scopes, db: db, keepLocalOnConflict: keepLocalOnConflict)
+        return inserted
     }
 
     private static func insertScopes(_ scopes: [BackupScopePayload], db: Database,
@@ -216,7 +239,7 @@ enum BackupImportWriter {
             """)
     }
 
-    private static func existingIDs(_ db: Database, _ table: String) throws -> Set<String> {
+    static func existingIDs(_ db: Database, _ table: String) throws -> Set<String> {
         let rows = try Row.fetchAll(db, sql: "SELECT id FROM \(table)")
         return Set(rows.map { row in (row["id"] as String).lowercased() })
     }

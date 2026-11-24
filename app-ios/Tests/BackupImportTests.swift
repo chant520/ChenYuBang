@@ -68,7 +68,7 @@ final class BackupImportTests: PackDatabaseTestCase {
         assertRejected(badDigest, contains: "摘要不符")
     }
 
-    func testValidationRejectsCountMismatchAndMissingReferencedIdiom() throws {
+    func testValidationRejectsCountMismatchButDefersMissingReferencedIdiom() throws {
         try seedReferencedIdioms(count: 2)
         let files = try generatedFiles()
         var badCounts = files
@@ -86,7 +86,9 @@ final class BackupImportTests: PackDatabaseTestCase {
         var changedPayload = payload
         changedPayload["mistakes"] = mistakes
         missingIdiom = try rehashed(missingIdiom, payload: changedPayload)
-        assertRejected(missingIdiom, contains: "不存在的成语")
+        let validated = try validate(missingIdiom)
+        XCTAssertEqual(validated.payload.mistakes.first?.idiomIds,
+                       ["99999999-9999-4999-8999-999999999999"])
     }
 
     func testValidationRejectsDuplicateAndNFCCollidingJSONKeys() throws {
