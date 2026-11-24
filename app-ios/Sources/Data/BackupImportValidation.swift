@@ -83,8 +83,8 @@ extension BackupMistakePayload {
         try BackupValidationRule.require(id, "错题 id")
         guard stem.count >= 2, ["待复习", "已掌握"].contains(state), reviewCount >= 0,
               BackupValidationRule.validAnswer(myAnswer),
-              BackupValidationRule.validExamType(examType), BackupValidationRule.validYear(year),
-              !idiomIds.isEmpty else { throw BackupError.format("错题 \(id) 字段不符合备份格式。") }
+              BackupValidationRule.validExamType(examType), BackupValidationRule.validYear(year)
+        else { throw BackupError.format("错题 \(id) 字段不符合备份格式。") }
     }
 }
 
@@ -92,8 +92,8 @@ extension BackupUserExamplePayload {
     fileprivate func validate() throws {
         try BackupValidationRule.require(id, "录入题 id")
         guard stem.count >= 2, BackupValidationRule.validAnswer(myAnswer),
-              BackupValidationRule.validExamType(examType), BackupValidationRule.validYear(year),
-              !idiomIds.isEmpty else { throw BackupError.format("录入题 \(id) 字段不符合备份格式。") }
+              BackupValidationRule.validExamType(examType), BackupValidationRule.validYear(year)
+        else { throw BackupError.format("录入题 \(id) 字段不符合备份格式。") }
     }
 }
 

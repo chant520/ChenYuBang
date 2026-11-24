@@ -74,21 +74,21 @@ final class BackupStoreTests: PackDatabaseTestCase {
         XCTAssertEqual(try snapshot(contentTables), contentBefore, "export must be read-only")
     }
 
-    func testExportRejectsUserExampleWithoutIdiom() throws {
+    func testExportRoundTripsImportedRowsWithoutIdioms() throws {
         try seedExportData()
         try queue.write { db in
             try db.execute(sql: "DELETE FROM user_example_idiom")
             try db.execute(sql: "DELETE FROM mistake_idiom")
         }
         let directory = try makeDirectory()
-        XCTAssertThrowsError(try queue.read { db in
+        let result = try queue.read { db in
             try Backup.export(db: db, to: directory, date: exportDate)
-        }) { error in
-            guard case let BackupError.format(message) = error else {
-                return XCTFail("Expected backup format error, got \(error)")
-            }
-            XCTAssertTrue(message.contains("idiomIds"))
         }
+        let validated = try queue.read { db in
+            try BackupImport.validate(Data(contentsOf: result.url), db: db)
+        }
+        XCTAssertEqual(validated.payload.mistakes.first?.idiomIds, [])
+        XCTAssertEqual(validated.payload.userExamples?.first?.idiomIds, [])
     }
 
     func testCanonicalHelpersUseUTCAndNormalizeIdentity() {
