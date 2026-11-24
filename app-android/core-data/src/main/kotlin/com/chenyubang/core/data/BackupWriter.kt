@@ -2,6 +2,8 @@ package com.chenyubang.core.data
 
 import androidx.room.withTransaction
 import androidx.sqlite.db.SupportSQLiteDatabase
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 /** 写库结果：counts 为实际写入条数（去重/孤儿过滤后），供 P15 结果条展示。 */
 internal data class BackupWriteResult(
@@ -30,7 +32,8 @@ internal object BackupWriter {
             buildSet { while (cursor.moveToNext()) add(cursor.getString(0)) }
         }
     }
-    private val scopeKey: (BackupScope) -> String = { "${it.type}\u0000${it.province.orEmpty()}" }
+    private val scopeKeyOf: (String, String?) -> String = { type, province -> "$type\u0000${province.orEmpty()}" }
+    private val scopeKey: (BackupScope) -> String = { scopeKeyOf(it.type, it.province) }
 
     suspend fun overwrite(
         database: AppDatabase,
@@ -39,8 +42,12 @@ internal object BackupWriter {
         database.withTransaction {
             val sqlite = database.openHelper.writableDatabase
             val resolved = BackupOrphans.resolve(backup, references(sqlite, backup, false))
+            // 先取本机同键 scope id 再删 exam_scope：整体替换范围行，同键复用 id、不残留旧范围。
+            val localScopes = scopeIds(sqlite)
             BackupRows.clear(sqlite)
-            val counts = insertAll(sqlite, resolved.snapshot, emptyMap())
+            sqlite.execSQL("DELETE FROM exam_scope")
+            val counts = insertAll(sqlite, resolved.snapshot, localScopes)
+            syncProvinces(sqlite, resolved.snapshot.scopes)
             verify(sqlite, counts, BackupCounts())
             BackupWriteResult(resolved.report, counts)
         }
@@ -83,22 +90,38 @@ internal object BackupWriter {
         )
     }
 
-    private fun localKeys(sqlite: SupportSQLiteDatabase): LocalKeys {
-        val scopeIds = LinkedHashMap<String, String>()
+    private fun scopeIds(sqlite: SupportSQLiteDatabase): Map<String, String> {
+        val result = LinkedHashMap<String, String>()
         sqlite.query("SELECT id, type, province FROM exam_scope").use { cursor ->
             while (cursor.moveToNext()) {
-                val province = if (cursor.isNull(2)) "" else cursor.getString(2)
-                val key = "${cursor.getString(1)}\u0000$province"
-                scopeIds[key] = cursor.getString(0)
+                val province = if (cursor.isNull(2)) null else cursor.getString(2)
+                result[scopeKeyOf(cursor.getString(1), province)] = cursor.getString(0)
             }
         }
+        return result
+    }
+
+    private fun localKeys(sqlite: SupportSQLiteDatabase): LocalKeys {
+        val scopes = scopeIds(sqlite)
         return LocalKeys(
             ids(sqlite, "SELECT id FROM mistake"),
             ids(sqlite, "SELECT id FROM user_example"),
             ids(sqlite, "SELECT id FROM review_log"),
             ids(sqlite, "SELECT idiomId FROM idiom_state"),
-            scopeIds.keys,
-            scopeIds,
+            scopes.keys,
+            scopes,
+        )
+    }
+
+    /** 覆盖后 settings.examScope.provinces 与备份省考省份一致，避免与 exam_scope 行脱节。 */
+    private fun syncProvinces(
+        sqlite: SupportSQLiteDatabase,
+        scopes: List<BackupScope>,
+    ) {
+        val provinces = scopes.filter { it.type == "省考" }.mapNotNull { it.province }.distinct().sorted()
+        sqlite.execSQL(
+            "INSERT OR REPLACE INTO settings (key, value) VALUES ('examScope.provinces', ?)",
+            arrayOf(Json.encodeToString(provinces)),
         )
     }
 
@@ -117,11 +140,11 @@ internal object BackupWriter {
 
     private fun snapshotCounts(sqlite: SupportSQLiteDatabase): BackupCounts =
         BackupCounts(
-            BackupRows.count(sqlite, "user_example"),
-            BackupRows.count(sqlite, "mistake"),
-            BackupRows.count(sqlite, "review_log"),
-            BackupRows.count(sqlite, "idiom_state"),
-            BackupRows.count(sqlite, "exam_scope"),
+            mistakes = BackupRows.count(sqlite, "mistake"),
+            userExamples = BackupRows.count(sqlite, "user_example"),
+            reviews = BackupRows.count(sqlite, "review_log"),
+            idiomStates = BackupRows.count(sqlite, "idiom_state"),
+            scopes = BackupRows.count(sqlite, "exam_scope"),
         )
 
     private fun verify(
