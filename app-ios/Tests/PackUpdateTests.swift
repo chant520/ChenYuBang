@@ -177,6 +177,7 @@ final class PackUpdateTests: PackDatabaseTestCase {
         )
         let load = Task { await library.load(library.scope) }
         await fulfillment(of: [reader.loaded], timeout: 1)
+        await client.waitForLatestCalls(1)
         XCTAssertFalse(library.loading)
         XCTAssertEqual(library.page.count, 1)
         XCTAssertEqual(updates.presentation.status, .checking)
