@@ -168,7 +168,7 @@ public struct P24SelfTestContent: View {
         .padding(.vertical, Tokens.Space.lrowY)
         .padding(.horizontal, Tokens.Space.lrowX)
         // 复用既有 48pt 尺寸令牌，不新增视觉档；实际最小高满足设计规范 5.16。
-        .frame(minHeight: Tokens.Space.cropMin, maxWidth: .infinity, alignment: .leading)
+        .frame(maxWidth: .infinity, minHeight: Tokens.Space.cropMin, alignment: .leading)
         .background(RoundedRectangle(cornerRadius: Tokens.Radius.r6).fill(background))
         .overlay(
             RoundedRectangle(cornerRadius: Tokens.Radius.r6)
