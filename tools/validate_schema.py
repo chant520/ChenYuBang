@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""校验 shared/schema 下 6 个交换 schema 与 shared/fixtures 的样例数据。
+"""校验 shared/schema 下交换 schema 与 shared/fixtures 的样例数据。
 
 本机没有 jsonschema 库，这里自带一个够用的 draft-07 子集校验器：
   支持 type（含类型数组）、required、properties、additionalProperties:false、
@@ -15,6 +15,8 @@
 import json
 import re
 import sys
+import zipfile
+import zlib
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -79,8 +81,10 @@ def validate(value, schema, path):
     if "enum" in schema and value not in schema["enum"]:
         err("%s: 值 %r 不在枚举 %s 内" % (path, value, schema["enum"]))
     if isinstance(value, str) and "pattern" in schema:
-        if re.search(schema["pattern"], value, flags=re.S) is None:
-            err("%s: %r 不匹配 %s" % (path, value, schema["pattern"]))
+        pattern = schema["pattern"]
+        matched = re.search(pattern, value, flags=re.S)
+        if matched is None or (pattern.startswith("^") and pattern.endswith("$") and matched.end() != len(value)):
+            err("%s: %r 不匹配 %s" % (path, value, pattern))
     if isinstance(value, int) and not isinstance(value, bool):
         if "minimum" in schema and value < schema["minimum"]:
             err("%s: %r < minimum %s" % (path, value, schema["minimum"]))
@@ -112,9 +116,138 @@ def load(path):
     return json.loads(Path(path).read_text(encoding="utf-8"))
 
 
+PACK_MEMBERS = ("idioms.json", "examples.json", "manifest.json")
+# 取双端导入限制的交集，确保本地产物不会被任一客户端拒绝。
+MAX_PACK_INPUT_BYTES = 4 * 1024 * 1024
+MAX_PACK_ENTRY_BYTES = 4 * 1024 * 1024
+MAX_PACK_EXPANDED_BYTES = 8 * 1024 * 1024
+
+
+def validate_pack_zip(path):
+    errors.clear()
+    pack_path = Path(path)
+    if not pack_path.is_file():
+        err("题库包不存在：%s" % pack_path)
+        return None, None, None, list(errors)
+    if pack_path.stat().st_size > MAX_PACK_INPUT_BYTES:
+        err("题库包超过 %d 字节输入上限" % MAX_PACK_INPUT_BYTES)
+        return None, None, None, list(errors)
+
+    try:
+        with zipfile.ZipFile(pack_path) as archive:
+            infos = archive.infolist()
+            names = [info.filename for info in infos]
+            if len(names) != len(set(names)):
+                err("题库包含重复路径")
+            if set(names) != set(PACK_MEMBERS) or any(info.is_dir() for info in infos):
+                err("题库包根目录必须且只能包含 %s" % ", ".join(PACK_MEMBERS))
+            if any(info.file_size > MAX_PACK_ENTRY_BYTES for info in infos):
+                err("题库包单文件超过 %d 字节展开上限" % MAX_PACK_ENTRY_BYTES)
+            if sum(info.file_size for info in infos) > MAX_PACK_EXPANDED_BYTES:
+                err("题库包超过 %d 字节总展开上限" % MAX_PACK_EXPANDED_BYTES)
+            if errors:
+                return None, None, None, list(errors)
+            payload = {name: archive.read(name) for name in PACK_MEMBERS}
+    except (OSError, RuntimeError, NotImplementedError, zipfile.BadZipFile, zlib.error) as error:
+        err("题库包无法读取（截断、CRC 或压缩格式异常）：%s" % error)
+        return None, None, None, list(errors)
+
+    try:
+        idioms = json.loads(payload["idioms.json"].decode("utf-8"))
+        examples = json.loads(payload["examples.json"].decode("utf-8"))
+        manifest = json.loads(payload["manifest.json"].decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as error:
+        err("题库包 JSON 解析失败：%s" % error)
+        return None, None, None, list(errors)
+
+    schema_path = SCHEMA / "pack-manifest.schema.json"
+    if not schema_path.exists():
+        err("缺 schema 文件 %s" % schema_path.name)
+    else:
+        schema = load(schema_path)
+        check_schema_shape(schema, "pack-manifest")
+        validate(manifest, schema, "pack.manifest")
+
+    if isinstance(manifest, dict) and manifest.get("schemaVersion") != 1:
+        err("pack.manifest.schemaVersion 仅支持 1")
+
+    if not isinstance(idioms, list) or not isinstance(examples, list):
+        err("idioms.json / examples.json 顶层必须是数组")
+    elif not idioms or not examples:
+        err("题库包不得为空")
+    else:
+        for name, data in (("idioms", idioms), ("examples", examples)):
+            data_schema_path = SCHEMA / (name + ".schema.json")
+            if not data_schema_path.exists():
+                err("缺 schema 文件 %s" % data_schema_path.name)
+                continue
+            data_schema = load(data_schema_path)
+            check_schema_shape(data_schema, name)
+            validate(data, data_schema, "pack/" + name)
+
+        idiom_ids = {
+            item["id"] for item in idioms if isinstance(item, dict) and isinstance(item.get("id"), str)
+        }
+        example_ids = {
+            item["id"] for item in examples if isinstance(item, dict) and isinstance(item.get("id"), str)
+        }
+        if len(idiom_ids) != len(idioms):
+            err("pack/idioms: id 缺失、类型错误或重复")
+        if len(example_ids) != len(examples):
+            err("pack/examples: id 缺失、类型错误或重复")
+        for index, example in enumerate(examples):
+            if not isinstance(example, dict):
+                continue
+            idiom_refs = example.get("idiomIds")
+            if not isinstance(idiom_refs, list):
+                continue
+            missing = [
+                idiom_id
+                for idiom_id in idiom_refs
+                if not isinstance(idiom_id, str) or idiom_id not in idiom_ids
+            ]
+            if missing:
+                err("pack/examples[%d]: 引用了不存在的成语 id %s" % (index, missing))
+
+    if isinstance(manifest, dict) and isinstance(idioms, list) and isinstance(examples, list):
+        expected_counts = {"idioms": len(idioms), "examples": len(examples)}
+        if manifest.get("counts") != expected_counts:
+            err("pack.manifest.counts 与实际条数不符（期望 %s）" % expected_counts)
+        try:
+            digest = combined_digest(idioms, examples)
+        except (TypeError, ValueError) as error:
+            err("pack.manifest.sha256 无法重算：%s" % error)
+        else:
+            if manifest.get("sha256") != digest:
+                err("pack.manifest.sha256 与重算合并摘要不符")
+    return manifest, idioms, examples, list(errors)
+
+
+def validate_channel_manifest(value):
+    errors.clear()
+    schema_path = SCHEMA / "channel-manifest.schema.json"
+    if not schema_path.exists():
+        err("缺 schema 文件 %s" % schema_path.name)
+    else:
+        schema = load(schema_path)
+        check_schema_shape(schema, "channel-manifest")
+        validate(value, schema, "channel.manifest")
+    if isinstance(value, dict):
+        if value.get("schemaVersion") != 1:
+            err("channel.manifest.schemaVersion 仅支持 1")
+        version = value.get("packVersion")
+        pack_file = value.get("packFile")
+        if isinstance(version, str) and isinstance(pack_file, str):
+            expected = "pack-%s.zip" % version
+            if pack_file != expected:
+                err("channel.manifest.packFile 应为 %s" % expected)
+    return list(errors)
+
+
 def validate_content_data(idioms_path, examples_path):
     """校验内容侧源数据（ingest 产出）：只查 idioms / examples schema 与交叉引用，
     不碰 fixtures 样例的 sha256（那套口径只针对 shared/fixtures 样例）。"""
+    errors.clear()
     paths = [Path(idioms_path), Path(examples_path)]
     for p in paths:
         if not p.exists():
@@ -137,11 +270,18 @@ def validate_content_data(idioms_path, examples_path):
         check_schema_shape(schema, name)
         validate(data, schema, "content/" + name)
 
-    idiom_ids = {i["id"] for i in idioms if isinstance(i, dict) and "id" in i}
+    if not isinstance(idioms, list) or not isinstance(examples, list):
+        return _report_content()
+    idiom_ids = {i["id"] for i in idioms if isinstance(i, dict) and isinstance(i.get("id"), str)}
     if len(idiom_ids) != len(idioms):
-        err("content/idioms: id 有重复")
+        err("content/idioms: id 缺失、类型错误或重复")
     for i, ex in enumerate(examples):
-        missing = [x for x in ex.get("idiomIds", []) if x not in idiom_ids]
+        if not isinstance(ex, dict):
+            continue
+        idiom_refs = ex.get("idiomIds")
+        if not isinstance(idiom_refs, list):
+            continue
+        missing = [x for x in idiom_refs if not isinstance(x, str) or x not in idiom_ids]
         if missing:
             err("content/examples[%d]: 引用了不存在的成语 id %s" % (i, missing))
     return _report_content()
@@ -168,7 +308,7 @@ def main(argv):
 
     update = "--update" in argv
 
-    schema_files = ["pack-manifest", "idioms", "examples", "user-examples", "backup-manifest", "backup-data"]
+    schema_files = ["pack-manifest", "channel-manifest", "idioms", "examples", "user-examples", "backup-manifest", "backup-data"]
     schemas = {}
     for name in schema_files:
         p = SCHEMA / (name + ".schema.json")
@@ -274,11 +414,40 @@ def main(argv):
                     err("pack.manifest.%s: counts 与样例条数不符（期望 %s）"
                         % (label, expected_counts))
 
+    if "channel-manifest" in schemas:
+        channel_correct_path = FIX / "channel" / "latest.correct.json"
+        channel_invalid_path = FIX / "channel" / "latest.invalid-pack-file.json"
+        for p in (channel_correct_path, channel_invalid_path):
+            if not p.exists():
+                err("缺 channel fixture：%s（v1.9 要求合法/非法 packFile 两份）" % p)
+        if channel_correct_path.exists() and channel_invalid_path.exists():
+            channel_correct = load(channel_correct_path)
+            channel_invalid = load(channel_invalid_path)
+            validate(channel_correct, schemas["channel-manifest"], "channel.manifest.correct")
+            before_invalid = len(errors)
+            validate(channel_invalid, schemas["channel-manifest"], "channel.manifest.invalid-pack-file")
+            invalid_errors = errors[before_invalid:]
+            del errors[before_invalid:]
+            if not any("packFile" in message for message in invalid_errors):
+                err("channel.manifest.invalid-pack-file: 绝对 URL 必须因 packFile 规则被拒绝")
+
+            expected_pack_file = "pack-%s.zip" % channel_correct.get("packVersion")
+            if channel_correct.get("packFile") != expected_pack_file:
+                err("channel.manifest.correct: packFile 应为 %s" % expected_pack_file)
+            pack_reference_path = FIX / "pack" / "manifest.correct.json"
+            if pack_reference_path.exists():
+                pack_reference = load(pack_reference_path)
+                for key in ("schemaVersion", "packVersion", "builtAt", "counts", "sha256"):
+                    if channel_correct.get(key) != pack_reference.get(key):
+                        err("channel.manifest.correct: %s 应与包内 manifest 一致" % key)
+
     hashes = {
         "idioms.sample.json": sha256_of(idioms),
         "examples.sample.json": sha256_of(examples),
         "backup/manifest.json": sha256_of(man),
         "backup/data.json": sha256_of(data),
+        "channel/latest.correct.json": sha256_of(load(FIX / "channel" / "latest.correct.json")),
+        "channel/latest.invalid-pack-file.json": sha256_of(load(FIX / "channel" / "latest.invalid-pack-file.json")),
     }
     if update:
         with EXPECTED.open("w", encoding="utf-8", newline="\n") as f:
@@ -299,8 +468,8 @@ def main(argv):
         for e in errors:
             print("  - " + e)
         return 1
-    print("schema ok: 6 个 schema、%d 条成语、%d 条例题、备份包 counts 与 sha256 全部通过"
-          % (len(idioms), len(examples)))
+    print("schema ok: %d 个 schema、%d 条成语、%d 条例题、备份包与通道清单 counts/sha256 全部通过"
+          % (len(schemas), len(idioms), len(examples)))
     return 0
 
 

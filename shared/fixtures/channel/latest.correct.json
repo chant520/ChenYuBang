@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "packVersion": "v1.0.0",
+  "builtAt": "2026-11-17T00:00:00Z",
+  "counts": {
+    "idioms": 3,
+    "examples": 2
+  },
+  "sha256": "b04123538fe7ab4ba506e694727f7180c3188915bbe00d7f0e86d1fd99640b26",
+  "sizeBytes": 1234,
+  "packFile": "pack-v1.0.0.zip"
+}
