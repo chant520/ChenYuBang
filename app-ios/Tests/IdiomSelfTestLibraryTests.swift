@@ -103,8 +103,8 @@ final class IdiomSelfTestLibraryTests: XCTestCase {
             return try tables.flatMap { table -> [String] in
                 let rows = try Row.fetchAll(db, sql: "SELECT * FROM \(table) ORDER BY rowid")
                 return ["\(table):\(rows.count)"] + rows.map { row in
-                    let columns = row.columnNames.enumerated().map { index, name -> String in
-                        let value: DatabaseValue = row[index].1
+                    let columns = row.columnNames.map { name -> String in
+                        let value: DatabaseValue = row[name]
                         let encoded: String
                         switch value {
                         case .null: encoded = "null"
