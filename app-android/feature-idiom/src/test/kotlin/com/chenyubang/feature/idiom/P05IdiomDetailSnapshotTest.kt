@@ -3,12 +3,16 @@ package com.chenyubang.feature.idiom
 import android.content.res.Configuration
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.test.isDialog
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import com.chenyubang.core.data.ExampleEntity
 import com.chenyubang.core.data.IdiomEntity
+import com.chenyubang.core.data.IdiomLearningState
+import com.chenyubang.core.data.IdiomLearningStatus
 import com.chenyubang.core.ui.ChenYuBangTheme
 import com.github.takahirom.roborazzi.captureRoboImage
 import org.junit.Rule
@@ -30,6 +34,8 @@ class P05IdiomDetailSnapshotTest {
         night: Boolean,
         scrollToText: String? = null,
         canReview: Boolean = false,
+        learningState: IdiomLearningState? = null,
+        openStatusPicker: Boolean = false,
     ) {
         composeTestRule.setContent {
             val base = LocalConfiguration.current
@@ -38,13 +44,31 @@ class P05IdiomDetailSnapshotTest {
             config.uiMode = (config.uiMode and Configuration.UI_MODE_NIGHT_MASK.inv()) or nightBits
             CompositionLocalProvider(LocalConfiguration provides config) {
                 ChenYuBangTheme(darkTheme = night) {
-                    P05IdiomDetailContent(state = state(), canReview = canReview)
+                    P05IdiomDetailContent(
+                        state =
+                            learningState?.let { state().copy(state = it) }
+                                ?: if (openStatusPicker) {
+                                    state().copy(
+                                        state = IdiomLearningState("detail", IdiomLearningStatus.UNLEARNED, false),
+                                    )
+                                } else {
+                                    state()
+                                },
+                        canReview = canReview,
+                    )
                 }
             }
         }
         if (scrollToText != null) {
             composeTestRule.onNodeWithText(scrollToText).performScrollTo()
             composeTestRule.waitForIdle()
+        }
+        if (openStatusPicker) {
+            composeTestRule.onNodeWithText("学习状态：未学").performClick()
+            composeTestRule.waitForIdle()
+            // COverlay 弹层在独立 Dialog 窗口：用 isDialog 精确取节点，避开 onRoot 多根歧义。
+            composeTestRule.onNode(isDialog()).captureRoboImage()
+            return
         }
         composeTestRule.onRoot().captureRoboImage()
     }
@@ -111,4 +135,19 @@ class P05IdiomDetailSnapshotTest {
 
     @Test
     fun reviewEnabledDark() = capture(night = true, scrollToText = "复习这个成语", canReview = true)
+
+    /** A7 收藏两态 + A6 三态标签：已收藏实心、学过浅绿。 */
+    @Test
+    fun favoriteAndStatusLight() =
+        capture(
+            night = false,
+            learningState = IdiomLearningState("detail", IdiomLearningStatus.LEARNED, true),
+        )
+
+    /** A6 自评三选一弹层：复用 COverlay + CCheckRow 单选。 */
+    @Test
+    fun statusPickerLight() = capture(night = false, openStatusPicker = true)
+
+    @Test
+    fun statusPickerDark() = capture(night = true, openStatusPicker = true)
 }
