@@ -30,18 +30,6 @@ struct ReviewSession: Equatable {
     let originEntryID: UUID
 }
 
-struct CaptureWorkflow: Equatable, Identifiable {
-    let id = UUID()
-    let tab: AppTab
-    let originEntryID: UUID
-    var imageURL: URL?
-    var croppedURL: URL?
-    var recognizedText: String?
-    var savedUserExampleID: String?
-    var savedMistakeID: String?
-    var savedIdioms: [SavedIdiom] = []
-}
-
 /// iOS 15 的显式 entry 栈；页面状态跟随 UUID，不按路由键去重。
 final class RouterState: ObservableObject {
     @Published private(set) var selectedTab: AppTab = .idiom
