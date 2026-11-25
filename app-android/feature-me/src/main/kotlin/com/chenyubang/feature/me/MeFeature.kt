@@ -1,5 +1,15 @@
 package com.chenyubang.feature.me
 
+/** P13 导航回调由 app 聚合，feature-me 不依赖其他页面实现。 */
+data class MeActions(
+    val onOpenScope: () -> Unit,
+    val onOpenSelfTest: () -> Unit,
+    val onOpenBackup: () -> Unit,
+    val onOpenPack: () -> Unit,
+    val onClear: () -> Unit,
+    val onCapture: () -> Unit,
+)
+
 /**
  * feature-me 模块占位：个人中心页面簇。
  *
@@ -10,7 +20,7 @@ package com.chenyubang.feature.me
  *  - P16 题库版本与更新（`settings/pack`，二级）
  *
  * 模块职责：
- *  - P13：考试范围当前值一行、数据概览、设置分组（考试范围 / 备份与恢复 / 题库版本）、
+ *  - P13：考试范围当前值一行、数据概览、设置分组（考试范围 / 成语自测 / 备份与恢复 / 题库版本）、
  *    本机存储说明块、版本号一行、清空数据入口（触发 P23）、右下角悬浮拍照按钮。
  *  - P14：国考 / 省考（含省份多选，勾选省考时省份默认全选、省份仅为筛选维度）/ 事业编勾选；教师编置灰不可选。
  *  - P15：导出备份（存本机 / 通过系统分享面板另存网盘）与导入备份；全程不登录、不上传。

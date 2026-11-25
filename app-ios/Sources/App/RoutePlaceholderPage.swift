@@ -74,6 +74,7 @@ struct RoutePlaceholderPage: View {
                 )
             }
             CButton(text: "考试范围", variant: .ghost) { router.push(.scope) }
+            CButton(text: "成语自测", variant: .ghost) { router.beginSelfTest() }
             CButton(text: "备份与恢复", variant: .ghost) { router.push(.backup) }
             CButton(text: "题库版本", variant: .ghost) { router.push(.pack) }
             CButton(text: "清空确认", variant: .dangerOutline) { router.openOverlay(.clear) }

@@ -2,6 +2,12 @@ package com.chenyubang.app
 
 import com.chenyubang.feature.review.ReviewSummary
 
+/** P13 → P24：与复习相同的全屏入栈方式，不经过拒绝 FullScreen 的 push。 */
+fun RouterState.startSelfTest(): RouterState {
+    if (current.route != Route.Me || review != null || modal != null) return this
+    return append(RouteEntry(Route.SelfTest, instance = sequence))
+}
+
 fun RouterState.startReview(pendingCount: Int): RouterState {
     if (pendingCount <= 0 || review != null || modal != null) return this
     require(current.route == Route.Mistakes || current.route == Route.Idiom)

@@ -41,6 +41,8 @@ dependencies {
     api(project(":core-ui"))
     implementation(project(":core-data"))
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
+    implementation("androidx.activity:activity-compose:1.9.3")
 
     testImplementation("junit:junit:4.13.2")
     testImplementation("io.github.takahirom.roborazzi:roborazzi:1.13.0")

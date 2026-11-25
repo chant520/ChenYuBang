@@ -21,7 +21,6 @@ internal fun RouteContent(
     onRoute: (RouterState) -> Unit,
     back: () -> Unit,
 ) {
-    val backupVm = requireNotNull(deps.backupVm)
     when (entry.route) {
         Route.Scope ->
             ScopeDestination(
@@ -45,6 +44,7 @@ internal fun RouteContent(
             ExampleDestination(requireNotNull(entry.id), deps.database, { onRoute(router.back()) }) { id ->
                 onRoute(router.push(Route.Idiom, id))
             }
+        Route.Me -> MeRouteContent(router, deps, onRoute)
         Route.Mistakes ->
             MistakesDestination(
                 viewMode = router.mistakesView,
@@ -55,9 +55,10 @@ internal fun RouteContent(
         Route.IdiomMistakes -> IdiomMistakesRouteContent(entry, router, deps, onRoute)
         Route.Mistake -> UserExampleRouteContent(entry, router, deps, onRoute)
         Route.Queue, Route.Summary -> ReviewRouteContent(entry, router, deps, onRoute, back)
+        Route.SelfTest -> SelfTestRouteContent(entry, router, deps, onRoute)
         Route.Backup ->
             P15BackupRoute(
-                vm = backupVm,
+                vm = requireNotNull(deps.backupVm),
                 onPresentImportMode = { onRoute(router.present(Route.ImportMode)) },
             )
         Route.Pack -> P16PackRoute(deps.packUpdates)

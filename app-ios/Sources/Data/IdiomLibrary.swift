@@ -24,6 +24,19 @@ public struct LibraryIdiom: Equatable, Sendable, Identifiable, FetchableRecord, 
     }
 }
 
+/// P24 成语自测的目标行：只带判分所需的 id / 词面 / 释义，不携带全列。
+public struct IdiomWordSense: Equatable, Sendable, Identifiable, FetchableRecord, Decodable {
+    public let id: String
+    public let word: String
+    public let sense: String
+
+    public init(id: String, word: String, sense: String) {
+        self.id = id
+        self.word = word
+        self.sense = sense
+    }
+}
+
 /// 成语库只读查询：JOIN `idiom_scope` 即得「按考试范围过滤后的全量」。
 ///
 /// 范围口径由 `pack_scope` / `PackContent.refreshScopes` 重建的 `idiom_scope` 决定，
@@ -36,6 +49,16 @@ public enum IdiomLibrary {
             FROM idiom
             JOIN (SELECT DISTINCT idiomId FROM idiom_scope) AS scope ON idiom.id = scope.idiomId
             ORDER BY idiom.initials, idiom.word
+            """)
+    }
+
+    /// P24 目标成语只读投影：范围仍以 `idiom_scope` 为唯一事实源。
+    public static func scopedWordSenses(_ db: Database) throws -> [IdiomWordSense] {
+        try IdiomWordSense.fetchAll(db, sql: """
+            SELECT idiom.id, idiom.word, idiom.sense
+            FROM idiom
+            JOIN (SELECT DISTINCT idiomId FROM idiom_scope) AS scope ON idiom.id = scope.idiomId
+            ORDER BY idiom.id
             """)
     }
 }
@@ -51,6 +74,11 @@ public final class IdiomLibraryReader: @unchecked Sendable {
 
     public func load() throws -> [LibraryIdiom] {
         try queue.read { db in try IdiomLibrary.load(db) }
+    }
+
+    /// P24 当前考试范围内的目标成语；只读，不写学习状态或答题记录。
+    public func scopedWordSenses() throws -> [IdiomWordSense] {
+        try queue.read { db in try IdiomLibrary.scopedWordSenses(db) }
     }
 
     /// P20 匹配候选专用：全库成语（含 synonyms / frequency），不按考试范围过滤。

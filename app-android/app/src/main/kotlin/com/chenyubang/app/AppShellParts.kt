@@ -13,6 +13,8 @@ import com.chenyubang.core.ui.CButtonVariant
 import com.chenyubang.core.ui.COverlay
 import com.chenyubang.core.ui.CTabBar
 import com.chenyubang.core.ui.tokens.Tokens
+import com.chenyubang.feature.me.MeActions
+import com.chenyubang.feature.me.P13MeContent
 
 /** 路由外壳的固定部件（初始化态 / 退出确认 / 底部标签栏），从 RouterShell 拆出以保持可读。 */
 
@@ -38,6 +40,26 @@ internal fun AppTabs(
     onSelect: (Int) -> Unit,
 ) {
     CTabBar(AppTab.entries.map { it.label }, selectedIndex, onSelect = onSelect)
+}
+
+@Composable
+internal fun MeRouteContent(
+    router: RouterState,
+    deps: RouteDeps,
+    onRoute: (RouterState) -> Unit,
+) {
+    P13MeContent(
+        scope = deps.scope,
+        actions =
+            MeActions(
+                onOpenScope = { onRoute(router.push(Route.Scope)) },
+                onOpenSelfTest = { onRoute(router.startSelfTest()) },
+                onOpenBackup = { onRoute(router.push(Route.Backup)) },
+                onOpenPack = { onRoute(router.push(Route.Pack)) },
+                onClear = { onRoute(router.present(Route.Clear)) },
+                onCapture = { onRoute(router.startCapture()) },
+            ),
+    )
 }
 
 @Composable

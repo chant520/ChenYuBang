@@ -34,7 +34,7 @@ struct ReviewSession: Equatable {
 final class RouterState: ObservableObject {
     @Published private(set) var selectedTab: AppTab = .idiom
     @Published private(set) var tabEntries: [AppTab: [RouteEntry]]
-    @Published private(set) var fullScreenEntries: [RouteEntry] = []
+    @Published internal(set) var fullScreenEntries: [RouteEntry] = []
     @Published internal(set) var overlay: RouteEntry?
     @Published private(set) var reviewSession: ReviewSession?
     @Published private(set) var captureWorkflow: CaptureWorkflow?
@@ -52,7 +52,8 @@ final class RouterState: ObservableObject {
     @Published internal(set) var clearResult: String?
     @Published internal(set) var clearError: String?
     private let onboardingEntry = RouteEntry(route: .onboarding)
-    @Published private(set) var suspendedFullScreenEntries: [RouteEntry] = []
+    @Published internal(set) var suspendedFullScreenEntries: [RouteEntry] = []
+    @Published private(set) var selfTestBackRequest = 0
 
     init(needsFirstLaunch: Bool = false) {
         self.needsFirstLaunch = needsFirstLaunch
@@ -116,6 +117,7 @@ final class RouterState: ObservableObject {
     @discardableResult
     func push(_ route: AppRoute, recordID: String? = nil) -> Bool {
         guard !needsFirstLaunch, overlay == nil, route.presentation == .push,
+              currentEntry.route != .selfTest,
               captureWorkflow == nil, reviewSession == nil || currentEntry.route != .queue else { return false }
         let details: Set<AppRoute> = [.idiomDetail, .exampleDetail, .idiomMistakes, .mistakeDetail]
         if details.contains(route), !validID(recordID) { return false }
@@ -197,6 +199,10 @@ final class RouterState: ObservableObject {
     func back() {
         if overlay != nil { closeOverlay(); return }
         guard canGoBack else { return }
+        if currentEntry.route == .selfTest {
+            selfTestBackRequest += 1
+            return
+        }
         if !fullScreenEntries.isEmpty {
             if fullScreenEntries.count == 1 { dismissFullScreen() } else {
                 let leaving = fullScreenEntries.removeLast()
@@ -215,16 +221,18 @@ final class RouterState: ObservableObject {
     func dismissFullScreen() {
         fullScreenEntries = suspendedFullScreenEntries
         suspendedFullScreenEntries = []
+        selfTestBackRequest = 0
         reviewSession = nil
         captureWorkflow = nil
     }
 
-    private var canStartFullScreen: Bool {
+    var canStartFullScreen: Bool {
         canStartWorkflow && fullScreenEntries.isEmpty
     }
 
     var canStartWorkflow: Bool {
         !needsFirstLaunch && overlay == nil && reviewSession == nil && captureWorkflow == nil
+            && currentEntry.route != .selfTest
     }
 
     private func resetToRoot(_ tab: AppTab) {
