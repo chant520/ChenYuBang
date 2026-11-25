@@ -64,7 +64,7 @@ internal fun RouteContent(
         Route.IdiomMistakes -> IdiomMistakesRouteContent(entry, router, deps, onRoute)
         Route.Mistake -> UserExampleRouteContent(entry, router, deps, onRoute)
         Route.Queue, Route.Summary -> ReviewRouteContent(entry, router, deps, onRoute, back)
-        Route.SelfTest -> SelfTestRouteContent(router, deps, onRoute)
+        Route.SelfTest -> SelfTestRouteContent(entry, router, deps, onRoute)
         Route.Backup ->
             P15BackupRoute(
                 vm = requireNotNull(deps.backupVm),
@@ -78,12 +78,14 @@ internal fun RouteContent(
 /** P13 设置入口与 P24 全屏自测的宿主接线。 */
 @Composable
 private fun SelfTestRouteContent(
+    entry: RouteEntry,
     router: RouterState,
     deps: RouteDeps,
     onRoute: (RouterState) -> Unit,
 ) {
     P24SelfTestRoute(
         database = deps.database,
+        instance = entry.instance,
         onExit = { onRoute(router.back()) },
     )
 }

@@ -7,6 +7,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -20,6 +21,7 @@ import com.chenyubang.core.ui.COverlay
 @Composable
 fun P24SelfTestRoute(
     database: AppDatabase,
+    instance: Long,
     onExit: () -> Unit,
 ) {
     val factory =
@@ -36,7 +38,7 @@ fun P24SelfTestRoute(
                 }
             }
         }
-    val model: SelfTestViewModel = viewModel(key = "p24-self-test", factory = factory)
+    val model = rememberP24SelfTestViewModel(instance, factory)
     val state by model.state.collectAsState()
     var confirmExit by remember { mutableStateOf(false) }
     val unfinished = state is SelfTestUiState.Question
@@ -60,6 +62,14 @@ fun P24SelfTestRoute(
         )
     }
 }
+
+internal fun p24SelfTestViewModelKey(instance: Long): String = "p24-self-test-$instance"
+
+@Composable
+internal fun rememberP24SelfTestViewModel(
+    instance: Long,
+    factory: ViewModelProvider.Factory,
+): SelfTestViewModel = viewModel(key = p24SelfTestViewModelKey(instance), factory = factory)
 
 @Composable
 internal fun SelfTestExitOverlay(
