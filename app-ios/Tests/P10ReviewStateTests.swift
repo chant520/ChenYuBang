@@ -62,7 +62,7 @@ final class P10ReviewStateTests: XCTestCase {
             onContentChanged: { contentChanges += 1 }
         )
         await model.load()
-        writer.onWrite = { self.reader.detail = self.makeDetail(reviewState: "已掌握") }
+        writer.onWrite = { reader.detail = self.makeDetail(reviewState: "已掌握") }
 
         await model.setReviewState(.proficient)
 
@@ -169,12 +169,12 @@ final class P10ReviewStateTests: XCTestCase {
         var contentChanges = 0
         let model = try makeModel(reader, writer, onContentChanged: { contentChanges += 1 })
         await model.load()
-        writer.onWrite = { self.reader.detail = self.makeDetail(reviewState: "已掌握") }
+        writer.onWrite = { reader.detail = self.makeDetail(reviewState: "已掌握") }
 
         await model.setReviewState(.proficient)
         XCTAssertEqual(contentChanges, 1)
         XCTAssertEqual(model.state.detail?.mistakeState, "已掌握")
-        writer.onWrite = { self.reader.detail = self.makeDetail(reviewState: "待复习") }
+        writer.onWrite = { reader.detail = self.makeDetail(reviewState: "待复习") }
 
         await model.setReviewState(.pending)
         XCTAssertEqual(writer.calls.map(\.state), [.proficient, .pending])
