@@ -128,10 +128,11 @@ public enum ReviewLibrary {
     ) throws -> MistakeStateUpdateResult {
         var result: MistakeStateUpdateResult = .notFound
         try db.inTransaction {
-            let changed = try db.execute(
+            try db.execute(
                 sql: "UPDATE mistake SET state = ? WHERE id = ?",
                 arguments: [state.rawValue, mistakeID]
             )
+            let changed = try Int.fetchOne(db, sql: "SELECT changes()") ?? 0
             result = changed == 0 ? .notFound : .updated
             return .commit
         }
