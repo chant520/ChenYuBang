@@ -32,6 +32,7 @@ private val selfChromedRoutes =
         Route.IdiomMistakes,
         Route.Queue,
         Route.Summary,
+        Route.SelfTest,
         Route.Camera,
         Route.Crop,
         Route.Ocr,

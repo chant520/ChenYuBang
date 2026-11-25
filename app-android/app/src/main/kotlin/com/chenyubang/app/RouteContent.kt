@@ -11,6 +11,7 @@ import com.chenyubang.feature.capture.P20FormScreen
 import com.chenyubang.feature.capture.P21DoneScreen
 import com.chenyubang.feature.me.P15BackupRoute
 import com.chenyubang.feature.me.P16PackRoute
+import com.chenyubang.feature.review.P24SelfTestRoute
 
 /** 按当前路由渲染目标页；P04/P05 的返回与跳转与其余路由同口径。 */
 @Composable
@@ -21,7 +22,6 @@ internal fun RouteContent(
     onRoute: (RouterState) -> Unit,
     back: () -> Unit,
 ) {
-    val backupVm = requireNotNull(deps.backupVm)
     when (entry.route) {
         Route.Scope ->
             ScopeDestination(
@@ -53,6 +53,7 @@ internal fun RouteContent(
             ExampleDestination(requireNotNull(entry.id), deps.database, { onRoute(router.back()) }) { id ->
                 onRoute(router.push(Route.Idiom, id))
             }
+        Route.Me -> MeRouteContent(router, deps, onRoute)
         Route.Mistakes ->
             MistakesDestination(
                 viewMode = router.mistakesView,
@@ -63,14 +64,28 @@ internal fun RouteContent(
         Route.IdiomMistakes -> IdiomMistakesRouteContent(entry, router, deps, onRoute)
         Route.Mistake -> UserExampleRouteContent(entry, router, deps, onRoute)
         Route.Queue, Route.Summary -> ReviewRouteContent(entry, router, deps, onRoute, back)
+        Route.SelfTest -> SelfTestRouteContent(router, deps, onRoute)
         Route.Backup ->
             P15BackupRoute(
-                vm = backupVm,
+                vm = requireNotNull(deps.backupVm),
                 onPresentImportMode = { onRoute(router.present(Route.ImportMode)) },
             )
         Route.Pack -> P16PackRoute(deps.packUpdates)
         else -> CaptureRouteContent(entry, router, deps, onRoute)
     }
+}
+
+/** P13 设置入口与 P24 全屏自测的宿主接线。 */
+@Composable
+private fun SelfTestRouteContent(
+    router: RouterState,
+    deps: RouteDeps,
+    onRoute: (RouterState) -> Unit,
+) {
+    P24SelfTestRoute(
+        database = deps.database,
+        onExit = { onRoute(router.back()) },
+    )
 }
 
 /** P09 成语下录入题：行点击进入 P10（user_example.id）。 */

@@ -4,13 +4,13 @@ import XCTest
 @testable import ChenYuBang
 
 final class RouterStateTests: XCTestCase {
-    func testRegistryKeepsAll23KeysAndFourRoots() {
+    func testRegistryKeepsAll24KeysAndFourRoots() {
         XCTAssertEqual(AppRoute.allCases.map(\.rawValue), [
             "onboarding", "tab/recommend", "library", "search", "idiom/{id}", "tab/examples",
             "example/{id}", "tab/mistakes", "mistakes/idiom/{id}", "mistake/{id}",
             "review/queue", "review/summary", "tab/me", "settings/scope", "settings/backup",
             "settings/pack", "capture/camera", "capture/crop", "capture/ocr", "capture/match",
-            "capture/done", "sheet/import-mode", "dialog/clear"
+            "capture/done", "sheet/import-mode", "dialog/clear", "review/self-test"
         ])
         XCTAssertEqual(AppTab.allCases.map(\.label), ["成语", "例题", "错题", "我的"])
         XCTAssertEqual(AppRoute.profile.owner, .profile)

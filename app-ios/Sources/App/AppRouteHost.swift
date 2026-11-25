@@ -189,7 +189,7 @@ private struct AppRoutePage: View {
                   let editor = launch.userExampleEditor,
                   let libraryReader = launch.libraryReader,
                   let exampleID = entry.recordID {
-            // 路由键 `mistake/{id}` 沿用规范 §5.1 的 23 行，值取 `user_example.id`（P10 是录入题详情）。
+            // 路由键 `mistake/{id}` 沿用规范 §5.1 的 24 行，值取 `user_example.id`（P10 是录入题详情）。
             P10UserExampleScreen(
                 id: exampleID,
                 reader: reader,
@@ -271,6 +271,12 @@ private struct AppRoutePage: View {
             PackVersionRouteScreen(
                 updates: updates,
                 onBack: { router.back() }
+            )
+        } else if entry.route == .selfTest, let reader = launch.libraryReader {
+            P24SelfTestScreen(
+                reader: reader,
+                backRequest: router.selfTestBackRequest,
+                onExit: { router.dismissFullScreen() }
             )
         } else if entry.route == .queue, let reader = launch.reviewReader {
             P11ReviewScreen(

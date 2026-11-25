@@ -53,6 +53,7 @@ final class RouterState: ObservableObject {
     @Published internal(set) var clearError: String?
     private let onboardingEntry = RouteEntry(route: .onboarding)
     @Published private(set) var suspendedFullScreenEntries: [RouteEntry] = []
+    @Published private(set) var selfTestBackRequest = 0
 
     init(needsFirstLaunch: Bool = false) {
         self.needsFirstLaunch = needsFirstLaunch
@@ -116,6 +117,7 @@ final class RouterState: ObservableObject {
     @discardableResult
     func push(_ route: AppRoute, recordID: String? = nil) -> Bool {
         guard !needsFirstLaunch, overlay == nil, route.presentation == .push,
+              currentEntry.route != .selfTest,
               captureWorkflow == nil, reviewSession == nil || currentEntry.route != .queue else { return false }
         let details: Set<AppRoute> = [.idiomDetail, .exampleDetail, .idiomMistakes, .mistakeDetail]
         if details.contains(route), !validID(recordID) { return false }
@@ -197,6 +199,10 @@ final class RouterState: ObservableObject {
     func back() {
         if overlay != nil { closeOverlay(); return }
         guard canGoBack else { return }
+        if currentEntry.route == .selfTest {
+            selfTestBackRequest += 1
+            return
+        }
         if !fullScreenEntries.isEmpty {
             if fullScreenEntries.count == 1 { dismissFullScreen() } else {
                 let leaving = fullScreenEntries.removeLast()
@@ -215,6 +221,7 @@ final class RouterState: ObservableObject {
     func dismissFullScreen() {
         fullScreenEntries = suspendedFullScreenEntries
         suspendedFullScreenEntries = []
+        selfTestBackRequest = 0
         reviewSession = nil
         captureWorkflow = nil
     }
@@ -225,6 +232,7 @@ final class RouterState: ObservableObject {
 
     var canStartWorkflow: Bool {
         !needsFirstLaunch && overlay == nil && reviewSession == nil && captureWorkflow == nil
+            && currentEntry.route != .selfTest
     }
 
     private func resetToRoot(_ tab: AppTab) {

@@ -9,6 +9,7 @@ import com.chenyubang.feature.review.ReviewSummary
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -20,13 +21,13 @@ class RouterStateTest {
                 "onboarding", "tab/recommend", "library", "search", "idiom/{id}", "tab/examples",
                 "example/{id}", "tab/mistakes", "mistakes/idiom/{id}", "mistake/{id}", "review/queue",
                 "review/summary", "tab/me", "settings/scope", "settings/backup", "settings/pack",
-                "capture/camera", "capture/crop", "capture/ocr", "capture/match", "capture/done",
+                "review/self-test", "capture/camera", "capture/crop", "capture/ocr", "capture/match", "capture/done",
                 "sheet/import-mode", "dialog/clear",
             )
         assertEquals(keys, Route.entries.map { it.key })
-        assertEquals(23, Route.entries.map { it.key }.toSet().size)
+        assertEquals(24, Route.entries.map { it.key }.toSet().size)
         assertEquals(
-            listOf(1, 4, 2, 3, 2, 4, 7),
+            listOf(1, 4, 2, 3, 3, 4, 7),
             RouteOwner.entries.map {
                     owner ->
                 Route.entries.count { it.owner == owner }
@@ -61,6 +62,24 @@ class RouterStateTest {
         val reset = switched.selectTab(AppTab.Idiom)
         assertEquals(Route.Recommend, reset.current.route)
         assertEquals(1, reset.rootTopEpoch[AppTab.Idiom])
+    }
+
+    @Test
+    fun selfTestStartsFullScreenFromMeAndReturnsWithoutChangingD1Review() {
+        val me = RouterState(tab = AppTab.Me)
+        val selfTest = me.startSelfTest()
+        assertEquals(Route.SelfTest, selfTest.current.route)
+        assertEquals(Presentation.FullScreen, Route.SelfTest.presentation)
+        assertEquals(RouteOwner.Review, Route.SelfTest.owner)
+        assertFalse(selfTest.showTabs)
+        assertFalse(selfTest.showFab)
+        assertFalse(systemBackEnabled(selfTest)) // P24 自己处理系统返回与退出确认。
+        assertEquals(me.stack, selfTest.back().stack)
+        assertEquals(selfTest, selfTest.startSelfTest())
+        val notMe = RouterState(tab = AppTab.Idiom)
+        assertEquals(notMe, notMe.startSelfTest())
+        assertThrows(IllegalArgumentException::class.java) { me.push(Route.SelfTest) }
+        assertEquals(Route.Queue, RouterState(tab = AppTab.Mistake).startReview(1).current.route)
     }
 
     @Test

@@ -8,7 +8,7 @@ enum RoutePresentation: String, Codable {
     case root, push, fullScreen, sheet, dialog
 }
 
-/// 键、顺序与开发规范 §5.1 的23行严格一致。归属不是模块间依赖。
+/// 键、顺序与开发规范 §5.1 的24行严格一致。归属不是模块间依赖。
 enum AppRoute: String, CaseIterable, Codable {
     case onboarding = "onboarding"
     case recommend = "tab/recommend"
@@ -33,6 +33,7 @@ enum AppRoute: String, CaseIterable, Codable {
     case done = "capture/done"
     case importMode = "sheet/import-mode"
     case clear = "dialog/clear"
+    case selfTest = "review/self-test"
 
     var owner: RouteOwner {
         switch self {
@@ -40,7 +41,7 @@ enum AppRoute: String, CaseIterable, Codable {
         case .recommend, .library, .search, .idiomDetail: return .idiom
         case .examples, .exampleDetail: return .example
         case .mistakes, .idiomMistakes, .mistakeDetail: return .mistake
-        case .queue, .summary: return .review
+        case .queue, .summary, .selfTest: return .review
         case .profile, .scope, .backup, .pack: return .profile
         case .camera, .crop, .ocr, .match, .done, .importMode, .clear: return .capture
         }
@@ -82,6 +83,7 @@ enum AppRoute: String, CaseIterable, Codable {
         case .done: return "保存成功"
         case .importMode: return "读入这份备份，用哪种方式"
         case .clear: return "清空全部学习数据"
+        case .selfTest: return "成语自测"
         }
     }
 }
