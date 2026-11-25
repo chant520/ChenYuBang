@@ -35,7 +35,7 @@ final class PackChannelClientTests: XCTestCase {
 
 private final class PackChannelURLProtocol: URLProtocol, @unchecked Sendable {
     private static let lock = NSLock()
-    private static var storedLoopStarts = 0
+    nonisolated(unsafe) private static var storedLoopStarts = 0
     private static let manifestData = Data("""
         {"schemaVersion":1,"packVersion":"v1.0.0","builtAt":"2026-01-01T00:00:00Z",
          "counts":{"idioms":1,"examples":1},"sha256":"0000000000000000000000000000000000000000000000000000000000000000",
