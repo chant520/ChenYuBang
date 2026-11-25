@@ -44,11 +44,15 @@ struct RoutePlaceholderPage: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(colors.page)
-        .task(id: isActive) {
+        .task(id: packUpdateTaskID) {
             guard isActive, entry.route == .examples, let updates = launch.packUpdates else { return }
             await updates.onEnterLibrary()
             updateFailure = updates.failureMessage
         }
+    }
+
+    var packUpdateTaskID: Int? {
+        isActive ? router.tabEntryEpoch[tab] : nil
     }
 
     @ViewBuilder

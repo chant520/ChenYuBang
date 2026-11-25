@@ -30,18 +30,6 @@ struct ReviewSession: Equatable {
     let originEntryID: UUID
 }
 
-struct CaptureWorkflow: Equatable, Identifiable {
-    let id = UUID()
-    let tab: AppTab
-    let originEntryID: UUID
-    var imageURL: URL?
-    var croppedURL: URL?
-    var recognizedText: String?
-    var savedUserExampleID: String?
-    var savedMistakeID: String?
-    var savedIdioms: [SavedIdiom] = []
-}
-
 /// iOS 15 的显式 entry 栈；页面状态跟随 UUID，不按路由键去重。
 final class RouterState: ObservableObject {
     @Published private(set) var selectedTab: AppTab = .idiom
@@ -52,6 +40,7 @@ final class RouterState: ObservableObject {
     @Published private(set) var captureWorkflow: CaptureWorkflow?
     @Published private(set) var needsFirstLaunch: Bool
     @Published private(set) var topRequests: [AppTab: UUID] = [:]
+    @Published private(set) var tabEntryEpoch: [AppTab: Int]
     /// 用户内容写入令牌：P10 保存 / 删除后刷新，让常驻挂载的来源页重新读库。
     /// `RetainedRouteStack` 只切透明度、不重建页面，`.task` 不会在返回时重跑（开发规范 §8.1.1「来源页列表刷新」）。
     @Published private(set) var userContentRevision = UUID()
@@ -70,6 +59,7 @@ final class RouterState: ObservableObject {
         tabEntries = Dictionary(uniqueKeysWithValues: AppTab.allCases.map {
             ($0, [RouteEntry(route: $0.root)])
         })
+        tabEntryEpoch = Dictionary(uniqueKeysWithValues: AppTab.allCases.map { ($0, 0) })
     }
 
     var currentEntry: RouteEntry {
@@ -91,7 +81,9 @@ final class RouterState: ObservableObject {
 
     func selectTab(_ tab: AppTab) {
         guard tabBarVisible, overlay == nil else { return }
-        if tab == selectedTab { resetToRoot(tab) } else { selectedTab = tab }
+        if tab == selectedTab { resetToRoot(tab) }
+        selectedTab = tab
+        tabEntryEpoch[tab, default: 0] += 1
     }
 
     func consumeTopRequest(for tab: AppTab, token: UUID) {
