@@ -38,6 +38,33 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+      - name: 预检 iOS 模拟器
+        run: |
+          set -euo pipefail
+          for attempt in 1 2 3; do
+            if xcrun simctl list devices available --json | python3 -c '
+          import json
+          import sys
+          devices = json.load(sys.stdin)["devices"]
+          matches = [
+              device
+              for runtime in devices.values()
+              for device in runtime
+              if device["name"] == "iPhone 16" and device["isAvailable"]
+          ]
+          if not matches:
+              raise SystemExit(1)
+          print("可用 iPhone 16：", matches[0]["udid"])
+          '; then
+              exit 0
+            fi
+            if [ "$attempt" -lt 3 ]; then
+              echo "iPhone 16 尚未就绪，5 秒后重试（$attempt/3）"
+              sleep 5
+            fi
+          done
+          echo "::error::CI 预检未找到可用 iPhone 16，请检查 CoreSimulator 与已安装 runtime"
+          exit 1
       - name: 部署目标守卫（iOS 15.0；规范 §13.1）
         run: |
           set -euo pipefail
@@ -74,9 +101,10 @@ jobs:
           cd app-ios
           xcodebuild -project ChenYuBang.xcodeproj -scheme ChenYuBang \
             -clonedSourcePackagesDirPath .spm-packages \
-            -destination 'generic/platform=iOS' build CODE_SIGNING_ALLOWED=NO
+            -destination 'generic/platform=iOS Simulator' build-for-testing CODE_SIGNING_ALLOWED=NO
       - name: 单测 + 快照比对（swift-snapshot-testing 作为 test 的一部分；规范 §13 / §13.1）
-        # Record runs fail every snapshot by design; continue-on-error keeps the run green
+        id: ios_tests
+        # 录制断言按设计失败；保留产物上传机会，实际执行数另行校验。
         continue-on-error: ${{ github.event.inputs.record == 'true' }}
         env:
           TEST_RUNNER_SNAPSHOT_RECORD: ${{ github.event.inputs.record == 'true' && '1' || '' }}
@@ -121,6 +149,28 @@ jobs:
               -resultBundlePath .xcresult/ios-recheck.xcresult \
               "${test_args[@]}" test CODE_SIGNING_ALLOWED=NO
           fi
+      - name: 核对录制执行证据
+        if: ${{ always() && github.event.inputs.record == 'true' && steps.ios_tests.outcome != 'skipped' }}
+        run: |
+          set -euo pipefail
+          bundle=app-ios/.xcresult/ios-results.xcresult
+          if [[ ! -d "$bundle" ]]; then
+            echo "::error::录制未生成 xcresult，不能判定测试已执行"
+            exit 1
+          fi
+          summary=$(mktemp)
+          xcrun xcresulttool get test-results summary --path "$bundle" --format json > "$summary"
+          python3 - "$summary" <<'PY'
+          import json
+          import sys
+
+          with open(sys.argv[1], encoding="utf-8") as source:
+              summary = json.load(source)
+          total = summary["totalTestCount"]
+          print(f"录制实际执行测试数：{total}")
+          if total == 0:
+              raise SystemExit("录制执行测试数为 0，不能判定成功")
+          PY
       - name: 上传快照基线产物（首次录制引导 / 失败时取回审阅；规范 §11.1）
         if: always()
         uses: actions/upload-artifact@v4
