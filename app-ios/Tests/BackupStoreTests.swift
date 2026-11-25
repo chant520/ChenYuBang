@@ -60,6 +60,17 @@ final class BackupStoreTests: PackDatabaseTestCase {
         XCTAssertEqual(text(object(review)["id"]), "30000000-0000-4abc-8def-000000000001")
         XCTAssertEqual(text(object(review)["mistakeId"]), "20000000-0000-4abc-8def-000000000001")
         XCTAssertEqual(array(payload["idiomStates"] ?? .null).count, 2)
+        let idiomStates = array(payload["idiomStates"] ?? .null).map(object)
+        let stateA = try XCTUnwrap(idiomStates.first {
+            text($0["idiomId"]) == "11111111-1111-4111-8111-111111111111"
+        })
+        let stateB = try XCTUnwrap(idiomStates.first {
+            text($0["idiomId"]) == "22222222-2222-4222-8222-222222222222"
+        })
+        XCTAssertEqual(text(stateA["status"]), "学过")
+        XCTAssertEqual(stateA["favorite"], .boolean(true))
+        XCTAssertEqual(text(stateB["status"]), "未学")
+        XCTAssertEqual(stateB["favorite"], .boolean(false))
 
         let scopes = array(payload["scopes"] ?? .null).map(object)
         XCTAssertEqual(scopes.count, 2)

@@ -215,6 +215,14 @@ private extension BackupImportWriterTests {
             XCTAssertEqual(try count(db, "mistake"), 3)
             XCTAssertEqual(try count(db, "user_example"), 3)
             XCTAssertEqual(try count(db, "review_log"), 3)
+            XCTAssertEqual(try String.fetchOne(db, sql: "SELECT status FROM idiom_state WHERE idiomId = ?",
+                                               arguments: [BackupWriterFixture.idiomA]), "学过")
+            XCTAssertEqual(try Bool.fetchOne(db, sql: "SELECT favorite FROM idiom_state WHERE idiomId = ?",
+                                             arguments: [BackupWriterFixture.idiomA]), false)
+            XCTAssertEqual(try String.fetchOne(db, sql: "SELECT status FROM idiom_state WHERE idiomId = ?",
+                                               arguments: [BackupWriterFixture.idiomB]), "学过")
+            XCTAssertEqual(try Bool.fetchOne(db, sql: "SELECT favorite FROM idiom_state WHERE idiomId = ?",
+                                             arguments: [BackupWriterFixture.idiomB]), true)
             XCTAssertEqual(try String.fetchOne(db, sql: "SELECT stem FROM mistake WHERE id = ?",
                                                arguments: [BackupWriterFixture.sharedMistake]), "本机共享错题")
             XCTAssertEqual(try String.fetchOne(db, sql: "SELECT stem FROM mistake WHERE id = ?",
@@ -262,6 +270,12 @@ private extension BackupImportWriterTests {
                                                arguments: [BackupWriterFixture.sharedReview]), "对")
             XCTAssertEqual(try String.fetchOne(db, sql: "SELECT status FROM idiom_state WHERE idiomId = ?",
                                                arguments: [BackupWriterFixture.idiomA]), "已掌握")
+            XCTAssertEqual(try Bool.fetchOne(db, sql: "SELECT favorite FROM idiom_state WHERE idiomId = ?",
+                                             arguments: [BackupWriterFixture.idiomA]), true)
+            XCTAssertEqual(try String.fetchOne(db, sql: "SELECT status FROM idiom_state WHERE idiomId = ?",
+                                               arguments: [BackupWriterFixture.idiomB]), "学过")
+            XCTAssertEqual(try Bool.fetchOne(db, sql: "SELECT favorite FROM idiom_state WHERE idiomId = ?",
+                                             arguments: [BackupWriterFixture.idiomB]), true)
             XCTAssertEqual(try String.fetchAll(db, sql: "SELECT province FROM exam_scope WHERE province IS NOT NULL"),
                            ["广东"])
             XCTAssertEqual(try Bool.fetchOne(db, sql: "SELECT enabled FROM exam_scope WHERE type = '国考'"), false)

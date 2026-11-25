@@ -244,8 +244,11 @@ interface MistakeDao {
     exportSchema = true,
 )
 @TypeConverters(Converters::class)
+@Suppress("TooManyFunctions")
 abstract class AppDatabase : RoomDatabase() {
     abstract fun idiomDao(): IdiomDao
+
+    abstract fun idiomStateDao(): IdiomStateDao
 
     abstract fun idiomWordDao(): IdiomWordDao
 

@@ -22,8 +22,8 @@ public struct ReviewQueueItem: Equatable, Sendable, Identifiable {
 }
 
 /// 复习队列查询与结果落库（P11 / P12，开发规范第 8.2 节）。
-/// 只写 `review_log` 与 `mistake.reviewCount` / `lastReviewedAt`，不改 `mistake.state`
-/// （掌握状态切换属 C9 进阶，MVP 不实现）。
+/// 只写 `review_log` 与 `mistake.reviewCount` / `lastReviewedAt`，不自动改 `mistake.state`
+/// （规范第 4.7 / 8.2 节）；掌握状态切换由 `setState` 独立完成。
 public enum ReviewLibrary {
     /// `review_log.result` 的两个库内字面值（第 8.2 节：不同记「对」、相同记「错」）。
     public static let resultRight = "对"
@@ -119,6 +119,25 @@ public enum ReviewLibrary {
         }
     }
 
+    /// C9 按 mistake.id 精确切换掌握状态；单事务只更新 state，目标不存在返回 notFound。
+    /// 重复写当前值仍返回 updated；不插入、不触碰正文、归属、复习字段或 review_log。
+    public static func setState(
+        _ db: Database,
+        mistakeID: String,
+        state: MistakeReviewState
+    ) throws -> MistakeStateUpdateResult {
+        var result: MistakeStateUpdateResult = .notFound
+        try db.inTransaction {
+            let changed = try db.execute(
+                sql: "UPDATE mistake SET state = ? WHERE id = ?",
+                arguments: [state.rawValue, mistakeID]
+            )
+            result = changed == 0 ? .notFound : .updated
+            return .commit
+        }
+        return result
+    }
+
     public enum ReviewError: Error, Equatable {
         case mistakeNotFound(String)
     }
@@ -169,6 +188,12 @@ public final class ReviewLibraryService: @unchecked Sendable {
 
     public func idiomsInRound(mistakeIDs: [String]) throws -> [LinkedIdiom] {
         try queue.read { db in try ReviewLibrary.idiomsInRound(db, mistakeIDs: mistakeIDs) }
+    }
+
+    public func setState(mistakeID: String, state: MistakeReviewState) throws -> MistakeStateUpdateResult {
+        try queue.writeWithoutTransaction { db in
+            try ReviewLibrary.setState(db, mistakeID: mistakeID, state: state)
+        }
     }
 
     public func record(mistakeID: String, result: String, reviewedAt: String) throws {
