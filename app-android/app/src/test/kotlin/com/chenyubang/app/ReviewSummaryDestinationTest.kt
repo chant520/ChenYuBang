@@ -125,6 +125,35 @@ class ReviewSummaryDestinationTest {
 
             assertEquals(listOf(1, 0), completedQueries)
             assertNull(started)
+            onNodeWithText("当前范围已没有待复习的错题").assertExists()
+        }
+
+    @Test
+    fun queueReadFailureShowsMessageAndDoesNotRestart() =
+        runComposeUiTest {
+            var fail = false
+            var started: Int? = null
+            var queries = 0
+            setContent {
+                ReviewSummaryDestination(
+                    summary = summary,
+                    scopeIdiomId = null,
+                    database = database,
+                    actions = ReviewSummaryActions({}, {}, { started = it }, {}),
+                    loadPendingCount = {
+                        queries++
+                        if (fail) error("read failed")
+                        1
+                    },
+                )
+            }
+            waitUntil(timeoutMillis = 5_000) { queries == 1 }
+            fail = true
+            onNodeWithText("再复习一轮").performClick()
+            waitUntil(timeoutMillis = 5_000) { queries == 2 }
+
+            assertNull(started)
+            onNodeWithText("待复习队列读取失败，请重试").assertExists()
         }
 
     private fun addMistake(

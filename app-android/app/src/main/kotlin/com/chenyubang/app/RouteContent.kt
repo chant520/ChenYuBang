@@ -59,7 +59,7 @@ internal fun RouteContent(
                 viewMode = router.mistakesView,
                 revision = router.contentRevision,
                 database = deps.database,
-                actions = mistakeActions(router, onRoute),
+                actions = mistakeActions(router, deps.database, onRoute),
             )
         Route.IdiomMistakes -> IdiomMistakesRouteContent(entry, router, deps, onRoute)
         Route.Mistake -> UserExampleRouteContent(entry, router, deps, onRoute)

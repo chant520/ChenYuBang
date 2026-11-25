@@ -26,6 +26,7 @@ class P12ReviewSummarySnapshotTest {
     private fun capture(
         night: Boolean,
         summary: ReviewSummary,
+        pageMessage: String? = null,
     ) {
         composeTestRule.setContent {
             val base = LocalConfiguration.current
@@ -40,6 +41,7 @@ class P12ReviewSummarySnapshotTest {
                         onBackToSource = {},
                         onAgain = {},
                         onOpenIdiom = {},
+                        pageMessage = pageMessage,
                     )
                 }
             }
@@ -97,4 +99,16 @@ class P12ReviewSummarySnapshotTest {
             night = true,
             summary = ReviewSummary(questionCount = 0, answerCount = 0, correctCount = 0, idioms = emptyList()),
         )
+
+    @Test
+    fun retryQueueEmptyLight() = capture(false, global(), "当前范围已没有待复习的错题")
+
+    @Test
+    fun retryQueueEmptyDark() = capture(true, global(), "当前范围已没有待复习的错题")
+
+    @Test
+    fun retryReadFailedLight() = capture(false, global(), "待复习队列读取失败，请重试")
+
+    @Test
+    fun retryReadFailedDark() = capture(true, global(), "待复习队列读取失败，请重试")
 }

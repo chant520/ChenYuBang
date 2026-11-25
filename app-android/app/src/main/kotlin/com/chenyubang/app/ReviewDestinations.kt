@@ -17,6 +17,7 @@ import com.chenyubang.feature.review.P12ReviewSummaryContent
 import com.chenyubang.feature.review.ReviewFlow
 import com.chenyubang.feature.review.ReviewSummary
 import com.chenyubang.feature.review.ReviewViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -90,11 +91,19 @@ internal fun ReviewSummaryDestination(
     loadPendingCount: suspend (String?) -> Int = database.reviewDao()::pendingCount,
 ) {
     var pendingCount by remember { mutableStateOf(0) }
+    var pageMessage by remember { mutableStateOf<String?>(null) }
     val pendingCountMutex = remember { Mutex() }
     val scope = rememberCoroutineScope()
     LaunchedEffect(scopeIdiomId, revision) {
         pendingCountMutex.withLock {
-            pendingCount = loadPendingCount(scopeIdiomId)
+            try {
+                pendingCount = loadPendingCount(scopeIdiomId)
+                pageMessage = null
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (_: Exception) {
+                pageMessage = "待复习队列读取失败，请重试"
+            }
         }
     }
     P12ReviewSummaryContent(
@@ -105,12 +114,20 @@ internal fun ReviewSummaryDestination(
             // 入口禁用态与点击取值都跟随 revision；真正起轮前再读当前范围。
             scope.launch {
                 pendingCountMutex.withLock {
-                    val latest = loadPendingCount(scopeIdiomId)
-                    pendingCount = latest
-                    if (latest > 0) actions.onAgain(latest)
+                    try {
+                        val latest = loadPendingCount(scopeIdiomId)
+                        pendingCount = latest
+                        pageMessage = if (latest > 0) null else "当前范围已没有待复习的错题"
+                        if (latest > 0) actions.onAgain(latest)
+                    } catch (cancelled: CancellationException) {
+                        throw cancelled
+                    } catch (_: Exception) {
+                        pageMessage = "待复习队列读取失败，请重试"
+                    }
                 }
             }
         },
         onOpenIdiom = actions.onOpenIdiom,
+        pageMessage = pageMessage,
     )
 }

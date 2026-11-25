@@ -46,9 +46,7 @@ final class P10UserExampleSnapshotTests: XCTestCase {
     private func assertP10Blocks(
         _ state: UserExampleState,
         dark: Bool,
-        file: StaticString = #filePath,
-        testName: String = #function,
-        line: UInt = #line
+        file: StaticString = #filePath, testName: String = #function, line: UInt = #line
     ) {
         guard let detail = state.detail else {
             XCTFail("区块帧需要 detail")
@@ -185,8 +183,11 @@ final class P10UserExampleSnapshotTests: XCTestCase {
         assertP10Blocks(mistakeState(revealed: true), dark: true)
     }
 
-    func testBlocksProficient() {
+    func testBlocksProficientLight() {
         assertP10Blocks(mistakeState(revealed: true, reviewState: "已掌握"), dark: false)
+    }
+
+    func testBlocksProficientDark() {
         assertP10Blocks(mistakeState(revealed: true, reviewState: "已掌握"), dark: true)
     }
 

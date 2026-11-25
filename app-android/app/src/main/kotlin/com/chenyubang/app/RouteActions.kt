@@ -4,27 +4,46 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import com.chenyubang.core.data.AppDatabase
 import com.chenyubang.feature.mistake.P08MistakeActions
 import com.chenyubang.feature.review.ReviewSummary
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.launch
 
 /** P08 入口动作；队列在点击瞬间变空时停在 P08 给页内中性提示条，正常态按钮已按待复习数置灰。 */
 @Composable
 internal fun mistakeActions(
     router: RouterState,
+    database: AppDatabase,
     onRoute: (RouterState) -> Unit,
+    loadPendingCount: suspend () -> Int = { database.reviewDao().pendingCount(null) },
 ): P08MistakeActions {
     var pageMessage by remember { mutableStateOf<String?>(null) }
+    var starting by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
     return P08MistakeActions(
         onViewModeChange = { onRoute(router.copy(mistakesView = it)) },
         onOpenIdiom = { id -> onRoute(router.push(Route.IdiomMistakes, id)) },
         onOpenMistake = { id -> onRoute(router.push(Route.Mistake, id)) },
         onCapture = { onRoute(router.startCapture()) },
-        onStartReview = { count ->
-            if (count <= 0) {
-                pageMessage = "今天没有待复习的错题"
-            } else {
-                onRoute(router.startReview(count))
+        onStartReview = { _ ->
+            if (!starting) {
+                starting = true
+                scope.launch {
+                    try {
+                        val latest = loadPendingCount()
+                        pageMessage = if (latest > 0) null else "今天没有待复习的错题"
+                        if (latest > 0) onRoute(router.startReview(latest))
+                    } catch (cancelled: CancellationException) {
+                        throw cancelled
+                    } catch (_: Exception) {
+                        pageMessage = "待复习队列读取失败，请重试"
+                    } finally {
+                        starting = false
+                    }
+                }
             }
         },
         pageMessage = pageMessage,
