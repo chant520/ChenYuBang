@@ -53,7 +53,7 @@ final class IdiomStateStoreTests: XCTestCase {
             try db.execute(sql: "INSERT INTO idiom_state(idiomId, status, favorite) VALUES (?, '学过', 1)",
                            arguments: [idiomA])
         }
-        try store.setStatus(idiomID: idiomA, status: .mastered)
+        try store.setStatus(idiomID: idiomA, status: .proficient)
         try assertRawState(idiomA, status: "已掌握", favorite: true)
     }
 
@@ -127,7 +127,7 @@ final class IdiomStateStoreTests: XCTestCase {
     }
 
     func testWrittenStateRoundTripsBackupAndClear() throws {
-        try store.setStatus(idiomID: idiomA, status: .mastered)
+        try store.setStatus(idiomID: idiomA, status: .proficient)
         try store.setFavorite(idiomID: idiomA, favorite: true)
         let directory = FileManager.default.temporaryDirectory
             .appendingPathComponent("idiom-state-test-\(UUID().uuidString)", isDirectory: true)

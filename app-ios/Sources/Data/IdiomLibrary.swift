@@ -80,7 +80,7 @@ public final class IdiomLibraryReader: @unchecked Sendable {
 public enum IdiomLearningStatus: String, CaseIterable, Sendable {
     case notStarted = "未学"
     case studied = "学过"
-    case mastered = "已掌握"
+    case proficient = "已掌握"
 }
 
 /// A6 / A7 的单条读投影；无 idiom_state 行时由 Store 补默认值，不写库。

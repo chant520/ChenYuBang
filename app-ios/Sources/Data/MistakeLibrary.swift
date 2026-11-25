@@ -114,7 +114,7 @@ public struct IdiomCapturedExample: Equatable, Sendable, Identifiable {
 /// C9 错题掌握状态只接受规范第 4.7 节的两个精确值。
 public enum MistakeReviewState: String, CaseIterable, Sendable {
     case pending = "待复习"
-    case mastered = "已掌握"
+    case proficient = "已掌握"
 }
 
 public enum MistakeStateUpdateResult: Equatable, Sendable {

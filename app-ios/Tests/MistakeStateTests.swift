@@ -37,7 +37,7 @@ final class MistakeStateTests: XCTestCase {
     func testSetStateUpdatesOnlyTargetAndPreservesAllFields() throws {
         let before = try snapshotAll()
         let targetBefore = try XCTUnwrap(before["mistake"]?.first { ($0["id"] as String) == targetMistake })
-        XCTAssertEqual(try service.setState(mistakeID: targetMistake, state: .mastered), .updated)
+        XCTAssertEqual(try service.setState(mistakeID: targetMistake, state: .proficient), .updated)
 
         let after = try snapshotAll()
         let targetAfter = try XCTUnwrap(after["mistake"]?.first { ($0["id"] as String) == targetMistake })
@@ -58,7 +58,7 @@ final class MistakeStateTests: XCTestCase {
 
     func testMissingIDReturnsNotFoundWithoutInserting() throws {
         let before = try snapshotAll()
-        XCTAssertEqual(try service.setState(mistakeID: "missing", state: .mastered), .notFound)
+        XCTAssertEqual(try service.setState(mistakeID: "missing", state: .proficient), .notFound)
         let after = try snapshotAll()
         XCTAssertEqual(after, before)
         try queue.read { db in
@@ -68,19 +68,19 @@ final class MistakeStateTests: XCTestCase {
     }
 
     func testRepeatedStateWriteIsIdempotent() throws {
-        XCTAssertEqual(try service.setState(mistakeID: targetMistake, state: .mastered), .updated)
+        XCTAssertEqual(try service.setState(mistakeID: targetMistake, state: .proficient), .updated)
         let before = try snapshotAll()
-        XCTAssertEqual(try service.setState(mistakeID: targetMistake, state: .mastered), .updated)
+        XCTAssertEqual(try service.setState(mistakeID: targetMistake, state: .proficient), .updated)
         XCTAssertEqual(try snapshotAll(), before)
     }
 
-    func testMasteredLeavesPendingQueuesButRemainsInAllMistakes() throws {
+    func testProficientLeavesPendingQueuesButRemainsInAllMistakes() throws {
         let globalBefore = try service.queue().map(\.id)
         let idiomBefore = try service.queue(idiomID: idiomA).map(\.id)
         XCTAssertEqual(globalBefore, [targetMistake, sharedMistake, otherMistake, otherIdiomMistake])
         XCTAssertEqual(idiomBefore, [targetMistake, sharedMistake, otherMistake])
 
-        XCTAssertEqual(try service.setState(mistakeID: targetMistake, state: .mastered), .updated)
+        XCTAssertEqual(try service.setState(mistakeID: targetMistake, state: .proficient), .updated)
         XCTAssertEqual(try service.queue().map(\.id), [sharedMistake, otherMistake, otherIdiomMistake])
         XCTAssertEqual(try service.queue(idiomID: idiomA).map(\.id), [sharedMistake, otherMistake])
         XCTAssertEqual(try service.pendingCount(idiomID: idiomA), 2)
@@ -95,8 +95,8 @@ final class MistakeStateTests: XCTestCase {
         XCTAssertEqual(try service.pendingCount(idiomID: idiomA), 3)
     }
 
-    func testReviewRecordDoesNotChangeMasteredState() throws {
-        XCTAssertEqual(try service.setState(mistakeID: targetMistake, state: .mastered), .updated)
+    func testReviewRecordDoesNotChangeProficientState() throws {
+        XCTAssertEqual(try service.setState(mistakeID: targetMistake, state: .proficient), .updated)
         try service.record(mistakeID: targetMistake, result: ReviewLibrary.resultRight,
                            reviewedAt: "2026-11-25T00:00:00Z")
         try queue.read { db in
@@ -135,12 +135,12 @@ final class MistakeStateTests: XCTestCase {
                         '望文生义', '["望文生义"]', '国考', 2026, '中央', '待复习',
                         '2026-11-24T00:00:00Z', '2026-11-24T01:00:00Z', 2)
                 """, arguments: [targetMistake, exampleA])
-            try seedMistake(db, id: sharedMistake, exampleID: exampleA,
-                            stem: "同一录入题的另一错题", createdAt: "2026-11-23T00:00:00Z", idiomID: idiomA)
-            try seedMistake(db, id: otherMistake, exampleID: exampleB,
-                            stem: "同一成语的其他错题", createdAt: "2026-11-22T00:00:00Z", idiomID: idiomA)
-            try seedMistake(db, id: otherIdiomMistake, exampleID: exampleC,
-                            stem: "其他成语的错题", createdAt: "2026-11-21T00:00:00Z", idiomID: idiomB)
+            try seedMistake(db, id: sharedMistake, example: (exampleA, "同一录入题的另一错题"),
+                            createdAt: "2026-11-23T00:00:00Z", idiomID: idiomA)
+            try seedMistake(db, id: otherMistake, example: (exampleB, "同一成语的其他错题"),
+                            createdAt: "2026-11-22T00:00:00Z", idiomID: idiomA)
+            try seedMistake(db, id: otherIdiomMistake, example: (exampleC, "其他成语的错题"),
+                            createdAt: "2026-11-21T00:00:00Z", idiomID: idiomB)
             try seedReview(db, id: "30000000-0000-4000-8000-000000000001",
                            mistakeID: targetMistake, result: "对")
             try seedReview(db, id: "30000000-0000-4000-8000-000000000002",
@@ -170,8 +170,7 @@ final class MistakeStateTests: XCTestCase {
     private func seedMistake(
         _ db: Database,
         id: String,
-        exampleID: String,
-        stem: String,
+        example: (id: String, stem: String),
         createdAt: String,
         idiomID: String
     ) throws {
@@ -179,7 +178,7 @@ final class MistakeStateTests: XCTestCase {
             INSERT INTO mistake(id, userExampleId, stem, optionA, optionB, optionC, optionD,
                                 state, createdAt, reviewCount)
             VALUES (?, ?, ?, '甲', '乙', '丙', '丁', '待复习', ?, 0)
-            """, arguments: [id, exampleID, stem, createdAt])
+            """, arguments: [id, example.id, example.stem, createdAt])
         try db.execute(sql: "INSERT INTO mistake_idiom(mistakeId, idiomId) VALUES (?, ?)",
                        arguments: [id, idiomID])
     }
