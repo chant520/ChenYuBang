@@ -47,18 +47,18 @@ private enum SnapshotFixtureError: Error {
     case missingQuestion
 }
 
-/// P24 的 8 类代表态 × 浅深，共 16 帧。所有帧都由真实 ViewModel / engine 到达，不手工拼死题目。
+/// P25 的 8 类代表态 × 浅深，共 16 帧。所有帧都由真实 ViewModel / engine 到达，不手工拼死题目。
 /// CI 录制兼容 TEST_RUNNER_SNAPSHOT_RECORD；未显式录制时始终是 verify 门禁。
 @MainActor
-final class P24SelfTestSnapshotTests: XCTestCase {
+final class P25SelfTestSnapshotTests: XCTestCase {
     override func setUp() {
         super.setUp()
         isRecording = ProcessInfo.processInfo.environment["TEST_RUNNER_SNAPSHOT_RECORD"] == "1"
             || ProcessInfo.processInfo.environment["SNAPSHOT_RECORD"] == "1"
     }
 
-    private func loadedModel(scopeCount: Int = 4, libraryCount: Int = 10) async -> P24SelfTestViewModel {
-        let model = P24SelfTestViewModel(
+    private func loadedModel(scopeCount: Int = 4, libraryCount: Int = 10) async -> P25SelfTestViewModel {
+        let model = P25SelfTestViewModel(
             reader: SnapshotSelfTestReader(scopeCount: scopeCount, libraryCount: libraryCount),
             randomSource: SnapshotSelfTestRandom(),
             onExit: {}
@@ -67,12 +67,12 @@ final class P24SelfTestSnapshotTests: XCTestCase {
         return model
     }
 
-    private func current(_ model: P24SelfTestViewModel) throws -> P24QuestionState {
+    private func current(_ model: P25SelfTestViewModel) throws -> P25QuestionState {
         guard case .question(let question) = model.state else { throw SnapshotFixtureError.missingQuestion }
         return question
     }
 
-    private func finish(_ model: P24SelfTestViewModel, correctCount: Int = 7) throws {
+    private func finish(_ model: P25SelfTestViewModel, correctCount: Int = 7) throws {
         for index in 0..<10 {
             let state = try current(model)
             let optionID = index < correctCount
@@ -83,17 +83,17 @@ final class P24SelfTestSnapshotTests: XCTestCase {
         }
     }
 
-    private func assertP24(
-        _ model: P24SelfTestViewModel,
+    private func assertP25(
+        _ model: P25SelfTestViewModel,
         dark: Bool,
         file: StaticString = #filePath,
         testName: String = #function,
         line: UInt = #line
     ) {
-        let view = P24SelfTestContent(
+        let view = P25SelfTestContent(
             state: model.state,
             exitAsking: model.exitAsking,
-            actions: P24SelfTestActions(
+            actions: P25SelfTestActions(
                 onPick: { _ in },
                 onNext: {},
                 onAskExit: {},
@@ -118,13 +118,13 @@ final class P24SelfTestSnapshotTests: XCTestCase {
     func testDefinitionQuestionUnansweredLight() async throws {
         let model = await loadedModel()
         XCTAssertEqual(try current(model).question.type, .definitionToIdiom)
-        assertP24(model, dark: false)
+        assertP25(model, dark: false)
     }
 
     func testDefinitionQuestionUnansweredDark() async throws {
         let model = await loadedModel()
         XCTAssertEqual(try current(model).question.type, .definitionToIdiom)
-        assertP24(model, dark: true)
+        assertP25(model, dark: true)
     }
 
     func testIdiomQuestionUnansweredLight() async throws {
@@ -133,7 +133,7 @@ final class P24SelfTestSnapshotTests: XCTestCase {
         model.pick(first.question.targetID)
         model.next()
         XCTAssertEqual(try current(model).question.type, .idiomToDefinition)
-        assertP24(model, dark: false)
+        assertP25(model, dark: false)
     }
 
     func testIdiomQuestionUnansweredDark() async throws {
@@ -142,21 +142,21 @@ final class P24SelfTestSnapshotTests: XCTestCase {
         model.pick(first.question.targetID)
         model.next()
         XCTAssertEqual(try current(model).question.type, .idiomToDefinition)
-        assertP24(model, dark: true)
+        assertP25(model, dark: true)
     }
 
     func testCorrectAnswerLight() async throws {
         let model = await loadedModel()
         model.pick(try current(model).question.targetID)
         XCTAssertTrue(try current(model).isCorrect)
-        assertP24(model, dark: false)
+        assertP25(model, dark: false)
     }
 
     func testCorrectAnswerDark() async throws {
         let model = await loadedModel()
         model.pick(try current(model).question.targetID)
         XCTAssertTrue(try current(model).isCorrect)
-        assertP24(model, dark: true)
+        assertP25(model, dark: true)
     }
 
     func testSelectedWrongAnswerLight() async throws {
@@ -165,7 +165,7 @@ final class P24SelfTestSnapshotTests: XCTestCase {
         let wrong = try XCTUnwrap(question.options.first { $0.idiomID != question.targetID })
         model.pick(wrong.idiomID)
         XCTAssertFalse(try current(model).isCorrect)
-        assertP24(model, dark: false)
+        assertP25(model, dark: false)
     }
 
     func testSelectedWrongAnswerDark() async throws {
@@ -174,43 +174,43 @@ final class P24SelfTestSnapshotTests: XCTestCase {
         let wrong = try XCTUnwrap(question.options.first { $0.idiomID != question.targetID })
         model.pick(wrong.idiomID)
         XCTAssertFalse(try current(model).isCorrect)
-        assertP24(model, dark: true)
+        assertP25(model, dark: true)
     }
 
     func testSummaryLight() async throws {
         let model = await loadedModel()
         try finish(model)
-        assertP24(model, dark: false)
+        assertP25(model, dark: false)
     }
 
     func testSummaryDark() async throws {
         let model = await loadedModel()
         try finish(model)
-        assertP24(model, dark: true)
+        assertP25(model, dark: true)
     }
 
     func testEmptyScopeLight() async {
         let model = await loadedModel(scopeCount: 0)
         XCTAssertEqual(model.state, .emptyScope)
-        assertP24(model, dark: false)
+        assertP25(model, dark: false)
     }
 
     func testEmptyScopeDark() async {
         let model = await loadedModel(scopeCount: 0)
         XCTAssertEqual(model.state, .emptyScope)
-        assertP24(model, dark: true)
+        assertP25(model, dark: true)
     }
 
     func testInsufficientCandidatesLight() async {
         let model = await loadedModel(scopeCount: 1, libraryCount: 3)
         XCTAssertEqual(model.state, .insufficientCandidates)
-        assertP24(model, dark: false)
+        assertP25(model, dark: false)
     }
 
     func testInsufficientCandidatesDark() async {
         let model = await loadedModel(scopeCount: 1, libraryCount: 3)
         XCTAssertEqual(model.state, .insufficientCandidates)
-        assertP24(model, dark: true)
+        assertP25(model, dark: true)
     }
 
     func testExitConfirmationLight() async throws {
@@ -218,7 +218,7 @@ final class P24SelfTestSnapshotTests: XCTestCase {
         _ = try current(model)
         model.askExit()
         XCTAssertTrue(model.exitAsking)
-        assertP24(model, dark: false)
+        assertP25(model, dark: false)
     }
 
     func testExitConfirmationDark() async throws {
@@ -226,6 +226,6 @@ final class P24SelfTestSnapshotTests: XCTestCase {
         _ = try current(model)
         model.askExit()
         XCTAssertTrue(model.exitAsking)
-        assertP24(model, dark: true)
+        assertP25(model, dark: true)
     }
 }

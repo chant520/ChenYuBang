@@ -19,7 +19,7 @@ private enum EngineFixtureError: Error {
     case notReady
 }
 
-/// P24 纯引擎：资格过滤、范围边界、10 题交替、循环目标、四选一与内存判分。
+/// P25 纯引擎：资格过滤、范围边界、10 题交替、循环目标、四选一与内存判分。
 final class SelfTestEngineTests: XCTestCase {
     private func candidate(_ id: String, word: String? = nil, sense: String? = nil) -> SelfTestCandidate {
         SelfTestCandidate(id: id, word: word ?? "成语\(id)", sense: sense ?? "释义\(id)")

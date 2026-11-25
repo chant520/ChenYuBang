@@ -17,9 +17,9 @@ import com.chenyubang.core.ui.CButton
 import com.chenyubang.core.ui.CButtonVariant
 import com.chenyubang.core.ui.COverlay
 
-/** P24 每次进入从 P13 新建 ViewModel；退出确认与系统返回都丢弃本轮内存状态。 */
+/** P25 每次进入从 P13 新建 ViewModel；退出确认与系统返回都丢弃本轮内存状态。 */
 @Composable
-fun P24SelfTestRoute(
+fun P25SelfTestRoute(
     database: AppDatabase,
     instance: Long,
     onExit: () -> Unit,
@@ -38,13 +38,13 @@ fun P24SelfTestRoute(
                 }
             }
         }
-    val model = rememberP24SelfTestViewModel(instance, factory)
+    val model = rememberP25SelfTestViewModel(instance, factory)
     val state by model.state.collectAsState()
     var confirmExit by remember { mutableStateOf(false) }
     val unfinished = state is SelfTestUiState.Question
     val requestExit = { if (unfinished) confirmExit = true else onExit() }
     BackHandler(enabled = true, onBack = requestExit)
-    P24SelfTestContent(
+    P25SelfTestContent(
         state = state,
         onPick = model::pick,
         onNext = model::next,
@@ -63,13 +63,13 @@ fun P24SelfTestRoute(
     }
 }
 
-internal fun p24SelfTestViewModelKey(instance: Long): String = "p24-self-test-$instance"
+internal fun p25SelfTestViewModelKey(instance: Long): String = "p25-self-test-$instance"
 
 @Composable
-internal fun rememberP24SelfTestViewModel(
+internal fun rememberP25SelfTestViewModel(
     instance: Long,
     factory: ViewModelProvider.Factory,
-): SelfTestViewModel = viewModel(key = p24SelfTestViewModelKey(instance), factory = factory)
+): SelfTestViewModel = viewModel(key = p25SelfTestViewModelKey(instance), factory = factory)
 
 @Composable
 internal fun SelfTestExitOverlay(

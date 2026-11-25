@@ -58,17 +58,17 @@ private enum SelfTestFlowError: Error {
 }
 
 @MainActor
-final class P24SelfTestFlowTests: XCTestCase {
-    private func makeModel(_ reader: FakeSelfTestReader, exited: @escaping () -> Void = {}) -> P24SelfTestViewModel {
-        P24SelfTestViewModel(reader: reader, randomSource: FlowRandomSource(), onExit: exited)
+final class P25SelfTestFlowTests: XCTestCase {
+    private func makeModel(_ reader: FakeSelfTestReader, exited: @escaping () -> Void = {}) -> P25SelfTestViewModel {
+        P25SelfTestViewModel(reader: reader, randomSource: FlowRandomSource(), onExit: exited)
     }
 
-    private func current(_ model: P24SelfTestViewModel) throws -> P24QuestionState {
+    private func current(_ model: P25SelfTestViewModel) throws -> P25QuestionState {
         guard case .question(let question) = model.state else { throw SelfTestFlowError.missingQuestion }
         return question
     }
 
-    private func finishRound(_ model: P24SelfTestViewModel, correctCount: Int = 7) throws {
+    private func finishRound(_ model: P25SelfTestViewModel, correctCount: Int = 7) throws {
         for index in 0..<10 {
             let state = try current(model)
             let optionID = index < correctCount
@@ -153,7 +153,7 @@ final class P24SelfTestFlowTests: XCTestCase {
         guard case .summary(let summary) = model.state else {
             return XCTFail("完成 10 题后应停留在本页小结")
         }
-        XCTAssertEqual(summary, P24SummaryState(total: 10, correct: 7, wrong: 3))
+        XCTAssertEqual(summary, P25SummaryState(total: 10, correct: 7, wrong: 3))
     }
 
     func testRetryCreatesFreshTransientRoundWithoutRereadingLibrary() async throws {

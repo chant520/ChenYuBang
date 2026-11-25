@@ -42,9 +42,9 @@ import com.chenyubang.core.ui.tokens.Tokens
 
 private val OPTION_LETTERS = listOf("A", "B", "C", "D")
 
-/** P24 成语自测主体。退出意图统一交给路由 / BackHandler，业务状态机不持有导航。 */
+/** P25 成语自测主体。退出意图统一交给路由 / BackHandler，业务状态机不持有导航。 */
 @Composable
-fun P24SelfTestContent(
+fun P25SelfTestContent(
     state: SelfTestUiState,
     onPick: (String) -> Unit = {},
     onNext: () -> Unit = {},

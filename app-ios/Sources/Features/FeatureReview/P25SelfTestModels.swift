@@ -2,7 +2,7 @@ import Combine
 import CangyuData
 import Foundation
 
-/// P24 只读库接口；后台加载只传递 Sendable 投影，不持有 DatabaseQueue 或 SwiftUI 状态。
+/// P25 只读库接口；后台加载只传递 Sendable 投影，不持有 DatabaseQueue 或 SwiftUI 状态。
 public protocol SelfTestLibraryReading: Sendable {
     func scopedWordSenses() throws -> [IdiomWordSense]
     func allIdiomsForMatch() throws -> [IdiomRecord]
@@ -10,16 +10,16 @@ public protocol SelfTestLibraryReading: Sendable {
 
 extension IdiomLibraryReader: SelfTestLibraryReading {}
 
-public enum P24SelfTestState: Equatable, Sendable {
+public enum P25SelfTestState: Equatable, Sendable {
     case loading
     case emptyScope
     case insufficientCandidates
-    case question(P24QuestionState)
-    case summary(P24SummaryState)
+    case question(P25QuestionState)
+    case summary(P25SummaryState)
     case error
 }
 
-public struct P24QuestionState: Equatable, Sendable {
+public struct P25QuestionState: Equatable, Sendable {
     public let question: SelfTestQuestion
     public let number: Int
     public let total: Int
@@ -50,7 +50,7 @@ public struct P24QuestionState: Equatable, Sendable {
     public var nextButtonTitle: String { isLast ? "查看结果" : "下一题" }
 }
 
-public struct P24SummaryState: Equatable, Sendable {
+public struct P25SummaryState: Equatable, Sendable {
     public let total: Int
     public let correct: Int
     public let wrong: Int
@@ -62,7 +62,7 @@ public struct P24SummaryState: Equatable, Sendable {
     }
 }
 
-public struct P24SelfTestActions {
+public struct P25SelfTestActions {
     public let onPick: (String) -> Void
     public let onNext: () -> Void
     public let onAskExit: () -> Void
@@ -94,8 +94,8 @@ public struct P24SelfTestActions {
 }
 
 @MainActor
-public final class P24SelfTestViewModel: ObservableObject {
-    @Published public private(set) var state: P24SelfTestState = .loading
+public final class P25SelfTestViewModel: ObservableObject {
+    @Published public private(set) var state: P25SelfTestState = .loading
     @Published public private(set) var exitAsking = false
 
     private let reader: SelfTestLibraryReading
@@ -162,7 +162,7 @@ public final class P24SelfTestViewModel: ObservableObject {
         guard session.next() else { return }
         self.session = session
         if let summary = session.summary {
-            state = .summary(P24SummaryState(total: summary.total, correct: summary.correct, wrong: summary.wrong))
+            state = .summary(P25SummaryState(total: summary.total, correct: summary.correct, wrong: summary.wrong))
         } else if let question = session.current {
             state = .question(questionState(for: session))
         }
@@ -220,8 +220,8 @@ public final class P24SelfTestViewModel: ObservableObject {
         }
     }
 
-    private func questionState(for session: SelfTestSession) -> P24QuestionState {
-        P24QuestionState(
+    private func questionState(for session: SelfTestSession) -> P25QuestionState {
+        P25QuestionState(
             question: session.current ?? session.questions[session.index],
             number: session.index + 1,
             total: session.questions.count,

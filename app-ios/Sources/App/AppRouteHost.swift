@@ -290,7 +290,7 @@ private struct AppRoutePage: View {
                 onBack: { router.back() }
             )
         } else if entry.route == .selfTest, let reader = launch.libraryReader {
-            P24SelfTestScreen(
+            P25SelfTestScreen(
                 reader: reader,
                 backRequest: router.selfTestBackRequest,
                 onExit: { router.dismissFullScreen() }

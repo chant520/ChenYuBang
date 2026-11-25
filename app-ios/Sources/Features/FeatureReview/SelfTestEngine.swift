@@ -1,6 +1,6 @@
 import Foundation
 
-/// P24 可注入随机源。实现必须是值类型或自行保证 Sendable；测试用固定序列钉住洗牌性质。
+/// P25 可注入随机源。实现必须是值类型或自行保证 Sendable；测试用固定序列钉住洗牌性质。
 public protocol SelfTestRandomSource: Sendable {
     mutating func next(upperBound: Int) -> Int
 }
@@ -120,7 +120,7 @@ public enum SelfTestRoundStart: Sendable {
     case ready(SelfTestSession)
 }
 
-/// P24 组题纯引擎：目标只来自当前范围，干扰项只来自全库同一资格集合。
+/// P25 组题纯引擎：目标只来自当前范围，干扰项只来自全库同一资格集合。
 public enum SelfTestRoundBuilder {
     public static let questionCount = 10
 

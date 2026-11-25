@@ -4,7 +4,7 @@ import GRDB
 import XCTest
 @testable import ChenYuBang
 
-/// P24 数据口子：范围内投影去重、全库干扰项来源，以及真实一轮自测对用户表零写入。
+/// P25 数据口子：范围内投影去重、全库干扰项来源，以及真实一轮自测对用户表零写入。
 final class IdiomSelfTestLibraryTests: XCTestCase {
     private var queue: DatabaseQueue!
 
@@ -79,7 +79,7 @@ final class IdiomSelfTestLibraryTests: XCTestCase {
     @MainActor
     func testCompleteSelfTestRoundDoesNotWriteLearningOrMistakeTables() async throws {
         let before = try userTableSnapshot()
-        let model = P24SelfTestViewModel(reader: IdiomLibraryReader(queue: queue), onExit: {})
+        let model = P25SelfTestViewModel(reader: IdiomLibraryReader(queue: queue), onExit: {})
         await model.load()
 
         for _ in 0..<10 {

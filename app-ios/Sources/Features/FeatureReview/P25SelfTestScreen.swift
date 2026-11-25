@@ -2,17 +2,17 @@ import CangyuDesignSystem
 import CangyuTokens
 import SwiftUI
 
-/// P24 纯渲染层：题目、选项、即时反馈、页内小结与退出确认都由真实状态驱动。
-public struct P24SelfTestContent: View {
-    private let state: P24SelfTestState
+/// P25 纯渲染层：题目、选项、即时反馈、页内小结与退出确认都由真实状态驱动。
+public struct P25SelfTestContent: View {
+    private let state: P25SelfTestState
     private let exitAsking: Bool
-    private let actions: P24SelfTestActions
+    private let actions: P25SelfTestActions
     private let colors: TokenColors
 
     public init(
-        state: P24SelfTestState,
+        state: P25SelfTestState,
         exitAsking: Bool,
-        actions: P24SelfTestActions,
+        actions: P25SelfTestActions,
         colors: TokenColors
     ) {
         self.state = state
@@ -100,7 +100,7 @@ public struct P24SelfTestContent: View {
         }
     }
 
-    private func questionContent(_ state: P24QuestionState) -> some View {
+    private func questionContent(_ state: P25QuestionState) -> some View {
         VStack(alignment: .leading, spacing: Tokens.Space.block) {
             HStack(spacing: 0) {
                 Text(state.progressText)
@@ -112,7 +112,7 @@ public struct P24SelfTestContent: View {
             promptCard(state.question)
             VStack(alignment: .leading, spacing: Tokens.Space.lmetaTop) {
                 ForEach(Array(state.question.options.enumerated()), id: \.offset) { index, option in
-                    optionRow(option, letter: P24SelfTestLetters.all[index], state: state)
+                    optionRow(option, letter: P25SelfTestLetters.all[index], state: state)
                 }
             }
             if state.isGraded {
@@ -136,7 +136,7 @@ public struct P24SelfTestContent: View {
     private func optionRow(
         _ option: SelfTestOption,
         letter: String,
-        state: P24QuestionState
+        state: P25QuestionState
     ) -> some View {
         let isCorrect = state.isGraded && option.idiomID == state.question.targetID
         let isSelectedWrong = state.isGraded && option.idiomID == state.selectedOptionID && !isCorrect
@@ -189,7 +189,7 @@ public struct P24SelfTestContent: View {
         .accessibilityValue(state.isGraded ? "已锁定" : "未选择")
     }
 
-    private func summaryContent(_ summary: P24SummaryState) -> some View {
+    private func summaryContent(_ summary: P25SummaryState) -> some View {
         VStack(alignment: .leading, spacing: Tokens.Space.block) {
             CCard {
                 CLabel("本轮小结")
@@ -234,14 +234,14 @@ public struct P24SelfTestContent: View {
     }
 }
 
-private enum P24SelfTestLetters {
+private enum P25SelfTestLetters {
     static let all = ["A", "B", "C", "D"]
 }
 
-/// P24 全屏路由页；ViewState 跟随 route entry，退出后本轮内存状态随之销毁。
-public struct P24SelfTestScreen: View {
+/// P25 全屏路由页；ViewState 跟随 route entry，退出后本轮内存状态随之销毁。
+public struct P25SelfTestScreen: View {
     @Environment(\.colorScheme) private var colorScheme
-    @StateObject private var model: P24SelfTestViewModel
+    @StateObject private var model: P25SelfTestViewModel
     private let backRequest: Int
 
     @MainActor
@@ -251,7 +251,7 @@ public struct P24SelfTestScreen: View {
         randomSource: any SelfTestRandomSource = SystemSelfTestRandomSource(),
         onExit: @escaping () -> Void
     ) {
-        _model = StateObject(wrappedValue: P24SelfTestViewModel(
+        _model = StateObject(wrappedValue: P25SelfTestViewModel(
             reader: reader,
             randomSource: randomSource,
             onExit: onExit
@@ -261,10 +261,10 @@ public struct P24SelfTestScreen: View {
 
     public var body: some View {
         let colors = CangyuTheme.colors(for: colorScheme)
-        P24SelfTestContent(
+        P25SelfTestContent(
             state: model.state,
             exitAsking: model.exitAsking,
-            actions: P24SelfTestActions(
+            actions: P25SelfTestActions(
                 onPick: { model.pick($0) },
                 onNext: { model.next() },
                 onAskExit: { model.askExit() },

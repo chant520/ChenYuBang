@@ -6,7 +6,7 @@ package com.chenyubang.feature.review
  * 负责页面（信息架构 v1.2 §3 页面清单，路由键见开发规范 v1.4 §5.1）：
  *  - P11 复习队列（`review/queue`，全屏浮层；全局模式与单成语模式共用本页）
  *  - P12 复习小结（`review/summary`，全屏浮层）
- *  - P24 成语自测（`review/self-test`，全屏浮层；每轮 10 题，结果仅存内存）
+ *  - P25 成语自测（`review/self-test`，全屏浮层；每轮 10 题，结果仅存内存）
  *
  * 模块职责：
  *  - 队列 = 全部 `state = 待复习` 的错题，按 `createdAt` 倒序；单成语模式按 `idiomId` 过滤，无内容时按钮置灰。
@@ -25,5 +25,5 @@ package com.chenyubang.feature.review
  */
 object ReviewFeature {
     /** 本模块负责的页面号，便于路由接线时核对归属（信息架构 v1.2 §3）。 */
-    val OWNED_PAGES: List<String> = listOf("P11", "P12", "P24")
+    val OWNED_PAGES: List<String> = listOf("P11", "P12", "P25")
 }

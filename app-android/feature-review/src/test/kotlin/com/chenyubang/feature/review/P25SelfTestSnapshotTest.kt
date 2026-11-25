@@ -23,11 +23,11 @@ import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 import kotlin.random.Random
 
-/** P24 专项快照：每个业务态均由真实 ViewModel 状态流转到达，不直接伪造 dead fixture。 */
+/** P25 专项快照：每个业务态均由真实 ViewModel 状态流转到达，不直接伪造 dead fixture。 */
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 @Config(sdk = [34], qualifiers = "w360dp-h812dp-xhdpi")
-class P24SelfTestSnapshotTest {
+class P25SelfTestSnapshotTest {
     @get:Rule
     val compose = createComposeRule()
 
@@ -53,7 +53,7 @@ class P24SelfTestSnapshotTest {
                     val model = remember { SelfTestViewModel({ scoped to full }, Random(21)) }
                     val state by model.state.collectAsState()
                     var confirmExit by remember { mutableStateOf(showExit) }
-                    P24SelfTestContent(
+                    P25SelfTestContent(
                         state = state,
                         onPick = model::pick,
                         onNext = model::next,

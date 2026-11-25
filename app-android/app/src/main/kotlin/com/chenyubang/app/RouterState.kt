@@ -19,7 +19,7 @@ data class ReviewSession(val source: RouteEntry, val baseDepth: Int, val idiomId
     }
 }
 
-/** P21 与 P24 自行处理返回；其余路由沿用栈深度 / 浮层口径（参照 RouteHeader）。 */
+/** P21 与 P25 自行处理返回；其余路由沿用栈深度 / 浮层口径（参照 RouteHeader）。 */
 internal fun systemBackEnabled(router: RouterState): Boolean =
     router.current.route != Route.Done &&
         router.current.route != Route.SelfTest &&

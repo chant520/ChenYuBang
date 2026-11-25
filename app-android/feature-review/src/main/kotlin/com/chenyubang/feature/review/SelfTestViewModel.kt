@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
-/** P24 每轮只读题库并保留内存进度；重试读取新数据，返回我的由宿主销毁本轮。 */
+/** P25 每轮只读题库并保留内存进度；重试读取新数据，返回我的由宿主销毁本轮。 */
 class SelfTestViewModel(
     private val loadData: suspend () -> Pair<List<SelfTestCandidate>, List<SelfTestCandidate>>,
     private val random: Random = Random.Default,

@@ -155,13 +155,13 @@
 		A000000000000000000000F1 /* MistakeStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001F1 /* MistakeStateTests.swift */; };
 		A000000000000000000000F2 /* BackupWriterFixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001F2 /* BackupWriterFixture.swift */; };
 		A00000000000000000000301 /* SelfTestEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000002F7 /* SelfTestEngine.swift */; };
-		A00000000000000000000302 /* P24SelfTestModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000002F8 /* P24SelfTestModels.swift */; };
-		A00000000000000000000303 /* P24SelfTestScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000002F9 /* P24SelfTestScreen.swift */; };
+		A00000000000000000000302 /* P25SelfTestModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000002F8 /* P25SelfTestModels.swift */; };
+		A00000000000000000000303 /* P25SelfTestScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000002F9 /* P25SelfTestScreen.swift */; };
 		A00000000000000000000304 /* SelfTestEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000002FA /* SelfTestEngineTests.swift */; };
-		A00000000000000000000305 /* P24SelfTestFlowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000002FB /* P24SelfTestFlowTests.swift */; };
+		A00000000000000000000305 /* P25SelfTestFlowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000002FB /* P25SelfTestFlowTests.swift */; };
 		A00000000000000000000306 /* IdiomSelfTestLibraryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000002FC /* IdiomSelfTestLibraryTests.swift */; };
 		A00000000000000000000307 /* RouterSelfTestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000002FD /* RouterSelfTestTests.swift */; };
-		A00000000000000000000308 /* P24SelfTestSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000002FE /* P24SelfTestSnapshotTests.swift */; };
+		A00000000000000000000308 /* P25SelfTestSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000002FE /* P25SelfTestSnapshotTests.swift */; };
 		A00000000000000000000309 /* RouterState+SelfTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000002FF /* RouterState+SelfTest.swift */; };
 		A00000000000000000000800 /* P13OverviewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000900 /* P13OverviewModel.swift */; };
 		A00000000000000000000801 /* P13OverviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000901 /* P13OverviewView.swift */; };
@@ -329,13 +329,13 @@
 		A000000000000000000001F1 /* MistakeStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MistakeStateTests.swift; sourceTree = "<group>"; };
 		A000000000000000000001F2 /* BackupWriterFixture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupWriterFixture.swift; sourceTree = "<group>"; };
 		A000000000000000000002F7 /* SelfTestEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelfTestEngine.swift; sourceTree = "<group>"; };
-		A000000000000000000002F8 /* P24SelfTestModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P24SelfTestModels.swift; sourceTree = "<group>"; };
-		A000000000000000000002F9 /* P24SelfTestScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P24SelfTestScreen.swift; sourceTree = "<group>"; };
+		A000000000000000000002F8 /* P25SelfTestModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P25SelfTestModels.swift; sourceTree = "<group>"; };
+		A000000000000000000002F9 /* P25SelfTestScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P25SelfTestScreen.swift; sourceTree = "<group>"; };
 		A000000000000000000002FA /* SelfTestEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelfTestEngineTests.swift; sourceTree = "<group>"; };
-		A000000000000000000002FB /* P24SelfTestFlowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P24SelfTestFlowTests.swift; sourceTree = "<group>"; };
+		A000000000000000000002FB /* P25SelfTestFlowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P25SelfTestFlowTests.swift; sourceTree = "<group>"; };
 		A000000000000000000002FC /* IdiomSelfTestLibraryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdiomSelfTestLibraryTests.swift; sourceTree = "<group>"; };
 		A000000000000000000002FD /* RouterSelfTestTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouterSelfTestTests.swift; sourceTree = "<group>"; };
-		A000000000000000000002FE /* P24SelfTestSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P24SelfTestSnapshotTests.swift; sourceTree = "<group>"; };
+		A000000000000000000002FE /* P25SelfTestSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P25SelfTestSnapshotTests.swift; sourceTree = "<group>"; };
 		A000000000000000000002FF /* RouterState+SelfTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RouterState+SelfTest.swift"; sourceTree = "<group>"; };
 		A00000000000000000000900 /* P13OverviewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P13OverviewModel.swift; sourceTree = "<group>"; };
 		A00000000000000000000901 /* P13OverviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P13OverviewView.swift; sourceTree = "<group>"; };
@@ -472,8 +472,8 @@
 				A000000000000000000001D2 /* P12SummaryModels.swift */,
 				A000000000000000000001D3 /* P12SummaryScreen.swift */,
 				A000000000000000000002F7 /* SelfTestEngine.swift */,
-				A000000000000000000002F8 /* P24SelfTestModels.swift */,
-				A000000000000000000002F9 /* P24SelfTestScreen.swift */,
+				A000000000000000000002F8 /* P25SelfTestModels.swift */,
+				A000000000000000000002F9 /* P25SelfTestScreen.swift */,
 			);
 			path = FeatureReview;
 			sourceTree = "<group>";
@@ -591,10 +591,10 @@
 				A000000000000000000001DA /* RouterReviewTests.swift */,
 				A000000000000000000001DB /* IdiomReviewEntryTests.swift */,
 				A000000000000000000002FA /* SelfTestEngineTests.swift */,
-				A000000000000000000002FB /* P24SelfTestFlowTests.swift */,
+				A000000000000000000002FB /* P25SelfTestFlowTests.swift */,
 				A000000000000000000002FC /* IdiomSelfTestLibraryTests.swift */,
 				A000000000000000000002FD /* RouterSelfTestTests.swift */,
-				A000000000000000000002FE /* P24SelfTestSnapshotTests.swift */,
+				A000000000000000000002FE /* P25SelfTestSnapshotTests.swift */,
 				A000000000000000000001E3 /* RouterBackupTests.swift */,
 				A000000000000000000001E4 /* Phase4SnapshotTests.swift */,
 				A000000000000000000001E5 /* BackupStoreTests.swift */,
@@ -778,8 +778,8 @@
 				A000000000000000000000D2 /* P12SummaryModels.swift in Sources */,
 				A000000000000000000000D3 /* P12SummaryScreen.swift in Sources */,
 				A00000000000000000000301 /* SelfTestEngine.swift in Sources */,
-				A00000000000000000000302 /* P24SelfTestModels.swift in Sources */,
-				A00000000000000000000303 /* P24SelfTestScreen.swift in Sources */,
+				A00000000000000000000302 /* P25SelfTestModels.swift in Sources */,
+				A00000000000000000000303 /* P25SelfTestScreen.swift in Sources */,
 				A00000000000000000000024 /* MeFeature.swift in Sources */,
 				A00000000000000000000028 /* ExamScopeScreen.swift in Sources */,
 				A000000000000000000000E0 /* BackupScreen.swift in Sources */,
@@ -885,10 +885,10 @@
 				A000000000000000000000DA /* RouterReviewTests.swift in Sources */,
 				A000000000000000000000DB /* IdiomReviewEntryTests.swift in Sources */,
 				A00000000000000000000304 /* SelfTestEngineTests.swift in Sources */,
-				A00000000000000000000305 /* P24SelfTestFlowTests.swift in Sources */,
+				A00000000000000000000305 /* P25SelfTestFlowTests.swift in Sources */,
 				A00000000000000000000306 /* IdiomSelfTestLibraryTests.swift in Sources */,
 				A00000000000000000000307 /* RouterSelfTestTests.swift in Sources */,
-				A00000000000000000000308 /* P24SelfTestSnapshotTests.swift in Sources */,
+				A00000000000000000000308 /* P25SelfTestSnapshotTests.swift in Sources */,
 				A000000000000000000000E3 /* RouterBackupTests.swift in Sources */,
 				A000000000000000000000E4 /* Phase4SnapshotTests.swift in Sources */,
 				A000000000000000000000E5 /* BackupStoreTests.swift in Sources */,
