@@ -104,16 +104,7 @@ final class IdiomSelfTestLibraryTests: XCTestCase {
                 let rows = try Row.fetchAll(db, sql: "SELECT * FROM \(table) ORDER BY rowid")
                 return ["\(table):\(rows.count)"] + rows.map { row in
                     let columns = row.columnNames.map { name -> String in
-                        let value: DatabaseValue = row[name]
-                        let encoded: String
-                        switch value {
-                        case .null: encoded = "null"
-                        case .int64(let number): encoded = String(number)
-                        case .double(let number): encoded = String(number)
-                        case .string(let text): encoded = text
-                        case .blob(let data): encoded = data.base64EncodedString()
-                        }
-                        return "\(name)=\(encoded)"
+                        "\(name)=\(String(describing: row[name]))"
                     }
                     return "\(table)|\(columns.joined(separator: "|"))"
                 }
