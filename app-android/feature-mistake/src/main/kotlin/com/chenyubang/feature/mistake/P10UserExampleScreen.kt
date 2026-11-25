@@ -22,6 +22,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -60,12 +61,14 @@ fun P10UserExampleRoute(
     onOpenIdiom: (String) -> Unit,
     onDataChanged: () -> Unit = {},
 ) {
+    val latestOnDataChanged by rememberUpdatedState(onDataChanged)
+    val latestOnBack by rememberUpdatedState(onBack)
     val editor =
         remember(database, filesDir) {
             UserExampleEditor(database, File(filesDir, "images"))
         }
     val factory =
-        remember(database, filesDir, onDataChanged, onBack) {
+        remember(database, filesDir) {
             viewModelFactory {
                 initializer {
                     P10UserExampleViewModel(
@@ -78,8 +81,9 @@ fun P10UserExampleRoute(
                         deleteExample = { id, target ->
                             if (target == P10DeleteTarget.Marked) editor.deleteMarked(id) else editor.deleteUnmarked(id)
                         },
-                        onDataChanged = onDataChanged,
-                        onExit = onBack,
+                        setReviewState = database.reviewDao()::setState,
+                        onDataChanged = { latestOnDataChanged() },
+                        onExit = { latestOnBack() },
                     )
                 }
             }
@@ -87,7 +91,9 @@ fun P10UserExampleRoute(
     val model: P10UserExampleViewModel = viewModel(key = "p10-user-example", factory = factory)
     val state by model.state.collectAsState()
     var image by remember { mutableStateOf<ImageBitmap?>(null) }
-    BackHandler(enabled = state.edit.editing || state.edit.deleteConfirm != null) { model.handleBack() }
+    BackHandler(
+        enabled = state.edit.editing || state.edit.deleteConfirm != null || state.updatingReviewState,
+    ) { model.handleBack() }
     LaunchedEffect(exampleId) { model.load(exampleId) }
     val imagePath = state.detail?.imagePath
     LaunchedEffect(imagePath) {
@@ -126,6 +132,7 @@ fun P10UserExampleRoute(
                 onDismissDelete = { model.dismissDelete() },
                 onConfirmDelete = { model.confirmDelete() },
                 onDismissMessage = { model.dismissMessage() },
+                onChangeReviewState = { model.changeReviewState(it) },
             ),
     )
 }
@@ -151,7 +158,7 @@ fun P10UserExampleContent(
         if (zoomed && image != null) {
             COverlayWrapper(image) { zoomed = false }
         }
-        state.edit.deleteConfirm?.let { P10DeleteConfirmOverlay(it, actions) }
+        state.edit.deleteConfirm?.let { P10DeleteConfirmOverlay(it, actions, state.edit.deleting) }
     }
 }
 
@@ -232,7 +239,9 @@ private fun P10Header(
             modifier =
                 Modifier
                     .size(21.dp)
-                    .clickable(onClick = if (editing) actions.onCancelEdit else actions.onBack)
+                    .clickable(enabled = !state.edit.saving && !state.edit.deleting && !state.updatingReviewState) {
+                        if (editing) actions.onCancelEdit() else actions.onBack()
+                    }
                     .semantics { contentDescription = "返回" },
         )
         Text(
@@ -243,7 +252,13 @@ private fun P10Header(
             modifier = Modifier.padding(start = Tokens.Space.lmetaGap.dp).weight(1f),
         )
         if (editing) {
-            CButton("取消", actions.onCancelEdit, Modifier.width(64.dp), CButtonVariant.Ghost)
+            CButton(
+                "取消",
+                actions.onCancelEdit,
+                Modifier.width(64.dp),
+                CButtonVariant.Ghost,
+                enabled = !state.edit.saving,
+            )
             CButton(
                 "保存",
                 actions.onSave,

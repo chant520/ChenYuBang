@@ -10,6 +10,32 @@ public protocol UserExampleReading {
 
 extension MistakeLibraryReader: UserExampleReading {}
 
+/// P10 手动掌握态写库口子：与正文编辑、删除协议分开，只按最新 mistake.id 更新 state。
+public protocol MistakeStateWriting: Sendable {
+    func setReviewState(
+        mistakeID: String,
+        state: MistakeReviewState
+    ) async throws -> MistakeStateUpdateResult
+}
+
+extension ReviewLibraryService: MistakeStateWriting {
+    /// 保留既有同步 `setState` 契约；页面侧异步写入，避免阻塞主线程。
+    public func setReviewState(
+        mistakeID: String,
+        state: MistakeReviewState
+    ) async throws -> MistakeStateUpdateResult {
+        try await Task.detached {
+            try self.setState(mistakeID: mistakeID, state: state)
+        }.value
+    }
+}
+
+/// P10 掌握态写入提示；失败不伪装成功，也不改动页面当前状态。
+public enum UserExampleReviewStateCopy {
+    public static let updateFailed = "掌握状态更新失败，请重试"
+    public static let notFound = "这道错题已不在本机，请返回刷新"
+}
+
 /// P10 页面状态（纯数据，快照测试直接喂，无需 DB / 路由 / 图片）。
 public struct UserExampleState: Equatable, Sendable {
     public var loading: Bool
@@ -33,6 +59,8 @@ public struct UserExampleState: Equatable, Sendable {
     public var saving: Bool
     /// 删除中：二次确认弹层的确认按钮转圈。
     public var deleting: Bool
+    /// 掌握态写入中：分段控件与编辑、删除、保存入口同时禁用，防重复点击。
+    public var updatingReviewState: Bool
     /// 归属手选浮层（复用 P04 搜索，与 P20「手动挑成语」同一浮层）。
     public var showsIdiomPicker: Bool
     /// 单条删除的二次确认弹层。
@@ -53,6 +81,7 @@ public struct UserExampleState: Equatable, Sendable {
         draft: UserExampleDraft? = nil,
         saving: Bool = false,
         deleting: Bool = false,
+        updatingReviewState: Bool = false,
         showsIdiomPicker: Bool = false,
         confirmDelete: Bool = false,
         issue: UserExampleIssue? = nil
@@ -69,6 +98,7 @@ public struct UserExampleState: Equatable, Sendable {
         self.draft = draft
         self.saving = saving
         self.deleting = deleting
+        self.updatingReviewState = updatingReviewState
         self.showsIdiomPicker = showsIdiomPicker
         self.confirmDelete = confirmDelete
         self.issue = issue
@@ -99,6 +129,17 @@ public struct UserExampleState: Equatable, Sendable {
     /// 底部红描边「删除这道错题」只在标错的录入题上渲染（信息架构 v1.4 版内修订第 ④ 条）：
     /// 未标错的普通详情无底部红动作，删除整题只走顶部「删除」（开发规范 §8.1.1）。
     public var showsBottomDeleteRow: Bool { isMistake }
+
+    /// 当前详情对应的两态掌握值；异常旧值按待复习显示，但写协议仍只接受枚举两态。
+    public var reviewState: MistakeReviewState {
+        MistakeReviewState(rawValue: detail?.mistakeState ?? "") ?? .pending
+    }
+
+    /// 只有最新 mistake.id 存在且没有其他写入/编辑进行中才允许切换。
+    public var canChangeReviewState: Bool {
+        guard isMistake, detail?.mistakeID != nil, !loading, !failed else { return false }
+        return !editing && !saving && !deleting && !updatingReviewState
+    }
 }
 
 /// P10 回调打包。
@@ -114,6 +155,8 @@ public struct UserExampleActions {
     /// 顶部「编辑」＝同页切编辑态；「删除」＝按标错／未标错起单条二次确认（开发规范 §8.1.1）。
     public let onEdit: () -> Void
     public let onDelete: () -> Void
+    /// 手动两态切换；只写 state，复用页面分段控件。
+    public let onSetReviewState: (MistakeReviewState) -> Void
     /// 编辑态：取消回到只读态（不落库）、保存走同事务写库、提示条关闭。
     public let onCancelEdit: () -> Void
     public let onSave: () -> Void
@@ -141,6 +184,7 @@ public struct UserExampleActions {
         onOpenIdiom: @escaping (String) -> Void,
         onEdit: @escaping () -> Void,
         onDelete: @escaping () -> Void,
+        onSetReviewState: @escaping (MistakeReviewState) -> Void = { _ in },
         onCancelEdit: @escaping () -> Void = {},
         onSave: @escaping () -> Void = {},
         onDismissIssue: @escaping () -> Void = {},
@@ -164,6 +208,7 @@ public struct UserExampleActions {
         self.onOpenIdiom = onOpenIdiom
         self.onEdit = onEdit
         self.onDelete = onDelete
+        self.onSetReviewState = onSetReviewState
         self.onCancelEdit = onCancelEdit
         self.onSave = onSave
         self.onDismissIssue = onDismissIssue

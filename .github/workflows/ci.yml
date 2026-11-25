@@ -107,6 +107,7 @@ jobs:
         # 录制断言按设计失败；保留产物上传机会，实际执行数另行校验。
         continue-on-error: ${{ github.event.inputs.record == 'true' }}
         env:
+          SNAPSHOT_RECORD: ${{ github.event.inputs.record == 'true' && '1' || '' }}
           TEST_RUNNER_SNAPSHOT_RECORD: ${{ github.event.inputs.record == 'true' && '1' || '' }}
           IOS_SNAPSHOT_SCOPE: ${{ github.event.inputs.ios_snapshot_scope || 'all' }}
           TEST_FILTER: ${{ github.event.inputs.test_filter || '' }}
@@ -142,7 +143,7 @@ jobs:
             -resultBundlePath .xcresult/ios-results.xcresult \
             "${test_args[@]}" test CODE_SIGNING_ALLOWED=NO
           if [[ "$IOS_SNAPSHOT_SCOPE" == representative && "$TEST_RUNNER_SNAPSHOT_RECORD" == 1 ]]; then
-            TEST_RUNNER_SNAPSHOT_RECORD=0 xcodebuild \
+            SNAPSHOT_RECORD=0 TEST_RUNNER_SNAPSHOT_RECORD=0 xcodebuild \
               -project ChenYuBang.xcodeproj -scheme ChenYuBang \
               -clonedSourcePackagesDirPath .spm-packages \
               -destination 'platform=iOS Simulator,name=iPhone 16' \

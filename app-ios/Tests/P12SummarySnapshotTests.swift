@@ -109,4 +109,11 @@ final class P12SummarySnapshotTests: XCTestCase {
     func testZeroRoundDark() {
         assertP12(P12SummaryState(loading: false, total: 0), dark: true)
     }
+
+    /// C9：本轮完成后队列被清空，再复习重查为空时保留成绩卡并给中性提示。
+    func testRetryQueueEmptyLight() {
+        var state = globalState()
+        state.retryIssue = "当前范围已没有待复习的错题"
+        assertP12(state, dark: false)
+    }
 }

@@ -15,6 +15,10 @@ public struct P12SummaryState: Equatable, Sendable {
     public var wrong: Int
     /// 涉及成语列表（去重、按词面升序，每个可点进 P05）。
     public var idioms: [LinkedIdiom]
+    /// 再复习点击时正在重查当前待复习队列。
+    public var retrying: Bool
+    /// 最新队列为空/读取失败/路由已失效的中性提示。
+    public var retryIssue: String?
 
     public init(
         loading: Bool = true,
@@ -23,7 +27,9 @@ public struct P12SummaryState: Equatable, Sendable {
         total: Int = 0,
         correct: Int = 0,
         wrong: Int = 0,
-        idioms: [LinkedIdiom] = []
+        idioms: [LinkedIdiom] = [],
+        retrying: Bool = false,
+        retryIssue: String? = nil
     ) {
         self.loading = loading
         self.failed = failed
@@ -32,6 +38,8 @@ public struct P12SummaryState: Equatable, Sendable {
         self.correct = correct
         self.wrong = wrong
         self.idioms = idioms
+        self.retrying = retrying
+        self.retryIssue = retryIssue
     }
 }
 
@@ -96,5 +104,25 @@ public final class P12SummaryViewModel: ObservableObject {
 
     public func retryLoad() {
         Task { await load() }
+    }
+
+    /// C9：再复习只按当前 scope 重查待复习队列；已掌握题不会因旧 queueIDs 复活。
+    public func retryRound(onStart: ([String]) -> Bool) async {
+        guard !state.retrying else { return }
+        state.retrying = true
+        state.retryIssue = nil
+        defer { state.retrying = false }
+        do {
+            let ids = try reader.queue(idiomID: state.scope.idiomID).map(\.id)
+            guard !ids.isEmpty else {
+                state.retryIssue = "当前范围已没有待复习的错题"
+                return
+            }
+            if !onStart(ids) {
+                state.retryIssue = "本轮复习已失效，请回来源页重试"
+            }
+        } catch {
+            state.retryIssue = "待复习队列读取失败，请重试"
+        }
     }
 }

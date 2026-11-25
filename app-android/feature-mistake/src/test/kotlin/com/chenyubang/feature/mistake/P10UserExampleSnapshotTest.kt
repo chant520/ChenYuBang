@@ -5,6 +5,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onRoot
+import com.chenyubang.core.data.MistakeReviewState
 import com.github.takahirom.roborazzi.captureRoboImage
 import org.junit.Rule
 import org.junit.Test
@@ -69,6 +70,8 @@ class P10UserExampleSnapshotTest {
         tagNames = listOf("对象误用", "高频"),
         idioms = listOf(P10IdiomRef("id-anbu", "按部就班"), P10IdiomRef("id-biechu", "别出心裁")),
         imagePath = imagePath,
+        mistakeId = "mistake-latest".takeIf { isMistake },
+        reviewState = MistakeReviewState.PENDING.takeIf { isMistake },
     )
 
     /** 显式置 imageUnreadable：快照不注入 Bitmap，保持 14 帧都渲染「原图已不在」橙占位（P13）。 */
@@ -125,6 +128,25 @@ class P10UserExampleSnapshotTest {
     @Config(sdk = [34], qualifiers = "w360dp-h1800dp-xhdpi")
     @Test
     fun blocksUnmarkedDark() = capture(base(isMistake = false), night = true, fullPage = true)
+
+    /** C9 手动两态与写入中：控件复用分段组件，不新增红动作。 */
+    @Config(sdk = [34], qualifiers = "w360dp-h1800dp-xhdpi")
+    @Test
+    fun reviewStateMasteredLight() =
+        capture(
+            base().copy(detail = detail().copy(reviewState = MistakeReviewState.MASTERED)),
+            night = false,
+            fullPage = true,
+        )
+
+    @Config(sdk = [34], qualifiers = "w360dp-h1800dp-xhdpi")
+    @Test
+    fun reviewStateWritingLight() =
+        capture(
+            base().copy(updatingReviewState = true),
+            night = false,
+            fullPage = true,
+        )
 
     // —— 2.8 / C8 新增基线：编辑态整页、字段级非法、写库失败、表单两模式、未标错表单、保存中、两套确认弹层 ——
 

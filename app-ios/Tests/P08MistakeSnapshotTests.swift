@@ -7,10 +7,7 @@ import XCTest
 /// P08 错题本快照（规范 §11.1）：三视图中的分组与平铺 × 浅深 + 空态 × 浅深。
 ///
 /// 基线目录 `__Snapshots__/P08MistakeSnapshotTests/`。只录本版可达状态：
-/// 「待复习已清空」空态要等 3.x 复习判分改 `mistake.state` 才会出现，本版不录（不把死分支钉成基线）。
-/// 阶段 3 接线后同样不录两种复习态：第 8.2 节 `state` 不自动改、手动标「已掌握」是 C9 进阶，
-/// 所以「错题列表非空但待复习为 0」的置灰按钮与「今天没有待复习的错题」提示条在本版都不可达，
-/// 只由 `P08ReviewHintTests` 钉行为，不产出像素基线。
+/// C9 手动标「已掌握」后，错题列表仍非空、待复习为 0：显示「待复习已清空」并置灰复习按钮。
 @MainActor
 final class P08MistakeSnapshotTests: XCTestCase {
     override func setUp() {
@@ -103,6 +100,15 @@ final class P08MistakeSnapshotTests: XCTestCase {
         MistakeBookState(loading: false, total: 0, pending: 0)
     }
 
+    private func allProficientState() -> MistakeBookState {
+        MistakeBookState(
+            loading: false,
+            total: 1,
+            pending: 0,
+            groups: [MistakeGroupView(id: "i1", word: "按部就班", countText: "1 道")]
+        )
+    }
+
     private func actions() -> MistakeBookActions {
         // P08 平铺行现在可点进 P10（§4.2 第 18 条）；夹具行不带 `userExampleID`，
         // 录的是 v2 迁移前历史错题那种静态行（无导航），像素与可点行一致。
@@ -147,5 +153,13 @@ final class P08MistakeSnapshotTests: XCTestCase {
 
     func testEmptyDark() {
         assertP08(emptyState(), dark: true)
+    }
+
+    func testAllProficientLight() {
+        assertP08(allProficientState(), dark: false)
+    }
+
+    func testAllProficientDark() {
+        assertP08(allProficientState(), dark: true)
     }
 }

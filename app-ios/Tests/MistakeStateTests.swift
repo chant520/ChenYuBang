@@ -96,6 +96,27 @@ final class MistakeStateTests: XCTestCase {
         XCTAssertEqual(try service.pendingCount(idiomID: idiomA), 3)
     }
 
+    /// P10 与 P09 同口径：createdAt 相同时取 id 最大的最新错题，避免手动状态写到旧记录。
+    func testDetailAndP09UseLatestMistakeIDWithDescendingIDTieBreak() throws {
+        try queue.write { db in
+            try db.execute(
+                sql: "UPDATE mistake SET createdAt = ? WHERE id = ?",
+                arguments: ["2026-11-24T00:00:00Z", sharedMistake]
+            )
+        }
+        XCTAssertEqual(try service.setState(mistakeID: targetMistake, state: .proficient), .updated)
+        let reader = MistakeLibraryReader(queue: queue)
+        let detail = try XCTUnwrap(reader.userExample(id: exampleA))
+        XCTAssertEqual(detail.mistakeID, sharedMistake)
+        XCTAssertEqual(detail.mistakeState, "待复习")
+        let captured = try XCTUnwrap(reader.capturedExamples(idiomID: idiomA).first { $0.id == exampleA })
+        XCTAssertEqual(captured.mistakeState, "待复习")
+
+        XCTAssertEqual(try service.setState(mistakeID: sharedMistake, state: .proficient), .updated)
+        XCTAssertEqual(try XCTUnwrap(reader.userExample(id: exampleA)).mistakeID, sharedMistake)
+        XCTAssertEqual(try XCTUnwrap(reader.userExample(id: exampleA)).mistakeState, "已掌握")
+    }
+
     func testReviewRecordDoesNotChangeProficientState() throws {
         XCTAssertEqual(try service.setState(mistakeID: targetMistake, state: .proficient), .updated)
         try service.record(mistakeID: targetMistake, result: ReviewLibrary.resultRight,

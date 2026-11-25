@@ -19,6 +19,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.chenyubang.core.data.MistakeReviewState
 import com.chenyubang.core.ui.CBadge
 import com.chenyubang.core.ui.CBadgeKind
 import com.chenyubang.core.ui.CButton
@@ -26,8 +27,8 @@ import com.chenyubang.core.ui.CButtonVariant
 import com.chenyubang.core.ui.CCard
 import com.chenyubang.core.ui.CLabel
 import com.chenyubang.core.ui.CLink
+import com.chenyubang.core.ui.CSegmentedControl
 import com.chenyubang.core.ui.CTag
-import com.chenyubang.core.ui.CTagStyle
 import com.chenyubang.core.ui.tokens.Tokens
 
 private val letters = listOf("A", "B", "C", "D")
@@ -208,6 +209,33 @@ internal fun P10AnswerCard(state: P10UserExampleUiState) {
     }
 }
 
+/** 手动两态不增加动作按钮；已掌握仍保留本题错题详情与重做入口。 */
+@Composable
+private fun P10ReviewStateCard(
+    state: P10UserExampleUiState,
+    actions: P10UserExampleActions,
+) {
+    val c = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
+    val reviewState = state.detail?.reviewState ?: return
+    CCard {
+        CLabel("掌握状态")
+        CSegmentedControl(
+            items = MistakeReviewState.entries.map { it.storedValue },
+            selectedIndex = MistakeReviewState.entries.indexOf(reviewState),
+            onSelect = { actions.onChangeReviewState(MistakeReviewState.entries[it]) },
+            disabledIndices =
+                if (state.canChangeReviewState) emptySet() else MistakeReviewState.entries.indices.toSet(),
+            modifier = Modifier.padding(top = Tokens.Space.lmetaTop.dp),
+        )
+        Text(
+            if (state.updatingReviewState) "正在保存掌握状态…" else "已掌握的题仍保留在错题本中，但不再进入待复习队列。",
+            color = c.text3,
+            fontSize = Tokens.Font.n11.sp,
+            modifier = Modifier.padding(top = Tokens.Space.lmetaTop.dp),
+        )
+    }
+}
+
 /**
  * 区块 ⑤–⑩ 公共渲染：页面与「按自然高度单帧」快照共用同一套构件，避免两处渲染漂移。
  * 门控全部取 state 派生量（showsBottomDeleteRow / isMistake），Composable 内不再另行判断口径。
@@ -225,7 +253,7 @@ internal fun P10UserExampleBlocks(
     P10SourceCard(detail)
     P10IdiomCard(detail.idioms, actions.onOpenIdiom)
     P10AnswerCard(state)
-    CTag("掌握状态切换（预留）", style = CTagStyle.Ghost)
+    P10ReviewStateCard(state, actions)
     if (state.showsBottomDeleteRow) {
         CButton(
             "删除这道错题",

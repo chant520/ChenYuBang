@@ -10,6 +10,7 @@ import kotlinx.coroutines.yield
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -65,6 +66,26 @@ class ReviewViewModelTest {
             yield()
             assertFalse(model.state.value.recordFailed)
             assertEquals(2, calls)
+        }
+
+    @Test
+    fun reloadReadsCurrentQueueInsteadOfReusingPreviousRound() =
+        runBlocking {
+            var rows = listOf(question("m-old"), question("m-current"))
+            val model =
+                ReviewViewModel(
+                    scopeIdiomId = "idiom-a",
+                    loadQueue = { scope -> if (scope == "idiom-a") rows else emptyList() },
+                    record = { _, _, _ -> },
+                )
+            yield()
+            assertEquals(listOf("m-old", "m-current"), model.state.value.questions.map { it.mistakeId })
+
+            rows = listOf(question("m-new"))
+            model.load()
+            yield()
+            assertEquals(listOf("m-new"), model.state.value.questions.map { it.mistakeId })
+            assertNull(model.state.value.currentAnswer)
         }
 
     @Test

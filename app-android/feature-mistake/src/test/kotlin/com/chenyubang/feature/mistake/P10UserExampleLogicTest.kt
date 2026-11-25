@@ -1,5 +1,6 @@
 package com.chenyubang.feature.mistake
 
+import com.chenyubang.core.data.MistakeReviewState
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -23,6 +24,8 @@ class P10UserExampleLogicTest {
         tagNames = listOf("高频"),
         idioms = listOf(P10IdiomRef("id-anbu", "按部就班")),
         imagePath = null,
+        mistakeId = "mistake-1".takeIf { isMistake },
+        reviewState = MistakeReviewState.PENDING.takeIf { isMistake },
     )
 
     private fun state(
@@ -111,6 +114,18 @@ class P10UserExampleLogicTest {
         assertEquals(plain, P10Transitions.startReroll(plain))
         assertEquals("B", P10Logic.answerText(plain.detail!!.myAnswer, plain.answerHidden))
         assertEquals("已遮住", P10Logic.answerText("B", hidden = true))
+    }
+
+    @Test
+    fun reviewStateControlRequiresLatestMistakeAndIsLockedByOtherWrites() {
+        val ready = state()
+        assertTrue(ready.canChangeReviewState)
+        assertFalse(state(isMistake = false).canChangeReviewState)
+        assertFalse(ready.copy(detail = ready.detail!!.copy(mistakeId = null)).canChangeReviewState)
+        assertFalse(ready.copy(updatingReviewState = true).canChangeReviewState)
+        assertFalse(ready.copy(edit = P10EditState(editing = true)).canChangeReviewState)
+        assertFalse(ready.copy(edit = P10EditState(saving = true)).canChangeReviewState)
+        assertFalse(ready.copy(edit = P10EditState(deleting = true)).canChangeReviewState)
     }
 
     /** 一处红规则适用范围：底部红描边删除行仅标错渲染，未标错整行不出现（不是置灰）。 */

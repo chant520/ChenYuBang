@@ -60,6 +60,31 @@ final class IdiomReviewEntryTests: XCTestCase {
         XCTAssertEqual(model.pendingReviewCount, 0)
     }
 
+    /// C9 状态回流：P10 切已掌握后 P05 重载为 0；切回待复习后计数与最新队列同时恢复。
+    @MainActor
+    func testIdiomDetailReloadReflectsReviewStateRoundTrip() async throws {
+        let ref = try insertIdiom(id: "idiom-anbu", word: "按部就班")
+        try insertMistake(id: "mk-1", idiomID: ref.id, state: "待复习")
+        let service = ReviewLibraryService(queue: queue)
+        let model = IdiomDetailViewModel(
+            reader: IdiomLibraryReader(queue: queue),
+            examplesReader: ExampleLibraryReader(queue: queue),
+            reviewCounter: service
+        )
+        await model.load(ref.id)
+        XCTAssertEqual(model.pendingReviewCount, 1)
+
+        XCTAssertEqual(try service.setState(mistakeID: "mk-1", state: .proficient), .updated)
+        await model.load(ref.id)
+        XCTAssertEqual(model.pendingReviewCount, 0)
+        XCTAssertTrue(try service.queue(idiomID: ref.id).isEmpty)
+
+        XCTAssertEqual(try service.setState(mistakeID: "mk-1", state: .pending), .updated)
+        await model.load(ref.id)
+        XCTAssertEqual(model.pendingReviewCount, 1)
+        XCTAssertEqual(try service.queue(idiomID: ref.id).map(\.id), ["mk-1"])
+    }
+
     // MARK: - Fixtures
 
     @discardableResult
