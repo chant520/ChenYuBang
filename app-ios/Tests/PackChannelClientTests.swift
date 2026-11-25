@@ -82,7 +82,11 @@ private final class PackChannelURLProtocol: URLProtocol, @unchecked Sendable {
                 return
             }
             client.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
-            client.urlProtocol(self, wasRedirectedTo: redirected)
+            client.urlProtocol(
+                self,
+                wasRedirectedTo: URLRequest(url: redirected),
+                redirectResponse: response
+            )
             return
         }
         guard url.path == "/latest.json", request.httpMethod == "GET",
