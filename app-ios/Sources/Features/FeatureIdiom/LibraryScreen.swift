@@ -3,6 +3,28 @@ import CangyuData
 import CangyuDesignSystem
 import CangyuTokens
 
+/// A6 三态文字徽标映射（拍板口径：未学=disabled、学过=solid 浅绿、已掌握=selected 实绿）。
+/// P03 / P24 共用，只展示不切换。
+struct StatusTag {
+    let text: String
+    let style: CTagStyle
+}
+
+func statusTag(for status: IdiomLearningStatus) -> StatusTag {
+    switch status {
+    case .notStarted: return StatusTag(text: "未学", style: .disabled)
+    case .studied: return StatusTag(text: "学过", style: .solid)
+    case .proficient: return StatusTag(text: "已掌握", style: .selected)
+    }
+}
+
+/// P03 学习状态只读口子：页面只依赖协议，实现由 app 注入的 IdiomStateStore 承担。
+public protocol IdiomStateReading {
+    func statesForIds(_ ids: [String]) throws -> [IdiomLearningState]
+}
+
+extension IdiomStateStore: IdiomStateReading {}
+
 /// 读库口子：页面只依赖协议，读库实现由 app 注入（不把 DatabaseQueue 带进视图）。
 public protocol IdiomLibraryReading {
     func load() throws -> [LibraryIdiom]
@@ -29,13 +51,21 @@ public final class LibraryViewModel: ObservableObject {
     @Published public private(set) var selectedLetter: String?
     @Published public private(set) var letters: [String] = []
     @Published public private(set) var page = LibraryPage(sections: [])
+    /// A6 学习状态：仅已显式落行的成语有值，缺行由 status(of:) 投影补未学。
+    @Published public private(set) var states: [String: IdiomLearningState] = [:]
     @Published public private(set) var loading = true
     @Published public private(set) var failed = false
     @Published public private(set) var updateFailure: String?
 
     public var scopeEmpty: Bool { scope.isEmpty }
 
+    /// 缺行=未学、未收藏，不创建 idiom_state 行。
+    public func status(of idiomID: String) -> IdiomLearningState {
+        states[idiomID] ?? IdiomLearningState(idiomID: idiomID, status: .notStarted, favorite: false)
+    }
+
     private let reader: IdiomLibraryReading
+    private let stateReader: IdiomStateReading?
     private let refreshTrigger: LibraryRefreshTrigger
     private let refreshFailure: (() -> String?)?
     private var items: [LibraryIdiom] = []
@@ -43,11 +73,13 @@ public final class LibraryViewModel: ObservableObject {
     public init(
         scope: ExamScopeSelection,
         reader: IdiomLibraryReading,
+        stateReader: IdiomStateReading? = nil,
         refreshTrigger: LibraryRefreshTrigger = NoLibraryRefreshTrigger(),
         refreshFailure: (() -> String?)? = nil
     ) {
         self.scope = scope
         self.reader = reader
+        self.stateReader = stateReader
         self.refreshTrigger = refreshTrigger
         self.refreshFailure = refreshFailure
     }
@@ -100,6 +132,9 @@ public final class LibraryViewModel: ObservableObject {
         items = try reader.load()
         letters = LibraryBrowse.letters(items)
         page = LibraryBrowse.page(items, dimension: dimension, letter: selectedLetter)
+        // A6：一次性批量取该页所有成语状态，避免逐行 state 的 N+1；只取显式落行，缺行展示时补未学。
+        let rows = try stateReader?.statesForIds(items.map(\.id)) ?? []
+        states = Dictionary(uniqueKeysWithValues: rows.map { ($0.idiomID, $0) })
         loading = false
         failed = false
     }
@@ -131,6 +166,7 @@ public struct LibraryScreen: View {
     public init(
         scope: ExamScopeSelection,
         reader: IdiomLibraryReading,
+        stateReader: IdiomStateReading? = nil,
         onOpenScope: @escaping () -> Void,
         onOpenIdiom: @escaping (String) -> Void,
         onSearch: @escaping () -> Void,
@@ -142,6 +178,7 @@ public struct LibraryScreen: View {
         _model = StateObject(wrappedValue: LibraryViewModel(
             scope: scope,
             reader: reader,
+            stateReader: stateReader,
             refreshTrigger: refreshTrigger,
             refreshFailure: refreshFailure
         ))
@@ -297,8 +334,9 @@ public struct LibraryScreen: View {
                                 showsDivider: index != section.items.count - 1,
                                 meta: {
                                     CTag(text: "考频 \(idiom.frequency)")
-                                    // A6 学习状态位：MVP 只呈现预留位，不读写 idiom_state。
-                                    CTag(text: "未学", style: .disabled)
+                                    // A6 学习状态位：按 idiom_state 三态展示，缺行补未学；只读不切换。
+                                    let tag = statusTag(for: model.status(of: idiom.id).status)
+                                    CTag(text: tag.text, style: tag.style)
                                 }
                             )
                         }
