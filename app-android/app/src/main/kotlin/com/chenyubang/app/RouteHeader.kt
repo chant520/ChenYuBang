@@ -28,6 +28,7 @@ private val selfChromedRoutes =
     setOf(
         Route.Search,
         Route.Idiom,
+        Route.Favorites,
         Route.Mistakes,
         Route.IdiomMistakes,
         Route.Queue,

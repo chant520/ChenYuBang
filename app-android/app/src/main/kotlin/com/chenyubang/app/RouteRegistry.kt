@@ -11,6 +11,7 @@ enum class Route(val key: String, val title: String, val owner: RouteOwner, val 
     Library("library", "成语库", RouteOwner.Idiom, Presentation.Push),
     Search("search", "搜索", RouteOwner.Idiom, Presentation.FullScreen),
     Idiom("idiom/{id}", "成语详情", RouteOwner.Idiom, Presentation.Push),
+    Favorites("favorites", "我的收藏", RouteOwner.Idiom, Presentation.Push),
     Examples("tab/examples", "例题", RouteOwner.Example, Presentation.Root),
     Example("example/{id}", "例题详情", RouteOwner.Example, Presentation.Push),
     Mistakes("tab/mistakes", "错题", RouteOwner.Mistake, Presentation.Root),
