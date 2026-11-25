@@ -105,7 +105,7 @@ final class IdiomSelfTestLibraryTests: XCTestCase {
                 return ["\(table):\(rows.count)"] + rows.map { row in
                     let columns = row.indices.map { index -> String in
                         let name = row.columnNames[index]
-                        let value: DatabaseValue = row[index]
+                        let value: DatabaseValue = row[index].1
                         let encoded: String
                         switch value {
                         case .null: encoded = "null"

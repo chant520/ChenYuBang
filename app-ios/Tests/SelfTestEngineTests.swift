@@ -34,7 +34,7 @@ final class SelfTestEngineTests: XCTestCase {
         library: [SelfTestCandidate],
         seed: UInt64 = 7
     ) throws -> SelfTestSession {
-        var random = SeededSelfTestRandom(seed: seed)
+        var random: any SelfTestRandomSource = SeededSelfTestRandom(seed: seed)
         switch SelfTestRoundBuilder.make(scoped: scoped, library: library, randomSource: &random) {
         case .ready(let session): return session
         case .emptyScope: throw EngineFixtureError.notReady
@@ -122,7 +122,7 @@ final class SelfTestEngineTests: XCTestCase {
         ]
         XCTAssertEqual(SelfTestRoundBuilder.eligibleCandidates(from: all).map(\.id), ["other1", "other2", "other3"])
 
-        var random = SeededSelfTestRandom(seed: 1)
+        var random: any SelfTestRandomSource = SeededSelfTestRandom(seed: 1)
         guard case .emptyScope = SelfTestRoundBuilder.make(
             scoped: [all[0]], library: all, randomSource: &random
         ) else {
@@ -131,7 +131,7 @@ final class SelfTestEngineTests: XCTestCase {
     }
 
     func testEmptyScopeTakesPrecedenceOverInsufficientFullPool() {
-        var random = SeededSelfTestRandom(seed: 1)
+        var random: any SelfTestRandomSource = SeededSelfTestRandom(seed: 1)
         guard case .emptyScope = SelfTestRoundBuilder.make(
             scoped: [], library: library(3), randomSource: &random
         ) else {
@@ -140,7 +140,7 @@ final class SelfTestEngineTests: XCTestCase {
     }
 
     func testFullEligiblePoolBelowFourIsInsufficientEvenWithScopedTarget() {
-        var random = SeededSelfTestRandom(seed: 1)
+        var random: any SelfTestRandomSource = SeededSelfTestRandom(seed: 1)
         guard case .insufficientCandidates = SelfTestRoundBuilder.make(
             scoped: [candidate("i0")], library: library(3), randomSource: &random
         ) else {

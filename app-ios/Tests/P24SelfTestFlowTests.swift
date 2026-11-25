@@ -80,7 +80,7 @@ final class P24SelfTestFlowTests: XCTestCase {
         }
     }
 
-    func testLoadStartsLoadingThenBuildsFirstDefinitionQuestion() async {
+    func testLoadStartsLoadingThenBuildsFirstDefinitionQuestion() async throws {
         let reader = FakeSelfTestReader()
         let model = makeModel(reader)
         XCTAssertEqual(model.state, .loading)
