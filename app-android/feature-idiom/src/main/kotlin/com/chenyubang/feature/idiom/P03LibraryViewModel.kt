@@ -3,6 +3,8 @@ package com.chenyubang.feature.idiom
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.chenyubang.core.data.ExamScopeSelection
+import com.chenyubang.core.data.IdiomLearningState
+import com.chenyubang.core.data.IdiomLearningStatus
 import com.chenyubang.core.data.PackCheckOutcome
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,12 +19,18 @@ data class P03LibraryUiState(
     val selectedLetter: String? = null,
     val letters: List<String> = emptyList(),
     val page: LibraryPage = LibraryPage(emptyList()),
+    /** A6 学习状态：仅已显式落行的成语有值，缺行由 statusOf 投影补未学。 */
+    val states: Map<String, IdiomLearningState> = emptyMap(),
     val loading: Boolean = true,
     val failed: Boolean = false,
     val updateFailed: Boolean = false,
 ) {
     val scopeEmpty: Boolean get() = scope.isEmpty
     val conditionCleared: Boolean get() = dimension == LibraryDimension.Scope && selectedLetter == null
+
+    /** 缺行=未学、未收藏，不创建 idiom_state 行。 */
+    fun statusOf(idiomId: String): IdiomLearningState =
+        states[idiomId] ?: IdiomLearningState(idiomId, IdiomLearningStatus.UNLEARNED, false)
 }
 
 /**
@@ -35,6 +43,7 @@ data class P03LibraryUiState(
 class P03LibraryViewModel(
     private val loadIdioms: suspend () -> List<LibraryIdiom>,
     private val refreshTrigger: LibraryRefreshTrigger = NoLibraryRefreshTrigger,
+    private val loadStates: suspend (List<String>) -> Map<String, IdiomLearningState> = { emptyMap() },
 ) : ViewModel() {
     private val _state = MutableStateFlow(P03LibraryUiState())
     val state: StateFlow<P03LibraryUiState> = _state.asStateFlow()
@@ -85,10 +94,13 @@ class P03LibraryViewModel(
     private suspend fun readLocal() {
         try {
             items = loadIdioms()
+            // A6：一次性批量取该页所有成语的状态，避免逐行 state() 的 N+1；只取显式落行，缺行展示时补未学。
+            val states = loadStates(items.map { it.id })
             _state.value =
                 _state.value.copy(
                     letters = LibraryBrowse.letters(items),
                     page = LibraryBrowse.page(items, _state.value.dimension, _state.value.selectedLetter),
+                    states = states,
                     loading = false,
                     failed = false,
                 )

@@ -154,6 +154,16 @@
 		A000000000000000000000F0 /* IdiomStateStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001F0 /* IdiomStateStoreTests.swift */; };
 		A000000000000000000000F1 /* MistakeStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001F1 /* MistakeStateTests.swift */; };
 		A000000000000000000000F2 /* BackupWriterFixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001F2 /* BackupWriterFixture.swift */; };
+		A00000000000000000000800 /* P13OverviewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000900 /* P13OverviewModel.swift */; };
+		A00000000000000000000801 /* P13OverviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000901 /* P13OverviewView.swift */; };
+		A00000000000000000000802 /* P24FavoriteModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000902 /* P24FavoriteModel.swift */; };
+		A00000000000000000000803 /* P24FavoriteScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000903 /* P24FavoriteScreen.swift */; };
+		A00000000000000000000804 /* P24FavoriteTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000904 /* P24FavoriteTests.swift */; };
+		A00000000000000000000805 /* P13OverviewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000905 /* P13OverviewTests.swift */; };
+		A00000000000000000000806 /* P24FavoriteSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000906 /* P24FavoriteSnapshotTests.swift */; };
+		A00000000000000000000807 /* P13OverviewSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000907 /* P13OverviewSnapshotTests.swift */; };
+		A00000000000000000000808 /* P05StateSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000908 /* P05StateSnapshotTests.swift */; };
+		A00000000000000000000809 /* P05DetailBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000909 /* P05DetailBody.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -309,6 +319,16 @@
 		A000000000000000000001F0 /* IdiomStateStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdiomStateStoreTests.swift; sourceTree = "<group>"; };
 		A000000000000000000001F1 /* MistakeStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MistakeStateTests.swift; sourceTree = "<group>"; };
 		A000000000000000000001F2 /* BackupWriterFixture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupWriterFixture.swift; sourceTree = "<group>"; };
+		A00000000000000000000900 /* P13OverviewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P13OverviewModel.swift; sourceTree = "<group>"; };
+		A00000000000000000000901 /* P13OverviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P13OverviewView.swift; sourceTree = "<group>"; };
+		A00000000000000000000902 /* P24FavoriteModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P24FavoriteModel.swift; sourceTree = "<group>"; };
+		A00000000000000000000903 /* P24FavoriteScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P24FavoriteScreen.swift; sourceTree = "<group>"; };
+		A00000000000000000000904 /* P24FavoriteTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P24FavoriteTests.swift; sourceTree = "<group>"; };
+		A00000000000000000000905 /* P13OverviewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P13OverviewTests.swift; sourceTree = "<group>"; };
+		A00000000000000000000906 /* P24FavoriteSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P24FavoriteSnapshotTests.swift; sourceTree = "<group>"; };
+		A00000000000000000000907 /* P13OverviewSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P13OverviewSnapshotTests.swift; sourceTree = "<group>"; };
+		A00000000000000000000908 /* P05StateSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P05StateSnapshotTests.swift; sourceTree = "<group>"; };
+		A00000000000000000000909 /* P05DetailBody.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P05DetailBody.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -389,6 +409,9 @@
 				A0000000000000000000018E /* P05IdiomDetailScreen.swift */,
 				A0000000000000000000018F /* IdiomSearchUi.swift */,
 				A00000000000000000000190 /* P04SearchScreen.swift */,
+				A00000000000000000000902 /* P24FavoriteModel.swift */,
+				A00000000000000000000903 /* P24FavoriteScreen.swift */,
+				A00000000000000000000909 /* P05DetailBody.swift */,
 			);
 			path = FeatureIdiom;
 			sourceTree = "<group>";
@@ -443,6 +466,8 @@
 				A000000000000000000001E1 /* PackVersionScreen.swift */,
 				A000000000000000000002F5 /* PackVersionModel.swift */,
 				A000000000000000000001E2 /* ClearDataSheet.swift */,
+				A00000000000000000000900 /* P13OverviewModel.swift */,
+				A00000000000000000000901 /* P13OverviewView.swift */,
 			);
 			path = FeatureMe;
 			sourceTree = "<group>";
@@ -550,6 +575,11 @@
 				A000000000000000000001E7 /* BackupImportWriterTests.swift */,
 				A000000000000000000001E8 /* UserDataCleanerTests.swift */,
 				A000000000000000000001EB /* BackupImportOrphanTests.swift */,
+				A00000000000000000000904 /* P24FavoriteTests.swift */,
+				A00000000000000000000905 /* P13OverviewTests.swift */,
+				A00000000000000000000906 /* P24FavoriteSnapshotTests.swift */,
+				A00000000000000000000907 /* P13OverviewSnapshotTests.swift */,
+				A00000000000000000000908 /* P05StateSnapshotTests.swift */,
 				A00000000000000000000152 /* pack fixture */,
 				A000000000000000000002F4 /* mock pack fixture */,
 			);
@@ -750,6 +780,11 @@
 				A000000000000000000000B7 /* P20MatchForm.swift in Sources */,
 				A000000000000000000000B8 /* P21DoneScreen.swift in Sources */,
 				A000000000000000000000BB /* P20CandidatePool.swift in Sources */,
+				A00000000000000000000800 /* P13OverviewModel.swift in Sources */,
+				A00000000000000000000801 /* P13OverviewView.swift in Sources */,
+				A00000000000000000000802 /* P24FavoriteModel.swift in Sources */,
+				A00000000000000000000803 /* P24FavoriteScreen.swift in Sources */,
+				A00000000000000000000809 /* P05DetailBody.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -825,6 +860,11 @@
 				A000000000000000000000E7 /* BackupImportWriterTests.swift in Sources */,
 				A000000000000000000000E8 /* UserDataCleanerTests.swift in Sources */,
 				A000000000000000000000EB /* BackupImportOrphanTests.swift in Sources */,
+				A00000000000000000000804 /* P24FavoriteTests.swift in Sources */,
+				A00000000000000000000805 /* P13OverviewTests.swift in Sources */,
+				A00000000000000000000806 /* P24FavoriteSnapshotTests.swift in Sources */,
+				A00000000000000000000807 /* P13OverviewSnapshotTests.swift in Sources */,
+				A00000000000000000000808 /* P05StateSnapshotTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -31,6 +32,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.chenyubang.core.data.AppDatabase
+import com.chenyubang.core.data.IdiomLearningState
+import com.chenyubang.core.data.IdiomLearningStatus
 import com.chenyubang.core.ui.CBar
 import com.chenyubang.core.ui.CBarKind
 import com.chenyubang.core.ui.CButton
@@ -73,6 +76,9 @@ fun P05IdiomDetailRoute(
                     P05IdiomDetailViewModel(
                         loadIdiom = { id -> database.idiomDao().byId(id) },
                         loadExamples = { id -> database.exampleDao().listByIdiom(id) },
+                        loadState = { id -> database.idiomStateDao().state(id) },
+                        writeStatus = { id, status -> database.idiomStateDao().setStatus(id, status) },
+                        writeFavorite = { id, favorite -> database.idiomStateDao().setFavorite(id, favorite) },
                     )
                 }
             }
@@ -97,6 +103,8 @@ fun P05IdiomDetailRoute(
                 }
             }
         },
+        onUpdateStatus = model::updateStatus,
+        onUpdateFavorite = model::updateFavorite,
     )
 }
 
@@ -116,6 +124,8 @@ fun P05IdiomDetailContent(
     onRetry: () -> Unit = {},
     canReview: Boolean = false,
     onReviewIdiom: () -> Unit = {},
+    onUpdateStatus: (IdiomLearningStatus) -> Unit = {},
+    onUpdateFavorite: (Boolean) -> Unit = {},
 ) {
     val colors = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
     Column(
@@ -125,7 +135,13 @@ fun P05IdiomDetailContent(
             .padding(horizontal = Tokens.Space.pageX.dp, vertical = Tokens.Space.contentTop.dp),
         verticalArrangement = Arrangement.spacedBy(Tokens.Space.block.dp),
     ) {
-        DetailHeader(onBack = onBack, colors = colors)
+        DetailHeader(
+            onBack = onBack,
+            colors = colors,
+            learningState = state.state,
+            onUpdateStatus = onUpdateStatus,
+            onUpdateFavorite = onUpdateFavorite,
+        )
         when {
             state.loading ->
                 CBar(
@@ -167,7 +183,11 @@ fun P05IdiomDetailContent(
 private fun DetailHeader(
     onBack: () -> Unit,
     colors: Tokens.ColorSet,
+    learningState: IdiomLearningState,
+    onUpdateStatus: (IdiomLearningStatus) -> Unit,
+    onUpdateFavorite: (Boolean) -> Unit,
 ) {
+    var statusPickerOpen by remember { mutableStateOf(false) }
     Row(verticalAlignment = Alignment.CenterVertically) {
         Box(
             Modifier
@@ -184,9 +204,45 @@ private fun DetailHeader(
             fontWeight = FontWeight.W700,
             modifier = Modifier.padding(start = Tokens.Space.lmetaGap.dp),
         )
-        Box(Modifier.weight(1f), contentAlignment = Alignment.CenterEnd) {
-            CTag(text = "收藏（预留）", style = CTagStyle.Ghost)
+        // idiomId 为空表示无状态输入（历史基线路径）：保持只读「收藏（预留）」外观，不改既有帧。
+        // 生产路由 load 后会带回真实 idiomId，走下方 A6/A7 可交互区。
+        if (learningState.idiomId.isBlank()) {
+            Box(Modifier.weight(1f), contentAlignment = Alignment.CenterEnd) {
+                CTag(text = "收藏（预留）", style = CTagStyle.Ghost)
+            }
+        } else {
+            Row(
+                Modifier.weight(1f),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.End,
+            ) {
+                // A6 自评入口：收藏左侧的 ghost 标签，点按弹三选一（见 StatusPickerOverlay）。
+                Box(Modifier.clickable { statusPickerOpen = true }) {
+                    CTag(
+                        text = "学习状态：${statusTag(learningState.status).text}",
+                        style = CTagStyle.Ghost,
+                    )
+                }
+                Spacer(Modifier.padding(end = Tokens.Space.lmetaGap.dp))
+                // A7 收藏：未收藏 ghost「收藏」，已收藏实心「已收藏」，点按即切换、无 toast。
+                Box(Modifier.clickable { onUpdateFavorite(!learningState.favorite) }) {
+                    CTag(
+                        text = if (learningState.favorite) "已收藏" else "收藏",
+                        style = if (learningState.favorite) CTagStyle.Solid else CTagStyle.Ghost,
+                    )
+                }
+            }
         }
+    }
+    if (statusPickerOpen) {
+        StatusPickerOverlay(
+            current = learningState.status,
+            onSelect = { status ->
+                onUpdateStatus(status)
+                statusPickerOpen = false
+            },
+            onCancel = { statusPickerOpen = false },
+        )
     }
 }
 

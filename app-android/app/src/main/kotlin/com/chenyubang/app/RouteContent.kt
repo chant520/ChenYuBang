@@ -40,16 +40,7 @@ internal fun RouteContent(
             SearchDestination(deps.database, { onRoute(router.back()) }) {
                 onRoute(router.push(Route.Idiom, it))
             }
-        Route.Idiom ->
-            IdiomDestination(
-                idiomId = requireNotNull(entry.id),
-                database = deps.database,
-                onBack = { onRoute(router.back()) },
-                onOpenMistakes = { onRoute(router.goToMistakes()) },
-                onOpenExample = { id -> onRoute(router.push(Route.Example, id)) },
-                onReviewIdiom = { count -> onRoute(router.startReview(count)) },
-                revision = router.contentRevision,
-            )
+        Route.Idiom, Route.Favorites -> IdiomRouteContent(entry, router, deps, onRoute)
         Route.Example ->
             ExampleDestination(requireNotNull(entry.id), deps.database, { onRoute(router.back()) }) { id ->
                 onRoute(router.push(Route.Idiom, id))
@@ -71,6 +62,37 @@ internal fun RouteContent(
             )
         Route.Pack -> P16PackRoute(deps.packUpdates)
         else -> CaptureRouteContent(entry, router, deps, onRoute)
+    }
+}
+
+/** P05 成语详情 / P24 我的收藏：同属 Idiom 归属的二级 Push 路由接线。 */
+@Composable
+private fun IdiomRouteContent(
+    entry: RouteEntry,
+    router: RouterState,
+    deps: RouteDeps,
+    onRoute: (RouterState) -> Unit,
+) {
+    when (entry.route) {
+        Route.Idiom ->
+            IdiomDestination(
+                idiomId = requireNotNull(entry.id),
+                database = deps.database,
+                onBack = { onRoute(router.back()) },
+                onOpenMistakes = { onRoute(router.goToMistakes()) },
+                onOpenExample = { id -> onRoute(router.push(Route.Example, id)) },
+                onReviewIdiom = { count -> onRoute(router.startReview(count)) },
+                revision = router.contentRevision,
+            )
+        Route.Favorites ->
+            FavoriteDestination(
+                database = deps.database,
+                revision = router.contentRevision,
+                onBack = { onRoute(router.back()) },
+                onOpenIdiom = { id -> onRoute(router.push(Route.Idiom, id)) },
+                onGoLibrary = { onRoute(router.selectTab(AppTab.Idiom).push(Route.Library)) },
+            )
+        else -> Unit
     }
 }
 
@@ -123,7 +145,7 @@ private fun CaptureRouteContent(
         Route.Ocr -> OcrRoute(router, deps, onRoute)
         Route.Match -> MatchRoute(router, deps, onRoute)
         Route.Done -> DoneRoute(router, onRoute)
-        else -> RoutePlaceholder(router, deps.scope, onRoute)
+        else -> RoutePlaceholder(router, deps.scope, deps.database, onRoute)
     }
 }
 
@@ -151,7 +173,7 @@ private fun CropRoute(
             onRetake = { onRoute(router.back()) },
             onNext = { selection -> onRoute(router.attachCropImage(selection.path, selection.frame)) },
         )
-    } ?: RoutePlaceholder(router, deps.scope, onRoute)
+    } ?: RoutePlaceholder(router, deps.scope, deps.database, onRoute)
 }
 
 @Composable
@@ -173,7 +195,7 @@ private fun OcrRoute(
                     onNext = { draft -> onRoute(router.attachOcrText(draft)) },
                 ),
         )
-    } ?: RoutePlaceholder(router, deps.scope, onRoute)
+    } ?: RoutePlaceholder(router, deps.scope, deps.database, onRoute)
 }
 
 @Composable
@@ -203,7 +225,7 @@ private fun MatchRoute(
             onBack = { onRoute(router.back()) },
             onSaved = { userExampleId, idioms -> onRoute(router.captureSaved(userExampleId, idioms)) },
         )
-    } ?: RoutePlaceholder(router, deps.scope, onRoute)
+    } ?: RoutePlaceholder(router, deps.scope, deps.database, onRoute)
 }
 
 @Composable

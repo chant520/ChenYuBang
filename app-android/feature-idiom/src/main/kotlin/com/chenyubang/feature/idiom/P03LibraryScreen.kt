@@ -35,6 +35,8 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.chenyubang.core.data.AppDatabase
 import com.chenyubang.core.data.ExamScopeSelection
+import com.chenyubang.core.data.IdiomLearningState
+import com.chenyubang.core.data.IdiomLearningStatus
 import com.chenyubang.core.ui.CBar
 import com.chenyubang.core.ui.CBarKind
 import com.chenyubang.core.ui.CButton
@@ -48,7 +50,6 @@ import com.chenyubang.core.ui.CListRow
 import com.chenyubang.core.ui.CSegmentedControl
 import com.chenyubang.core.ui.CSkeletonBlock
 import com.chenyubang.core.ui.CTag
-import com.chenyubang.core.ui.CTagStyle
 import com.chenyubang.core.ui.tokens.Tokens
 
 /** 骨架屏行数：与首屏一屏内可见的列表行数大致对齐，避免加载态跳动。 */
@@ -85,6 +86,16 @@ fun P03LibraryRoute(
                             }
                         },
                         refreshTrigger = refreshTrigger,
+                        loadStates = { ids ->
+                            database.idiomStateDao().statesForIds(ids).associate { row ->
+                                row.idiomId to
+                                    IdiomLearningState(
+                                        idiomId = row.idiomId,
+                                        status = IdiomLearningStatus.fromStored(row.status),
+                                        favorite = row.favorite,
+                                    )
+                            }
+                        },
                     )
                 }
             }
@@ -294,8 +305,9 @@ private fun LibraryList(
                             showDivider = index != section.items.lastIndex,
                             meta = {
                                 CTag("考频 ${idiom.frequency}")
-                                // A6 学习状态位：MVP 只呈现预留位，不读写 idiom_state。
-                                CTag("未学", style = CTagStyle.Disabled)
+                                // A6 学习状态位：按 idiom_state 三态展示，缺行补未学；只读不切换。
+                                val tag = statusTag(state.statusOf(idiom.id).status)
+                                CTag(tag.text, style = tag.style)
                             },
                             onClick = { onOpenIdiom(idiom.id) },
                         )

@@ -18,6 +18,7 @@ import com.chenyubang.feature.idiom.P03LibraryEntry
 import com.chenyubang.feature.idiom.P03LibraryRoute
 import com.chenyubang.feature.idiom.P04SearchRoute
 import com.chenyubang.feature.idiom.P05IdiomDetailRoute
+import com.chenyubang.feature.idiom.P24FavoriteRoute
 import com.chenyubang.feature.me.ExamScopeMode
 import com.chenyubang.feature.me.ExamScopeRequest
 import com.chenyubang.feature.me.ExamScopeSaver
@@ -113,6 +114,23 @@ internal fun IdiomDestination(
         onOpenExample = onOpenExample,
         onReviewIdiom = onReviewIdiom,
         revision = revision,
+    )
+}
+
+@Composable
+internal fun FavoriteDestination(
+    database: AppDatabase,
+    revision: Long,
+    onBack: () -> Unit,
+    onOpenIdiom: (String) -> Unit,
+    onGoLibrary: () -> Unit,
+) {
+    P24FavoriteRoute(
+        database = database,
+        revision = revision,
+        onBack = onBack,
+        onOpenIdiom = onOpenIdiom,
+        onGoLibrary = onGoLibrary,
     )
 }
 
