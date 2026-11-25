@@ -34,7 +34,7 @@ struct ReviewSession: Equatable {
 final class RouterState: ObservableObject {
     @Published private(set) var selectedTab: AppTab = .idiom
     @Published private(set) var tabEntries: [AppTab: [RouteEntry]]
-    @Published private(set) var fullScreenEntries: [RouteEntry] = []
+    @Published internal(set) var fullScreenEntries: [RouteEntry] = []
     @Published internal(set) var overlay: RouteEntry?
     @Published private(set) var reviewSession: ReviewSession?
     @Published private(set) var captureWorkflow: CaptureWorkflow?
@@ -52,7 +52,7 @@ final class RouterState: ObservableObject {
     @Published internal(set) var clearResult: String?
     @Published internal(set) var clearError: String?
     private let onboardingEntry = RouteEntry(route: .onboarding)
-    @Published private(set) var suspendedFullScreenEntries: [RouteEntry] = []
+    @Published internal(set) var suspendedFullScreenEntries: [RouteEntry] = []
     @Published private(set) var selfTestBackRequest = 0
 
     init(needsFirstLaunch: Bool = false) {
@@ -226,7 +226,7 @@ final class RouterState: ObservableObject {
         captureWorkflow = nil
     }
 
-    private var canStartFullScreen: Bool {
+    var canStartFullScreen: Bool {
         canStartWorkflow && fullScreenEntries.isEmpty
     }
 
