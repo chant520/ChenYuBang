@@ -85,7 +85,7 @@ public final class URLPackChannelClient: PackChannelClient, @unchecked Sendable 
     }
 }
 
-private final class ChannelSessionDelegate: NSObject, URLSessionDownloadDelegate, @unchecked Sendable {
+final class ChannelSessionDelegate: NSObject, URLSessionDownloadDelegate, @unchecked Sendable {
     private let expectedBytes: Int?
     private let maximumBytes: Int64
     private let progress: @Sendable (Double) -> Void

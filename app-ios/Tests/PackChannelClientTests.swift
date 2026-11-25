@@ -4,55 +4,82 @@ import XCTest
 
 @MainActor
 final class PackChannelClientTests: XCTestCase {
-    func testSameOriginRedirectSucceedsButCrossOriginAndLoopsFail() async throws {
+    func testClientReadsManifestThroughURLProtocol() async throws {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [PackChannelURLProtocol.self]
         let client = URLPackChannelClient(configuration: configuration)
         let origin = try XCTUnwrap(URL(string: "https://example.com"))
 
-        PackChannelURLProtocol.reset()
-        let manifest = try await client.latest(from: origin.appendingPathComponent("same-origin"))
+        let manifest = try await client.latest(from: origin.appendingPathComponent("latest.json"))
         XCTAssertEqual(manifest.packVersion, "v1.0.0")
+    }
 
-        PackChannelURLProtocol.reset()
-        do {
-            _ = try await client.latest(from: origin.appendingPathComponent("cross-origin"))
-            XCTFail("Cross-origin redirect must be rejected")
-        } catch {
-            XCTAssertEqual(error as? PackChannelError, .network)
+    func testRedirectPolicyAllowsOnlyFiveSameOriginRedirects() throws {
+        let configuration = URLSessionConfiguration.ephemeral
+        let session = URLSession(configuration: configuration)
+        defer { session.finishTasksAndInvalidate() }
+        let origin = try XCTUnwrap(URL(string: "https://example.com"))
+        let task = session.downloadTask(with: URLRequest(url: origin.appendingPathComponent("latest.json")))
+        let delegate = makeDelegate()
+        let response = try XCTUnwrap(HTTPURLResponse(
+            url: origin, statusCode: 302, httpVersion: nil, headerFields: ["Location": "/next.json"]
+        ))
+        var decisions: [URLRequest?] = []
+
+        for _ in 0..<6 {
+            delegate.urlSession(
+                session,
+                task: task,
+                willPerformHTTPRedirection: response,
+                newRequest: URLRequest(url: origin.appendingPathComponent("next.json"))
+            ) { decisions.append($0) }
         }
 
-        PackChannelURLProtocol.reset()
-        do {
-            _ = try await client.latest(from: origin.appendingPathComponent("loop"))
-            XCTFail("Redirect loop must be rejected")
-        } catch {
-            XCTAssertEqual(error as? PackChannelError, .network)
+        XCTAssertEqual(decisions.dropLast().compactMap { $0 }.count, 5)
+        XCTAssertNil(decisions.last ?? nil)
+    }
+
+    func testRedirectPolicyRejectsCrossOriginAndUserInfo() throws {
+        let configuration = URLSessionConfiguration.ephemeral
+        let session = URLSession(configuration: configuration)
+        defer { session.finishTasksAndInvalidate() }
+        let origin = try XCTUnwrap(URL(string: "https://example.com"))
+        let task = session.downloadTask(with: URLRequest(url: origin.appendingPathComponent("latest.json")))
+        let response = try XCTUnwrap(HTTPURLResponse(
+            url: origin, statusCode: 302, httpVersion: nil, headerFields: ["Location": "/next.json"]
+        ))
+        let crossOrigin = try XCTUnwrap(URL(string: "https://other.example/latest.json"))
+        let withUserInfo = try XCTUnwrap(URL(string: "https://user@example.com/latest.json"))
+
+        for redirected in [crossOrigin, withUserInfo] {
+            let delegate = makeDelegate()
+            var decision: URLRequest?
+            delegate.urlSession(
+                session,
+                task: task,
+                willPerformHTTPRedirection: response,
+                newRequest: URLRequest(url: redirected)
+            ) { decision = $0 }
+            XCTAssertNil(decision)
         }
-        XCTAssertEqual(PackChannelURLProtocol.loopStarts, 6)
+    }
+
+    private func makeDelegate() -> ChannelSessionDelegate {
+        ChannelSessionDelegate(
+            expectedBytes: nil,
+            maximumBytes: 64 * 1024,
+            progress: { _ in },
+            completion: { _ in }
+        )
     }
 }
 
 private final class PackChannelURLProtocol: URLProtocol, @unchecked Sendable {
-    private static let lock = NSLock()
-    nonisolated(unsafe) private static var storedLoopStarts = 0
     private static let manifestData = Data("""
         {"schemaVersion":1,"packVersion":"v1.0.0","builtAt":"2026-01-01T00:00:00Z",
          "counts":{"idioms":1,"examples":1},"sha256":"0000000000000000000000000000000000000000000000000000000000000000",
          "sizeBytes":1,"packFile":"pack-v1.0.0.zip"}
         """.utf8)
-
-    static var loopStarts: Int {
-        lock.lock()
-        defer { lock.unlock() }
-        return storedLoopStarts
-    }
-
-    static func reset() {
-        lock.lock()
-        storedLoopStarts = 0
-        lock.unlock()
-    }
 
     override static func canInit(with request: URLRequest) -> Bool { true }
     override static func canonicalRequest(for request: URLRequest) -> URLRequest { request }
@@ -60,33 +87,6 @@ private final class PackChannelURLProtocol: URLProtocol, @unchecked Sendable {
     override func startLoading() {
         guard let url = request.url, let client else {
             self.client?.urlProtocolDidFinishLoading(self)
-            return
-        }
-        if url.path == "/loop" {
-            Self.lock.lock()
-            Self.storedLoopStarts += 1
-            Self.lock.unlock()
-        }
-        let location: String?
-        switch url.path {
-        case "/same-origin": location = "/latest.json"
-        case "/cross-origin": location = "https://other.example/latest.json"
-        case "/loop": location = "/loop"
-        default: location = nil
-        }
-        if let location {
-            guard let response = HTTPURLResponse(
-                url: url, statusCode: 302, httpVersion: nil, headerFields: ["Location": location]
-            ), let redirected = URL(string: location, relativeTo: url) else {
-                client.urlProtocol(self, didFailWithError: PackChannelError.invalidResponse)
-                return
-            }
-            client.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
-            client.urlProtocol(
-                self,
-                wasRedirectedTo: URLRequest(url: redirected),
-                redirectResponse: response
-            )
             return
         }
         guard url.path == "/latest.json", request.httpMethod == "GET",
