@@ -29,5 +29,5 @@
 public enum MeFeature {
 
     /// 本模块负责的页面号，便于路由接线时核对归属（信息架构 v1.2 §3）。
-    public static let ownedPages: [String] = ["P13", "P14", "P15", "P16"]
+    public static let ownedPages: [String] = ["P13", "P14", "P15", "P16", "P24"]
 }
