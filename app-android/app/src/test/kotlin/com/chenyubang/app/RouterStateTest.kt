@@ -91,7 +91,7 @@ class RouterStateTest {
         assertEquals(RouteOwner.Review, Route.SelfTest.owner)
         assertFalse(selfTest.showTabs)
         assertFalse(selfTest.showFab)
-        assertFalse(systemBackEnabled(selfTest)) // P24 自己处理系统返回与退出确认。
+        assertFalse(systemBackEnabled(selfTest)) // P25 自己处理系统返回与退出确认。
         assertEquals(me.stack, selfTest.back().stack)
         assertEquals(selfTest, selfTest.startSelfTest())
         val notMe = RouterState(tab = AppTab.Idiom)

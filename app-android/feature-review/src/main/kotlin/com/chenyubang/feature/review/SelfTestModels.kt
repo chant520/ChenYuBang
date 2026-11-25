@@ -2,7 +2,7 @@ package com.chenyubang.feature.review
 
 import kotlin.random.Random
 
-/** P24 题库快照只含出题必需字段，不持有 Room / Android 类型。 */
+/** P25 题库快照只含出题必需字段，不持有 Room / Android 类型。 */
 data class SelfTestCandidate(
     val id: String,
     val word: String,

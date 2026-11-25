@@ -24,7 +24,7 @@ public struct LibraryIdiom: Equatable, Sendable, Identifiable, FetchableRecord, 
     }
 }
 
-/// P24 成语自测的目标行：只带判分所需的 id / 词面 / 释义，不携带全列。
+/// P25 成语自测的目标行：只带判分所需的 id / 词面 / 释义，不携带全列。
 public struct IdiomWordSense: Equatable, Sendable, Identifiable, FetchableRecord, Decodable {
     public let id: String
     public let word: String
@@ -52,7 +52,7 @@ public enum IdiomLibrary {
             """)
     }
 
-    /// P24 目标成语只读投影：范围仍以 `idiom_scope` 为唯一事实源。
+    /// P25 目标成语只读投影：范围仍以 `idiom_scope` 为唯一事实源。
     public static func scopedWordSenses(_ db: Database) throws -> [IdiomWordSense] {
         try IdiomWordSense.fetchAll(db, sql: """
             SELECT idiom.id, idiom.word, idiom.sense
@@ -76,7 +76,7 @@ public final class IdiomLibraryReader: @unchecked Sendable {
         try queue.read { db in try IdiomLibrary.load(db) }
     }
 
-    /// P24 当前考试范围内的目标成语；只读，不写学习状态或答题记录。
+    /// P25 当前考试范围内的目标成语；只读，不写学习状态或答题记录。
     public func scopedWordSenses() throws -> [IdiomWordSense] {
         try queue.read { db in try IdiomLibrary.scopedWordSenses(db) }
     }

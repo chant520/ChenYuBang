@@ -2,7 +2,7 @@ import Foundation
 import XCTest
 @testable import ChenYuBang
 
-/// P13 → P24 全屏路由：只在「我的」启动，退出回原栈，且不串 D1 / 拍照工作流。
+/// P13 → P25 全屏路由：只在「我的」启动，退出回原栈，且不串 D1 / 拍照工作流。
 final class RouterSelfTestTests: XCTestCase {
     func testSelfTestStartsOnlyFromProfileAndRestoresOrigin() {
         let router = RouterState()

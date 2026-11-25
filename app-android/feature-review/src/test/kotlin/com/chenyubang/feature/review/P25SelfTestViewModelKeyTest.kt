@@ -22,7 +22,7 @@ import org.junit.Test
 import kotlin.random.Random
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class P24SelfTestViewModelKeyTest {
+class P25SelfTestViewModelKeyTest {
     private val dispatcher = StandardTestDispatcher()
 
     @Before
@@ -50,7 +50,7 @@ class P24SelfTestViewModelKeyTest {
 
             val first =
                 ViewModelProvider(owner, factory).get(
-                    p24SelfTestViewModelKey(11L),
+                    p25SelfTestViewModelKey(11L),
                     SelfTestViewModel::class.java,
                 )
             advanceUntilIdle()
@@ -61,7 +61,7 @@ class P24SelfTestViewModelKeyTest {
 
             val second =
                 ViewModelProvider(owner, factory).get(
-                    p24SelfTestViewModelKey(12L),
+                    p25SelfTestViewModelKey(12L),
                     SelfTestViewModel::class.java,
                 )
             advanceUntilIdle()
@@ -76,7 +76,7 @@ class P24SelfTestViewModelKeyTest {
 
     @Test
     fun viewModelKeyIsStableForSameInstanceAndDistinctForNewEntry() {
-        assertEquals(p24SelfTestViewModelKey(11L), p24SelfTestViewModelKey(11L))
-        assertNotEquals(p24SelfTestViewModelKey(11L), p24SelfTestViewModelKey(12L))
+        assertEquals(p25SelfTestViewModelKey(11L), p25SelfTestViewModelKey(11L))
+        assertNotEquals(p25SelfTestViewModelKey(11L), p25SelfTestViewModelKey(12L))
     }
 }
