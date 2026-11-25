@@ -11,7 +11,6 @@ import com.chenyubang.feature.capture.P20FormScreen
 import com.chenyubang.feature.capture.P21DoneScreen
 import com.chenyubang.feature.me.P15BackupRoute
 import com.chenyubang.feature.me.P16PackRoute
-import com.chenyubang.feature.review.P24SelfTestRoute
 
 /** 按当前路由渲染目标页；P04/P05 的返回与跳转与其余路由同口径。 */
 @Composable
@@ -95,21 +94,6 @@ private fun IdiomRouteContent(
             )
         else -> Unit
     }
-}
-
-/** P13 设置入口与 P24 全屏自测的宿主接线。 */
-@Composable
-private fun SelfTestRouteContent(
-    entry: RouteEntry,
-    router: RouterState,
-    deps: RouteDeps,
-    onRoute: (RouterState) -> Unit,
-) {
-    P24SelfTestRoute(
-        database = deps.database,
-        instance = entry.instance,
-        onExit = { onRoute(router.back()) },
-    )
 }
 
 /** P09 成语下录入题：行点击进入 P10（user_example.id）。 */

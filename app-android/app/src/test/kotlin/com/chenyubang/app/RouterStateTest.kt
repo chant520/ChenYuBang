@@ -25,7 +25,7 @@ class RouterStateTest {
                 "sheet/import-mode", "dialog/clear",
             )
         assertEquals(keys, Route.entries.map { it.key })
-        assertEquals(24, Route.entries.map { it.key }.toSet().size)
+        assertEquals(25, Route.entries.map { it.key }.toSet().size)
         assertEquals(
             listOf(1, 5, 2, 3, 3, 4, 7),
             RouteOwner.entries.map {
