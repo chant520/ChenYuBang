@@ -4,9 +4,9 @@ import XCTest
 @testable import ChenYuBang
 
 final class RouterStateTests: XCTestCase {
-    func testRegistryKeepsAll23KeysAndFourRoots() {
+    func testRegistryKeepsAll24KeysAndFourRoots() {
         XCTAssertEqual(AppRoute.allCases.map(\.rawValue), [
-            "onboarding", "tab/recommend", "library", "search", "idiom/{id}", "tab/examples",
+            "onboarding", "tab/recommend", "library", "search", "idiom/{id}", "favorites", "tab/examples",
             "example/{id}", "tab/mistakes", "mistakes/idiom/{id}", "mistake/{id}",
             "review/queue", "review/summary", "tab/me", "settings/scope", "settings/backup",
             "settings/pack", "capture/camera", "capture/crop", "capture/ocr", "capture/match",
@@ -15,6 +15,27 @@ final class RouterStateTests: XCTestCase {
         XCTAssertEqual(AppTab.allCases.map(\.label), ["成语", "例题", "错题", "我的"])
         XCTAssertEqual(AppRoute.profile.owner, .profile)
         XCTAssertEqual(RouteRegistry.fabRoutes, Set(AppTab.allCases.map(\.root)))
+    }
+
+    func testFavoritesPushFromProfileAndBack() {
+        XCTAssertEqual(AppRoute.favorites.rawValue, "favorites")
+        XCTAssertEqual(AppRoute.favorites.title, "我的收藏")
+        XCTAssertEqual(AppRoute.favorites.owner, .idiom)
+        XCTAssertEqual(AppRoute.favorites.presentation, .push)
+        let router = RouterState()
+        router.selectTab(.profile)
+        XCTAssertTrue(router.push(.favorites))
+        XCTAssertEqual(router.currentEntry.route, .favorites)
+        XCTAssertEqual(router.entries(for: .profile).count, 2)
+        router.back()
+        XCTAssertEqual(router.currentEntry.route, .profile)
+        XCTAssertEqual(router.entries(for: .profile).count, 1)
+        // P24 空态「去成语库」：切到成语标签并压入成语库，返回各标签栈独立。
+        XCTAssertTrue(router.push(.favorites))
+        router.selectTab(.idiom)
+        XCTAssertTrue(router.push(.library))
+        XCTAssertEqual(router.currentEntry.route, .library)
+        XCTAssertEqual(router.entries(for: .profile).count, 2)
     }
 
     func testAllPushRoutesAcceptRealReferencesButRejectMissingIDs() {
