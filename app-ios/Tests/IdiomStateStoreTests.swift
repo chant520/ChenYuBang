@@ -147,6 +147,64 @@ final class IdiomStateStoreTests: XCTestCase {
         XCTAssertEqual(try count("idiom"), 3)
     }
 
+    // MARK: - 阶段6包1只读聚合（E2 三计数 / P03 statesForIds / P24 favoriteIdioms）
+
+    func testCountsAreZeroWhenEmpty() throws {
+        XCTAssertEqual(try store.countLearned(), 0)
+        XCTAssertEqual(try store.countMastered(), 0)
+        XCTAssertEqual(try store.countFavorite(), 0)
+        XCTAssertTrue(try store.favoriteIdioms().isEmpty)
+    }
+
+    func testE2CountsFollowContract() throws {
+        try store.setStatus(idiomID: idiomA, status: .studied)
+        try store.setStatus(idiomID: idiomB, status: .proficient)
+        // idiomC 显式「未学」落行不算入已学。
+        try store.setStatus(idiomID: idiomC, status: .notStarted)
+        try store.setFavorite(idiomID: idiomA, favorite: true)
+        try store.setFavorite(idiomID: idiomB, favorite: true)
+        XCTAssertEqual(try store.countLearned(), 2)
+        XCTAssertEqual(try store.countMastered(), 1)
+        XCTAssertEqual(try store.countFavorite(), 2)
+    }
+
+    func testFavoriteIdiomsJoinAndShareFilterWithCount() throws {
+        try store.setFavorite(idiomID: idiomA, favorite: true)
+        try store.setStatus(idiomID: idiomB, status: .proficient)
+        let rows = try store.favoriteIdioms()
+        XCTAssertEqual(rows.map(\.idiomId), [idiomA])
+        XCTAssertEqual(rows.first?.word, "按部就班")
+        XCTAssertEqual(rows.first?.status, IdiomLearningStatus.notStarted.rawValue)
+        XCTAssertEqual(rows.count, try store.countFavorite())
+        try store.setFavorite(idiomID: idiomA, favorite: false)
+        XCTAssertTrue(try store.favoriteIdioms().isEmpty)
+        XCTAssertEqual(try store.countFavorite(), 0)
+    }
+
+    func testFavoriteIdiomsExcludesOrphanStateRowsNotInIdiom() throws {
+        try queue.write { db in
+            try db.execute(sql: """
+                INSERT INTO idiom_state(idiomId, status, favorite)
+                VALUES ('orphan-id', '学过', 1)
+                """)
+        }
+        XCTAssertEqual(try store.countFavorite(), 1)
+        XCTAssertTrue(try store.favoriteIdioms().isEmpty)
+    }
+
+    func testStatesForIdsOnlyReturnsLandedRows() throws {
+        try store.setStatus(idiomID: idiomA, status: .proficient)
+        try store.setFavorite(idiomID: idiomB, favorite: true)
+        let states = try store.statesForIds([idiomA, idiomB, idiomC])
+        XCTAssertEqual(states.count, 2)
+        let byID = Dictionary(uniqueKeysWithValues: states.map { ($0.idiomID, $0) })
+        XCTAssertEqual(byID[idiomA]?.status, .proficient)
+        XCTAssertEqual(byID[idiomB]?.status, .notStarted)
+        XCTAssertEqual(byID[idiomB]?.favorite, true)
+        XCTAssertNil(byID[idiomC])
+        XCTAssertTrue(try store.statesForIds([]).isEmpty)
+    }
+
     private func assertRawState(
         _ idiomID: String,
         status: String,

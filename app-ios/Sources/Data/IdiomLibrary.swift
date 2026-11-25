@@ -143,4 +143,89 @@ public final class IdiomStateStore: @unchecked Sendable {
                 """, arguments: [idiomID, IdiomLearningStatus.notStarted.rawValue, favorite])
         }
     }
+
+    // MARK: - 阶段6包1只读聚合（只 SELECT，不建表 / 不加字段 / 不迁移）
+
+    /// E2「已学成语数」：显式落行且状态为学过或已掌握；缺行=未学不计。
+    public func countLearned() throws -> Int {
+        try queue.read { db in
+            try Int.fetchOne(
+                db,
+                sql: "SELECT COUNT(*) FROM idiom_state WHERE status IN (?, ?)",
+                arguments: [IdiomLearningStatus.studied.rawValue, IdiomLearningStatus.proficient.rawValue]
+            ) ?? 0
+        }
+    }
+
+    /// E2「已掌握数」：仅 idiom_state 的成语自评已掌握，非错题 C9 的掌握态。
+    public func countMastered() throws -> Int {
+        try queue.read { db in
+            try Int.fetchOne(
+                db,
+                sql: "SELECT COUNT(*) FROM idiom_state WHERE status = ?",
+                arguments: [IdiomLearningStatus.proficient.rawValue]
+            ) ?? 0
+        }
+    }
+
+    /// E2「收藏数」：与 P24 列表同源过滤 favorite=1；取消收藏后 -1。
+    public func countFavorite() throws -> Int {
+        try queue.read { db in
+            try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM idiom_state WHERE favorite = 1") ?? 0
+        }
+    }
+
+    /// P03 批量取该页状态，避免逐行 state() 的 N+1；只返回已落行，缺行由调用方投影补未学。
+    public func statesForIds(_ ids: [String]) throws -> [IdiomLearningState] {
+        guard !ids.isEmpty else { return [] }
+        return try queue.read { db in
+            let placeholders = ids.map { _ in "?" }.joined(separator: ", ")
+            return try Row.fetchAll(
+                db,
+                sql: "SELECT idiomId, status, favorite FROM idiom_state WHERE idiomId IN (\(placeholders))",
+                arguments: StatementArguments(ids)
+            ).compactMap { row in
+                let idiomID: String = row["idiomId"]
+                let rawStatus: String = row["status"]
+                guard let status = IdiomLearningStatus(rawValue: rawStatus) else { return nil }
+                let favorite: Bool = row["favorite"]
+                return IdiomLearningState(idiomID: idiomID, status: status, favorite: favorite)
+            }
+        }
+    }
+
+    /// P24 收藏列表：只取 favorite=1 且能 JOIN 到 idiom 的行，天然排除未收藏 / 缺省行。
+    public func favoriteIdioms() throws -> [FavoriteIdiom] {
+        try queue.read { db in
+            try FavoriteIdiom.fetchAll(db, sql: """
+                SELECT idiom.id AS idiomId, idiom.word, idiom.pinyin, idiom.initials, idiom.frequency,
+                       idiom_state.status AS status
+                FROM idiom_state
+                JOIN idiom ON idiom.id = idiom_state.idiomId
+                WHERE idiom_state.favorite = 1
+                ORDER BY idiom.initials, idiom.word
+                """)
+        }
+    }
+}
+
+/// P24 收藏列表一行：成语展示字段 + 该成语的 A6 状态存储串（同源 idiom_state）。
+public struct FavoriteIdiom: FetchableRecord, Decodable, Equatable, Sendable, Identifiable {
+    public let idiomId: String
+    public let word: String
+    public let pinyin: String
+    public let initials: String
+    public let frequency: Int
+    public let status: String
+
+    public init(idiomId: String, word: String, pinyin: String, initials: String, frequency: Int, status: String) {
+        self.idiomId = idiomId
+        self.word = word
+        self.pinyin = pinyin
+        self.initials = initials
+        self.frequency = frequency
+        self.status = status
+    }
+
+    public var id: String { idiomId }
 }
