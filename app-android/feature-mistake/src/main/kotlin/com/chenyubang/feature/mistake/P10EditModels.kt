@@ -36,6 +36,7 @@ data class P10EditState(
     val pageMessage: String? = null,
     val errorMessage: String? = null,
     val deleteConfirm: P10DeleteTarget? = null,
+    val deleting: Boolean = false,
     val idiomCandidates: List<P10IdiomRef> = emptyList(),
     val idiomQuery: String = "",
 )
@@ -50,6 +51,8 @@ object P10EditTransitions {
     const val NO_IDIOM = "至少保留一条归属"
     const val SAVE_FAILED = "保存失败，请重试"
     const val DELETE_FAILED = "删除失败，请重试"
+    const val REVIEW_STATE_FAILED = "掌握状态保存失败，请重试"
+    const val MISTAKE_NOT_FOUND = "这道错题已不存在，请返回后刷新"
     const val HINT_ANSWER = "我的答案只能是 A/B/C/D"
     const val HINT_YEAR = "年份为 4 位数字"
     const val HINT_TAG = "标签需为 1–8 个字"

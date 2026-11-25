@@ -41,7 +41,7 @@ private struct StubMistakeReader: MistakeBookReading {
 private enum StubMistakeError: Error { case read }
 
 /// 复习入口在 P08 的落地（信息架构 v1.4 跳转表 19）：队列已空时不开复习、页内如实提示。
-/// 提示条与置灰按钮在本版不可达为常态（`state` 不自动改），故只钉行为、不录像素基线。
+/// 提示条与置灰按钮在 C9 手动标「已掌握」后可达；列表与总数仍保留，不与零错题空态混淆。
 @MainActor
 final class P08ReviewHintTests: XCTestCase {
     func testEmptyReviewHintIsTheGlobalQueueEmptyTitle() {
@@ -58,10 +58,17 @@ final class P08ReviewHintTests: XCTestCase {
         XCTAssertEqual(MistakeBrowse.reviewTitle(pending: model.state.pending), "开始复习 · 4 道待复习")
     }
 
+    func testPendingClearedCopyDistinguishesAllLearnedFromNoMistakes() {
+        XCTAssertEqual(MistakeBrowse.pendingClearedTitle, "待复习已清空")
+        XCTAssertEqual(MistakeBrowse.pendingClearedNote, "已掌握的错题仍保留在错题本中，可切回待复习后继续复习。")
+    }
+
     func testPendingZeroStillPrintsZeroInsteadOfHidingTheNumber() async {
         let model = MistakeBookViewModel(reader: StubMistakeReader(pending: 0))
         await model.load()
         XCTAssertEqual(MistakeBrowse.reviewTitle(pending: model.state.pending), "开始复习 · 0 道待复习")
+        XCTAssertEqual(model.state.total, 7)
+        XCTAssertEqual(model.state.groups.count, 1, "全部已掌握仍显示错题列表，不误入「还没有错题」空态")
     }
 
     func testHintAppearsAndIsDismissableWithoutTouchingTheList() async {

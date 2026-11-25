@@ -19,6 +19,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,6 +43,9 @@ import com.chenyubang.core.ui.CLink
 import com.chenyubang.core.ui.CTag
 import com.chenyubang.core.ui.CTagStyle
 import com.chenyubang.core.ui.tokens.Tokens
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 /** P05 路由入口：装配只读详情 ViewModel。读音朗读、收藏、学习状态均为预留位，本期不接。 */
 @Composable
@@ -52,9 +56,16 @@ fun P05IdiomDetailRoute(
     onOpenMistakes: () -> Unit,
     onOpenExample: (String) -> Unit,
     onReviewIdiom: (Int) -> Unit = {},
+    revision: Long = 0,
 ) {
     var pendingCount by remember { mutableStateOf(0) }
-    LaunchedEffect(idiomId) { pendingCount = database.reviewDao().pendingCount(idiomId) }
+    val pendingCountMutex = remember { Mutex() }
+    val scope = rememberCoroutineScope()
+    LaunchedEffect(idiomId, revision) {
+        pendingCountMutex.withLock {
+            pendingCount = database.reviewDao().pendingCount(idiomId)
+        }
+    }
     val factory =
         remember(database) {
             viewModelFactory {
@@ -76,7 +87,16 @@ fun P05IdiomDetailRoute(
         onOpenExample = onOpenExample,
         onRetry = { model.load(idiomId) },
         canReview = pendingCount > 0,
-        onReviewIdiom = { onReviewIdiom(pendingCount) },
+        onReviewIdiom = {
+            // 点击时再查一次，避免展示计数与当前队列之间发生掌握状态变化。
+            scope.launch {
+                pendingCountMutex.withLock {
+                    val latest = database.reviewDao().pendingCount(idiomId)
+                    pendingCount = latest
+                    if (latest > 0) onReviewIdiom(latest)
+                }
+            }
+        },
     )
 }
 

@@ -3,6 +3,8 @@ package com.chenyubang.feature.mistake
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.chenyubang.core.data.ExampleEditInput
+import com.chenyubang.core.data.MistakeReviewState
+import com.chenyubang.core.data.MistakeStateUpdateResult
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,6 +23,8 @@ class P10UserExampleViewModel(
     private val loadIdiomCandidates: suspend () -> List<P10IdiomRef> = { emptyList() },
     private val saveEdit: suspend (ExampleEditInput) -> Unit = {},
     private val deleteExample: suspend (String, P10DeleteTarget) -> Unit = { _, _ -> },
+    private val setReviewState: suspend (String, MistakeReviewState) -> MistakeStateUpdateResult =
+        { _, _ -> MistakeStateUpdateResult.NOT_FOUND },
     private val onDataChanged: () -> Unit = {},
     private val onExit: () -> Unit = {},
 ) : ViewModel() {
@@ -50,12 +54,12 @@ class P10UserExampleViewModel(
     }
 
     fun toggleAnswer() {
-        if (_state.value.edit.editing) return
+        if (!_state.value.canEdit) return
         _state.value = P10Transitions.toggleAnswer(_state.value)
     }
 
     fun startReroll() {
-        if (_state.value.edit.editing) return
+        if (!_state.value.canEdit) return
         _state.value = P10Transitions.startReroll(_state.value)
     }
 
@@ -97,7 +101,9 @@ class P10UserExampleViewModel(
     }
 
     fun cancelEdit() {
-        val edit = _state.value.edit
+        val current = _state.value
+        if (current.edit.saving || current.edit.deleting) return
+        val edit = current.edit
         _state.value =
             _state.value.copy(
                 edit =
@@ -111,6 +117,7 @@ class P10UserExampleViewModel(
     }
 
     fun changeDraft(edit: (P10EditDraft) -> P10EditDraft) {
+        if (_state.value.edit.saving) return
         val next = P10EditTransitions.change(_state.value.edit, edit)
         _state.value = _state.value.copy(edit = next)
     }
@@ -123,6 +130,7 @@ class P10UserExampleViewModel(
     }
 
     fun addTag() {
+        if (_state.value.edit.saving) return
         _state.value = _state.value.copy(edit = P10EditTransitions.addTag(_state.value.edit))
     }
 
@@ -131,6 +139,7 @@ class P10UserExampleViewModel(
     fun addNextIdiom() = changeDraft { P10EditTransitions.nextIdiom(it, _state.value.edit.idiomCandidates) }
 
     fun setIdiomQuery(query: String) {
+        if (_state.value.edit.saving) return
         _state.value = _state.value.copy(edit = _state.value.edit.copy(idiomQuery = query))
     }
 
@@ -140,18 +149,25 @@ class P10UserExampleViewModel(
     }
 
     fun dismissDelete() {
+        if (_state.value.edit.deleting) return
         _state.value = _state.value.copy(edit = _state.value.edit.copy(deleteConfirm = null))
     }
 
     /** 系统返回：确认弹层优先收起，其次等同「取消」编辑；只读态返回 false 交给路由返回。 */
     fun handleBack(): Boolean {
         val edit = _state.value.edit
-        when {
-            edit.deleteConfirm != null -> dismissDelete()
-            edit.editing -> cancelEdit()
-            else -> return false
+        return when {
+            edit.deleteConfirm != null -> {
+                dismissDelete()
+                true
+            }
+            edit.editing && !edit.saving && !edit.deleting -> {
+                cancelEdit()
+                true
+            }
+            edit.saving || edit.deleting || _state.value.updatingReviewState -> true
+            else -> false
         }
-        return true
     }
 
     fun dismissMessage() {
@@ -162,7 +178,8 @@ class P10UserExampleViewModel(
     fun save() {
         val current = _state.value
         val draft = current.edit.draft ?: return
-        if (current.edit.errors.hasInvalid || current.edit.saving) return
+        if (!current.edit.editing || current.edit.errors.hasInvalid) return
+        if (current.edit.saving || current.edit.deleting || current.updatingReviewState) return
         val message = P10EditTransitions.pageMessage(draft)
         if (message != null) {
             _state.value = current.copy(edit = current.edit.copy(pageMessage = message))
@@ -188,8 +205,12 @@ class P10UserExampleViewModel(
     }
 
     fun confirmDelete() {
-        val target = _state.value.edit.deleteConfirm ?: return
-        val id = _state.value.detail?.id ?: return
+        val current = _state.value
+        val target = current.edit.deleteConfirm
+        val id = current.detail?.id
+        if (target == null || id == null) return
+        if (current.edit.deleting || current.edit.saving || current.updatingReviewState) return
+        _state.value = current.copy(edit = current.edit.copy(deleting = true))
         viewModelScope.launch {
             try {
                 deleteExample(id, target)
@@ -202,9 +223,48 @@ class P10UserExampleViewModel(
                     _state.value.copy(
                         edit =
                             _state.value.edit.copy(
+                                deleting = false,
                                 deleteConfirm = null,
                                 errorMessage = P10EditTransitions.DELETE_FAILED,
                             ),
+                    )
+            }
+        }
+    }
+
+    /** C9 手动两态：写前锁门，成功后重读最新 mistake 并通知来源页；失败不猜改本地状态。 */
+    fun changeReviewState(state: MistakeReviewState) {
+        val current = _state.value
+        val detail = current.detail
+        val mistakeId = detail?.mistakeId
+        if (detail == null || mistakeId == null) return
+        if (!current.canChangeReviewState || detail.reviewState == state) return
+        _state.value =
+            current.copy(
+                updatingReviewState = true,
+                edit = current.edit.copy(errorMessage = null, pageMessage = null),
+            )
+        viewModelScope.launch {
+            try {
+                when (setReviewState(mistakeId, state)) {
+                    MistakeStateUpdateResult.NOT_FOUND ->
+                        _state.value =
+                            _state.value.copy(
+                                updatingReviewState = false,
+                                edit = _state.value.edit.copy(errorMessage = P10EditTransitions.MISTAKE_NOT_FOUND),
+                            )
+                    MistakeStateUpdateResult.UPDATED -> {
+                        onDataChanged()
+                        load(detail.id)
+                    }
+                }
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (_: Exception) {
+                _state.value =
+                    _state.value.copy(
+                        updatingReviewState = false,
+                        edit = _state.value.edit.copy(errorMessage = P10EditTransitions.REVIEW_STATE_FAILED),
                     )
             }
         }

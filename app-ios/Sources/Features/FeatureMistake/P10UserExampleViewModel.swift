@@ -20,6 +20,8 @@ public final class UserExampleViewModel: ObservableObject {
     private let id: String
     private let reader: UserExampleReading
     private let editor: UserExampleWriting
+    /// 掌握态独立写口子；按详情返回的最新 mistake.id 精确更新。
+    private let stateWriter: MistakeStateWriting
     /// 手选归属回显用（按 id 取词形）与 P04 浮层同一读库入口。
     private let libraryReader: IdiomLibraryReader
     /// 本机数据根目录（`images/…` 相对路径的解析基准）；nil＝不尝试读图。
@@ -33,6 +35,7 @@ public final class UserExampleViewModel: ObservableObject {
         id: String,
         reader: UserExampleReading,
         editor: UserExampleWriting,
+        stateWriter: MistakeStateWriting,
         libraryReader: IdiomLibraryReader,
         dataDirectory: URL?,
         onContentChanged: @escaping () -> Void = {},
@@ -41,6 +44,7 @@ public final class UserExampleViewModel: ObservableObject {
         self.id = id
         self.reader = reader
         self.editor = editor
+        self.stateWriter = stateWriter
         self.libraryReader = libraryReader
         self.dataDirectory = dataDirectory
         self.onContentChanged = onContentChanged
@@ -92,38 +96,64 @@ public final class UserExampleViewModel: ObservableObject {
     }
 
     public func toggleAnswer() {
+        guard state.canToggleMask, !state.updatingReviewState else { return }
         state.revealed.toggle()
     }
 
     /// 重做入口只在非重做态显示；进入后清掉本轮选择，遮住首次作答。
     public func startReroll() {
+        guard state.isMistake, !state.rerolling, !state.editing, !state.updatingReviewState else { return }
         state.rerolling = true
         state.picked = nil
         state.checked = false
     }
 
     public func pick(_ index: Int) {
-        guard state.rerolling, (0..<4).contains(index) else { return }
+        guard state.rerolling, !state.updatingReviewState, (0..<4).contains(index) else { return }
         state.picked = index
         state.checked = false
     }
 
     public func check() {
-        guard state.picked != nil else { return }
+        guard state.picked != nil, !state.updatingReviewState else { return }
         state.checked = true
     }
 
     public func exitReroll() {
+        guard !state.updatingReviewState else { return }
         state.rerolling = false
         state.picked = nil
         state.checked = false
+    }
+
+    // MARK: - 手动掌握态（C9）
+
+    /// 只写最新 mistake.id 的 state；成功（含重复写）后刷新 P10 并通知来源页重载。
+    public func setReviewState(_ reviewState: MistakeReviewState) async {
+        guard state.canChangeReviewState, let mistakeID = state.detail?.mistakeID else { return }
+        state.issue = nil
+        state.updatingReviewState = true
+        defer { state.updatingReviewState = false }
+        do {
+            let result = try await stateWriter.setReviewState(mistakeID: mistakeID, state: reviewState)
+            guard result == .updated else {
+                state.issue = UserExampleIssue(kind: .error, message: UserExampleReviewStateCopy.notFound)
+                return
+            }
+        } catch {
+            state.issue = UserExampleIssue(kind: .error, message: UserExampleReviewStateCopy.updateFailed)
+            return
+        }
+        onContentChanged()
+        await load()
     }
 
     // MARK: - 编辑态（工作包 2.8 / C8）
 
     /// 同页切编辑态：草稿从当前 detail 起，进入前先退出重做态（开发规范 §8.1.1 两态互斥）。
     public func startEdit() {
-        guard let detail = state.detail, !state.editing, !state.saving, !state.deleting else { return }
+        guard let detail = state.detail, !state.editing, !state.saving, !state.deleting,
+              !state.updatingReviewState else { return }
         exitReroll()
         state.issue = nil
         state.draft = UserExampleDraft(detail: detail)
@@ -131,7 +161,7 @@ public final class UserExampleViewModel: ObservableObject {
 
     /// 取消编辑：草稿丢弃、浮层收起，未落库的内容不留痕。
     public func cancelEdit() {
-        guard state.editing, !state.saving else { return }
+        guard state.editing, !state.saving, !state.deleting, !state.updatingReviewState else { return }
         state.draft = nil
         state.showsIdiomPicker = false
         state.issue = nil
@@ -158,7 +188,9 @@ public final class UserExampleViewModel: ObservableObject {
     /// 标签口径同 P20：1–8 字、去重，越界或重复给提示并拒绝。
     @discardableResult
     public func addTag(_ raw: String) -> Bool {
-        guard var draft = state.draft else { return false }
+        guard var draft = state.draft, !state.saving, !state.deleting, !state.updatingReviewState else {
+            return false
+        }
         let tag = raw.trimmingCharacters(in: .whitespacesAndNewlines)
         guard (1...8).contains(tag.count), !draft.tags.contains(tag) else {
             state.issue = UserExampleIssue(kind: .info, message: UserExampleEditCopy.tagRule)
@@ -175,7 +207,7 @@ public final class UserExampleViewModel: ObservableObject {
 
     /// 归属至少保留一条：删到只剩一条时给提示、不动草稿。
     public func removeIdiom(id idiomID: String) {
-        guard var draft = state.draft else { return }
+        guard var draft = state.draft, !state.saving, !state.deleting, !state.updatingReviewState else { return }
         guard draft.idioms.count > 1 else {
             state.issue = UserExampleIssue(kind: .info, message: UserExampleEditCopy.atLeastOne)
             return
@@ -185,12 +217,13 @@ public final class UserExampleViewModel: ObservableObject {
     }
 
     public func setIdiomPicker(visible: Bool) {
-        guard state.editing else { return }
+        guard state.editing, !state.saving, !state.deleting, !state.updatingReviewState else { return }
         state.showsIdiomPicker = visible
     }
 
     /// 手动增补归属：排末尾（`user_example_idiom` 无 order 列，页面顺序即写入顺序）。
     public func pickIdiom(id idiomID: String) {
+        guard state.editing, !state.saving, !state.deleting, !state.updatingReviewState else { return }
         state.showsIdiomPicker = false
         guard var draft = state.draft else { return }
         guard !draft.idioms.contains(where: { $0.id == idiomID }) else { return }
@@ -204,7 +237,8 @@ public final class UserExampleViewModel: ObservableObject {
 
     /// 保存：字段级非法已由「保存」置灰挡掉，题干为空与归属不足一条在点击时给提示。
     public func save() {
-        guard let draft = state.draft, !state.saving, draft.canSave else { return }
+        guard let draft = state.draft, !state.saving, !state.deleting, !state.updatingReviewState,
+              draft.canSave else { return }
         guard !draft.trimmedStem.isEmpty else {
             state.issue = UserExampleIssue(kind: .info, message: UserExampleEditCopy.emptyStem)
             return
@@ -241,19 +275,20 @@ public final class UserExampleViewModel: ObservableObject {
 
     /// 顶部「删除」与底部红行同一入口：只起二次确认，实际分支在确认里按标错／未标错判。
     public func requestDelete() {
-        guard state.detail != nil, !state.editing, !state.saving, !state.deleting else { return }
+        guard state.detail != nil, !state.editing, !state.saving, !state.deleting,
+              !state.updatingReviewState else { return }
         state.issue = nil
         state.confirmDelete = true
     }
 
     public func dismissDelete() {
-        guard !state.deleting else { return }
+        guard !state.deleting, !state.updatingReviewState else { return }
         state.confirmDelete = false
     }
 
     /// 标错的＝移出错题本（删错题标记行，题与原图都留）；未标错的＝删整题连本机原图。
     public func confirmDelete() {
-        guard let detail = state.detail, !state.deleting else { return }
+        guard let detail = state.detail, !state.deleting, !state.saving, !state.updatingReviewState else { return }
         state.deleting = true
         defer {
             state.deleting = false
@@ -274,13 +309,13 @@ public final class UserExampleViewModel: ObservableObject {
     }
 
     private func mutate(_ change: (inout UserExampleDraft) -> Void) {
-        guard var draft = state.draft else { return }
+        guard var draft = state.draft, !state.saving, !state.deleting, !state.updatingReviewState else { return }
         change(&draft)
         state.draft = draft
     }
+}
 
-    private func blankToNil(_ value: String) -> String? {
-        let text = value.trimmingCharacters(in: .whitespacesAndNewlines)
-        return text.isEmpty ? nil : text
-    }
+private func blankToNil(_ value: String) -> String? {
+    let text = value.trimmingCharacters(in: .whitespacesAndNewlines)
+    return text.isEmpty ? nil : text
 }

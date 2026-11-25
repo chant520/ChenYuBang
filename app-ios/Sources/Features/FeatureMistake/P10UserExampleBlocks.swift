@@ -36,8 +36,10 @@ public struct P10UserExampleBlocks: View {
             sourceCard
             idiomCard
             answerCard
-            // ⑩：掌握状态切换为 C9 进阶预留位。
-            reservedRow
+            // ⑩：仅标错录入题显示手动两态切换；不新增红动作。
+            if state.isMistake {
+                reviewStateCard
+            }
             // 底部红描边删除行仅标错的录入题渲染（信息架构 v1.4 版内修订第 ④ 条）：
             // 未标错的普通详情整行不出现，删除入口只留顶部置灰「删除」，其文案与语义随 2.8（C8）定义。
             if state.showsBottomDeleteRow {
@@ -61,8 +63,8 @@ public struct P10UserExampleBlocks: View {
                     .foregroundStyle(colors.accent)
             }
             // 重做中对答案前不给看首次作答，按钮在位、置灰。
-            .disabled(!state.canToggleMask)
-            .opacity(state.canToggleMask ? 1 : 0.4)
+            .disabled(!state.canToggleMask || state.updatingReviewState)
+            .opacity(state.canToggleMask && !state.updatingReviewState ? 1 : 0.4)
             .accessibilityLabel(state.answerHidden ? "显示我的答案" : "隐藏我的答案")
         }
         .padding(.vertical, 11)
@@ -83,11 +85,13 @@ public struct P10UserExampleBlocks: View {
                     resultCard
                 }
                 HStack(spacing: Tokens.Space.lmetaGap) {
-                    CButton(text: "对答案", enabled: state.picked != nil, action: actions.onCheck)
-                    CButton(text: "退出重做", variant: .ghost, action: actions.onExitReroll)
+                    CButton(text: "对答案", enabled: state.picked != nil && !state.updatingReviewState,
+                            action: actions.onCheck)
+                    CButton(text: "退出重做", variant: .ghost, enabled: !state.updatingReviewState,
+                            action: actions.onExitReroll)
                 }
             } else {
-                CButton(text: "重做这道题", action: actions.onStartReroll)
+                CButton(text: "重做这道题", enabled: !state.updatingReviewState, action: actions.onStartReroll)
             }
         }
     }
@@ -187,11 +191,42 @@ public struct P10UserExampleBlocks: View {
         return answer.isEmpty ? MistakeBrowse.placeholder : answer
     }
 
-    /// ⑩：掌握状态切换为 C9 进阶预留位（与 P07「标记（预留）」同一形态）。
-    private var reservedRow: some View {
-        HStack(spacing: Tokens.Space.lmetaGap) {
-            CTag(text: "掌握状态切换（预留）", style: .ghost)
-            Spacer(minLength: 0)
+    /// ⑩：已掌握仍留在错题本，但退出全局与单成语待复习队列；切回后重新入队。
+    private var reviewStateCard: some View {
+        CCard {
+            CLabel("掌握状态")
+            CSegmentedControl(
+                items: MistakeReviewState.allCases.map(\.rawValue),
+                selection: Binding(
+                    get: {
+                        MistakeReviewState.allCases.firstIndex(of: state.reviewState) ?? 0
+                    },
+                    set: { index in
+                        guard let reviewState = MistakeReviewState.allCases.indices.contains(index)
+                            ? MistakeReviewState.allCases[index] : nil else { return }
+                        actions.onSetReviewState(reviewState)
+                    }
+                ),
+                disabledIndices: state.canChangeReviewState ? [] : Set(MistakeReviewState.allCases.indices)
+            )
+            .padding(.top, Tokens.Space.lsubTop)
+            if state.updatingReviewState {
+                HStack(spacing: Tokens.Space.lmetaGap) {
+                    CSpinner()
+                    Text("正在更新掌握状态…")
+                        .font(.system(size: Tokens.Font.n11))
+                        .foregroundStyle(colors.text3)
+                }
+                .padding(.top, Tokens.Space.lmetaTop)
+            } else {
+                Text(state.reviewState == .proficient
+                     ? "已掌握的题仍保留在错题本中，但不再进入待复习队列。"
+                     : "切到待复习后，这道题会重新进入对应范围的复习队列。")
+                    .font(.system(size: Tokens.Font.n11))
+                    .foregroundStyle(colors.text3)
+                    .padding(.top, Tokens.Space.lmetaTop)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
         }
     }
 
@@ -199,7 +234,7 @@ public struct P10UserExampleBlocks: View {
     private var deleteRow: some View {
         VStack(alignment: .leading, spacing: 0) {
             CButton(text: UserExampleEditCopy.deleteMistakeRow, variant: .dangerOutline,
-                    enabled: !state.deleting, action: actions.onDelete)
+                    enabled: !state.deleting && !state.saving && !state.updatingReviewState, action: actions.onDelete)
             Text(UserExampleEditCopy.deleteMistakeNote)
                 .font(.system(size: Tokens.Font.n11))
                 .foregroundStyle(colors.text3)

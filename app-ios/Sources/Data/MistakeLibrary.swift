@@ -211,7 +211,7 @@ public enum MistakeLibrary {
             FROM mistake
             JOIN user_example_idiom ON user_example_idiom.userExampleId = mistake.userExampleId
             WHERE user_example_idiom.idiomId = ? AND mistake.userExampleId IS NOT NULL
-            ORDER BY mistake.createdAt DESC, mistake.id
+            ORDER BY mistake.createdAt DESC, mistake.id DESC
             """, arguments: [idiomID])
         var latest: [String: MistakeStamp] = [:]
         var seen: Set<String> = []

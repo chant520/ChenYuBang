@@ -6,6 +6,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
@@ -16,6 +17,9 @@ import com.chenyubang.feature.review.P12ReviewSummaryContent
 import com.chenyubang.feature.review.ReviewFlow
 import com.chenyubang.feature.review.ReviewSummary
 import com.chenyubang.feature.review.ReviewViewModel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 internal data class ReviewQueueActions(
     val onClose: () -> Unit,
@@ -82,14 +86,31 @@ internal fun ReviewSummaryDestination(
     scopeIdiomId: String?,
     database: AppDatabase,
     actions: ReviewSummaryActions,
+    revision: Long = 0,
+    loadPendingCount: suspend (String?) -> Int = database.reviewDao()::pendingCount,
 ) {
     var pendingCount by remember { mutableStateOf(0) }
-    LaunchedEffect(scopeIdiomId) { pendingCount = database.reviewDao().pendingCount(scopeIdiomId) }
+    val pendingCountMutex = remember { Mutex() }
+    val scope = rememberCoroutineScope()
+    LaunchedEffect(scopeIdiomId, revision) {
+        pendingCountMutex.withLock {
+            pendingCount = loadPendingCount(scopeIdiomId)
+        }
+    }
     P12ReviewSummaryContent(
         summary = summary,
         onBack = actions.onBack,
         onBackToSource = actions.onBackToSource,
-        onAgain = { if (pendingCount > 0) actions.onAgain(pendingCount) },
+        onAgain = {
+            // 入口禁用态与点击取值都跟随 revision；真正起轮前再读当前范围。
+            scope.launch {
+                pendingCountMutex.withLock {
+                    val latest = loadPendingCount(scopeIdiomId)
+                    pendingCount = latest
+                    if (latest > 0) actions.onAgain(latest)
+                }
+            }
+        },
         onOpenIdiom = actions.onOpenIdiom,
     )
 }

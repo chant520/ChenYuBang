@@ -48,6 +48,7 @@ internal fun RouteContent(
                 onOpenMistakes = { onRoute(router.goToMistakes()) },
                 onOpenExample = { id -> onRoute(router.push(Route.Example, id)) },
                 onReviewIdiom = { count -> onRoute(router.startReview(count)) },
+                revision = router.contentRevision,
             )
         Route.Example ->
             ExampleDestination(requireNotNull(entry.id), deps.database, { onRoute(router.back()) }) { id ->

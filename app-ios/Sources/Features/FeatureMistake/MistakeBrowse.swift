@@ -121,6 +121,9 @@ public enum MistakeBrowse {
 
     /// 「开始复习」点下时队列已空的如实提示（与第 5.4 节 P11 全局空态标题同字面值）。
     public static let emptyReviewHint = "今天没有待复习的错题"
+    /// C9：错题总数仍大于 0、但待复习队列已清空；不能与「还没有错题」混淆。
+    public static let pendingClearedTitle = "待复习已清空"
+    public static let pendingClearedNote = "已掌握的错题仍保留在错题本中，可切回待复习后继续复习。"
     /// 中性提示条的确认动作（与 P10 / P20 同字面值，feature 之间不互相引用故各自持有）。
     public static let gotIt = "知道了"
 

@@ -62,6 +62,7 @@ internal fun ReviewRouteContent(
                         ?: ReviewSummary(questionCount = 0, answerCount = 0, correctCount = 0, idioms = emptyList()),
                 scopeIdiomId = router.review?.idiomId,
                 database = deps.database,
+                revision = router.contentRevision,
                 actions =
                     ReviewSummaryActions(
                         onBack = { onRoute(router.back()) },

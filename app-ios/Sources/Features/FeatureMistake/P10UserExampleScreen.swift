@@ -64,6 +64,7 @@ public struct P10UserExampleContent: View {
     /// 编辑态的返回箭头与「取消」同义：草稿不落库，直接回只读态。
     private var header: some View {
         let readonly = state.detail != nil && !state.loading && !state.failed
+        let writeIdle = !state.saving && !state.deleting && !state.updatingReviewState
         return HStack(spacing: Tokens.Space.lmetaGap) {
             Button(action: state.editing ? actions.onCancelEdit : actions.onBack) {
                 CIcon(.back, size: Tokens.Icon.n21, strokeWidth: 1.6, color: colors.text2)
@@ -71,6 +72,7 @@ public struct P10UserExampleContent: View {
                     .contentShape(Rectangle())
             }
             .buttonStyle(CPressDimStyle())
+            .disabled(!writeIdle)
             .accessibilityLabel(state.editing ? "取消编辑" : "返回")
             Text("录入题详情")
                 .font(.system(size: Tokens.Font.n15, weight: .semibold))
@@ -79,17 +81,17 @@ public struct P10UserExampleContent: View {
             Spacer(minLength: 0)
             if state.editing {
                 CButton(text: UserExampleEditCopy.cancel, variant: .ghost,
-                        enabled: !state.saving, action: actions.onCancelEdit)
+                        enabled: writeIdle, action: actions.onCancelEdit)
                     .fixedSize()
-                CButton(text: UserExampleEditCopy.save, enabled: state.draft?.canSave ?? false,
+                CButton(text: UserExampleEditCopy.save, enabled: (state.draft?.canSave ?? false) && writeIdle,
                         loading: state.saving, action: actions.onSave)
                     .fixedSize()
             } else {
                 CButton(text: UserExampleEditCopy.edit, variant: .ghost,
-                        enabled: readonly, action: actions.onEdit)
+                        enabled: readonly && writeIdle, action: actions.onEdit)
                     .fixedSize()
                 CButton(text: UserExampleEditCopy.delete, variant: .ghost,
-                        enabled: readonly, action: actions.onDelete)
+                        enabled: readonly && writeIdle, action: actions.onDelete)
                     .fixedSize()
             }
         }
@@ -213,6 +215,7 @@ public struct P10UserExampleContent: View {
                     label.contentShape(Rectangle())
                 })
                 .buttonStyle(CPressDimStyle())
+                .disabled(state.updatingReviewState)
                 .accessibilityLabel("选项 \(letter)")
                 .accessibilityValue(selected ? "已选中" : "")
             } else {
@@ -263,6 +266,7 @@ public struct P10UserExampleScreen: View {
         id: String,
         reader: UserExampleReading,
         editor: UserExampleWriting,
+        stateWriter: MistakeStateWriting,
         libraryReader: IdiomLibraryReader,
         dataDirectory: URL?,
         onBack: @escaping () -> Void,
@@ -274,6 +278,7 @@ public struct P10UserExampleScreen: View {
             id: id,
             reader: reader,
             editor: editor,
+            stateWriter: stateWriter,
             libraryReader: libraryReader,
             dataDirectory: dataDirectory,
             onContentChanged: onContentChanged,
@@ -299,6 +304,7 @@ public struct P10UserExampleScreen: View {
                 onOpenIdiom: onOpenIdiom,
                 onEdit: model.startEdit,
                 onDelete: model.requestDelete,
+                onSetReviewState: { state in Task { await model.setReviewState(state) } },
                 onCancelEdit: model.cancelEdit,
                 onSave: model.save,
                 onDismissIssue: model.dismissIssue,

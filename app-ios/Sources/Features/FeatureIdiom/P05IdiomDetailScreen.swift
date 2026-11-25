@@ -79,6 +79,8 @@ public final class IdiomDetailViewModel: ObservableObject {
     @Published public private(set) var failed = false
     /// 该成语的待复习错题数（决策 H：0 时「复习这个成语」保持置灰）。
     @Published public private(set) var pendingReviewCount = 0
+    /// 点击时最新队列已空或读取失败：来源页如实提示，不静默无反应。
+    @Published public private(set) var reviewMessage: String?
 
     private let reader: IdiomDetailReading
     private let examplesReader: IdiomExamplesReading
@@ -100,6 +102,7 @@ public final class IdiomDetailViewModel: ObservableObject {
         missing = false
         failed = false
         pendingReviewCount = 0
+        reviewMessage = nil
         loading = true
         do {
             if let record = try reader.detail(id: id) {
@@ -115,6 +118,13 @@ public final class IdiomDetailViewModel: ObservableObject {
             failed = true
         }
     }
+    public func showUnavailableReview() {
+        reviewMessage = "待复习队列已变化，请刷新后再试"
+    }
+
+    public func dismissReviewMessage() {
+        reviewMessage = nil
+    }
 }
 
 /// P05 成语详情长页（信息架构 v1.3 P05 ①–⑪）：五项齐全 + 相关区 / 录入题占位。
@@ -126,8 +136,10 @@ public struct P05IdiomDetailScreen: View {
     private let onBack: () -> Void
     private let onOpenMistakes: () -> Void
     private let onOpenExample: (String) -> Void
-    /// 单成语复习入口（决策 H）：参数为该成语词面，供 P11 / P12 的「本轮范围」一行显示。
-    private let onReviewIdiom: (String) -> Void
+    /// 单成语复习入口（决策 H）：返回 false 表示点击时最新队列已空或读取失败。
+    private let onReviewIdiom: (String) -> Bool
+    /// P10 写成功后重载待复习数；常驻路由栈里的 `.task` 不会自行重跑。
+    private let contentRevision: UUID
 
     @MainActor
     public init(
@@ -135,10 +147,11 @@ public struct P05IdiomDetailScreen: View {
         reader: IdiomDetailReading,
         examplesReader: IdiomExamplesReading,
         reviewCounter: PendingReviewCountReading? = nil,
+        contentRevision: UUID = UUID(),
         onBack: @escaping () -> Void,
         onOpenMistakes: @escaping () -> Void,
         onOpenExample: @escaping (String) -> Void,
-        onReviewIdiom: @escaping (String) -> Void = { _ in }
+        onReviewIdiom: @escaping (String) -> Bool = { _ in false }
     ) {
         _model = StateObject(wrappedValue: IdiomDetailViewModel(
             reader: reader,
@@ -150,6 +163,7 @@ public struct P05IdiomDetailScreen: View {
         self.onOpenMistakes = onOpenMistakes
         self.onOpenExample = onOpenExample
         self.onReviewIdiom = onReviewIdiom
+        self.contentRevision = contentRevision
     }
 
     public var body: some View {
@@ -165,6 +179,9 @@ public struct P05IdiomDetailScreen: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(colors.page)
         .task { await model.load(idiomID) }
+        .onChange(of: contentRevision) { _ in
+            Task { await model.load(idiomID) }
+        }
     }
 
     private func header(_ colors: TokenColors) -> some View {
@@ -253,8 +270,14 @@ public struct P05IdiomDetailScreen: View {
             text: "复习这个成语",
             variant: .primary,
             enabled: model.pendingReviewCount > 0,
-            action: { onReviewIdiom(detail.word) }
+            action: {
+                if !onReviewIdiom(detail.word) { model.showUnavailableReview() }
+            }
         )
+        if let message = model.reviewMessage {
+            CBar(kind: .info, title: message, actionTitle: "知道了",
+                 onAction: { model.dismissReviewMessage() })
+        }
         if model.pendingReviewCount == 0 {
             Text("这个成语下还没有待复习的错题")
                 .font(.system(size: Tokens.Font.n12))
