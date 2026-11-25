@@ -251,6 +251,7 @@ internal fun P10EditMessageBar(
 internal fun P10DeleteConfirmOverlay(
     target: P10DeleteTarget,
     actions: P10UserExampleActions,
+    deleting: Boolean = false,
 ) {
     val c = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
     val title = if (target == P10DeleteTarget.Marked) "删除这道错题？" else "删除这道录入题？"
@@ -265,7 +266,7 @@ internal fun P10DeleteConfirmOverlay(
         Modifier
             .fillMaxSize()
             .background(c.modal)
-            .clickable(onClick = actions.onDismissDelete),
+            .clickable(enabled = !deleting, onClick = actions.onDismissDelete),
         contentAlignment = Alignment.Center,
     ) {
         Column(
@@ -284,8 +285,14 @@ internal fun P10DeleteConfirmOverlay(
                 fontSize = Tokens.Font.n12.sp,
                 lineHeight = (Tokens.Font.n12 * 1.7f).sp,
             )
-            CButton("删除", actions.onConfirmDelete, variant = CButtonVariant.DangerFilled)
-            CButton("取消", actions.onDismissDelete, variant = CButtonVariant.Ghost)
+            CButton(
+                "删除",
+                actions.onConfirmDelete,
+                variant = CButtonVariant.DangerFilled,
+                enabled = !deleting,
+                loading = deleting,
+            )
+            CButton("取消", actions.onDismissDelete, variant = CButtonVariant.Ghost, enabled = !deleting)
         }
     }
 }

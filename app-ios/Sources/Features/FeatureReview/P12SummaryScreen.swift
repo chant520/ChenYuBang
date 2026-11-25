@@ -38,7 +38,11 @@ public struct P12SummaryContent: View {
                         enabled: true,
                         action: actions.onHome
                     )
-                    CButton(text: "再复习一轮", variant: .ghost, enabled: true, action: actions.onRetryRound)
+                    CButton(text: "再复习一轮", variant: .ghost, enabled: !state.retrying,
+                            loading: state.retrying, action: actions.onRetryRound)
+                    if let issue = state.retryIssue {
+                        CBar(kind: .info, title: issue)
+                    }
                 }
             }
             .padding(.horizontal, Tokens.Space.pageX)
@@ -182,7 +186,8 @@ public struct P12SummaryScreen: View {
 
     private let scope: ReviewScope
     private let onHome: () -> Void
-    private let onRetryRound: () -> Void
+    /// 接收点击时重查到的最新队列 id；禁止把小结entry 的旧 queueIDs 原样复用。
+    private let onRetryRound: ([String]) -> Bool
     private let onOpenIdiom: (String) -> Void
 
     @MainActor
@@ -192,7 +197,7 @@ public struct P12SummaryScreen: View {
         summary: ReviewRoundOutcome,
         queueIDs: [String],
         onHome: @escaping () -> Void,
-        onRetryRound: @escaping () -> Void,
+        onRetryRound: @escaping ([String]) -> Bool,
         onOpenIdiom: @escaping (String) -> Void
     ) {
         _model = StateObject(wrappedValue: P12SummaryViewModel(
@@ -214,7 +219,7 @@ public struct P12SummaryScreen: View {
             actions: P12SummaryActions(
                 onOpenIdiom: onOpenIdiom,
                 onHome: onHome,
-                onRetryRound: onRetryRound,
+                onRetryRound: { Task { await model.retryRound(onStart: onRetryRound) } },
                 onRetryLoad: { model.retryLoad() }
             ),
             colors: colors

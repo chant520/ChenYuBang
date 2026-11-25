@@ -26,6 +26,8 @@
 		A000000000000000000000D9 /* P08ReviewHintTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001D9 /* P08ReviewHintTests.swift */; };
 		A000000000000000000000DA /* RouterReviewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001DA /* RouterReviewTests.swift */; };
 		A000000000000000000000DB /* IdiomReviewEntryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001DB /* IdiomReviewEntryTests.swift */; };
+		A000000000000000000000DC /* P10ReviewStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001DC /* P10ReviewStateTests.swift */; };
+		A000000000000000000000DD /* P12RetryQueueTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001DD /* P12RetryQueueTests.swift */; };
 		A000000000000000000000E0 /* BackupScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001E0 /* BackupScreen.swift */; };
 		A000000000000000000000E1 /* PackVersionScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001E1 /* PackVersionScreen.swift */; };
 		A000000000000000000001F5 /* PackVersionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000002F5 /* PackVersionModel.swift */; };
@@ -196,6 +198,8 @@
 		A000000000000000000001D9 /* P08ReviewHintTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P08ReviewHintTests.swift; sourceTree = "<group>"; };
 		A000000000000000000001DA /* RouterReviewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouterReviewTests.swift; sourceTree = "<group>"; };
 		A000000000000000000001DB /* IdiomReviewEntryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdiomReviewEntryTests.swift; sourceTree = "<group>"; };
+		A000000000000000000001DC /* P10ReviewStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P10ReviewStateTests.swift; sourceTree = "<group>"; };
+		A000000000000000000001DD /* P12RetryQueueTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P12RetryQueueTests.swift; sourceTree = "<group>"; };
 		A000000000000000000001E0 /* BackupScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupScreen.swift; sourceTree = "<group>"; };
 		A000000000000000000001E1 /* PackVersionScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackVersionScreen.swift; sourceTree = "<group>"; };
 		A000000000000000000002F5 /* PackVersionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackVersionModel.swift; sourceTree = "<group>"; };
@@ -553,12 +557,14 @@
 				A000000000000000000001C4 /* P08MistakeSnapshotTests.swift */,
 				A000000000000000000001C5 /* P09CapturedSnapshotTests.swift */,
 				A000000000000000000001C7 /* P10UserExampleSnapshotTests.swift */,
+				A000000000000000000001DC /* P10ReviewStateTests.swift */,
 				A000000000000000000001CB /* UserExampleEditorTests.swift */,
 				A000000000000000000001D4 /* ReviewLibraryTests.swift */,
 				A000000000000000000001D5 /* ReviewBrowseTests.swift */,
 				A000000000000000000001D6 /* P11ReviewFlowTests.swift */,
 				A000000000000000000001D7 /* P11ReviewSnapshotTests.swift */,
 				A000000000000000000001D8 /* P12SummarySnapshotTests.swift */,
+				A000000000000000000001DD /* P12RetryQueueTests.swift */,
 				A000000000000000000001D9 /* P08ReviewHintTests.swift */,
 				A000000000000000000001DA /* RouterReviewTests.swift */,
 				A000000000000000000001DB /* IdiomReviewEntryTests.swift */,
@@ -836,12 +842,14 @@
 				A000000000000000000000C4 /* P08MistakeSnapshotTests.swift in Sources */,
 				A000000000000000000000C5 /* P09CapturedSnapshotTests.swift in Sources */,
 				A000000000000000000000C7 /* P10UserExampleSnapshotTests.swift in Sources */,
+				A000000000000000000000DC /* P10ReviewStateTests.swift in Sources */,
 				A000000000000000000000CB /* UserExampleEditorTests.swift in Sources */,
 				A000000000000000000000D4 /* ReviewLibraryTests.swift in Sources */,
 				A000000000000000000000D5 /* ReviewBrowseTests.swift in Sources */,
 				A000000000000000000000D6 /* P11ReviewFlowTests.swift in Sources */,
 				A000000000000000000000D7 /* P11ReviewSnapshotTests.swift in Sources */,
 				A000000000000000000000D8 /* P12SummarySnapshotTests.swift in Sources */,
+				A000000000000000000000DD /* P12RetryQueueTests.swift in Sources */,
 				A000000000000000000000D9 /* P08ReviewHintTests.swift in Sources */,
 				A000000000000000000000DA /* RouterReviewTests.swift in Sources */,
 				A000000000000000000000DB /* IdiomReviewEntryTests.swift in Sources */,

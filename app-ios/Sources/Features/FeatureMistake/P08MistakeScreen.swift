@@ -174,11 +174,22 @@ public struct P08MistakeContent: View {
                 CSpinner()
                 Spacer(minLength: 0)
             }
-        } else if state.isEmpty {
+        } else if state.total == 0 {
             emptyState
         } else {
             VStack(alignment: .leading, spacing: Tokens.Space.block) {
-                list
+                if state.isEmpty {
+                    CEmptyState(
+                        title: "没有可展示的错题",
+                        description: "错题仍计入总数，可切换按录入时间查看。"
+                    )
+                } else {
+                    list
+                }
+                if state.pending == 0 {
+                    CBar(kind: .info, title: MistakeBrowse.pendingClearedTitle,
+                         subtitle: MistakeBrowse.pendingClearedNote)
+                }
                 if let message = state.pageMessage {
                     CBar(
                         kind: .info,

@@ -4,6 +4,7 @@ import android.graphics.BitmapFactory
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import com.chenyubang.core.data.AppDatabase
+import com.chenyubang.core.data.MistakeReviewState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -32,6 +33,8 @@ internal suspend fun loadP10Detail(
         tagNames = mark?.tagNames.orEmpty(),
         idioms = idioms,
         imagePath = example.imagePath,
+        mistakeId = mark?.id,
+        reviewState = MistakeReviewState.entries.firstOrNull { it.storedValue == mark?.state },
     )
 }
 

@@ -1,5 +1,7 @@
 package com.chenyubang.feature.mistake
 
+import com.chenyubang.core.data.MistakeReviewState
+
 /** 关联成语（P10 区块 ⑧，每个可点进 P05）。 */
 data class P10IdiomRef(
     val id: String,
@@ -19,6 +21,9 @@ data class P10UserExampleDetail(
     val tagNames: List<String>,
     val idioms: List<P10IdiomRef>,
     val imagePath: String?,
+    /** 与 P09 同口径取最新错题；手动切换绝不按 user_example.id 猜写。 */
+    val mistakeId: String? = null,
+    val reviewState: MistakeReviewState? = null,
 )
 
 /** P10 页面状态（纯数据，快照直接喂；loading/failed/missing 为读取态）。 */
@@ -33,14 +38,23 @@ data class P10UserExampleUiState(
     val checked: Boolean = false,
     val imageUnreadable: Boolean = false,
     val edit: P10EditState = P10EditState(),
+    val updatingReviewState: Boolean = false,
 ) {
     val isMistake: Boolean get() = detail?.isMistake == true
 
     /** 顶部「编辑 / 删除」只读且详情在位才可点；读取中 / 失败 / 未找到置灰但仍在位。 */
     val canEdit: Boolean
-        get() = detail != null && !loading && !failed && !missing && !edit.editing && !edit.saving
+        get() =
+            detail != null && !loading && !failed && !missing && !edit.editing && !edit.saving &&
+                !edit.deleting && !updatingReviewState
 
     val canDelete: Boolean get() = canEdit
+
+    /** 掌握控件与编辑、删除、保存及另一次状态写入互斥。 */
+    val canChangeReviewState: Boolean
+        get() =
+            isMistake && detail?.mistakeId != null && detail.reviewState != null && canEdit &&
+                edit.deleteConfirm == null
 
     /** 首次作答下标；空值或 A–D 之外为 null（不可比对）。 */
     val firstPick: Int? get() = P10Logic.firstPick(detail?.myAnswer)
@@ -90,6 +104,7 @@ data class P10UserExampleActions(
     val onDismissDelete: () -> Unit = {},
     val onConfirmDelete: () -> Unit = {},
     val onDismissMessage: () -> Unit = {},
+    val onChangeReviewState: (MistakeReviewState) -> Unit = {},
     val onPickIdiom: ((P10IdiomRef) -> Unit, () -> Unit) -> Unit = { _, _ -> },
 )
 

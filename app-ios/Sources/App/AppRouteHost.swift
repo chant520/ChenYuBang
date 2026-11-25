@@ -141,12 +141,13 @@ private struct AppRoutePage: View {
                 reader: reader,
                 examplesReader: exampleReader,
                 reviewCounter: launch.reviewReader as PendingReviewCountReading?,
+                contentRevision: router.userContentRevision,
                 stateStore: launch.idiomStateStore as IdiomStateWriting?,
                 onBack: { router.back() },
                 onOpenMistakes: { router.goToMistakes() },
                 onOpenExample: { id in _ = router.push(.exampleDetail, recordID: id) },
                 onReviewIdiom: { word in
-                    _ = self.startReview(source: .idiom(id: idiomID, word: word))
+                    self.startReview(source: .idiom(id: idiomID, word: word))
                 },
                 onStateChanged: { router.bumpUserContent() }
             )
@@ -201,6 +202,7 @@ private struct AppRoutePage: View {
         } else if entry.route == .mistakeDetail,
                   let reader = launch.mistakeReader,
                   let editor = launch.userExampleEditor,
+                  let stateWriter = launch.reviewReader,
                   let libraryReader = launch.libraryReader,
                   let exampleID = entry.recordID {
             // 路由键 `mistake/{id}` 沿用规范 §5.1 的 23 行，值取 `user_example.id`（P10 是录入题详情）。
@@ -208,6 +210,7 @@ private struct AppRoutePage: View {
                 id: exampleID,
                 reader: reader,
                 editor: editor,
+                stateWriter: stateWriter,
                 libraryReader: libraryReader,
                 dataDirectory: launch.dataDirectory,
                 onBack: { router.back() },
@@ -305,7 +308,7 @@ private struct AppRoutePage: View {
                 summary: summary,
                 queueIDs: entry.queueIDs,
                 onHome: { router.dismissFullScreen() },
-                onRetryRound: { _ = router.retryReview(queueIDs: entry.queueIDs) },
+                onRetryRound: { router.retryReview(queueIDs: $0) },
                 onOpenIdiom: { id in _ = router.push(.idiomDetail, recordID: id) }
             )
         } else {

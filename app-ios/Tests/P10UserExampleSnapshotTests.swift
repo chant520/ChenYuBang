@@ -8,7 +8,7 @@ import XCTest
 
 /// P10 录入题详情快照（规范 §11.1）：遮罩 / 重做三态 / 未标错 × 浅深，基线目录 `__Snapshots__/P10UserExampleSnapshotTests/`。
 ///
-/// 只录本版可达状态：`已掌握` 标签要等 3.1 复习判分改 `mistake.state` 才会出现，本版不录；
+/// 只录本版可达状态：C9 待复习 / 已掌握 / 处理中均由手动切换或写入中到达；
 /// 区块 ⑥「正确答案 + 一句解析」本版无来源、不渲染（信息架构 v1.4 版内修订第 ① 条），故无对应帧；
 /// 读取失败（橙条）与「没有找到这道录入题」属边界，由构件矩阵覆盖同款 `CBar` / `CEmptyState`；
 /// 有原图的缩略帧取的是本机拍照文件，快照不注入二进制，图片位以「原图已不在」橙占位为准。
@@ -46,9 +46,7 @@ final class P10UserExampleSnapshotTests: XCTestCase {
     private func assertP10Blocks(
         _ state: UserExampleState,
         dark: Bool,
-        file: StaticString = #filePath,
-        testName: String = #function,
-        line: UInt = #line
+        file: StaticString = #filePath, testName: String = #function, line: UInt = #line
     ) {
         guard let detail = state.detail else {
             XCTFail("区块帧需要 detail")
@@ -73,7 +71,7 @@ final class P10UserExampleSnapshotTests: XCTestCase {
         )
     }
 
-    private func example(isMistake: Bool) -> UserExampleDetail {
+    private func example(isMistake: Bool, reviewState: String? = nil) -> UserExampleDetail {
         UserExampleDetail(
             id: "e1",
             stem: "下列各句中，加点的成语使用不恰当的一项是",
@@ -93,7 +91,8 @@ final class P10UserExampleSnapshotTests: XCTestCase {
                 LinkedIdiom(id: "i1", word: "按部就班"),
                 LinkedIdiom(id: "i2", word: "墨守成规")
             ],
-            mistakeState: isMistake ? "待复习" : nil,
+            mistakeState: reviewState ?? (isMistake ? "待复习" : nil),
+            mistakeID: isMistake ? "mistake-e1" : nil,
             reason: isMistake ? "望文生义：只按字面理解「按部就班」的褒贬" : nil,
             tagNames: isMistake ? ["易混词", "褒贬误用"] : []
         )
@@ -104,16 +103,18 @@ final class P10UserExampleSnapshotTests: XCTestCase {
         revealed: Bool = false,
         rerolling: Bool = false,
         picked: Int? = nil,
-        checked: Bool = false
+        checked: Bool = false, reviewState: String = "待复习",
+        updatingReviewState: Bool = false
     ) -> UserExampleState {
         UserExampleState(
             loading: false,
-            detail: example(isMistake: true),
+            detail: example(isMistake: true, reviewState: reviewState),
             revealed: revealed,
             rerolling: rerolling,
             picked: picked,
             checked: checked,
-            imageUnreadable: true
+            imageUnreadable: true,
+            updatingReviewState: updatingReviewState
         )
     }
 
@@ -173,7 +174,7 @@ final class P10UserExampleSnapshotTests: XCTestCase {
         assertP10(UserExampleState(loading: false, detail: example(isMistake: false)), dark: true)
     }
 
-    /// 区块帧取「已显示答案」的标错态：一次覆盖 ⑤ 遮罩行与重做按钮、⑦ 出处、⑧ 关联成语、⑨ 答案与错因与标签、⑩ 预留位、底部删除行。
+    /// 区块帧取「已显示答案」的标错态：覆盖 ⑤ 遮罩行、⑦⑧⑨、⑩ 两态分段控件与底部红描边删除行。
     func testBlocksLight() {
         assertP10Blocks(mistakeState(revealed: true), dark: false)
     }
@@ -181,6 +182,17 @@ final class P10UserExampleSnapshotTests: XCTestCase {
     func testBlocksDark() {
         assertP10Blocks(mistakeState(revealed: true), dark: true)
     }
+
+    func testBlocksProficientLight() {
+        assertP10Blocks(mistakeState(revealed: true, reviewState: "已掌握"), dark: false)
+    }
+
+    func testBlocksProficientDark() {
+        assertP10Blocks(mistakeState(revealed: true, reviewState: "已掌握"), dark: true)
+    }
+
+    /// 写入中：分段控件禁用并显示处理中，底部红动作同时禁用。
+    func testBlocksUpdatingReviewStateLight() { assertP10Blocks(mistakeState(updatingReviewState: true), dark: false) }
 
     /// 未标错的区块帧：844 视口拍不到页底，整行删除是否出现只有按自然高度的帧才算证据——本对帧钉住「⑤ 与底部红描边删除行整段不出现」。
     func testBlocksUnmarkedLight() {

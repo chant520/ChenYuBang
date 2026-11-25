@@ -22,6 +22,8 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.chenyubang.core.ui.CBar
+import com.chenyubang.core.ui.CBarKind
 import com.chenyubang.core.ui.CButton
 import com.chenyubang.core.ui.CButtonVariant
 import com.chenyubang.core.ui.CCard
@@ -42,6 +44,7 @@ fun P12ReviewSummaryContent(
     onBackToSource: () -> Unit,
     onAgain: () -> Unit,
     onOpenIdiom: (String) -> Unit,
+    pageMessage: String? = null,
 ) {
     val colors = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
     Column(
@@ -67,6 +70,7 @@ fun P12ReviewSummaryContent(
                 onClick = onBackToSource,
             )
             CButton(text = "再复习一轮", onClick = onAgain, variant = CButtonVariant.Ghost)
+            pageMessage?.let { CBar(kind = CBarKind.Info, title = it) }
         }
     }
 }

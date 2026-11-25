@@ -89,6 +89,8 @@ public final class IdiomDetailViewModel: ObservableObject {
     @Published public private(set) var failed = false
     /// 该成语的待复习错题数（决策 H：0 时「复习这个成语」保持置灰）。
     @Published public private(set) var pendingReviewCount = 0
+    /// 点击时最新队列已空或读取失败：来源页如实提示，不静默无反应。
+    @Published public private(set) var reviewMessage: String?
     /// A6 自评 + A7 收藏当前值；缺行由 Store.state 投影补未学、未收藏。
     /// idiomID 为空表示未注入状态源，顶部保持旧占位外观（保护既有快照基线）。
     @Published public private(set) var learningState = IdiomLearningState(
@@ -120,6 +122,7 @@ public final class IdiomDetailViewModel: ObservableObject {
         missing = false
         failed = false
         pendingReviewCount = 0
+        reviewMessage = nil
         learningState = IdiomLearningState(idiomID: "", status: .notStarted, favorite: false)
         loading = true
         do {
@@ -137,6 +140,13 @@ public final class IdiomDetailViewModel: ObservableObject {
             loading = false
             failed = true
         }
+    }
+    public func showUnavailableReview() {
+        reviewMessage = "待复习队列已变化，请刷新后再试"
+    }
+
+    public func dismissReviewMessage() {
+        reviewMessage = nil
     }
 
     /// A6 自评：写入后回读刷新，保证缺行/并发写入后的值一致。
@@ -206,8 +216,10 @@ public struct P05IdiomDetailScreen: View {
     private let onBack: () -> Void
     private let onOpenMistakes: () -> Void
     private let onOpenExample: (String) -> Void
-    /// 单成语复习入口（决策 H）：参数为该成语词面，供 P11 / P12 的「本轮范围」一行显示。
-    private let onReviewIdiom: (String) -> Void
+    /// 单成语复习入口（决策 H）：返回 false 表示点击时最新队列已空或读取失败。
+    private let onReviewIdiom: (String) -> Bool
+    /// P10 写成功后重载待复习数；常驻路由栈里的 `.task` 不会自行重跑。
+    private let contentRevision: UUID
     /// 写状态/收藏后通知外层（P13 概览计数联动），默认空操作。
     private let onStateChanged: () -> Void
     @State private var statusPickerPresented = false
@@ -218,11 +230,12 @@ public struct P05IdiomDetailScreen: View {
         reader: IdiomDetailReading,
         examplesReader: IdiomExamplesReading,
         reviewCounter: PendingReviewCountReading? = nil,
+        contentRevision: UUID = UUID(),
         stateStore: IdiomStateWriting? = nil,
         onBack: @escaping () -> Void,
         onOpenMistakes: @escaping () -> Void,
         onOpenExample: @escaping (String) -> Void,
-        onReviewIdiom: @escaping (String) -> Void = { _ in },
+        onReviewIdiom: @escaping (String) -> Bool = { _ in false },
         onStateChanged: @escaping () -> Void = {}
     ) {
         _model = StateObject(wrappedValue: IdiomDetailViewModel(
@@ -236,6 +249,7 @@ public struct P05IdiomDetailScreen: View {
         self.onOpenMistakes = onOpenMistakes
         self.onOpenExample = onOpenExample
         self.onReviewIdiom = onReviewIdiom
+        self.contentRevision = contentRevision
         self.onStateChanged = onStateChanged
     }
 
@@ -252,6 +266,9 @@ public struct P05IdiomDetailScreen: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(colors.page)
         .task { await model.load(idiomID) }
+        .onChange(of: contentRevision) { _ in
+            Task { await model.load(idiomID) }
+        }
         .overlay {
             if statusPickerPresented {
                 statusPicker(colors)
@@ -348,8 +365,18 @@ public struct P05IdiomDetailScreen: View {
                 examples: model.examples,
                 onOpenMistakes: onOpenMistakes,
                 onOpenExample: onOpenExample,
-                onReviewIdiom: onReviewIdiom
+                onReviewIdiom: { word in
+                    if !onReviewIdiom(word) { model.showUnavailableReview() }
+                }
             )
+            if let message = model.reviewMessage {
+                CBar(
+                    kind: .info,
+                    title: message,
+                    actionTitle: "知道了",
+                    onAction: { model.dismissReviewMessage() }
+                )
+            }
         }
     }
 }

@@ -20,6 +20,8 @@ public struct UserExampleDetail: Equatable, Sendable {
     public let idioms: [LinkedIdiom]
     /// 当前错题记录的掌握状态；删除错题后为 nil。
     public let mistakeState: String?
+    /// 当前错题记录 id；P10 手动切换按此 id 精确写入，不按录入题 id 猜记录。
+    public let mistakeID: String?
     public let reason: String?
     public let tagNames: [String]
 
@@ -35,6 +37,7 @@ public struct UserExampleDetail: Equatable, Sendable {
         createdAt: String,
         idioms: [LinkedIdiom],
         mistakeState: String?,
+        mistakeID: String? = nil,
         reason: String?,
         tagNames: [String]
     ) {
@@ -49,6 +52,7 @@ public struct UserExampleDetail: Equatable, Sendable {
         self.createdAt = createdAt
         self.idioms = idioms
         self.mistakeState = mistakeState
+        self.mistakeID = mistakeID
         self.reason = reason
         self.tagNames = tagNames
     }
@@ -76,10 +80,10 @@ extension MistakeLibrary {
             ORDER BY user_example_idiom.rowid, idiom.word
             """, arguments: [id])
         let stamp = try ExampleMistakeStamp.fetchOne(db, sql: """
-            SELECT state, reason, tagNames
+            SELECT id, state, reason, tagNames
             FROM mistake
             WHERE userExampleId = ?
-            ORDER BY createdAt DESC, id
+            ORDER BY createdAt DESC, id DESC
             LIMIT 1
             """, arguments: [id])
         return UserExampleDetail(
@@ -94,6 +98,7 @@ extension MistakeLibrary {
             createdAt: head.createdAt,
             idioms: idioms,
             mistakeState: stamp?.state,
+            mistakeID: stamp?.id,
             reason: stamp?.reason,
             tagNames: decodeTagNames(stamp?.tagNames)
         )
@@ -121,6 +126,7 @@ extension MistakeLibrary {
     }
 
     private struct ExampleMistakeStamp: FetchableRecord, Decodable {
+        let id: String
         let state: String
         let reason: String?
         let tagNames: String

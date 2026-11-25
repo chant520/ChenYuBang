@@ -104,6 +104,7 @@ internal fun IdiomDestination(
     onOpenMistakes: () -> Unit,
     onOpenExample: (String) -> Unit,
     onReviewIdiom: (Int) -> Unit = {},
+    revision: Long = 0,
 ) {
     P05IdiomDetailRoute(
         idiomId = idiomId,
@@ -112,6 +113,7 @@ internal fun IdiomDestination(
         onOpenMistakes = onOpenMistakes,
         onOpenExample = onOpenExample,
         onReviewIdiom = onReviewIdiom,
+        revision = revision,
     )
 }
 
