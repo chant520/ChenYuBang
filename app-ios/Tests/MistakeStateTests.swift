@@ -53,7 +53,8 @@ final class MistakeStateTests: XCTestCase {
         for table in ["user_example", "user_example_idiom", "mistake_idiom", "review_log"] {
             XCTAssertEqual(after[table], before[table], table)
         }
-        XCTAssertEqual(after["mistake"], before["mistake"]?.filter { ($0["id"] as String) != targetMistake })
+        let otherMistakesAfter = after["mistake"]?.filter { ($0["id"] as String) != targetMistake }
+        XCTAssertEqual(otherMistakesAfter, before["mistake"]?.filter { ($0["id"] as String) != targetMistake })
     }
 
     func testMissingIDReturnsNotFoundWithoutInserting() throws {
@@ -135,6 +136,8 @@ final class MistakeStateTests: XCTestCase {
                         '望文生义', '["望文生义"]', '国考', 2026, '中央', '待复习',
                         '2026-11-24T00:00:00Z', '2026-11-24T01:00:00Z', 2)
                 """, arguments: [targetMistake, exampleA])
+            try db.execute(sql: "INSERT INTO mistake_idiom(mistakeId, idiomId) VALUES (?, ?)",
+                           arguments: [targetMistake, idiomA])
             try seedMistake(db, id: sharedMistake, example: (exampleA, "同一录入题的另一错题"),
                             createdAt: "2026-11-23T00:00:00Z", idiomID: idiomA)
             try seedMistake(db, id: otherMistake, example: (exampleB, "同一成语的其他错题"),
