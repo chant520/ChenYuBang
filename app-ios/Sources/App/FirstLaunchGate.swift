@@ -23,6 +23,8 @@ final class FirstLaunchState: ObservableObject {
     @Published private(set) var userExampleEditor: UserExampleEditor?
     /// P11 / P12 复习队列读库与成绩落库入口（阶段 3）：与 mistakeReader 同时就绪。
     @Published private(set) var reviewReader: ReviewLibraryService?
+    /// A6 / A7 学习状态与收藏入口（阶段6包1）：与 libraryReader 共用同一数据库队列。
+    @Published private(set) var idiomStateStore: IdiomStateStore?
     /// P15 / P22 备份导出与恢复入口（阶段 4）：与 mistakeReader 共用同一数据库队列。
     @Published private(set) var backupService: BackupService?
     @Published private(set) var dataCleaner: UserDataCleaner?
@@ -89,6 +91,7 @@ final class FirstLaunchState: ObservableObject {
             )
             availableProvinces = provinces
             libraryReader = IdiomLibraryReader(queue: queue)
+            idiomStateStore = IdiomStateStore(queue: queue)
             exampleReader = ExampleLibraryReader(queue: queue)
             captureSaver = UserExampleSaver(queue: queue, imagesDirectory: imagesDirectory)
             userExampleEditor = UserExampleEditor(queue: queue, dataDirectory: directory)

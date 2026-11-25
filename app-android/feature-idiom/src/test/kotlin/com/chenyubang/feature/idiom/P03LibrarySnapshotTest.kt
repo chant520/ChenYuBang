@@ -6,6 +6,8 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onRoot
 import com.chenyubang.core.data.ExamScopeSelection
+import com.chenyubang.core.data.IdiomLearningState
+import com.chenyubang.core.data.IdiomLearningStatus
 import com.chenyubang.core.ui.ChenYuBangTheme
 import com.github.takahirom.roborazzi.captureRoboImage
 import org.junit.Rule
@@ -29,6 +31,7 @@ class P03LibrarySnapshotTest {
     private fun capture(
         night: Boolean,
         updateFailed: Boolean = false,
+        withStates: Boolean = false,
     ) {
         composeTestRule.setContent {
             val base = LocalConfiguration.current
@@ -37,14 +40,17 @@ class P03LibrarySnapshotTest {
             config.uiMode = (config.uiMode and Configuration.UI_MODE_NIGHT_MASK.inv()) or nightBits
             CompositionLocalProvider(LocalConfiguration provides config) {
                 ChenYuBangTheme(darkTheme = night) {
-                    P03LibraryContent(state = state(updateFailed))
+                    P03LibraryContent(state = state(updateFailed, withStates))
                 }
             }
         }
         composeTestRule.onRoot().captureRoboImage()
     }
 
-    private fun state(updateFailed: Boolean = false): P03LibraryUiState {
+    private fun state(
+        updateFailed: Boolean = false,
+        withStates: Boolean = false,
+    ): P03LibraryUiState {
         val items = SAMPLE
         return P03LibraryUiState(
             scope =
@@ -58,6 +64,15 @@ class P03LibrarySnapshotTest {
             selectedLetter = null,
             letters = LibraryBrowse.letters(items),
             page = LibraryBrowse.page(items, LibraryDimension.Scope, null),
+            states =
+                if (withStates) {
+                    mapOf(
+                        "s1" to IdiomLearningState("s1", IdiomLearningStatus.LEARNED, false),
+                        "s3" to IdiomLearningState("s3", IdiomLearningStatus.MASTERED, true),
+                    )
+                } else {
+                    emptyMap()
+                },
             loading = false,
             updateFailed = updateFailed,
         )
@@ -86,4 +101,11 @@ class P03LibrarySnapshotTest {
 
     @Test
     fun libraryUpdateFailedDark() = capture(night = true, updateFailed = true)
+
+    /** A6 三态帧：学到的浅绿 / 已掌握的实绿 / 其余未学中性，缺行补未学。 */
+    @Test
+    fun libraryThreeStatesLight() = capture(night = false, withStates = true)
+
+    @Test
+    fun libraryThreeStatesDark() = capture(night = true, withStates = true)
 }
