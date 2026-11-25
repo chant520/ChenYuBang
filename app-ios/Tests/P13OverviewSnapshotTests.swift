@@ -24,7 +24,7 @@ final class P13OverviewSnapshotTests: XCTestCase {
     }
 
     private func filledStats() -> P13OverviewStats {
-        P13OverviewStats(learned: 18, favorites: 4, mistakes: 12, pending: 7, mastered: 3)
+        P13OverviewStats(learned: 18, favorites: 4, mistakes: 12, pending: 7, proficient: 3)
     }
 
     func testFilledLight() { assertP13(filledStats(), dark: false) }

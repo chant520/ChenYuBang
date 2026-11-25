@@ -161,6 +161,7 @@
 		A00000000000000000000806 /* P24FavoriteSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000906 /* P24FavoriteSnapshotTests.swift */; };
 		A00000000000000000000807 /* P13OverviewSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000907 /* P13OverviewSnapshotTests.swift */; };
 		A00000000000000000000808 /* P05StateSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000908 /* P05StateSnapshotTests.swift */; };
+		A00000000000000000000809 /* P05DetailBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000909 /* P05DetailBody.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -323,6 +324,7 @@
 		A00000000000000000000906 /* P24FavoriteSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P24FavoriteSnapshotTests.swift; sourceTree = "<group>"; };
 		A00000000000000000000907 /* P13OverviewSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P13OverviewSnapshotTests.swift; sourceTree = "<group>"; };
 		A00000000000000000000908 /* P05StateSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P05StateSnapshotTests.swift; sourceTree = "<group>"; };
+		A00000000000000000000909 /* P05DetailBody.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P05DetailBody.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -405,6 +407,7 @@
 				A00000000000000000000190 /* P04SearchScreen.swift */,
 				A00000000000000000000902 /* P24FavoriteModel.swift */,
 				A00000000000000000000903 /* P24FavoriteScreen.swift */,
+				A00000000000000000000909 /* P05DetailBody.swift */,
 			);
 			path = FeatureIdiom;
 			sourceTree = "<group>";
@@ -775,6 +778,7 @@
 				A00000000000000000000801 /* P13OverviewView.swift in Sources */,
 				A00000000000000000000802 /* P24FavoriteModel.swift in Sources */,
 				A00000000000000000000803 /* P24FavoriteScreen.swift in Sources */,
+				A00000000000000000000809 /* P05DetailBody.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -4,7 +4,7 @@ import Foundation
 /// P13 E2 五项统计只读口子：三计数取 IdiomStateStore，错题/待复习取 MistakeLibrary.overview。
 public protocol OverviewReading {
     func countLearned() throws -> Int
-    func countMastered() throws -> Int
+    func countProficient() throws -> Int
     func countFavorite() throws -> Int
     func mistakeOverview() throws -> MistakeOverview
 }
@@ -20,7 +20,7 @@ public struct ComposedOverviewReader: OverviewReading {
     }
 
     public func countLearned() throws -> Int { try stateStore.countLearned() }
-    public func countMastered() throws -> Int { try stateStore.countMastered() }
+    public func countProficient() throws -> Int { try stateStore.countProficient() }
     public func countFavorite() throws -> Int { try stateStore.countFavorite() }
     public func mistakeOverview() throws -> MistakeOverview { try mistakeReader.overview() }
 }
@@ -36,14 +36,14 @@ public struct P13OverviewStats: Equatable, Sendable {
     /// 待复习：mistake.state='待复习'。
     public var pending = 0
     /// 已掌握：idiom_state status='已掌握'，非错题 C9 掌握态。
-    public var mastered = 0
+    public var proficient = 0
 
-    public init(learned: Int = 0, favorites: Int = 0, mistakes: Int = 0, pending: Int = 0, mastered: Int = 0) {
+    public init(learned: Int = 0, favorites: Int = 0, mistakes: Int = 0, pending: Int = 0, proficient: Int = 0) {
         self.learned = learned
         self.favorites = favorites
         self.mistakes = mistakes
         self.pending = pending
-        self.mastered = mastered
+        self.proficient = proficient
     }
 }
 
@@ -66,7 +66,7 @@ public final class P13OverviewModel: ObservableObject {
                 favorites: try reader.countFavorite(),
                 mistakes: overview.total,
                 pending: overview.pending,
-                mastered: try reader.countMastered()
+                proficient: try reader.countProficient()
             )
         } catch {
             stats = P13OverviewStats()

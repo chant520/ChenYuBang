@@ -298,20 +298,25 @@ public struct P05IdiomDetailScreen: View {
 
     /// A6 三选一自评弹层：复用 COverlay + CCheckRow 单选语义，点选即生效并回写顶部标签。
     private func statusPicker(_ colors: TokenColors) -> some View {
-        COverlay(style: .dialog, title: "学习状态", onDismiss: { statusPickerPresented = false }) {
-            VStack(spacing: 0) {
-                ForEach(Array(IdiomLearningStatus.allCases.enumerated()), id: \.element) { index, status in
-                    CCheckRow(
-                        label: statusTag(for: status).text,
-                        isOn: Binding(
-                            get: { model.learningState.status == status },
-                            set: { if $0 { selectStatus(status) } }
-                        ),
-                        showsDivider: index != IdiomLearningStatus.allCases.count - 1
-                    )
+        COverlay(
+            style: .dialog,
+            title: "学习状态",
+            onDismiss: { statusPickerPresented = false },
+            content: {
+                VStack(spacing: 0) {
+                    ForEach(Array(IdiomLearningStatus.allCases.enumerated()), id: \.element) { index, status in
+                        CCheckRow(
+                            label: statusTag(for: status).text,
+                            isOn: Binding(
+                                get: { model.learningState.status == status },
+                                set: { if $0 { selectStatus(status) } }
+                            ),
+                            showsDivider: index != IdiomLearningStatus.allCases.count - 1
+                        )
+                    }
                 }
             }
-        }
+        )
     }
 
     private func selectStatus(_ status: IdiomLearningStatus) {
@@ -336,161 +341,15 @@ public struct P05IdiomDetailScreen: View {
                 subtitle: "只重新读取本机数据，不影响已录入的内容。"
             )
         } else if let detail = model.detail {
-            detailBody(detail, colors)
-        }
-    }
-
-    @ViewBuilder
-    private func detailBody(_ detail: IdiomDetailView, _ colors: TokenColors) -> some View {
-        HStack(alignment: .center) {
-            VStack(alignment: .leading, spacing: Tokens.Space.lsubTop) {
-                Text(detail.word)
-                    .font(.system(size: Tokens.Font.n20, weight: .bold))
-                    .foregroundStyle(colors.head)
-                Text(detail.pinyin)
-                    .font(.system(size: Tokens.Font.n12))
-                    .foregroundStyle(colors.text3)
-            }
-            Spacer(minLength: 0)
-            // 读音播放是未来项；本期只展示图标，不触发播放。
-            CIcon(.sound, size: Tokens.Icon.n21, strokeWidth: 1.6, color: colors.text3)
-                .accessibilityHidden(true)
-        }
-        HStack {
-            CTag(text: detail.color)
-            Spacer(minLength: 0)
-        }
-
-        infoCard("释义", detail.sense, colors, strong: true)
-        infoCard("出处", detail.origin, colors)
-
-        CCard {
-            CLabel("易错点")
-            if detail.pitfalls.isEmpty {
-                bodyText(IdiomDetail.placeholder, colors)
-            } else {
-                ForEach(detail.pitfalls, id: \.self) { item in
-                    bodyText(item, colors)
-                }
-            }
-        }
-
-        CCard {
-            CLabel("近义与反义")
-            bodyText("近义：\(IdiomDetail.presentList(detail.synonyms))", colors)
-            bodyText("反义：\(IdiomDetail.presentList(detail.antonyms))", colors)
-        }
-
-        relatedExamplesCard(colors)
-        myExamplesPlaceholder(colors)
-
-        // D1 单成语复习入口（决策 H）：按该成语待复习错题数判定可点性，为 0 时保持置灰并说明原因。
-        CButton(
-            text: "复习这个成语",
-            variant: .primary,
-            enabled: model.pendingReviewCount > 0,
-            action: { onReviewIdiom(detail.word) }
-        )
-        if model.pendingReviewCount == 0 {
-            Text("这个成语下还没有待复习的错题")
-                .font(.system(size: Tokens.Font.n12))
-                .foregroundStyle(colors.text3)
-        }
-    }
-
-    private func infoCard(
-        _ label: String,
-        _ value: String,
-        _ colors: TokenColors,
-        strong: Bool = false
-    ) -> some View {
-        CCard {
-            CLabel(label)
-            Text(value)
-                .font(.system(size: Tokens.Font.n13, weight: strong ? .semibold : .regular))
-                .foregroundStyle(strong ? colors.text : colors.text2)
-                .fixedSize(horizontal: false, vertical: true)
-        }
-    }
-
-    private func bodyText(_ text: String, _ colors: TokenColors) -> some View {
-        Text(text)
-            .font(.system(size: Tokens.Font.n13))
-            .foregroundStyle(colors.text2)
-            .padding(.top, Tokens.Space.lsubTop)
-            .fixedSize(horizontal: false, vertical: true)
-    }
-
-    /// A4「相关题目」双来源（信息架构 v1.4 P05 ⑧）：系统题库按 example_idiom 列出关联真题（1.6），
-    /// 每条题干摘要 + 年份 · 地区 · 考试类型 + 题型，点击进 P07；暂无时保留文案不隐藏。
-    /// 阶段2：我录入的题接 user_example，暂无时保留「还没在这个成语下录入题」不隐藏。
-    private func relatedExamplesCard(_ colors: TokenColors) -> some View {
-        CCard {
-            CLabel("相关题目")
-            sectionCaption("系统题库", colors)
-            if model.examples.isEmpty {
-                bodyText("暂无真题，后续补充", colors)
-            } else {
-                ForEach(model.examples) { example in
-                    relatedExampleRow(example, colors)
-                }
-            }
-            sectionCaption("我录入的题（标错才进错题本）", colors)
-            bodyText("还没在这个成语下录入题", colors)
-        }
-    }
-
-    private func relatedExampleRow(_ example: IdiomExampleView, _ colors: TokenColors) -> some View {
-        Button {
-            onOpenExample(example.id)
-        } label: {
-            VStack(alignment: .leading, spacing: 0) {
-                Text(example.stem)
-                    .font(.system(size: Tokens.Font.n13))
-                    .foregroundStyle(colors.text2)
-                    .lineLimit(2)
-                    .multilineTextAlignment(.leading)
-                HStack(spacing: Tokens.Space.lmetaGap) {
-                    Text(example.sourceLine)
-                        .font(.system(size: Tokens.Font.n12))
-                        .foregroundStyle(colors.text3)
-                    Text(example.questionType)
-                        .font(.system(size: Tokens.Font.n12))
-                        .foregroundStyle(colors.text3)
-                }
-                .padding(.top, Tokens.Space.lsubTop)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .contentShape(Rectangle())
-            .padding(.top, Tokens.Space.lmetaTop)
-        }
-        .buttonStyle(CPressDimStyle())
-    }
-
-    private func sectionCaption(_ text: String, _ colors: TokenColors) -> some View {
-        Text(text)
-            .font(.system(size: Tokens.Font.n12))
-            .foregroundStyle(colors.text3)
-            .padding(.top, Tokens.Space.lmetaTop)
-    }
-
-    /// A5「我的录入题 N」数字入口占位。阶段2：N 接 user_example 计数，N>0 可点进 P09。
-    private func myExamplesPlaceholder(_ colors: TokenColors) -> some View {
-        CCard {
-            HStack {
-                CLabel("我在这个成语下录入了")
-                Text(" 0 道题")
-                    .font(.system(size: Tokens.Font.n20, weight: .bold))
-                    .foregroundStyle(colors.disfg)
-                Spacer(minLength: 0)
-            }
-            HStack {
-                Text("还没在这个成语下录入题")
-                    .font(.system(size: Tokens.Font.n12))
-                    .foregroundStyle(colors.text3)
-                Spacer(minLength: 0)
-                CLink("去错题本", action: onOpenMistakes)
-            }
+            P05DetailBody(
+                detail: detail,
+                colors: colors,
+                pendingReviewCount: model.pendingReviewCount,
+                examples: model.examples,
+                onOpenMistakes: onOpenMistakes,
+                onOpenExample: onOpenExample,
+                onReviewIdiom: onReviewIdiom
+            )
         }
     }
 }

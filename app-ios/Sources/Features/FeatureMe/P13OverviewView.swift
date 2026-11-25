@@ -71,7 +71,7 @@ public struct P13OverviewContent: View {
                 numberCell("待复习", stats.pending, hot: true)
             }
             .padding(.top, Tokens.Space.lmetaTop)
-            numberCell("已掌握", stats.mastered, hot: false)
+            numberCell("已掌握", stats.proficient, hot: false)
                 .padding(.top, Tokens.Space.lmetaTop)
         }
     }

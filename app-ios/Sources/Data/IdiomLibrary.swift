@@ -158,7 +158,7 @@ public final class IdiomStateStore: @unchecked Sendable {
     }
 
     /// E2「已掌握数」：仅 idiom_state 的成语自评已掌握，非错题 C9 的掌握态。
-    public func countMastered() throws -> Int {
+    public func countProficient() throws -> Int {
         try queue.read { db in
             try Int.fetchOne(
                 db,

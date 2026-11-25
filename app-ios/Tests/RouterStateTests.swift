@@ -232,6 +232,27 @@ final class RouterStateTests: XCTestCase {
         XCTAssertNil(router.captureWorkflow?.croppedURL)
     }
 
+    func testOverlayOriginAndCancellationAreNonMutating() {
+        let router = RouterState()
+        XCTAssertFalse(router.openOverlay(.clear))
+        XCTAssertFalse(router.openOverlay(.importMode))
+        router.selectTab(.profile)
+        let profile = router.currentEntry
+        XCTAssertTrue(router.openOverlay(.clear))
+        XCTAssertFalse(router.fabVisible)
+        router.closeOverlay()
+        XCTAssertEqual(router.currentEntry, profile)
+        router.push(.backup)
+        let backup = router.currentEntry
+        XCTAssertFalse(router.openOverlay(.clear))
+        XCTAssertTrue(router.openOverlay(.importMode))
+        router.back()
+        XCTAssertNil(router.overlay)
+        XCTAssertEqual(router.currentEntry, backup)
+    }
+}
+
+extension RouterStateTests {
     func testWorkflowFromSearchDetailRestoresSameEntriesAndState() throws {
         let router = RouterState()
         router.openSearch()
@@ -259,27 +280,6 @@ final class RouterStateTests: XCTestCase {
         XCTAssertFalse(router.captured(workflowID: workflowID, imageURL: URL(fileURLWithPath: "/fixture.jpg")))
     }
 
-    func testOverlayOriginAndCancellationAreNonMutating() {
-        let router = RouterState()
-        XCTAssertFalse(router.openOverlay(.clear))
-        XCTAssertFalse(router.openOverlay(.importMode))
-        router.selectTab(.profile)
-        let profile = router.currentEntry
-        XCTAssertTrue(router.openOverlay(.clear))
-        XCTAssertFalse(router.fabVisible)
-        router.closeOverlay()
-        XCTAssertEqual(router.currentEntry, profile)
-        router.push(.backup)
-        let backup = router.currentEntry
-        XCTAssertFalse(router.openOverlay(.clear))
-        XCTAssertTrue(router.openOverlay(.importMode))
-        router.back()
-        XCTAssertNil(router.overlay)
-        XCTAssertEqual(router.currentEntry, backup)
-    }
-}
-
-extension RouterStateTests {
     func testLateRecognitionCannotAdvanceRecroppedImage() throws {
         let router = RouterState()
         router.beginCapture()

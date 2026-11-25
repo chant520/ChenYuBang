@@ -151,7 +151,7 @@ final class IdiomStateStoreTests: XCTestCase {
 
     func testCountsAreZeroWhenEmpty() throws {
         XCTAssertEqual(try store.countLearned(), 0)
-        XCTAssertEqual(try store.countMastered(), 0)
+        XCTAssertEqual(try store.countProficient(), 0)
         XCTAssertEqual(try store.countFavorite(), 0)
         XCTAssertTrue(try store.favoriteIdioms().isEmpty)
     }
@@ -164,7 +164,7 @@ final class IdiomStateStoreTests: XCTestCase {
         try store.setFavorite(idiomID: idiomA, favorite: true)
         try store.setFavorite(idiomID: idiomB, favorite: true)
         XCTAssertEqual(try store.countLearned(), 2)
-        XCTAssertEqual(try store.countMastered(), 1)
+        XCTAssertEqual(try store.countProficient(), 1)
         XCTAssertEqual(try store.countFavorite(), 2)
     }
 
