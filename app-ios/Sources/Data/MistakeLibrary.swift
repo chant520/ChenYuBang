@@ -111,6 +111,17 @@ public struct IdiomCapturedExample: Equatable, Sendable, Identifiable {
     }
 }
 
+/// C9 错题掌握状态只接受规范第 4.7 节的两个精确值。
+public enum MistakeReviewState: String, CaseIterable, Sendable {
+    case pending = "待复习"
+    case proficient = "已掌握"
+}
+
+public enum MistakeStateUpdateResult: Equatable, Sendable {
+    case updated
+    case notFound
+}
+
 /// `mistake` / `mistake_idiom` / `user_example` / `user_example_idiom` 只读查询（P08 / P09）。
 /// P10 单条录入题详情的查询见 `UserExampleLibrary.swift`（同一枚举的分文件扩展）。
 ///
@@ -119,7 +130,7 @@ public struct IdiomCapturedExample: Equatable, Sendable, Identifiable {
 /// 只读：不改表结构、不写任何用户表。
 public enum MistakeLibrary {
     /// 待复习状态的库内字面值（规范 §4.1，保存时一律写入该值）。
-    public static let pendingState = "待复习"
+    public static let pendingState = MistakeReviewState.pending.rawValue
 
     /// 错题总数与待复习数；空表返回两个 0。
     public static func overview(_ db: Database) throws -> MistakeOverview {

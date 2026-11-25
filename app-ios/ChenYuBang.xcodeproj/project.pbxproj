@@ -149,6 +149,9 @@
 		A000000000000000000000CD /* P10UserExampleViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001CD /* P10UserExampleViewModel.swift */; };
 		A000000000000000000000CB /* UserExampleEditorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001CB /* UserExampleEditorTests.swift */; };
 		A000000000000000000000BA /* P20MatchContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001BA /* P20MatchContent.swift */; };
+		A000000000000000000000F0 /* IdiomStateStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001F0 /* IdiomStateStoreTests.swift */; };
+		A000000000000000000000F1 /* MistakeStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001F1 /* MistakeStateTests.swift */; };
+		A000000000000000000000F2 /* BackupWriterFixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000001F2 /* BackupWriterFixture.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -299,6 +302,9 @@
 		A000000000000000000001CD /* P10UserExampleViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P10UserExampleViewModel.swift; sourceTree = "<group>"; };
 		A000000000000000000001CB /* UserExampleEditorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserExampleEditorTests.swift; sourceTree = "<group>"; };
 		A000000000000000000001BA /* P20MatchContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P20MatchContent.swift; sourceTree = "<group>"; };
+		A000000000000000000001F0 /* IdiomStateStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdiomStateStoreTests.swift; sourceTree = "<group>"; };
+		A000000000000000000001F1 /* MistakeStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MistakeStateTests.swift; sourceTree = "<group>"; };
+		A000000000000000000001F2 /* BackupWriterFixture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupWriterFixture.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -515,6 +521,9 @@
 				A000000000000000000001BD /* UserExampleSaverTests.swift */,
 				A000000000000000000001BE /* P20FormModelTests.swift */,
 				A000000000000000000001C2 /* MistakeLibraryTests.swift */,
+				A000000000000000000001F0 /* IdiomStateStoreTests.swift */,
+				A000000000000000000001F1 /* MistakeStateTests.swift */,
+				A000000000000000000001F2 /* BackupWriterFixture.swift */,
 				A000000000000000000001C3 /* MistakeBrowseTests.swift */,
 				A000000000000000000001C4 /* P08MistakeSnapshotTests.swift */,
 				A000000000000000000001C5 /* P09CapturedSnapshotTests.swift */,
@@ -785,6 +794,9 @@
 				A000000000000000000000BD /* UserExampleSaverTests.swift in Sources */,
 				A000000000000000000000BE /* P20FormModelTests.swift in Sources */,
 				A000000000000000000000C2 /* MistakeLibraryTests.swift in Sources */,
+				A000000000000000000000F0 /* IdiomStateStoreTests.swift in Sources */,
+				A000000000000000000000F1 /* MistakeStateTests.swift in Sources */,
+				A000000000000000000000F2 /* BackupWriterFixture.swift in Sources */,
 				A000000000000000000000C3 /* MistakeBrowseTests.swift in Sources */,
 				A000000000000000000000C4 /* P08MistakeSnapshotTests.swift in Sources */,
 				A000000000000000000000C5 /* P09CapturedSnapshotTests.swift in Sources */,

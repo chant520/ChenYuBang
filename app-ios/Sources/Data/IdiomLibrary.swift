@@ -75,3 +75,72 @@ public final class IdiomLibraryReader: @unchecked Sendable {
         }
     }
 }
+
+/// A6 学习状态只接受规范第 4.7 节的三个精确值。
+public enum IdiomLearningStatus: String, CaseIterable, Sendable {
+    case notStarted = "未学"
+    case studied = "学过"
+    case proficient = "已掌握"
+}
+
+/// A6 / A7 的单条读投影；无 idiom_state 行时由 Store 补默认值，不写库。
+public struct IdiomLearningState: Equatable, Sendable {
+    public let idiomID: String
+    public let status: IdiomLearningStatus
+    public let favorite: Bool
+
+    public init(idiomID: String, status: IdiomLearningStatus, favorite: Bool) {
+        self.idiomID = idiomID
+        self.status = status
+        self.favorite = favorite
+    }
+}
+
+public enum IdiomStateError: Error, Equatable, Sendable {
+    case invalidStoredStatus(String)
+}
+
+/// A6 / A7 数据层前置（规范第 4.7 节）：读不落行，两个写入方向各自单事务 upsert。
+public final class IdiomStateStore: @unchecked Sendable {
+    private let queue: DatabaseQueue
+
+    public init(queue: DatabaseQueue) {
+        self.queue = queue
+    }
+
+    public func state(idiomID: String) throws -> IdiomLearningState {
+        try queue.read { db in
+            guard let row = try Row.fetchOne(
+                db, sql: "SELECT status, favorite FROM idiom_state WHERE idiomId = ?", arguments: [idiomID]
+            ) else {
+                return IdiomLearningState(idiomID: idiomID, status: .notStarted, favorite: false)
+            }
+            let rawStatus: String = row["status"]
+            guard let status = IdiomLearningStatus(rawValue: rawStatus) else {
+                throw IdiomStateError.invalidStoredStatus(rawStatus)
+            }
+            let favorite: Bool = row["favorite"]
+            return IdiomLearningState(idiomID: idiomID, status: status, favorite: favorite)
+        }
+    }
+
+    public func setStatus(idiomID: String, status: IdiomLearningStatus) throws {
+        try queue.write { db in
+            try db.execute(sql: """
+                INSERT INTO idiom_state(idiomId, status, favorite)
+                VALUES (?, ?, 0)
+                ON CONFLICT(idiomId) DO UPDATE SET status = excluded.status
+                """, arguments: [idiomID, status.rawValue])
+        }
+    }
+
+    public func setFavorite(idiomID: String, favorite: Bool) throws {
+        try queue.write { db in
+            try db.execute(sql: """
+                INSERT INTO idiom_state(idiomId, status, favorite)
+                VALUES (?, ?, ?)
+                ON CONFLICT(idiomId) DO UPDATE SET favorite = excluded.favorite
+                """, arguments: [idiomID, IdiomLearningStatus.notStarted.rawValue, favorite])
+        }
+    }
+}

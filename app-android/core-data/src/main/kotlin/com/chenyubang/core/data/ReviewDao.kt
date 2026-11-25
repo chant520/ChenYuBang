@@ -43,6 +43,18 @@ data class ReviewQuestionIdiom(
     val word: String,
 )
 
+/** C9 手动切换只接受这两个状态；数据库仍按开发规范 v1.9 §4.1 存字符串。 */
+enum class MistakeReviewState(val storedValue: String) {
+    PENDING("待复习"),
+    MASTERED("已掌握"),
+}
+
+/** C9 写入结果：目标不存在时明确返回 [NOT_FOUND]，不会插入错题。 */
+enum class MistakeStateUpdateResult {
+    UPDATED,
+    NOT_FOUND,
+}
+
 /**
  * 阶段 3 复习队列与结果记录（开发规范 v1.7 §8.1 / §8.2）。
  *
@@ -76,6 +88,24 @@ abstract class ReviewDao {
 
     @Query("SELECT state FROM mistake WHERE id = :mistakeId")
     abstract suspend fun stateOf(mistakeId: String): String?
+
+    /** C9：只按 mistake.id 更新 state；同值重复写入仍返回成功。 */
+    @Query("UPDATE mistake SET state = :state WHERE id = :mistakeId")
+    protected abstract suspend fun updateState(
+        mistakeId: String,
+        state: String,
+    ): Int
+
+    @Transaction
+    open suspend fun setState(
+        mistakeId: String,
+        state: MistakeReviewState,
+    ): MistakeStateUpdateResult =
+        if (updateState(mistakeId, state.storedValue) > 0) {
+            MistakeStateUpdateResult.UPDATED
+        } else {
+            MistakeStateUpdateResult.NOT_FOUND
+        }
 
     /** 「再复习一轮」判空：与 queue 同一过滤口径，仅计数不组装正文。 */
     @Query(
