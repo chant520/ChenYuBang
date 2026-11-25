@@ -81,6 +81,23 @@ final class RouterStateTests: XCTestCase {
         XCTAssertNil(router.topRequests[.idiom])
     }
 
+    func testSuccessfulTabEntryIncrementsEpochIncludingReselection() {
+        let router = RouterState()
+        XCTAssertEqual(router.tabEntryEpoch, Dictionary(uniqueKeysWithValues: AppTab.allCases.map { ($0, 0) }))
+        router.selectTab(.example)
+        XCTAssertEqual(router.tabEntryEpoch[.example], 1)
+        XCTAssertEqual(router.tabEntryEpoch[.idiom], 0)
+        router.selectTab(.example)
+        XCTAssertEqual(router.tabEntryEpoch[.example], 2)
+        router.push(.library)
+        router.selectTab(.example)
+        XCTAssertEqual(router.tabEntryEpoch[.example], 3)
+        XCTAssertEqual(router.currentEntry.route, .examples)
+        router.openSearch()
+        router.selectTab(.profile)
+        XCTAssertEqual(router.tabEntryEpoch[.profile], 0)
+    }
+
     func testEachTabHasIndependentEntryArray() {
         let router = RouterState()
         for tab in AppTab.allCases {

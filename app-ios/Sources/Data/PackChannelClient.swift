@@ -93,6 +93,7 @@ private final class ChannelSessionDelegate: NSObject, URLSessionDownloadDelegate
     private let lock = NSLock()
     private var exceeded = false
     private var completed = false
+    private var redirectionCount = 0
     private var session: URLSession?
 
     init(
@@ -198,7 +199,11 @@ private final class ChannelSessionDelegate: NSObject, URLSessionDownloadDelegate
         newRequest request: URLRequest,
         completionHandler: @escaping (URLRequest?) -> Void
     ) {
-        guard let original = task.originalRequest?.url, let redirected = request.url,
+        lock.lock()
+        let allowed = redirectionCount < 5
+        if allowed { redirectionCount += 1 }
+        lock.unlock()
+        guard allowed, let original = task.originalRequest?.url, let redirected = request.url,
               redirected.user == nil, redirected.password == nil,
               isSameOrigin(original, redirected) else {
             completionHandler(nil)
