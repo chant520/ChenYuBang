@@ -67,6 +67,7 @@
 		A00000000000000000000042 /* PackTestSupportTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000149 /* PackTestSupportTests.swift */; };
 		A00000000000000000000201 /* PackUpdateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000202 /* PackUpdateTests.swift */; };
 		A00000000000000000000203 /* PackChannelClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000204 /* PackChannelClientTests.swift */; };
+		A00000000000000000000205 /* PackUpdateTriggerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000206 /* PackUpdateTriggerTests.swift */; };
 		A000000000000000000001F6 /* PackMockFallbackTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000002F6 /* PackMockFallbackTests.swift */; };
 		A00000000000000000000048 /* CButtonSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000014A /* CButtonSnapshotTests.swift */; };
 		A00000000000000000000043 /* pack-v1.0.0.zip in Resources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000151 /* pack-v1.0.0.zip */; };
@@ -219,6 +220,7 @@
 		A00000000000000000000149 /* PackTestSupportTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackTestSupportTests.swift; sourceTree = "<group>"; };
 		A00000000000000000000202 /* PackUpdateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackUpdateTests.swift; sourceTree = "<group>"; };
 		A00000000000000000000204 /* PackChannelClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackChannelClientTests.swift; sourceTree = "<group>"; };
+		A00000000000000000000206 /* PackUpdateTriggerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackUpdateTriggerTests.swift; sourceTree = "<group>"; };
 		A000000000000000000002F6 /* PackMockFallbackTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackMockFallbackTests.swift; sourceTree = "<group>"; };
 		A0000000000000000000014A /* CButtonSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CButtonSnapshotTests.swift; sourceTree = "<group>"; };
 		A00000000000000000000151 /* pack-v1.0.0.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = Resources/pack-v1.0.0.zip; sourceTree = "<group>"; };
@@ -482,6 +484,7 @@
 				A00000000000000000000149 /* PackTestSupportTests.swift */,
 				A00000000000000000000202 /* PackUpdateTests.swift */,
 				A00000000000000000000204 /* PackChannelClientTests.swift */,
+				A00000000000000000000206 /* PackUpdateTriggerTests.swift */,
 				A000000000000000000002F6 /* PackMockFallbackTests.swift */,
 				A0000000000000000000014A /* CButtonSnapshotTests.swift */,
 				A00000000000000000000180 /* CTagSnapshotTests.swift */,
@@ -751,6 +754,7 @@
 				A00000000000000000000042 /* PackTestSupportTests.swift in Sources */,
 				A00000000000000000000201 /* PackUpdateTests.swift in Sources */,
 				A00000000000000000000203 /* PackChannelClientTests.swift in Sources */,
+				A00000000000000000000205 /* PackUpdateTriggerTests.swift in Sources */,
 				A000000000000000000001F6 /* PackMockFallbackTests.swift in Sources */,
 				A00000000000000000000048 /* CButtonSnapshotTests.swift in Sources */,
 				A00000000000000000000080 /* CTagSnapshotTests.swift in Sources */,
