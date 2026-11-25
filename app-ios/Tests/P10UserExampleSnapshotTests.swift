@@ -113,8 +113,8 @@ final class P10UserExampleSnapshotTests: XCTestCase {
             rerolling: rerolling,
             picked: picked,
             checked: checked,
-            updatingReviewState: updatingReviewState,
-            imageUnreadable: true
+            imageUnreadable: true,
+            updatingReviewState: updatingReviewState
         )
     }
 

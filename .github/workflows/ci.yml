@@ -75,6 +75,15 @@ jobs:
           xcodebuild -project ChenYuBang.xcodeproj -scheme ChenYuBang \
             -clonedSourcePackagesDirPath .spm-packages \
             -destination 'generic/platform=iOS' build CODE_SIGNING_ALLOWED=NO
+      - name: 录制前测试编译预检（record=true；快照预期失败不得掩盖编译失败）
+        if: github.event.inputs.record == 'true'
+        run: |
+          cd app-ios
+          SNAPSHOT_RECORD=0 TEST_RUNNER_SNAPSHOT_RECORD=0 xcodebuild \
+            -project ChenYuBang.xcodeproj -scheme ChenYuBang \
+            -clonedSourcePackagesDirPath .spm-packages \
+            -destination 'platform=iOS Simulator,name=iPhone 16' \
+            build-for-testing CODE_SIGNING_ALLOWED=NO
       - name: 单测 + 快照比对（swift-snapshot-testing 作为 test 的一部分；规范 §13 / §13.1）
         # Record runs fail every snapshot by design; continue-on-error keeps the run green
         continue-on-error: ${{ github.event.inputs.record == 'true' }}
