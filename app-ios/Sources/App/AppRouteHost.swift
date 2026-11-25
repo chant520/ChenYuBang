@@ -123,6 +123,7 @@ private struct AppRoutePage: View {
             LibraryScreen(
                 scope: preferences.scope,
                 reader: reader,
+                stateReader: launch.idiomStateStore,
                 onOpenScope: { _ = router.push(.scope) },
                 onOpenIdiom: { id in _ = router.push(.idiomDetail, recordID: id) },
                 onSearch: { _ = router.openSearch() },
@@ -140,12 +141,25 @@ private struct AppRoutePage: View {
                 reader: reader,
                 examplesReader: exampleReader,
                 reviewCounter: launch.reviewReader as PendingReviewCountReading?,
+                stateStore: launch.idiomStateStore as IdiomStateWriting?,
                 onBack: { router.back() },
                 onOpenMistakes: { router.goToMistakes() },
                 onOpenExample: { id in _ = router.push(.exampleDetail, recordID: id) },
                 onReviewIdiom: { word in
                     _ = self.startReview(source: .idiom(id: idiomID, word: word))
-                }
+                },
+                onStateChanged: { router.bumpUserContent() }
+            )
+        } else if entry.route == .favorites, let store = launch.idiomStateStore {
+            P24FavoriteScreen(
+                reader: store,
+                onBack: { router.back() },
+                onOpenIdiom: { id in _ = router.push(.idiomDetail, recordID: id) },
+                onGoBackToLibrary: {
+                    router.selectTab(.idiom)
+                    if router.currentEntry.route != .library { _ = router.push(.library) }
+                },
+                revision: router.userContentRevision
             )
         } else if entry.route == .exampleDetail,
                   let reader = launch.exampleReader,

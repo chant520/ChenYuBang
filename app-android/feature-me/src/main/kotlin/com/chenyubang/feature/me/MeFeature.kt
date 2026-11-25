@@ -39,5 +39,5 @@ data class MeActions(
  */
 object MeFeature {
     /** 本模块负责的页面号，便于路由接线时核对归属（信息架构 v1.2 §3）。 */
-    val OWNED_PAGES: List<String> = listOf("P13", "P14", "P15", "P16")
+    val OWNED_PAGES: List<String> = listOf("P13", "P14", "P15", "P16", "P24")
 }

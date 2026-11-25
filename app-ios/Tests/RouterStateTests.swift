@@ -6,7 +6,7 @@ import XCTest
 final class RouterStateTests: XCTestCase {
     func testRegistryKeepsAll24KeysAndFourRoots() {
         XCTAssertEqual(AppRoute.allCases.map(\.rawValue), [
-            "onboarding", "tab/recommend", "library", "search", "idiom/{id}", "tab/examples",
+            "onboarding", "tab/recommend", "library", "search", "idiom/{id}", "favorites", "tab/examples",
             "example/{id}", "tab/mistakes", "mistakes/idiom/{id}", "mistake/{id}",
             "review/queue", "review/summary", "tab/me", "settings/scope", "settings/backup",
             "settings/pack", "capture/camera", "capture/crop", "capture/ocr", "capture/match",
@@ -15,6 +15,27 @@ final class RouterStateTests: XCTestCase {
         XCTAssertEqual(AppTab.allCases.map(\.label), ["成语", "例题", "错题", "我的"])
         XCTAssertEqual(AppRoute.profile.owner, .profile)
         XCTAssertEqual(RouteRegistry.fabRoutes, Set(AppTab.allCases.map(\.root)))
+    }
+
+    func testFavoritesPushFromProfileAndBack() {
+        XCTAssertEqual(AppRoute.favorites.rawValue, "favorites")
+        XCTAssertEqual(AppRoute.favorites.title, "我的收藏")
+        XCTAssertEqual(AppRoute.favorites.owner, .idiom)
+        XCTAssertEqual(AppRoute.favorites.presentation, .push)
+        let router = RouterState()
+        router.selectTab(.profile)
+        XCTAssertTrue(router.push(.favorites))
+        XCTAssertEqual(router.currentEntry.route, .favorites)
+        XCTAssertEqual(router.entries(for: .profile).count, 2)
+        router.back()
+        XCTAssertEqual(router.currentEntry.route, .profile)
+        XCTAssertEqual(router.entries(for: .profile).count, 1)
+        // P24 空态「去成语库」：切到成语标签并压入成语库，返回各标签栈独立。
+        XCTAssertTrue(router.push(.favorites))
+        router.selectTab(.idiom)
+        XCTAssertTrue(router.push(.library))
+        XCTAssertEqual(router.currentEntry.route, .library)
+        XCTAssertEqual(router.entries(for: .profile).count, 2)
     }
 
     func testAllPushRoutesAcceptRealReferencesButRejectMissingIDs() {
@@ -211,6 +232,27 @@ final class RouterStateTests: XCTestCase {
         XCTAssertNil(router.captureWorkflow?.croppedURL)
     }
 
+    func testOverlayOriginAndCancellationAreNonMutating() {
+        let router = RouterState()
+        XCTAssertFalse(router.openOverlay(.clear))
+        XCTAssertFalse(router.openOverlay(.importMode))
+        router.selectTab(.profile)
+        let profile = router.currentEntry
+        XCTAssertTrue(router.openOverlay(.clear))
+        XCTAssertFalse(router.fabVisible)
+        router.closeOverlay()
+        XCTAssertEqual(router.currentEntry, profile)
+        router.push(.backup)
+        let backup = router.currentEntry
+        XCTAssertFalse(router.openOverlay(.clear))
+        XCTAssertTrue(router.openOverlay(.importMode))
+        router.back()
+        XCTAssertNil(router.overlay)
+        XCTAssertEqual(router.currentEntry, backup)
+    }
+}
+
+extension RouterStateTests {
     func testWorkflowFromSearchDetailRestoresSameEntriesAndState() throws {
         let router = RouterState()
         router.openSearch()
@@ -238,27 +280,6 @@ final class RouterStateTests: XCTestCase {
         XCTAssertFalse(router.captured(workflowID: workflowID, imageURL: URL(fileURLWithPath: "/fixture.jpg")))
     }
 
-    func testOverlayOriginAndCancellationAreNonMutating() {
-        let router = RouterState()
-        XCTAssertFalse(router.openOverlay(.clear))
-        XCTAssertFalse(router.openOverlay(.importMode))
-        router.selectTab(.profile)
-        let profile = router.currentEntry
-        XCTAssertTrue(router.openOverlay(.clear))
-        XCTAssertFalse(router.fabVisible)
-        router.closeOverlay()
-        XCTAssertEqual(router.currentEntry, profile)
-        router.push(.backup)
-        let backup = router.currentEntry
-        XCTAssertFalse(router.openOverlay(.clear))
-        XCTAssertTrue(router.openOverlay(.importMode))
-        router.back()
-        XCTAssertNil(router.overlay)
-        XCTAssertEqual(router.currentEntry, backup)
-    }
-}
-
-extension RouterStateTests {
     func testLateRecognitionCannotAdvanceRecroppedImage() throws {
         let router = RouterState()
         router.beginCapture()

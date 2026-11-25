@@ -18,7 +18,7 @@ class RouterStateTest {
     fun exactRegistryAndOwnership() {
         val keys =
             listOf(
-                "onboarding", "tab/recommend", "library", "search", "idiom/{id}", "tab/examples",
+                "onboarding", "tab/recommend", "library", "search", "idiom/{id}", "favorites", "tab/examples",
                 "example/{id}", "tab/mistakes", "mistakes/idiom/{id}", "mistake/{id}", "review/queue",
                 "review/summary", "tab/me", "settings/scope", "settings/backup", "settings/pack",
                 "review/self-test", "capture/camera", "capture/crop", "capture/ocr", "capture/match", "capture/done",
@@ -27,7 +27,7 @@ class RouterStateTest {
         assertEquals(keys, Route.entries.map { it.key })
         assertEquals(24, Route.entries.map { it.key }.toSet().size)
         assertEquals(
-            listOf(1, 4, 2, 3, 3, 4, 7),
+            listOf(1, 5, 2, 3, 3, 4, 7),
             RouteOwner.entries.map {
                     owner ->
                 Route.entries.count { it.owner == owner }
@@ -47,6 +47,24 @@ class RouterStateTest {
         assertTrue(RouterState().push(Route.Library).showTabs)
         assertFalse(RouterState().push(Route.Search).showTabs)
         assertFalse(RouterState(tab = AppTab.Me).present(Route.Clear).showFab)
+    }
+
+    @Test
+    fun favoritesPushesFromMeAndBackReturnsToProfile() {
+        assertEquals("favorites", Route.Favorites.key)
+        assertEquals("我的收藏", Route.Favorites.title)
+        assertEquals(RouteOwner.Idiom, Route.Favorites.owner)
+        assertEquals(Presentation.Push, Route.Favorites.presentation)
+        val profile = RouterState(tab = AppTab.Me)
+        val favorites = profile.push(Route.Favorites)
+        assertEquals(Route.Favorites, favorites.current.route)
+        assertEquals(profile.stack, favorites.back().stack)
+        assertTrue(favorites.showTabs)
+        assertFalse(favorites.showFab)
+        // 「去成语库」可从收藏二级页切到成语标签并 push 成语库，返回仍按各标签独立栈。
+        val library = favorites.selectTab(AppTab.Idiom).push(Route.Library)
+        assertEquals(Route.Library, library.current.route)
+        assertEquals(profile.stack, favorites.back().stack)
     }
 
     @Test

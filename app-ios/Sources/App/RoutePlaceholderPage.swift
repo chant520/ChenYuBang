@@ -65,6 +65,14 @@ struct RoutePlaceholderPage: View {
             CButton(text: "去错题本", variant: .ghost, action: router.goToMistakes)
         case .profile:
             if let message = router.clearResult { PendingPageText(text: message) }
+            // E2 数据概览（4+1）+ 设置分组首行「我的收藏 N」入口。
+            if let stateStore = launch.idiomStateStore, let mistakeReader = launch.mistakeReader {
+                P13OverviewView(
+                    reader: ComposedOverviewReader(stateStore: stateStore, mistakeReader: mistakeReader),
+                    onOpenFavorites: { _ = router.push(.favorites) },
+                    revision: router.userContentRevision
+                )
+            }
             CButton(text: "考试范围", variant: .ghost) { router.push(.scope) }
             CButton(text: "成语自测", variant: .ghost) { router.beginSelfTest() }
             CButton(text: "备份与恢复", variant: .ghost) { router.push(.backup) }

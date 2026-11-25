@@ -53,6 +53,7 @@ import com.chenyubang.core.ui.CChromeIcon
 import com.chenyubang.core.ui.CFab
 import com.chenyubang.core.ui.CInput
 import com.chenyubang.core.ui.tokens.Tokens
+import com.chenyubang.feature.me.P13OverviewRoute
 import com.chenyubang.feature.me.P15BackupViewModel
 import com.chenyubang.feature.me.P22ImportModeSheet
 import com.chenyubang.feature.me.P23ClearDialogRoute
@@ -205,6 +206,7 @@ private fun BoxScope.CaptureShortcut(onClick: () -> Unit) {
 internal fun RoutePlaceholder(
     router: RouterState,
     scope: ExamScopeSelection,
+    database: AppDatabase,
     update: (RouterState) -> Unit,
 ) {
     val colors = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
@@ -230,7 +232,7 @@ internal fun RoutePlaceholder(
             CButton("取消录题", { update(router.cancelCapture()) }, variant = CButtonVariant.Ghost)
             CButton("下一步（拍照业务待接入）", {}, enabled = false)
         }
-        PlaceholderLinks(router, scope, update)
+        PlaceholderLinks(router, scope, database, update)
         Spacer(Modifier.padding(bottom = Tokens.Space.fabBottom.dp))
     }
 }
@@ -239,6 +241,7 @@ internal fun RoutePlaceholder(
 private fun PlaceholderLinks(
     router: RouterState,
     scope: ExamScopeSelection,
+    database: AppDatabase,
     update: (RouterState) -> Unit,
 ) {
     when (router.current.route) {
@@ -261,6 +264,12 @@ private fun PlaceholderLinks(
             CButton("去错题本", { update(router.goToMistakes()) }, variant = CButtonVariant.Ghost)
         }
         Route.Me -> {
+            // E2 概览（4+1 纯数字）+ 设置分组首行「我的收藏 N」入口。
+            P13OverviewRoute(
+                database = database,
+                revision = router.contentRevision,
+                onOpenFavorites = { update(router.push(Route.Favorites)) },
+            )
             RouteScopeLine(scope)
             CButton("考试范围设置", { update(router.push(Route.Scope)) })
             CButton("备份与恢复", { update(router.push(Route.Backup)) })

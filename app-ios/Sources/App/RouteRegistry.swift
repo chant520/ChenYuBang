@@ -15,6 +15,7 @@ enum AppRoute: String, CaseIterable, Codable {
     case library = "library"
     case search = "search"
     case idiomDetail = "idiom/{id}"
+    case favorites = "favorites"
     case examples = "tab/examples"
     case exampleDetail = "example/{id}"
     case mistakes = "tab/mistakes"
@@ -38,7 +39,7 @@ enum AppRoute: String, CaseIterable, Codable {
     var owner: RouteOwner {
         switch self {
         case .onboarding: return .app
-        case .recommend, .library, .search, .idiomDetail: return .idiom
+        case .recommend, .library, .search, .idiomDetail, .favorites: return .idiom
         case .examples, .exampleDetail: return .example
         case .mistakes, .idiomMistakes, .mistakeDetail: return .mistake
         case .queue, .summary, .selfTest: return .review
@@ -50,7 +51,7 @@ enum AppRoute: String, CaseIterable, Codable {
     var presentation: RoutePresentation {
         switch self {
         case .recommend, .examples, .mistakes, .profile: return .root
-        case .library, .idiomDetail, .exampleDetail, .idiomMistakes, .mistakeDetail, .scope, .backup, .pack:
+        case .library, .idiomDetail, .favorites, .exampleDetail, .idiomMistakes, .mistakeDetail, .scope, .backup, .pack:
             return .push
         case .importMode: return .sheet
         case .clear: return .dialog
@@ -65,6 +66,7 @@ enum AppRoute: String, CaseIterable, Codable {
         case .library: return "成语库"
         case .search: return "搜索"
         case .idiomDetail: return "成语详情"
+        case .favorites: return "我的收藏"
         case .examples: return "例题"
         case .exampleDetail: return "例题详情"
         case .mistakes: return "错题"
