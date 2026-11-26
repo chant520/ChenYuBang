@@ -13,12 +13,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.chenyubang.core.ui.CButton
-import com.chenyubang.core.ui.CButtonVariant
 import com.chenyubang.core.ui.CChromeGlyph
 import com.chenyubang.core.ui.CChromeIcon
 import com.chenyubang.core.ui.tokens.Tokens
@@ -55,13 +55,24 @@ internal fun RouteHeader(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (router.stack.size > 1 && router.current.route != Route.Done) {
-            CButton("返回", back, variant = CButtonVariant.Ghost, modifier = Modifier.weight(1f))
+            Box(
+                Modifier.size(Tokens.Space.hitMin.dp)
+                    .clickable(role = Role.Button, onClick = back)
+                    .semantics { contentDescription = "返回" },
+                contentAlignment = Alignment.Center,
+            ) {
+                CChromeGlyph(
+                    kind = CChromeIcon.Back,
+                    color = colors.accent,
+                    modifier = Modifier.size(Tokens.Icon.n21.dp),
+                )
+            }
         }
         Text(
             router.current.route.title,
             color = colors.head,
             fontSize = Tokens.Font.n20.sp,
-            modifier = Modifier.weight(2f),
+            modifier = Modifier.weight(1f),
         )
         if (onSearch != null) {
             val interaction = remember { MutableInteractionSource() }

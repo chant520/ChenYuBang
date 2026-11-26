@@ -132,7 +132,7 @@ private fun ExportCard(
         Spacer(Modifier.size(Tokens.Space.lmetaTop.dp))
         CList {
             ActionRow("存到手机本地", onClick = onLocal)
-            ActionRow("通过系统文件 / 分享面板另存到网盘", showDivider = false, onClick = onShare)
+            ActionRow("通过系统文件 / 分享面板\n另存到网盘", showDivider = false, onClick = onShare)
         }
     }
 }

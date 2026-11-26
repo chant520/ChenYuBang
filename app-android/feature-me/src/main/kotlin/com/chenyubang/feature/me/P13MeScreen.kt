@@ -42,7 +42,6 @@ fun P13MeContent(
             .padding(horizontal = Tokens.Space.pageX.dp, vertical = Tokens.Space.contentTop.dp),
         verticalArrangement = Arrangement.spacedBy(Tokens.Space.block.dp),
     ) {
-        Text("我的", color = colors.head, fontSize = Tokens.Font.n20.sp, fontWeight = FontWeight.W700)
         SettingsRow("考试范围", scope.description, onClick = actions.onOpenScope)
         SettingsRow("成语自测", "10 题，两种题型交替", onClick = actions.onOpenSelfTest)
         SettingsRow("备份与恢复", "学习数据只存本机", onClick = actions.onOpenBackup)

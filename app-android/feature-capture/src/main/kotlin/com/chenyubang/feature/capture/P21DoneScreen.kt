@@ -102,8 +102,10 @@ fun P21DoneScreen(
 internal fun attribution(idioms: List<IdiomRef>): String =
     if (idioms.isEmpty()) {
         ""
+    } else if (idioms.size == 1) {
+        "这道题归到了 ${idioms.single().word} 下"
     } else {
-        "这道题归到了 ${idioms.joinToString("、") { it.word }} 下"
+        "这道题归到了\n${idioms.joinToString("、") { it.word }} 下"
     }
 
 private const val SUCCESS_ICON_SIZE = 64

@@ -1,5 +1,5 @@
 // GENERATED FILE — DO NOT EDIT.
-// Source: shared/tokens/tokens.json (docs/设计规范-v1.3.md)
+// Source: shared/tokens/tokens.json (docs/设计规范-v1.5.md)
 // Regenerate: python tools/gen_tokens.py
 
 import SwiftUI

@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.sp
 import com.chenyubang.core.ui.tokens.Tokens
 
 private const val ERROR_HINT_LINE_HEIGHT = 1.55f
+private const val INPUT_LINE_HEIGHT = 1.5f
 private const val FOCUS_RING_WIDTH = 2
 private const val ERROR_HINT_TOP = 4
 
@@ -82,15 +83,15 @@ fun CInput(
     val background = if (enabled) c.inputbg else c.disbg
     val foreground = inputForeground(c, enabled, error)
     val border = inputBorder(c, enabled, error, focused)
-    val verticalPad = if (enabled) Tokens.Space.inputY else Tokens.Space.inputDisY
     val fontSize = if (enabled) Tokens.Font.n12.sp else Tokens.Font.n125.sp
+    val lineHeight = fontSize.value * INPUT_LINE_HEIGHT
     Column(modifier = modifier.fillMaxWidth()) {
         BasicTextField(
             value = value,
             onValueChange = onValueChange,
             enabled = enabled,
             singleLine = true,
-            textStyle = TextStyle(color = foreground, fontSize = fontSize),
+            textStyle = TextStyle(color = foreground, fontSize = fontSize, lineHeight = lineHeight.sp),
             cursorBrush = SolidColor(c.accent),
             modifier =
                 Modifier
@@ -107,7 +108,7 @@ fun CInput(
                     )
                     .background(background, shape)
                     .border(1.dp, border, shape)
-                    .padding(horizontal = Tokens.Space.inputX.dp, vertical = verticalPad.dp),
+                    .padding(horizontal = Tokens.Space.inputX.dp),
             decorationBox = { inner ->
                 InputDecoration(value, placeholder, c.text3, fontSize, inner, leadingIcon, trailing)
             },
@@ -152,10 +153,11 @@ private fun InputDecoration(
     leadingIcon: (@Composable () -> Unit)? = null,
     trailing: (@Composable () -> Unit)? = null,
 ) {
+    val lineHeight = fontSize.value * INPUT_LINE_HEIGHT
+    val inputModifier = Modifier.fillMaxWidth().heightIn(min = Tokens.Space.inputMinH.dp)
     if (leadingIcon == null && trailing == null) {
-        // 无附加槽位时保持原有渲染结构，避免既有快照漂移
-        Box {
-            Placeholder(value, placeholder, placeholderColor, fontSize)
+        Box(inputModifier, contentAlignment = Alignment.CenterStart) {
+            Placeholder(value, placeholder, placeholderColor, fontSize, lineHeight)
             inner()
         }
     } else {
@@ -164,8 +166,11 @@ private fun InputDecoration(
                 leadingIcon()
                 Spacer(Modifier.width(Tokens.Space.inputX.dp))
             }
-            Box(Modifier.weight(1f)) {
-                Placeholder(value, placeholder, placeholderColor, fontSize)
+            Box(
+                Modifier.weight(1f).heightIn(min = Tokens.Space.inputMinH.dp),
+                contentAlignment = Alignment.CenterStart,
+            ) {
+                Placeholder(value, placeholder, placeholderColor, fontSize, lineHeight)
                 inner()
             }
             if (trailing != null) {
@@ -182,8 +187,9 @@ private fun Placeholder(
     placeholder: String,
     color: Color,
     fontSize: TextUnit,
+    lineHeight: Float,
 ) {
-    if (value.isEmpty()) Text(text = placeholder, color = color, fontSize = fontSize)
+    if (value.isEmpty()) Text(text = placeholder, color = color, fontSize = fontSize, lineHeight = lineHeight.sp)
 }
 
 @Composable

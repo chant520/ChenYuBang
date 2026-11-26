@@ -8,9 +8,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
@@ -152,7 +158,7 @@ private fun RouterShell(deps: RouteDeps) {
     val onSearch: (() -> Unit)? =
         if (router.current.route == Route.Library) ({ router = router.push(Route.Search) }) else null
     Box(Modifier.fillMaxSize().background(colors.page)) {
-        Column(Modifier.fillMaxSize()) {
+        Column(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Top))) {
             RouteHeader(router = router, back = back, onSearch = onSearch)
             Box(Modifier.weight(1f)) {
                 val entry = router.current
@@ -189,6 +195,7 @@ private fun BoxScope.CaptureShortcut(onClick: () -> Unit) {
     val colors = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
     Box(
         Modifier.align(Alignment.BottomEnd)
+            .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Bottom))
             .padding(end = Tokens.Space.fabRight.dp, bottom = Tokens.Space.fabBottom.dp)
             .semantics { contentDescription = "拍照录题" },
         contentAlignment = Alignment.Center,

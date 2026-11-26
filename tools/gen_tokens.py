@@ -20,7 +20,7 @@ TOKENS = ROOT / "shared" / "tokens" / "tokens.json"
 ANDROID_OUT = ROOT / "app-android" / "core-ui" / "src" / "main" / "kotlin" / "com" / "chenyubang" / "core" / "ui" / "tokens" / "Tokens.kt"
 IOS_OUT = ROOT / "app-ios" / "Sources" / "Tokens" / "Tokens.swift"
 
-HEADER = "// GENERATED FILE — DO NOT EDIT.\n// Source: shared/tokens/tokens.json (docs/设计规范-v1.3.md)\n// Regenerate: python tools/gen_tokens.py\n"
+HEADER = "// GENERATED FILE — DO NOT EDIT.\n// Source: shared/tokens/tokens.json (docs/设计规范-v1.5.md)\n// Regenerate: python tools/gen_tokens.py\n"
 
 
 def parse_color(value):
@@ -88,7 +88,7 @@ def kotlin():
     dark = data["color"]["dark"]
     out = [HEADER, "package com.chenyubang.core.ui.tokens", "",
            "import androidx.compose.ui.graphics.Color", "",
-           "/** 设计令牌。数值唯一来源：docs/设计规范-v1.3.md */",
+           "/** 设计令牌。数值唯一来源：docs/设计规范-v1.5.md */",
            "object Tokens {", ""]
 
     if sorted(light.keys()) != sorted(dark.keys()):
@@ -109,14 +109,18 @@ def kotlin():
         out.append("    }")
         out.append("")
 
-    for group, label in (("font", "字号（规范 3.2，11 档）"), ("radius", "圆角（规范 4.1）")):
+    android_font_scale = float(data.get("androidFontScale", 1.0))
+    if android_font_scale <= 0:
+        raise ValueError("androidFontScale must be positive")
+    for group, label in (("font", "字号（规范 3.2 / 3.4，Android 倍率，11 档）"), ("radius", "圆角（规范 4.1）")):
         out.append("    /** %s，单位 dp/sp */" % label)
         out.append("    object %s {" % ("Font" if group == "font" else "Radius"))
         for key, val in data[group].items():
-            if isinstance(val, float) and val != int(val):
-                out.append("        val %s = %s" % (key, val))
+            value = round(val * android_font_scale, 3) if group == "font" else val
+            if isinstance(value, float) and value != int(value):
+                out.append("        val %s = %s" % (key, value))
             else:
-                out.append("        val %s = %d" % (key, int(val)))
+                out.append("        val %s = %d" % (key, int(value)))
         out.append("    }")
         out.append("")
 

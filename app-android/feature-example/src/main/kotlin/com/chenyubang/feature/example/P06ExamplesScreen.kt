@@ -89,7 +89,7 @@ fun P06ExamplesContent(
         if (state.updateFailed) {
             CBar(
                 kind = CBarKind.Warn,
-                title = "题库更新失败，当前题库仍可离线浏览",
+                title = "题库更新失败，\n当前题库仍可离线浏览",
                 subtitle = "请到题库版本页手动重试。",
                 actionText = "去题库版本",
                 onAction = onOpenPack,
