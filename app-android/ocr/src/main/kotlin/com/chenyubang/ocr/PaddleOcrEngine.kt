@@ -2,6 +2,7 @@ package com.chenyubang.ocr
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.util.Log
 import com.baidu.paddle.lite.MobileConfig
 import com.baidu.paddle.lite.PaddlePredictor
 import com.baidu.paddle.lite.PowerMode
@@ -12,7 +13,8 @@ import kotlinx.coroutines.withContext
 import java.io.File
 
 /**
- * 端侧实现：Paddle-Lite 2.10 + PP-OCRv3 slim det/rec，模型随包、零联网。
+ * 端侧实现：Paddle-Lite 2.10 + 官方 PP-OCRv3 det/rec .nb（opt v2.10），模型随包、零联网。
+ * det/rec 模型与 so 的 opt 版本必须一致，否则 native 层 Fatal；替换任一模型前先核对 .nb 版本头。
  * 推理全程在 [Dispatchers.Default]，同一实例串行执行（PaddlePredictor 非线程安全）。
  * 真机精度复测后置（B1）；代理实测 18/20＝90% 只作参考，不视为达标。
  */
@@ -27,7 +29,10 @@ class PaddleOcrEngine(context: Context) : OcrEngine {
         withContext(Dispatchers.Default) {
             val started = System.nanoTime()
             mutex.withLock {
-                val lines = runCatching { runPipeline(imagePath) }.getOrNull().orEmpty()
+                val lines =
+                    runCatching { runPipeline(imagePath) }
+                        .onFailure { Log.e(TAG, "runPipeline failed", it) }
+                        .getOrNull().orEmpty()
                 val (stem, options) = OcrLineClassifier.classify(lines)
                 OcrResult(
                     stem = stem.ifBlank { null },
@@ -70,7 +75,8 @@ class PaddleOcrEngine(context: Context) : OcrEngine {
                 setThreads(THREADS)
                 setPowerMode(PowerMode.LITE_POWER_HIGH)
             }
-        return checkNotNull(PaddlePredictor.createPaddlePredictor(config)) { "predictor init failed" }
+        val predictor = PaddlePredictor.createPaddlePredictor(config)
+        return checkNotNull(predictor) { "predictor init failed: ${model.name}" }
     }
 
     /** rec 模型训练时 use_space_char=true：字符类 = 字典 + 空格，调用方须追加。 */
@@ -141,6 +147,7 @@ class PaddleOcrEngine(context: Context) : OcrEngine {
     )
 
     private companion object {
+        const val TAG = "OcrDiag"
         const val THREADS = 2
         const val CHANNEL_COUNT = 3
         const val MIN_LINE_SCORE = 0.5f
