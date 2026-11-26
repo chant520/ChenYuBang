@@ -39,6 +39,7 @@ internal class OcrModelStore(context: Context) {
     }
 
     private companion object {
-        const val MODEL_DIR = "ocr/ppocrv3-slim"
+        // 换模型版本时改 THIS 标识即可让旧目录整体失效，避免升级后沿用旧模型。
+        const val MODEL_DIR = "ocr/ppocrv3-v2.10"
     }
 }
