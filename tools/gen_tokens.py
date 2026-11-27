@@ -20,7 +20,18 @@ TOKENS = ROOT / "shared" / "tokens" / "tokens.json"
 ANDROID_OUT = ROOT / "app-android" / "core-ui" / "src" / "main" / "kotlin" / "com" / "chenyubang" / "core" / "ui" / "tokens" / "Tokens.kt"
 IOS_OUT = ROOT / "app-ios" / "Sources" / "Tokens" / "Tokens.swift"
 
-HEADER = "// GENERATED FILE — DO NOT EDIT.\n// Source: shared/tokens/tokens.json (docs/设计规范-v1.6.md)\n// Regenerate: python tools/gen_tokens.py\n"
+def source_ref(data):
+    """规范版本引用取自 tokens.json，避免生成器硬编码版本号。"""
+    source = data.get("source")
+    if not source:
+        raise ValueError("tokens.json 缺少 source 字段（规范版本引用）")
+    return source
+
+
+def header(source):
+    return ("// GENERATED FILE — DO NOT EDIT.\n"
+            "// Source: shared/tokens/tokens.json (%s)\n"
+            "// Regenerate: python tools/gen_tokens.py\n" % source)
 
 
 def parse_color(value):
@@ -84,11 +95,12 @@ def fnum(v):
 
 def kotlin():
     data = json.loads(TOKENS.read_text(encoding="utf-8"))
+    source = source_ref(data)
     light = data["color"]["light"]
     dark = data["color"]["dark"]
-    out = [HEADER, "package com.chenyubang.core.ui.tokens", "",
+    out = [header(source), "package com.chenyubang.core.ui.tokens", "",
            "import androidx.compose.ui.graphics.Color", "",
-           "/** 设计令牌。数值唯一来源：docs/设计规范-v1.6.md */",
+           "/** 设计令牌。数值唯一来源：%s */" % source,
            "object Tokens {", ""]
 
     if sorted(light.keys()) != sorted(dark.keys()):
@@ -161,10 +173,11 @@ def kotlin():
 
 def swift():
     data = json.loads(TOKENS.read_text(encoding="utf-8"))
+    source = source_ref(data)
     light = data["color"]["light"]
     dark = data["color"]["dark"]
-    out = [HEADER, "import SwiftUI", "",
-           "/// 设计令牌。数值唯一来源：docs/设计规范-v1.6.md",
+    out = [header(source), "import SwiftUI", "",
+           "/// 设计令牌。数值唯一来源：%s" % source,
            "public struct TokenColors: Sendable {"]
     for key in sorted(light.keys()):
         out.append("    public let %s: Color" % key)
