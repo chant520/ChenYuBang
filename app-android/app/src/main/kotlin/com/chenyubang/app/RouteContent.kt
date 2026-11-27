@@ -9,6 +9,7 @@ import com.chenyubang.feature.capture.OcrScreenActions
 import com.chenyubang.feature.capture.P20FormDeps
 import com.chenyubang.feature.capture.P20FormScreen
 import com.chenyubang.feature.capture.P21DoneScreen
+import com.chenyubang.feature.idiom.P05IdiomDetailRoute
 import com.chenyubang.feature.me.P15BackupRoute
 import com.chenyubang.feature.me.P16PackRoute
 
@@ -66,7 +67,10 @@ internal fun RouteContent(
     }
 }
 
-/** P05 成语详情 / P24 我的收藏：同属 Idiom 归属的二级 Push 路由接线。 */
+/**
+ * P05 成语详情 / P24 我的收藏：同属 Idiom 归属的二级 Push 路由接线。
+ * P05 的 A5 数字进 P09（按当前成语），「去错题本」仍进 P08，两者是独立回调。
+ */
 @Composable
 private fun IdiomRouteContent(
     entry: RouteEntry,
@@ -75,16 +79,19 @@ private fun IdiomRouteContent(
     onRoute: (RouterState) -> Unit,
 ) {
     when (entry.route) {
-        Route.Idiom ->
-            IdiomDestination(
-                idiomId = requireNotNull(entry.id),
+        Route.Idiom -> {
+            val idiomId = requireNotNull(entry.id)
+            P05IdiomDetailRoute(
+                idiomId = idiomId,
                 database = deps.database,
                 onBack = { onRoute(router.back()) },
-                onOpenMistakes = { onRoute(router.goToMistakes()) },
+                onOpenMistakes = { onRoute(router.push(Route.IdiomMistakes, idiomId)) },
+                onOpenMistakeBook = { onRoute(router.goToMistakes()) },
                 onOpenExample = { id -> onRoute(router.push(Route.Example, id)) },
                 onReviewIdiom = { count -> onRoute(router.startReview(count)) },
                 revision = router.contentRevision,
             )
+        }
         Route.Favorites ->
             FavoriteDestination(
                 database = deps.database,

@@ -2,8 +2,7 @@ plugins {
     id("com.android.library")
     kotlin("android")
     kotlin("plugin.compose")
-    id("org.jlleitschuh.gradle.ktlint")
-    id("io.gitlab.arturbosch.detekt")
+    // ktlint / detekt 由根 build.gradle.kts 的 subprojects 统一 apply，本模块不另起一套。
     id("io.github.takahirom.roborazzi")
 }
 

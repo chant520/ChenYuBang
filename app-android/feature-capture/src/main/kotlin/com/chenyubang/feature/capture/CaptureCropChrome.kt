@@ -1,6 +1,7 @@
 package com.chenyubang.feature.capture
 
 import android.graphics.Bitmap
+import android.graphics.Paint
 import android.graphics.RectF
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -23,23 +24,17 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.drawscope.withTransform
+import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
@@ -55,7 +50,7 @@ import com.chenyubang.core.ui.tokens.Tokens
 import kotlin.math.roundToInt
 
 internal const val ROTATION_QUARTERS = 4
-private const val QUARTER_DEGREES = 90f
+private const val QUARTER_TURN_DEGREES = 90f
 private const val ANGLE_LIMIT = 15f
 private const val ANGLE_STEP_DIVISIONS = 2f
 private const val ANGLE_SLIDER_STEPS = 59
@@ -81,6 +76,24 @@ internal fun CropHeader(
     onBack: () -> Unit,
     colors: Tokens.ColorSet,
 ) {
+    CaptureStepHeader(
+        title = "裁切与摆正",
+        step = "第 2 步 / 共 5 步",
+        backDescription = "返回重拍",
+        onBack = onBack,
+        colors = colors,
+    )
+}
+
+@Composable
+internal fun CaptureStepHeader(
+    title: String,
+    step: String,
+    backDescription: String,
+    onBack: () -> Unit,
+    colors: Tokens.ColorSet,
+) {
+    val stackStep = LocalDensity.current.fontScale > 1f
     Column(Modifier.fillMaxWidth().background(colors.page)) {
         Row(
             Modifier.fillMaxWidth().padding(
@@ -94,20 +107,30 @@ internal fun CropHeader(
             Box(
                 Modifier.size(Tokens.Space.hitMin.dp)
                     .clickable(onClick = onBack)
-                    .semantics { contentDescription = "返回重拍" },
+                    .semantics { contentDescription = backDescription },
                 contentAlignment = Alignment.Center,
             ) {
                 CChromeGlyph(CChromeIcon.Back, colors.text2, Modifier.size(Tokens.Icon.n21.dp))
             }
             Spacer(Modifier.width(Tokens.Space.camTopGap.dp))
             Text(
-                "裁切与摆正",
+                title,
                 color = colors.head,
-                fontSize = Tokens.Font.n15.sp,
+                fontSize = Tokens.FontRole.pageTitle.sp,
                 fontWeight = FontWeight.W700,
                 modifier = Modifier.weight(1f),
             )
-            Text("第 2 步 / 共 5 步", color = colors.text3, fontSize = Tokens.Font.n11.sp)
+            if (!stackStep) {
+                Text(step, color = colors.text3, fontSize = Tokens.FontRole.caption.sp)
+            }
+        }
+        if (stackStep) {
+            Text(
+                step,
+                color = colors.text3,
+                fontSize = Tokens.FontRole.caption.sp,
+                modifier = Modifier.align(Alignment.End).padding(end = Tokens.Space.pageX.dp),
+            )
         }
         Box(Modifier.fillMaxWidth().height(Tokens.Space.cropEdge.dp).background(colors.line))
     }
@@ -129,12 +152,12 @@ internal fun CropCanvasBox(
         val bitmap = view.bitmap
         val crop = view.crop
         when {
-            view.failed -> Text("图片读取失败，请返回重拍", color = Tokens.Dark.warnfg, fontSize = Tokens.Font.n12.sp)
+            view.failed -> Text("图片读取失败，请返回重拍", color = Tokens.Dark.warnfg, fontSize = Tokens.FontRole.supporting.sp)
             bitmap == null || crop == null ->
                 Text(
                     "正在读取图片…",
                     color = Tokens.Dark.camhint,
-                    fontSize = Tokens.Font.n12.sp,
+                    fontSize = Tokens.FontRole.supporting.sp,
                 )
             else -> CropCanvas(view, colors, onCropChange)
         }
@@ -150,36 +173,68 @@ private fun CropCanvas(
     val bitmap = requireNotNull(view.bitmap)
     val crop = requireNotNull(view.crop)
     val density = LocalDensity.current
-    val image = remember(bitmap) { bitmap.asImageBitmap() }
-    val latestCrop by rememberUpdatedState(crop)
-    var corner by remember { mutableStateOf<Int?>(null) }
+    val latestCrop = rememberUpdatedState(crop)
     val minSizePx = with(density) { Tokens.Space.cropMin.dp.toPx() }
     val hitRadius = with(density) { Tokens.Space.hitMin.dp.toPx() }
     Canvas(
-        Modifier.fillMaxSize().pointerInput(view.quarterTurns) {
+        Modifier.fillMaxSize().pointerInput(view.quarterTurns, view.fineDegrees) {
+            var dragCrop = latestCrop.value
+            var dragCorner: Int? = null
             detectDragGestures(
-                onDragStart = { offset -> corner = nearestCorner(latestCrop, size, offset, hitRadius) },
-                onDragEnd = { corner = null },
-                onDragCancel = { corner = null },
+                onDragStart = { offset ->
+                    dragCrop = latestCrop.value
+                    dragCorner = nearestCorner(dragCrop, size, offset, hitRadius)
+                },
+                onDragEnd = { dragCorner = null },
+                onDragCancel = { dragCorner = null },
             ) { change, dragAmount ->
                 change.consume()
-                val current = corner
-                if (current != null) onCropChange(moveCorner(latestCrop, current, dragAmount, size, minSizePx))
+                val current = dragCorner
+                if (current != null) {
+                    val bounds =
+                        CropDisplayGeometry.displayedImageBounds(
+                            CropViewport(
+                                bitmap.width,
+                                bitmap.height,
+                                size.width.toFloat(),
+                                size.height.toFloat(),
+                                view.quarterTurns,
+                                view.fineDegrees,
+                            ),
+                        )
+                    dragCrop = moveCorner(dragCrop, current, dragAmount, size, minSizePx, bounds)
+                    onCropChange(dragCrop)
+                }
             }
         },
     ) {
-        val scale =
-            CropImage.fitScale(bitmap.width, bitmap.height, size.width, size.height, view.quarterTurns)
-        withTransform({
-            translate(size.width / 2f, size.height / 2f)
-            rotate(view.quarterTurns * QUARTER_DEGREES + view.fineDegrees)
-            scale(scale, scale)
-            translate(-bitmap.width / 2f, -bitmap.height / 2f)
-        }) {
-            drawImage(image, filterQuality = FilterQuality.Medium)
-        }
+        val displayView =
+            CropViewport(
+                bitmap.width,
+                bitmap.height,
+                size.width.toFloat(),
+                size.height.toFloat(),
+                view.quarterTurns,
+                view.fineDegrees,
+            )
+        drawCropBitmap(bitmap, displayView)
         drawCropOverlay(crop, colors)
     }
+}
+
+private fun DrawScope.drawCropBitmap(
+    bitmap: Bitmap,
+    view: CropViewport,
+) {
+    val canvas = this.drawContext.canvas.nativeCanvas
+    val checkpoint = canvas.save()
+    canvas.translate(size.width / 2f, size.height / 2f)
+    canvas.rotate(view.quarterTurns * QUARTER_TURN_DEGREES + view.fineDegrees)
+    val fitScale = CropDisplayGeometry.fitScale(view)
+    canvas.scale(fitScale, fitScale)
+    canvas.translate(-bitmap.width / 2f, -bitmap.height / 2f)
+    canvas.drawBitmap(bitmap, 0f, 0f, Paint(Paint.FILTER_BITMAP_FLAG))
+    canvas.restoreToCount(checkpoint)
 }
 
 private fun DrawScope.drawCropOverlay(
@@ -251,7 +306,7 @@ private fun CropGhostButton(
         Text(
             text,
             color = if (enabled) colors.text2 else colors.disfg,
-            fontSize = Tokens.Font.n115.sp,
+            fontSize = Tokens.FontRole.button.sp,
             modifier = Modifier.padding(vertical = Tokens.Space.ghostY.dp),
         )
     }
@@ -271,7 +326,7 @@ internal fun AdjustPanel(
         ),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text("微调", color = colors.text3, fontSize = Tokens.Font.n11.sp)
+        Text("微调", color = colors.text3, fontSize = Tokens.FontRole.caption.sp)
         Slider(
             value = fineDegrees,
             onValueChange = { onFineChange((it * ANGLE_STEP_DIVISIONS).roundToInt() / ANGLE_STEP_DIVISIONS) },
@@ -287,12 +342,12 @@ internal fun AdjustPanel(
                     inactiveTickColor = Color.Transparent,
                 ),
         )
-        Text(angleLabel(fineDegrees), color = colors.text3, fontSize = Tokens.Font.n11.sp)
+        Text(angleLabel(fineDegrees), color = colors.text3, fontSize = Tokens.FontRole.caption.sp)
         Spacer(Modifier.width(Tokens.Space.cropRowGap.dp))
         Text(
             "复位",
             color = colors.accent,
-            fontSize = Tokens.Font.n11.sp,
+            fontSize = Tokens.FontRole.caption.sp,
             modifier = Modifier.clickable(onClick = onReset),
         )
     }

@@ -3,7 +3,6 @@ package com.chenyubang.core.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -43,7 +42,7 @@ fun CLetterIndex(
     onSelect: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val c = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
+    val c = LocalColorSet.current
     Column(
         modifier = modifier.width(LETTER_RAIL_WIDTH.dp),
         verticalArrangement = Arrangement.spacedBy(LETTER_GAP.dp),
@@ -73,7 +72,7 @@ fun CLetterIndex(
                 Text(
                     text = letter,
                     color = if (active) c.accent else c.text3,
-                    fontSize = Tokens.Font.n10.sp,
+                    fontSize = Tokens.FontRole.label.sp,
                     fontWeight = if (active) FontWeight.W700 else FontWeight.Normal,
                 )
             }

@@ -2,6 +2,7 @@ package com.chenyubang.core.data
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -11,6 +12,7 @@ import kotlinx.serialization.json.JsonPrimitive
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -296,6 +298,31 @@ class PackUpdateCoordinatorTest : PackDatabaseTest() {
             assertTrue(database.idiomDao().byId(stateId) != null)
             assertEquals(null, database.idiomDao().byId(removedId))
             assertEquals(beforeUsers, snapshot(userTables))
+        }
+
+    @Test
+    fun closeCancelsPendingCheckAndStopsWritingState() =
+        runBlocking {
+            val gate = CompletableDeferred<ChannelManifestResult>()
+            val source = FakeSource(gate = gate)
+            val coordinator = coordinator(source)
+            coordinator.bootstrap()
+            val check = async { runCatching { coordinator.check() } }
+            while (source.latestCalls == 0) yield()
+            assertEquals(PackVersionStatus.CHECKING, coordinator.state.value?.status)
+
+            coordinator.close()
+            assertNull(coordinator.state.value)
+            gate.complete(ChannelManifestResult.Recoverable("offline"))
+            check.await()
+            assertNull(coordinator.state.value)
+            assertEquals(1, source.latestCalls)
+
+            val afterClose = runCatching { coordinator.check() }
+            assertTrue(afterClose.exceptionOrNull() is CancellationException)
+            assertNull(coordinator.state.value)
+            coordinator.close()
+            assertNull(coordinator.state.value)
         }
 
     private fun coordinator(

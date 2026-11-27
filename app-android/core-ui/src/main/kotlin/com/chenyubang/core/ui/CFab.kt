@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -80,8 +79,8 @@ fun CFab(
     enabled: Boolean = true,
     badgeText: String? = null,
 ) {
-    val dark = isSystemInDarkTheme()
-    val c = if (dark) Tokens.Dark else Tokens.Light
+    val dark = LocalDarkTheme.current
+    val c = LocalColorSet.current
     val layers = if (dark) Tokens.Shadow.fabDark else Tokens.Shadow.fabLight
     val interaction = remember { MutableInteractionSource() }
     val pressed by interaction.collectIsPressedAsState()

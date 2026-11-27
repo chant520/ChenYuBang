@@ -91,7 +91,7 @@ private fun DiscardOverlay(
         Text(
             text = "未保存的范围修改会丢弃，已录的错题、收藏与学习状态不受影响。",
             color = colors.text2,
-            fontSize = Tokens.Font.n12.sp,
+            fontSize = Tokens.FontRole.supporting.sp,
         )
         CButton("放弃修改", onDiscard)
         CButton("继续编辑", onDismiss, variant = CButtonVariant.Ghost)
@@ -129,7 +129,7 @@ fun P14ExamScopeContent(
             Text(
                 text = "范围保存失败，请重试；当前选择已保留。",
                 color = colors.warnfg,
-                fontSize = Tokens.Font.n12.sp,
+                fontSize = Tokens.FontRole.supporting.sp,
             )
         }
         ScopeActions(mode, state.saving, onSave, onSkip, onBack)
@@ -194,12 +194,12 @@ private fun EffectiveScopeCard() {
         Text(
             text = "范围决定成语库与例题库里能看到哪些内容；省份用于筛选省考内容，不改变页面的其他功能。",
             color = colors.text2,
-            fontSize = Tokens.Font.n13.sp,
+            fontSize = Tokens.FontRole.body.sp,
         )
         Text(
             text = "改范围不会影响已录的错题、收藏与学习状态；P01 引导用的是同一份数据，两边同步。",
             color = colors.text3,
-            fontSize = Tokens.Font.n12.sp,
+            fontSize = Tokens.FontRole.supporting.sp,
             modifier = Modifier.padding(top = Tokens.Space.lsubTop.dp),
         )
     }
@@ -211,7 +211,7 @@ private fun EmptyScopeHint() {
     Text(
         text = "不选范围时成语库和例题库会是空的，可以稍后在『我的』里改。",
         color = colors.text3,
-        fontSize = Tokens.Font.n12.sp,
+        fontSize = Tokens.FontRole.supporting.sp,
     )
 }
 
@@ -260,7 +260,7 @@ private fun BrandBlock() {
         Text(
             text = "成语记忆",
             color = colors.head,
-            fontSize = Tokens.Font.n20.sp,
+            fontSize = Tokens.FontRole.sectionTitle.sp,
             fontWeight = FontWeight.W700,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(top = Tokens.Space.lsubTop.dp),
@@ -268,7 +268,7 @@ private fun BrandBlock() {
         Text(
             text = "把考公考编的成语错题，记成自己的题库",
             color = colors.text3,
-            fontSize = Tokens.Font.n12.sp,
+            fontSize = Tokens.FontRole.supporting.sp,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(top = Tokens.Space.lsubTop.dp),
         )
@@ -286,14 +286,14 @@ private fun ProvinceGroup(
         Text(
             text = "省份用于筛选省考内容，可自行增减",
             color = colors.text3,
-            fontSize = Tokens.Font.n12.sp,
+            fontSize = Tokens.FontRole.supporting.sp,
             modifier = Modifier.padding(top = Tokens.Space.lsubTop.dp),
         )
         if (state.availableProvinces.isEmpty()) {
             Text(
                 text = "当前题库没有省考省份数据，选好题库版本后再来。",
                 color = colors.text3,
-                fontSize = Tokens.Font.n12.sp,
+                fontSize = Tokens.FontRole.supporting.sp,
                 modifier = Modifier.padding(top = Tokens.Space.lsubTop.dp),
             )
         } else {

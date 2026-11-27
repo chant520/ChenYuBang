@@ -2,7 +2,6 @@ package com.chenyubang.core.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,7 +35,7 @@ fun CEmptyState(
     onAction: (() -> Unit)? = null,
     icon: CChromeIcon? = null,
 ) {
-    val c = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
+    val c = LocalColorSet.current
     Column(
         modifier = modifier.fillMaxWidth().padding(horizontal = Tokens.Space.pageX.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -62,13 +61,13 @@ fun CEmptyState(
         Text(
             text = title,
             color = c.text2,
-            fontSize = Tokens.Font.n15.sp,
+            fontSize = Tokens.FontRole.sectionTitle.sp,
             textAlign = TextAlign.Center,
         )
         Text(
             text = description,
             color = c.text3,
-            fontSize = Tokens.Font.n12.sp,
+            fontSize = Tokens.FontRole.supporting.sp,
             textAlign = TextAlign.Center,
         )
         if (actionText != null && onAction != null) {

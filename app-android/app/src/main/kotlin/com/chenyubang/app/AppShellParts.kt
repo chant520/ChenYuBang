@@ -1,8 +1,16 @@
 package com.chenyubang.app
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -28,7 +36,7 @@ internal fun InitializingScreen(
         Text(
             if (failed) "本机数据或内置题库初始化失败，请重试" else "正在初始化本机数据与内置题库",
             color = if (failed) colors.warnfg else colors.text2,
-            fontSize = Tokens.Font.n13.sp,
+            fontSize = Tokens.FontRole.body.sp,
         )
         if (failed) CButton("重试初始化", onRetry)
     }
@@ -39,7 +47,14 @@ internal fun AppTabs(
     selectedIndex: Int,
     onSelect: (Int) -> Unit,
 ) {
-    CTabBar(AppTab.entries.map { it.label }, selectedIndex, onSelect = onSelect)
+    val colors = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
+    Box(
+        Modifier.fillMaxWidth()
+            .background(colors.tabbg)
+            .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Bottom)),
+    ) {
+        CTabBar(AppTab.entries.map { it.label }, selectedIndex, onSelect = onSelect)
+    }
 }
 
 @Composable
@@ -69,7 +84,7 @@ internal fun ExitReviewOverlay(
 ) {
     val colors = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
     COverlay("放弃本轮复习？", true, onDismiss) {
-        Text("退出会丢本轮进度", color = colors.text2, fontSize = Tokens.Font.n12.sp)
+        Text("退出会丢本轮进度", color = colors.text2, fontSize = Tokens.FontRole.supporting.sp)
         CButton("确认退出", onConfirm)
         CButton("继续复习", onDismiss, variant = CButtonVariant.Ghost)
     }

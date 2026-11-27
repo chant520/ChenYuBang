@@ -5,14 +5,14 @@ import com.chenyubang.feature.review.ReviewSummary
 /** P13 → P25：与复习相同的全屏入栈方式，不经过拒绝 FullScreen 的 push。 */
 fun RouterState.startSelfTest(): RouterState {
     if (current.route != Route.Me || review != null || modal != null) return this
-    return append(RouteEntry(Route.SelfTest, instance = sequence))
+    return pushFullScreen(Route.SelfTest, instance = sequence)
 }
 
 fun RouterState.startReview(pendingCount: Int): RouterState {
     if (pendingCount <= 0 || review != null || modal != null) return this
     require(current.route == Route.Mistakes || current.route == Route.Idiom)
     val session = ReviewSession(current, stack.size, current.id.takeIf { current.route == Route.Idiom })
-    return append(RouteEntry(Route.Queue, session.idiomId, sequence)).copy(review = session)
+    return pushFullScreen(Route.Queue, session.idiomId, sequence).copy(review = session)
 }
 
 fun RouterState.finishReview(
@@ -28,7 +28,7 @@ fun RouterState.retryReview(pendingCount: Int): RouterState {
     val session = review
     if (pendingCount <= 0 || session == null || current.route != Route.Summary) return this
     // 保留上一轮小结：从新队列返回时 P12 仍显示当轮数字；0 题兜底只留给进程重建等真异常。
-    return append(RouteEntry(Route.Queue, session.idiomId, sequence))
+    return pushFullScreen(Route.Queue, session.idiomId, sequence)
 }
 
 fun RouterState.exitReview(): RouterState {

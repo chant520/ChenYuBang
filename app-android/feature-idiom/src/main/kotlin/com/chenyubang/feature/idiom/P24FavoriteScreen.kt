@@ -116,7 +116,7 @@ private fun FavoriteHeader(
         Text(
             text = "我的收藏",
             color = colors.head,
-            fontSize = Tokens.Font.n20.sp,
+            fontSize = Tokens.FontRole.pageTitle.sp,
             fontWeight = FontWeight.W700,
             modifier = Modifier.padding(start = Tokens.Space.lmetaGap.dp),
         )
@@ -150,7 +150,7 @@ private fun FavoriteBody(
             state.isEmpty ->
                 CEmptyState(
                     title = "还没收藏成语",
-                    description = "在成语库里点右上角收藏，就能在这里集中看",
+                    description = "在成语库里点右上角收藏，\n就能在这里集中看",
                     actionText = "去成语库",
                     onAction = onGoLibrary,
                 )

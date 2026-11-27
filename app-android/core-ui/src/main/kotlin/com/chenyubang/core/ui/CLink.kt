@@ -3,7 +3,6 @@ package com.chenyubang.core.ui
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,13 +25,13 @@ fun CLink(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val c = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
+    val c = LocalColorSet.current
     val interaction = remember { MutableInteractionSource() }
     val pressed by interaction.collectIsPressedAsState()
     Text(
         text = text,
         color = c.accent,
-        fontSize = Tokens.Font.n12.sp,
+        fontSize = Tokens.FontRole.supporting.sp,
         textDecoration = TextDecoration.Underline,
         modifier =
             modifier

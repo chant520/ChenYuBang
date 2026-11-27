@@ -5,7 +5,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -39,7 +38,7 @@ fun CList(
     modifier: Modifier = Modifier,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    val c = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
+    val c = LocalColorSet.current
     val shape = RoundedCornerShape(Tokens.Radius.r6.dp)
     Column(
         modifier =
@@ -67,7 +66,7 @@ private fun ListRowTitle(
         Text(
             text = name,
             color = nameColor,
-            fontSize = Tokens.Font.n14.sp,
+            fontSize = Tokens.FontRole.itemTitle.sp,
             fontWeight = FontWeight.W600,
             letterSpacing = NAME_LETTER_SPACING.em,
             modifier = Modifier.alignByBaseline(),
@@ -75,7 +74,7 @@ private fun ListRowTitle(
         Text(
             text = pinyin,
             color = secondaryColor,
-            fontSize = Tokens.Font.n11.sp,
+            fontSize = Tokens.FontRole.caption.sp,
             modifier = Modifier.alignByBaseline(),
         )
         if (trailing != null) {
@@ -83,7 +82,7 @@ private fun ListRowTitle(
             Text(
                 text = trailing,
                 color = secondaryColor,
-                fontSize = Tokens.Font.n11.sp,
+                fontSize = Tokens.FontRole.caption.sp,
                 modifier = Modifier.alignByBaseline(),
             )
         }
@@ -104,7 +103,7 @@ fun CListRow(
     showDivider: Boolean = true,
     onClick: (() -> Unit)? = null,
 ) {
-    val c = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
+    val c = LocalColorSet.current
     val interaction = remember { MutableInteractionSource() }
     val pressed by interaction.collectIsPressedAsState()
     val clickable = onClick != null && enabled
@@ -149,8 +148,8 @@ fun CListRow(
             Text(
                 text = sub,
                 color = if (enabled) c.text2 else c.disfg,
-                fontSize = Tokens.Font.n12.sp,
-                lineHeight = (Tokens.Font.n12 * SUB_LINE_HEIGHT).sp,
+                fontSize = Tokens.FontRole.supporting.sp,
+                lineHeight = (Tokens.FontRole.supporting * SUB_LINE_HEIGHT).sp,
                 modifier = Modifier.padding(top = Tokens.Space.lsubTop.dp),
             )
         }

@@ -102,7 +102,7 @@ fun P04SearchContent(
         Text(
             text = IdiomSearchUi.INPUT_HINT,
             color = colors.text3,
-            fontSize = Tokens.Font.n12.sp,
+            fontSize = Tokens.FontRole.supporting.sp,
         )
         when {
             state.query.isBlank() -> Unit
@@ -136,7 +136,7 @@ private fun SearchHeader(
         Text(
             text = "搜索",
             color = colors.head,
-            fontSize = Tokens.Font.n15.sp,
+            fontSize = Tokens.FontRole.pageTitle.sp,
             fontWeight = FontWeight.W700,
             modifier = Modifier.padding(start = Tokens.Space.lmetaGap.dp),
         )
@@ -181,7 +181,7 @@ private fun NoResult(colors: Tokens.ColorSet) {
         Text(
             text = "已输入的内容不会自动清空，改字即时出新结果",
             color = colors.text3,
-            fontSize = Tokens.Font.n12.sp,
+            fontSize = Tokens.FontRole.supporting.sp,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(top = Tokens.Space.ghostY.dp),
         )
@@ -209,7 +209,7 @@ private fun SearchResults(
         Text(
             text = "${results.size} 条结果",
             color = colors.text3,
-            fontSize = Tokens.Font.n11.sp,
+            fontSize = Tokens.FontRole.caption.sp,
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth(),
         )

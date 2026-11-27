@@ -112,13 +112,13 @@ private fun NumberCell(
         Text(
             text = "$value",
             color = valueColor,
-            fontSize = Tokens.Font.n20.sp,
+            fontSize = Tokens.FontRole.metric.sp,
             fontWeight = FontWeight.W700,
         )
         Text(
             text = label,
             color = if (hot) colors.hot else colors.text3,
-            fontSize = Tokens.Font.n11.sp,
+            fontSize = Tokens.FontRole.label.sp,
             modifier = Modifier.padding(top = Tokens.Space.lsubTop.dp),
         )
     }

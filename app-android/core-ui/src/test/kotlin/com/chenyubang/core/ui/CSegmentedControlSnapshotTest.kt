@@ -2,10 +2,15 @@ package com.chenyubang.core.ui
 
 import android.content.res.Configuration
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.test.performTouchInput
 import com.github.takahirom.roborazzi.captureRoboImage
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -72,4 +77,31 @@ class CSegmentedControlSnapshotTest {
 
     @Test
     fun segmentedTwoItemsDark() = captureSegmented(night = true, items = listOf("甲", "乙"))
+
+    /**
+     * L3 重排回归：按下「甲」后把列表改为 [乙, 甲, 丙]。key(label) 应让按压态随 label 走，
+     * 即「甲」仍为按下态、「乙」不误承按压态；key(index) 会把按压态留在原位置而误落到「乙」。
+     */
+    @Test
+    fun segmentedItemsReorderKeepsPressedStateOnLabel() {
+        composeTestRule.mainClock.autoAdvance = false
+        val items = mutableStateListOf("甲", "乙", "丙")
+        composeTestRule.setContent {
+            ChenYuBangTheme(darkTheme = false) {
+                CSegmentedControl(items = items, selectedIndex = 0, onSelect = {})
+            }
+        }
+        composeTestRule.mainClock.advanceTimeBy(16L)
+        composeTestRule.onNodeWithText("甲").performTouchInput { down(center) }
+        composeTestRule.mainClock.advanceTimeBy(100L)
+        composeTestRule.runOnUiThread {
+            items.removeAt(0)
+            items.add(1, "甲")
+        }
+        composeTestRule.mainClock.advanceTimeBy(16L)
+        assertTrue(composeTestRule.onAllNodesWithText("乙").fetchSemanticsNodes().isNotEmpty())
+        assertTrue(composeTestRule.onAllNodesWithText("甲").fetchSemanticsNodes().isNotEmpty())
+        composeTestRule.onRoot().captureRoboImage()
+        composeTestRule.onNodeWithText("甲").performTouchInput { up() }
+    }
 }

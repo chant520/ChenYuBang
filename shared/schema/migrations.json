@@ -1,9 +1,9 @@
 {
-  "$comment": "数据库迁移版本表。口径写在 docs/开发规范-v1.7.md §4.5。两端各有一份实现，但版本号与表结构必须一致。",
+  "$comment": "数据库迁移版本表。口径写在 docs/开发规范-v1.11.md 第 4.5 节。两端各有一份实现，但版本号与表结构必须一致。",
   "schemaVersion": 3,
-  "currentVersion": 3,
+  "currentVersion": 4,
   "rules": [
-    "只增：新版本只能新增表或新增可空列，不删除、不改名、不改类型。",
+    "只增：新版本只能新增表、新增可空列或做纯数据回填，不删除、不改名、不改类型。",
     "每版必须同时提交 forward 迁移与回读校验（Android Room TestMigration、iOS GRDB DatabaseMigrator），校验内容：目标表行数、关键索引存在、外键可解析。",
     "禁止依赖 Room 自动迁移推断；iOS 禁止用 eraseDatabaseOnSchemaChange。",
     "备份包的 schemaVersion 与 DB version 相互独立，各自演进；导入时按备份的 schemaVersion 判断能否读。",
@@ -40,6 +40,15 @@
       "tables": ["user_example_idiom"],
       "android": "DbMigrations.MIGRATION_2_3（AppDatabase version = 3，schema 导出 3.json）；单测 UserExampleIdiomMigrationTest：正常路径 + 中断回滚",
       "ios": "GRDB DatabaseMigrator.registerMigration(\"v3\")；单测 DatabaseMigrationTests：正常路径 + 中断回滚"
+    },
+    {
+      "version": 4,
+      "status": "shipped",
+      "description": "v1.11 未标错录入题归属回填：不新增表或列。仅对 isMistake=false 且 user_example_idiom 无关联的录入题，按题干精确匹配 example.stem 经 example_idiom、题干/myAnswer 完整包含 idiom.word 回填；命中多条全写，不中跳过；校验 userExampleId/idiomId 外键可解析，幂等",
+      "tables": [],
+      "columns": [],
+      "android": "DbMigrations.MIGRATION_3_4（AppDatabase version = 4，schema 导出 4.json）；单测 UserExampleBackfillMigrationTest：正常路径 + 中断回滚 + 多命中/无命中/悬空数据",
+      "ios": "GRDB DatabaseMigrator.registerMigration(\"v4\")；单测 DatabaseMigrationTests：正常路径 + 中断回滚 + 幂等"
     }
   ]
 }

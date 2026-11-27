@@ -111,11 +111,11 @@ private fun saveAction(
     onSaved: (String, List<IdiomRef>) -> Unit,
 ): () -> Unit =
     {
-        val current = model.state.value
+        val clickSnapshot = model.state.value
         when {
-            !current.canSave -> Unit
+            !clickSnapshot.canSave -> Unit
             deps.imagePath.isBlank() -> model.candidate.setInfo(P20Matcher.NO_IMAGE)
-            else -> model.viewModelScope.launch { performSave(draft, deps, current, model, onSaved) }
+            else -> model.viewModelScope.launch { performSave(draft, deps, model, onSaved) }
         }
     }
 

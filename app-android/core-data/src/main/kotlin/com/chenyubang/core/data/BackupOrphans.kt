@@ -1,6 +1,6 @@
 package com.chenyubang.core.data
 
-/** 解析孤儿时可见的本机键：合并模式把本机 mistake id 也计入，避免误判备份 review 为孤儿。 */
+/** 解析孤儿时可见的本机键：mistakeIds 只放本机 id（合并模式计入），不混入备份错题。 */
 internal data class BackupReferences(
     val idiomIds: Set<String>,
     val userExampleIds: Set<String>,
@@ -30,9 +30,10 @@ internal object BackupOrphans {
     ): ResolvedBackup {
         val (mistakes, missingUser, missingMistakeIdioms) = resolveMistakes(backup.snapshot.mistakes, references)
         val (examples, missingExampleIdioms) = resolveExamples(backup.snapshot.userExamples, references)
-        val mistakeIds = references.mistakeIds + mistakes.map { it.id }
+        // 只认本机已有 id + resolveMistakes 实际保留的 id；被丢弃的备份错题不得算作已知。
+        val knownMistakes = references.mistakeIds + mistakes.map { it.id }
         val (reviews, missingReviews) =
-            resolveReviews(backup.snapshot.reviews, mistakeIds)
+            resolveReviews(backup.snapshot.reviews, knownMistakes)
         return ResolvedBackup(
             snapshot =
                 backup.snapshot.copy(

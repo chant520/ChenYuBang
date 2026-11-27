@@ -120,7 +120,7 @@ private fun P10MistakeEditCard(
         Text(
             P10EditTransitions.HINT_TAG,
             color = c.text3,
-            fontSize = Tokens.Font.n11.sp,
+            fontSize = Tokens.FontRole.caption.sp,
             modifier = Modifier.padding(top = Tokens.Space.lmetaTop.dp),
         )
     }
@@ -278,12 +278,12 @@ internal fun P10DeleteConfirmOverlay(
                 .padding(Tokens.Space.contentTop.dp),
             verticalArrangement = Arrangement.spacedBy(Tokens.Space.block.dp),
         ) {
-            Text(title, color = c.head, fontSize = Tokens.Font.n15.sp, fontWeight = FontWeight.Bold)
+            Text(title, color = c.head, fontSize = Tokens.FontRole.sectionTitle.sp, fontWeight = FontWeight.Bold)
             Text(
                 body,
                 color = c.text2,
-                fontSize = Tokens.Font.n12.sp,
-                lineHeight = (Tokens.Font.n12 * 1.7f).sp,
+                fontSize = Tokens.FontRole.supporting.sp,
+                lineHeight = (Tokens.FontRole.supporting * 1.7f).sp,
             )
             CButton(
                 "删除",

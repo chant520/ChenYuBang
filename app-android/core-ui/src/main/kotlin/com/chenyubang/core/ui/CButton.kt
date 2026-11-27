@@ -6,7 +6,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -52,19 +51,33 @@ private fun buttonStyle(
 ): ButtonStyle =
     when {
         !enabled && variant != CButtonVariant.Top ->
-            ButtonStyle(c.disbg, c.disfg, c.disline, Tokens.Font.n135.sp, FontWeight.W700, Tokens.Space.dangerY)
+            ButtonStyle(c.disbg, c.disfg, c.disline, Tokens.FontRole.button.sp, FontWeight.W700, Tokens.Space.dangerY)
         !enabled ->
-            ButtonStyle(c.disbg, c.disfg, null, Tokens.Font.n115.sp, FontWeight.W700, Tokens.Space.topBtnY)
+            ButtonStyle(c.disbg, c.disfg, null, Tokens.FontRole.button.sp, FontWeight.W700, Tokens.Space.topBtnY)
         variant == CButtonVariant.Primary ->
-            ButtonStyle(c.btnbg, c.btnfg, c.btnline, Tokens.Font.n14.sp, FontWeight.W700, Tokens.Space.btnY)
+            ButtonStyle(c.btnbg, c.btnfg, c.btnline, Tokens.FontRole.button.sp, FontWeight.W700, Tokens.Space.btnY)
         variant == CButtonVariant.DangerFilled ->
-            ButtonStyle(c.errfill, c.errfillfg, c.errfill, Tokens.Font.n135.sp, FontWeight.W700, Tokens.Space.dangerY)
+            ButtonStyle(
+                c.errfill,
+                c.errfillfg,
+                c.errfill,
+                Tokens.FontRole.button.sp,
+                FontWeight.W700,
+                Tokens.Space.dangerY,
+            )
         variant == CButtonVariant.DangerOutline ->
-            ButtonStyle(transparent, c.errfg, c.errline, Tokens.Font.n135.sp, FontWeight.W700, Tokens.Space.dangerY)
+            ButtonStyle(
+                transparent,
+                c.errfg,
+                c.errline,
+                Tokens.FontRole.button.sp,
+                FontWeight.W700,
+                Tokens.Space.dangerY,
+            )
         variant == CButtonVariant.Ghost ->
-            ButtonStyle(transparent, c.text2, c.line, Tokens.Font.n115.sp, FontWeight.Normal, Tokens.Space.ghostY)
+            ButtonStyle(transparent, c.text2, c.line, Tokens.FontRole.button.sp, FontWeight.Normal, Tokens.Space.ghostY)
         else ->
-            ButtonStyle(c.btnbg, c.btnfg, null, Tokens.Font.n115.sp, FontWeight.W700, Tokens.Space.topBtnY)
+            ButtonStyle(c.btnbg, c.btnfg, null, Tokens.FontRole.button.sp, FontWeight.W700, Tokens.Space.topBtnY)
     }
 
 @Composable
@@ -113,7 +126,7 @@ fun CButton(
     loading: Boolean = false,
     icon: CIconKind? = null,
 ) {
-    val c = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
+    val c = LocalColorSet.current
     val interaction = remember { MutableInteractionSource() }
     val pressed by interaction.collectIsPressedAsState()
     val active = enabled && !loading

@@ -5,12 +5,14 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.chenyubang.core.data.BackupCounts
+import com.chenyubang.core.data.BackupExportResult
 import com.chenyubang.core.data.BackupExporter
 import com.chenyubang.core.data.BackupImportResult
 import com.chenyubang.core.data.BackupImporter
 import com.chenyubang.core.data.ImportMode
 import com.chenyubang.core.data.ValidatedBackup
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,6 +20,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.io.InputStream
+import java.io.OutputStream
 
 // ===== 已拍板正式结果态文案（视觉契约第 8 节；仅替文字，颜色/字号仍走 Tokens）=====
 const val P15_EXPORT_SUCCESS_TITLE = "导出完成"
@@ -84,15 +88,52 @@ data class P15BackupUiState(
     val pendingBackup: ValidatedBackup? = null,
 )
 
+/** 导出/导入的数据层口子：生产由 core-data 构件适配，单测可注入假实现。 */
+interface P15Exporter {
+    suspend fun exportTo(output: OutputStream): BackupExportResult
+
+    suspend fun exportToFile(directory: File): BackupExportResult
+}
+
+interface P15Importer {
+    fun validate(input: InputStream): ValidatedBackup
+
+    suspend fun restore(
+        backup: ValidatedBackup,
+        mode: ImportMode,
+    ): BackupImportResult
+}
+
+private fun BackupExporter.asP15Exporter() =
+    object : P15Exporter {
+        override suspend fun exportTo(output: OutputStream) = this@asP15Exporter.exportTo(output)
+
+        override suspend fun exportToFile(directory: File) = this@asP15Exporter.exportToFile(directory)
+    }
+
+private fun BackupImporter.asP15Importer() =
+    object : P15Importer {
+        override fun validate(input: InputStream) = this@asP15Importer.validate(input)
+
+        override suspend fun restore(
+            backup: ValidatedBackup,
+            mode: ImportMode,
+        ) = this@asP15Importer.restore(backup, mode)
+    }
+
 /**
  * P15 备份与恢复状态机，P15 页面与 P22 底部 sheet 共用同一实例（由 app 按固定 key 装配）。
  * 只调数据层公开 API：导出写 SAF 流或缓存目录，导入先同步 validate 再按 P22 选择 restore。
  */
 class P15BackupViewModel(
     private val appContext: Context,
-    private val exporter: BackupExporter,
-    private val importer: BackupImporter,
+    private val exporter: P15Exporter,
+    private val importer: P15Importer,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : ViewModel() {
+    constructor(appContext: Context, exporter: BackupExporter, importer: BackupImporter) :
+        this(appContext, exporter.asP15Exporter(), importer.asP15Importer())
+
     private val _state = MutableStateFlow(P15BackupUiState())
     val state: StateFlow<P15BackupUiState> = _state.asStateFlow()
 
@@ -101,7 +142,7 @@ class P15BackupViewModel(
         viewModelScope.launch {
             _state.value = _state.value.copy(banner = null)
             runCatching {
-                withContext(Dispatchers.IO) {
+                withContext(ioDispatcher) {
                     val out =
                         appContext.contentResolver.openOutputStream(uri)
                             ?: error("无法写入所选位置")
@@ -131,7 +172,7 @@ class P15BackupViewModel(
         viewModelScope.launch {
             _state.value = _state.value.copy(banner = null)
             runCatching {
-                withContext(Dispatchers.IO) {
+                withContext(ioDispatcher) {
                     if (!directory.exists()) directory.mkdirs()
                     exporter.exportToFile(directory)
                 }
@@ -159,7 +200,7 @@ class P15BackupViewModel(
         viewModelScope.launch {
             _state.value = _state.value.copy(banner = null, pendingBackup = null)
             runCatching {
-                withContext(Dispatchers.IO) {
+                withContext(ioDispatcher) {
                     val input =
                         appContext.contentResolver.openInputStream(uri)
                             ?: error("无法读取所选文件")

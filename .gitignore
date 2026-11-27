@@ -11,6 +11,10 @@ app-android/local.properties
 *.apk
 *.aab
 
+# Roborazzi 对比/实际产物（仅金色基线入版本库）
+*_actual.png
+*_compare.png
+
 # iOS / Xcode
 app-ios/.build/
 app-ios/.spm-packages/
@@ -28,6 +32,7 @@ app-ios/DerivedData/
 # 本机会话快照与项目工作日志（含内部过程记录，不随仓库公开）
 /.workbuddy/context-mode-memory.json
 /.workbuddy/memory/
+/.workbuddy/evidence/
 
 # 工具与系统杂项
 .DS_Store

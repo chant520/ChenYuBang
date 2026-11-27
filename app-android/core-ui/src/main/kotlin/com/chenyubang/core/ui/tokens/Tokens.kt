@@ -1,12 +1,12 @@
 // GENERATED FILE — DO NOT EDIT.
-// Source: shared/tokens/tokens.json (docs/设计规范-v1.3.md)
+// Source: shared/tokens/tokens.json (docs/设计规范-v1.6.md)
 // Regenerate: python tools/gen_tokens.py
 
 package com.chenyubang.core.ui.tokens
 
 import androidx.compose.ui.graphics.Color
 
-/** 设计令牌。数值唯一来源：docs/设计规范-v1.3.md */
+/** 设计令牌。数值唯一来源：docs/设计规范-v1.6.md */
 object Tokens {
 
     /** 浅/深色组共同接口：if/else 选色组时保留类型 */
@@ -195,6 +195,22 @@ object Tokens {
         val n10 = 10
     }
 
+    /** Android 语义字号（规范 3.4），单位 dp/sp */
+    object FontRole {
+        val displayNumber = 36
+        val metric = 20
+        val pageTitle = 20
+        val contentTitle = 18
+        val sectionTitle = 16
+        val itemTitle = 16
+        val body = 16
+        val input = 16
+        val supporting = 14
+        val caption = 13
+        val label = 12
+        val button = 14
+    }
+
     /** 圆角（规范 4.1），单位 dp/sp */
     object Radius {
         val r6 = 6
@@ -222,6 +238,7 @@ object Tokens {
         val fabRight = 20
         val fabBottom = 88
         val hitMin = 44
+        val n64 = 64
         val lrowX = 16
         val lrowY = 13
         val lt1Gap = 8

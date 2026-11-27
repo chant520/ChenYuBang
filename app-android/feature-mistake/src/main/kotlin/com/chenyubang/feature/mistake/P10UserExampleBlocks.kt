@@ -46,7 +46,7 @@ internal fun P10QuestionCard(
             Text(
                 "题干",
                 color = c.text3,
-                fontSize = Tokens.Font.n11.sp,
+                fontSize = Tokens.FontRole.label.sp,
                 fontWeight = FontWeight.W700,
                 modifier = Modifier.weight(1f),
             )
@@ -55,7 +55,7 @@ internal fun P10QuestionCard(
         Text(
             detail.stem.ifEmpty { P10Logic.PLACEHOLDER },
             color = c.text,
-            fontSize = Tokens.Font.n13.sp,
+            fontSize = Tokens.FontRole.contentTitle.sp,
             modifier = Modifier.padding(top = Tokens.Space.lsubTop.dp),
         )
         detail.options.forEachIndexed { index, value ->
@@ -63,7 +63,7 @@ internal fun P10QuestionCard(
             Text(
                 "${letters[index]}. ${P10Logic.optionText(value)}",
                 color = c.text2,
-                fontSize = Tokens.Font.n13.sp,
+                fontSize = Tokens.FontRole.body.sp,
                 modifier =
                     Modifier
                         .padding(top = Tokens.Space.lmetaTop.dp)
@@ -86,7 +86,7 @@ internal fun P10MaskRow(
             Text(
                 if (state.answerHidden) "答案已遮住" else "答案已显示",
                 color = c.text2,
-                fontSize = Tokens.Font.n12.sp,
+                fontSize = Tokens.FontRole.supporting.sp,
                 modifier = Modifier.weight(1f),
             )
             CLink(
@@ -127,14 +127,14 @@ private fun P10ResultCard(state: P10UserExampleUiState) {
         Text(
             P10Logic.rerollResult(state.firstPick, state.picked),
             color = c.text,
-            fontSize = Tokens.Font.n13.sp,
+            fontSize = Tokens.FontRole.body.sp,
             fontWeight = FontWeight.W600,
             modifier = Modifier.padding(top = Tokens.Space.lsubTop.dp),
         )
         Text(
             P10Logic.REROLL_NOTE,
             color = c.text3,
-            fontSize = Tokens.Font.n11.sp,
+            fontSize = Tokens.FontRole.caption.sp,
             modifier = Modifier.padding(top = Tokens.Space.lmetaTop.dp),
         )
     }
@@ -148,7 +148,7 @@ internal fun P10SourceCard(detail: P10UserExampleDetail) {
         Text(
             P10Logic.sourceLine(detail.examType, detail.year),
             color = c.text2,
-            fontSize = Tokens.Font.n13.sp,
+            fontSize = Tokens.FontRole.caption.sp,
             modifier = Modifier.padding(top = Tokens.Space.lsubTop.dp),
         )
     }
@@ -164,7 +164,7 @@ internal fun P10IdiomCard(
         CLabel("关联成语")
         if (idioms.isEmpty()) {
             val c = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
-            Text("暂未关联成语", color = c.text2, fontSize = Tokens.Font.n13.sp)
+            Text("暂未关联成语", color = c.text2, fontSize = Tokens.FontRole.body.sp)
         } else {
             FlowRow(Modifier.padding(top = Tokens.Space.lmetaTop.dp)) {
                 idioms.forEach { idiom ->
@@ -187,14 +187,14 @@ internal fun P10AnswerCard(state: P10UserExampleUiState) {
         Text(
             "我的答案：${P10Logic.answerText(detail.myAnswer, state.answerHidden)}",
             color = c.text2,
-            fontSize = Tokens.Font.n13.sp,
+            fontSize = Tokens.FontRole.body.sp,
             modifier = Modifier.padding(top = Tokens.Space.lsubTop.dp),
         )
         if (state.isMistake && !detail.reason.isNullOrBlank()) {
             Text(
                 "错因：${detail.reason}",
                 color = c.text2,
-                fontSize = Tokens.Font.n13.sp,
+                fontSize = Tokens.FontRole.body.sp,
                 modifier = Modifier.padding(top = Tokens.Space.lmetaTop.dp),
             )
         }
@@ -202,7 +202,7 @@ internal fun P10AnswerCard(state: P10UserExampleUiState) {
             Text(
                 "标签：${detail.tagNames.joinToString("、")}",
                 color = c.text2,
-                fontSize = Tokens.Font.n13.sp,
+                fontSize = Tokens.FontRole.body.sp,
                 modifier = Modifier.padding(top = Tokens.Space.lmetaTop.dp),
             )
         }
@@ -230,7 +230,7 @@ private fun P10ReviewStateCard(
         Text(
             if (state.updatingReviewState) "正在保存掌握状态…" else "已掌握的题仍保留在错题本中，但不再进入待复习队列。",
             color = c.text3,
-            fontSize = Tokens.Font.n11.sp,
+            fontSize = Tokens.FontRole.caption.sp,
             modifier = Modifier.padding(top = Tokens.Space.lmetaTop.dp),
         )
     }
@@ -265,7 +265,7 @@ internal fun P10UserExampleBlocks(
         Text(
             "删除只把这道题移出错题本，录入的原题仍保留在对应成语下。",
             color = c.text3,
-            fontSize = Tokens.Font.n11.sp,
+            fontSize = Tokens.FontRole.caption.sp,
         )
     }
 }

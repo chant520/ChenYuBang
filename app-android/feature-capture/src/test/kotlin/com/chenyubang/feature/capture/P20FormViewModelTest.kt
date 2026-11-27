@@ -55,6 +55,21 @@ class P20FormViewModelTest {
     }
 
     @Test
+    fun cycleStopsAtPoolTailInsteadOfWrapping() {
+        val five = (0 until 5).map { idiom("id-$it", "词$it", 3) }
+        val model = newModel().also { it.candidate.bootstrap(five.joinToString(" ") { it.word }, five) }
+        val first = model.state.value.candidates.map { it.id }
+
+        model.candidate.cycle()
+        val second = model.state.value.candidates.map { it.id }
+        assertFalse("窗口回卷把首轮候选又显示一遍", second.contains(first.first()))
+
+        model.candidate.cycle()
+        assertEquals(P20Matcher.NO_MORE_CANDIDATES, model.state.value.candidateHint)
+        assertEquals(second, model.state.value.candidates.map { it.id })
+    }
+
+    @Test
     fun addAppendsByFrequencyWithoutChangingCheck() {
         val extra = idiom("id-extra", "额外词", 9)
         val low = idiom("id-low", "低频词", 1)

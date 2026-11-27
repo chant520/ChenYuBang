@@ -2,6 +2,7 @@ package com.chenyubang.feature.capture
 
 import android.content.Context
 import android.view.Surface
+import androidx.camera.core.AspectRatio
 import androidx.camera.core.CameraInfoUnavailableException
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
@@ -17,7 +18,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -49,6 +51,8 @@ import com.chenyubang.core.ui.tokens.Tokens
 import java.util.concurrent.ExecutionException
 
 /** P17 取景区 + 快门行：真实 CameraX 预览，快门产出本机 JPEG 路径交给 P18。 */
+internal const val PREVIEW_ASPECT_RATIO = 3f / 4f
+
 @Composable
 internal fun CameraBody(
     modifier: Modifier,
@@ -59,8 +63,13 @@ internal fun CameraBody(
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
-    val previewView = remember { PreviewView(context).apply { scaleType = PreviewView.ScaleType.FILL_CENTER } }
-    val imageCapture = remember { ImageCapture.Builder().build() }
+    val previewView =
+        remember {
+            PreviewView(context).apply {
+                scaleType = PreviewView.ScaleType.FIT_CENTER
+            }
+        }
+    val imageCapture = remember { ImageCapture.Builder().setTargetAspectRatio(AspectRatio.RATIO_4_3).build() }
     var bindFailed by remember { mutableStateOf(false) }
     var capturing by remember { mutableStateOf(false) }
     var captureFailed by remember { mutableStateOf(false) }
@@ -68,8 +77,13 @@ internal fun CameraBody(
     BindCameraPreview(lifecycleOwner, previewView, imageCapture) { bindFailed = true }
 
     Column(modifier.fillMaxWidth()) {
-        Box(Modifier.weight(1f).fillMaxWidth()) {
-            AndroidView(factory = { previewView }, modifier = Modifier.fillMaxSize())
+        Box(Modifier.weight(1f).fillMaxWidth().background(Tokens.Dark.cam), contentAlignment = Alignment.Center) {
+            AndroidView(
+                factory = { previewView },
+                modifier =
+                    Modifier.fillMaxHeight()
+                        .aspectRatio(PREVIEW_ASPECT_RATIO),
+            )
             CameraHint(
                 bindFailed = bindFailed,
                 pickFailed = pickFailed,
@@ -121,7 +135,7 @@ private fun BindCameraPreview(
                 try {
                     val cameraProvider = future.get()
                     provider = cameraProvider
-                    val preview = Preview.Builder().build()
+                    val preview = Preview.Builder().setTargetAspectRatio(AspectRatio.RATIO_4_3).build()
                     preview.surfaceProvider = previewView.surfaceProvider
                     cameraProvider.bindToLifecycle(
                         lifecycleOwner,
@@ -183,13 +197,13 @@ private fun CameraHint(
         }
     if (message == null) return
     Row(modifier.padding(horizontal = Tokens.Space.pageX.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text(message, color = Tokens.Dark.warnfg, fontSize = Tokens.Font.n115.sp)
+        Text(message, color = Tokens.Dark.warnfg, fontSize = Tokens.FontRole.supporting.sp)
         if (bindFailed || pickFailed) {
             Spacer(Modifier.width(Tokens.Space.camTopGap.dp))
             Text(
                 "改用相册",
                 color = Tokens.Dark.camfg,
-                fontSize = Tokens.Font.n115.sp,
+                fontSize = Tokens.FontRole.button.sp,
                 modifier = Modifier.clickable(onClick = onPick),
             )
         }
@@ -219,7 +233,7 @@ private fun ShutterRow(
         Text(
             "取消",
             color = Tokens.Dark.camdim,
-            fontSize = Tokens.Font.n11.sp,
+            fontSize = Tokens.FontRole.caption.sp,
             textAlign = TextAlign.Center,
             modifier =
                 Modifier.width(Tokens.Space.camGallery.dp)

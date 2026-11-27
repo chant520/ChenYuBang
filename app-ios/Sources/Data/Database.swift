@@ -9,6 +9,7 @@ public enum ChenYuBangDatabase {
         registerV1(&migrator)
         registerV2(&migrator)
         registerV3(&migrator)
+        registerV4(&migrator)
         return migrator
     }
 
@@ -169,6 +170,33 @@ public enum ChenYuBangDatabase {
                 FROM mistake
                 JOIN mistake_idiom ON mistake_idiom.mistakeId = mistake.id
                 WHERE mistake.userExampleId IS NOT NULL
+                """)
+        }
+    }
+
+    private static func registerV4(_ migrator: inout DatabaseMigrator) {
+        migrator.registerMigration("v4") { db in
+            // v4（v1.11 口径，规范 4.5 节）：纯数据回填，不新增表或列。
+            // 仅未标错且无任何归属的录入题：规则一题干去首尾空白后全等匹配 example.stem，
+            // 经 example_idiom 并 JOIN idiom 保证外键存在；规则二题干或 myAnswer 完整包含 idiom.word。
+            // 两规则命中多条全写、均不中跳过；INSERT OR IGNORE 配合无归属前置条件保证幂等。
+            try db.execute(sql: """
+                INSERT OR IGNORE INTO user_example_idiom(userExampleId, idiomId)
+                SELECT ue.id, ei.idiomId
+                FROM user_example AS ue
+                JOIN example AS ex ON trim(ue.stem, char(9,10,13,32,12288)) = ex.stem
+                JOIN example_idiom AS ei ON ei.exampleId = ex.id
+                JOIN idiom AS i ON i.id = ei.idiomId
+                WHERE ue.isMistake = 0
+                  AND NOT EXISTS (SELECT 1 FROM user_example_idiom AS link WHERE link.userExampleId = ue.id)
+                UNION
+                SELECT ue.id, i.id
+                FROM user_example AS ue
+                JOIN idiom AS i
+                  ON i.word <> ''
+                 AND (instr(ue.stem, i.word) > 0 OR instr(coalesce(ue.myAnswer, ''), i.word) > 0)
+                WHERE ue.isMistake = 0
+                  AND NOT EXISTS (SELECT 1 FROM user_example_idiom AS link WHERE link.userExampleId = ue.id)
                 """)
         }
     }

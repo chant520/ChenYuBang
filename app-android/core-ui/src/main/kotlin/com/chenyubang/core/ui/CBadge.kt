@@ -2,7 +2,6 @@ package com.chenyubang.core.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,7 +19,7 @@ fun CBadge(
     kind: CBadgeKind,
     modifier: Modifier = Modifier,
 ) {
-    val c = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
+    val c = LocalColorSet.current
     val shape = RoundedCornerShape(Tokens.Radius.r3.dp)
     val background =
         when (kind) {
@@ -50,6 +49,6 @@ fun CBadge(
                 .border(1.dp, line, shape)
                 .padding(horizontal = Tokens.Space.badgeX.dp, vertical = Tokens.Space.badgeY.dp),
     ) {
-        Text(text = text, color = foreground, fontSize = Tokens.Font.n10.sp)
+        Text(text = text, color = foreground, fontSize = Tokens.FontRole.label.sp)
     }
 }

@@ -5,7 +5,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -62,7 +61,7 @@ fun CBar(
     actionText: String? = null,
     onAction: (() -> Unit)? = null,
 ) {
-    val c = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
+    val c = LocalColorSet.current
     val shape = RoundedCornerShape(Tokens.Radius.r6.dp)
     val palette = barPalette(c, kind)
     Row(
@@ -89,16 +88,16 @@ fun CBar(
             Text(
                 text = title,
                 color = palette.foreground,
-                fontSize = Tokens.Font.n13.sp,
+                fontSize = Tokens.FontRole.sectionTitle.sp,
                 fontWeight = FontWeight.W700,
-                lineHeight = (Tokens.Font.n13 * BAR_TITLE_LINE_HEIGHT).sp,
+                lineHeight = (Tokens.FontRole.sectionTitle * BAR_TITLE_LINE_HEIGHT).sp,
             )
             if (subtitle != null) {
                 Text(
                     text = subtitle,
                     color = c.text2,
-                    fontSize = Tokens.Font.n115.sp,
-                    lineHeight = (Tokens.Font.n115 * BAR_SUB_LINE_HEIGHT).sp,
+                    fontSize = Tokens.FontRole.caption.sp,
+                    lineHeight = (Tokens.FontRole.caption * BAR_SUB_LINE_HEIGHT).sp,
                 )
             }
         }
@@ -108,7 +107,7 @@ fun CBar(
             Text(
                 text = actionText,
                 color = palette.foreground,
-                fontSize = Tokens.Font.n12.sp,
+                fontSize = Tokens.FontRole.button.sp,
                 fontWeight = FontWeight.W700,
                 textDecoration = TextDecoration.Underline,
                 modifier =
@@ -126,14 +125,14 @@ fun CInlineWarning(
     text: String,
     modifier: Modifier = Modifier,
 ) {
-    val c = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
+    val c = LocalColorSet.current
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(INLINE_GAP.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         CIcon(kind = CIconKind.Warn, size = Tokens.Icon.n13.dp, stroke = INLINE_ICON_STROKE, color = c.warnfg)
-        Text(text = text, color = c.warnfg, fontSize = Tokens.Font.n12.sp, fontWeight = FontWeight.W600)
+        Text(text = text, color = c.warnfg, fontSize = Tokens.FontRole.supporting.sp, fontWeight = FontWeight.W600)
     }
 }
 
@@ -143,13 +142,13 @@ fun CInlineError(
     text: String,
     modifier: Modifier = Modifier,
 ) {
-    val c = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
+    val c = LocalColorSet.current
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(INLINE_GAP.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         CIcon(kind = CIconKind.Error, size = Tokens.Icon.n13.dp, stroke = INLINE_ICON_STROKE, color = c.errfg)
-        Text(text = text, color = c.errfg, fontSize = Tokens.Font.n12.sp, fontWeight = FontWeight.W600)
+        Text(text = text, color = c.errfg, fontSize = Tokens.FontRole.supporting.sp, fontWeight = FontWeight.W600)
     }
 }

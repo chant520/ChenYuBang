@@ -238,7 +238,7 @@ private fun P10Header(
             color = c.text2,
             modifier =
                 Modifier
-                    .size(21.dp)
+                    .size(Tokens.Icon.n21.dp)
                     .clickable(enabled = !state.edit.saving && !state.edit.deleting && !state.updatingReviewState) {
                         if (editing) actions.onCancelEdit() else actions.onBack()
                     }
@@ -247,7 +247,7 @@ private fun P10Header(
         Text(
             "录入题详情",
             color = c.head,
-            fontSize = Tokens.Font.n15.sp,
+            fontSize = Tokens.FontRole.pageTitle.sp,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.padding(start = Tokens.Space.lmetaGap.dp).weight(1f),
         )
@@ -255,23 +255,29 @@ private fun P10Header(
             CButton(
                 "取消",
                 actions.onCancelEdit,
-                Modifier.width(64.dp),
+                Modifier.width(Tokens.Space.n64.dp),
                 CButtonVariant.Ghost,
                 enabled = !state.edit.saving,
             )
             CButton(
                 "保存",
                 actions.onSave,
-                Modifier.width(64.dp),
+                Modifier.width(Tokens.Space.n64.dp),
                 enabled = !state.edit.errors.hasInvalid && !state.edit.saving,
                 loading = state.edit.saving,
             )
         } else {
-            CButton("编辑", actions.onEdit, Modifier.width(64.dp), CButtonVariant.Ghost, enabled = state.canEdit)
+            CButton(
+                "编辑",
+                actions.onEdit,
+                Modifier.width(Tokens.Space.n64.dp),
+                CButtonVariant.Ghost,
+                enabled = state.canEdit,
+            )
             CButton(
                 "删除",
                 { actions.onRequestDelete(if (state.isMistake) P10DeleteTarget.Marked else P10DeleteTarget.Unmarked) },
-                Modifier.width(64.dp),
+                Modifier.width(Tokens.Space.n64.dp),
                 CButtonVariant.Ghost,
                 enabled = state.canDelete,
             )

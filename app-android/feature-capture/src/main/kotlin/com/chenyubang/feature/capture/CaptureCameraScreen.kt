@@ -145,7 +145,7 @@ private fun CameraTopBar(onCancel: () -> Unit) {
             CChromeGlyph(CChromeIcon.Close, colors.text2, Modifier.size(Tokens.Icon.n21.dp))
         }
         Spacer(Modifier.width(Tokens.Space.camTopGap.dp))
-        Text("拍照", color = colors.head, fontSize = Tokens.Font.n15.sp)
+        Text("拍照", color = colors.head, fontSize = Tokens.FontRole.pageTitle.sp)
     }
 }
 
@@ -169,12 +169,12 @@ private fun CameraDenied(
             ) {
                 CChromeGlyph(CChromeIcon.CameraOff, Tokens.Dark.warnfg, Modifier.size(Tokens.Space.camDenyIcon.dp))
                 Spacer(Modifier.height(Tokens.Space.camDenyHint.dp))
-                Text("需要相机权限才能拍照", color = Tokens.Dark.head, fontSize = Tokens.Font.n15.sp)
+                Text("需要相机权限才能拍照", color = Tokens.Dark.head, fontSize = Tokens.FontRole.sectionTitle.sp)
                 Spacer(Modifier.height(Tokens.Space.camDenyTextGap.dp))
                 Text(
                     "系统里这项权限被关掉了。可以先去开启，也可以先用相册里的照片。",
                     color = Tokens.Dark.text2,
-                    fontSize = Tokens.Font.n115.sp,
+                    fontSize = Tokens.FontRole.supporting.sp,
                     textAlign = TextAlign.Center,
                 )
             }
@@ -195,7 +195,7 @@ private fun CameraDenied(
             Text(
                 if (pickFailed) "照片读取失败，请重试" else "取消可回上一页",
                 color = Tokens.Dark.camhint,
-                fontSize = Tokens.Font.n11.sp,
+                fontSize = Tokens.FontRole.caption.sp,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth().clickable(onClick = onCancel),
             )
@@ -219,7 +219,7 @@ private fun CamGhostButton(
         Text(
             text,
             color = Tokens.Dark.camfg,
-            fontSize = Tokens.Font.n135.sp,
+            fontSize = Tokens.FontRole.button.sp,
             modifier = Modifier.padding(vertical = Tokens.Space.ghostY.dp),
         )
     }

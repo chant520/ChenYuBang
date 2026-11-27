@@ -20,7 +20,7 @@ TOKENS = ROOT / "shared" / "tokens" / "tokens.json"
 ANDROID_OUT = ROOT / "app-android" / "core-ui" / "src" / "main" / "kotlin" / "com" / "chenyubang" / "core" / "ui" / "tokens" / "Tokens.kt"
 IOS_OUT = ROOT / "app-ios" / "Sources" / "Tokens" / "Tokens.swift"
 
-HEADER = "// GENERATED FILE — DO NOT EDIT.\n// Source: shared/tokens/tokens.json (docs/设计规范-v1.3.md)\n// Regenerate: python tools/gen_tokens.py\n"
+HEADER = "// GENERATED FILE — DO NOT EDIT.\n// Source: shared/tokens/tokens.json (docs/设计规范-v1.6.md)\n// Regenerate: python tools/gen_tokens.py\n"
 
 
 def parse_color(value):
@@ -88,7 +88,7 @@ def kotlin():
     dark = data["color"]["dark"]
     out = [HEADER, "package com.chenyubang.core.ui.tokens", "",
            "import androidx.compose.ui.graphics.Color", "",
-           "/** 设计令牌。数值唯一来源：docs/设计规范-v1.3.md */",
+           "/** 设计令牌。数值唯一来源：docs/设计规范-v1.6.md */",
            "object Tokens {", ""]
 
     if sorted(light.keys()) != sorted(dark.keys()):
@@ -109,9 +109,14 @@ def kotlin():
         out.append("    }")
         out.append("")
 
-    for group, label in (("font", "字号（规范 3.2，11 档）"), ("radius", "圆角（规范 4.1）")):
+    groups = (
+        ("font", "字号（规范 3.2，11 档）", "Font"),
+        ("androidFontRole", "Android 语义字号（规范 3.4）", "FontRole"),
+        ("radius", "圆角（规范 4.1）", "Radius"),
+    )
+    for group, label, name in groups:
         out.append("    /** %s，单位 dp/sp */" % label)
-        out.append("    object %s {" % ("Font" if group == "font" else "Radius"))
+        out.append("    object %s {" % name)
         for key, val in data[group].items():
             if isinstance(val, float) and val != int(val):
                 out.append("        val %s = %s" % (key, val))
@@ -159,7 +164,7 @@ def swift():
     light = data["color"]["light"]
     dark = data["color"]["dark"]
     out = [HEADER, "import SwiftUI", "",
-           "/// 设计令牌。数值唯一来源：docs/设计规范-v1.3.md",
+           "/// 设计令牌。数值唯一来源：docs/设计规范-v1.6.md",
            "public struct TokenColors: Sendable {"]
     for key in sorted(light.keys()):
         out.append("    public let %s: Color" % key)

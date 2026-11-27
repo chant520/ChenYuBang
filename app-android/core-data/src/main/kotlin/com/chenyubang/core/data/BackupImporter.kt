@@ -5,6 +5,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.JsonObject
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -13,7 +14,7 @@ import java.io.InputStream
 /**
  * 4.2 恢复导入（P22）。固定顺序：ZIP 严格校验 → schemaVersion → sha256 → 字段与 counts → P22。
  * 超版 / sha256 不符 / 解析失败均为 DataError.Hard（红，直接拒绝，不进 P22，不猜字段）。
- * 覆盖前在 cacheDir 留 backup-before-import-*.zip；事务内替换并校验条数，失败由 Room 回滚。
+ * 覆盖前在 filesDir/backups 留 backup-before-import-*.zip；事务内替换并校验条数，失败由 Room 回滚。
  */
 class BackupImporter(
     private val database: AppDatabase,
@@ -76,8 +77,10 @@ class BackupImporter(
         }
 
     private suspend fun safetyCopy(): String {
-        val name = BackupSpec.SAFETY_PREFIX + BackupTime.fileStamp() + BackupSpec.ZIP_SUFFIX
-        val file = File(context.cacheDir, name)
+        val dir = File(context.filesDir, "backups")
+        dir.mkdirs()
+        val name = BackupSpec.SAFETY_PREFIX + BackupTime.safetyStamp() + BackupSpec.ZIP_SUFFIX
+        val file = File(dir, name)
         val snapshot = BackupSnapshotReader.read(database)
         val data = BackupDocument.toJson(snapshot)
         val sha = BackupDocument.sha256(data)
@@ -114,7 +117,24 @@ class BackupImporter(
             manifest.string("exportedAt"),
             declared,
             sha,
-            BackupDecode.fromJson(data),
+            verifiedSnapshot(data),
+        )
+    }
+
+    /** 与 validate_schema.py 对齐：按 id 去重检查，并清理 idiomIds 内重复值；重复 id 由 guarded 包成硬错误。 */
+    private fun verifiedSnapshot(data: JsonObject): BackupSnapshot {
+        val snapshot = BackupDecode.fromJson(data)
+        check(snapshot.mistakes.map { it.id }.distinct().size == snapshot.mistakes.size) { "重复的错题 id" }
+        check(snapshot.userExamples.map { it.id }.distinct().size == snapshot.userExamples.size) {
+            "重复的录入题 id"
+        }
+        check(snapshot.reviews.map { it.id }.distinct().size == snapshot.reviews.size) { "重复的复习记录 id" }
+        check(snapshot.idiomStates.map { it.idiomId }.distinct().size == snapshot.idiomStates.size) {
+            "重复的成语状态 idiomId"
+        }
+        return snapshot.copy(
+            mistakes = snapshot.mistakes.map { it.copy(idiomIds = it.idiomIds.distinct()) },
+            userExamples = snapshot.userExamples.map { it.copy(idiomIds = it.idiomIds.distinct()) },
         )
     }
 }

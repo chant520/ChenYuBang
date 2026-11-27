@@ -62,7 +62,7 @@ class CCardSnapshotTest {
                     Text(
                         text = "国考 + 省考（全部省份）",
                         color = MaterialTheme.colorScheme.onSurface,
-                        fontSize = Tokens.Font.n15.sp,
+                        fontSize = Tokens.FontRole.body.sp,
                     )
                 }
             }

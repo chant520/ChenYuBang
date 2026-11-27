@@ -85,11 +85,11 @@ fun P06ExamplesContent(
             .padding(horizontal = Tokens.Space.pageX.dp, vertical = Tokens.Space.contentTop.dp),
         verticalArrangement = Arrangement.spacedBy(Tokens.Space.block.dp),
     ) {
-        Text("考试类型 / 年份 / 题型 / 是否做过", color = colors.text3, fontSize = Tokens.Font.n12.sp)
+        Text("考试类型 / 年份 / 题型 / 是否做过", color = colors.text3, fontSize = Tokens.FontRole.caption.sp)
         if (state.updateFailed) {
             CBar(
                 kind = CBarKind.Warn,
-                title = "题库更新失败，当前题库仍可离线浏览",
+                title = "题库更新失败，\n当前题库仍可离线浏览",
                 subtitle = "请到题库版本页手动重试。",
                 actionText = "去题库版本",
                 onAction = onOpenPack,
@@ -117,8 +117,8 @@ fun P06ExamplesContent(
                 )
             else -> ExampleList(state.items, onOpenExample)
         }
-        Text("共 ${state.items.size} 条", color = colors.text3, fontSize = Tokens.Font.n11.sp)
-        Text("只获取题库内容，不改动本机学习记录。", color = colors.text3, fontSize = Tokens.Font.n115.sp)
+        Text("共 ${state.items.size} 条", color = colors.text3, fontSize = Tokens.FontRole.caption.sp)
+        Text("只获取题库内容，不改动本机学习记录。", color = colors.text3, fontSize = Tokens.FontRole.caption.sp)
         Spacer(Modifier.size(Tokens.Space.fabBottom.dp))
     }
 }
@@ -128,6 +128,8 @@ private fun ExampleList(
     items: List<ExampleListItem>,
     onOpenExample: (String) -> Unit,
 ) {
+    // 题库随安装包内置、条目数固定（content/examples/examples.json 当前 11 条），
+    // 不随用户录入增长；一次组合全量有明确上界，故保留 CList，不引入 LazyColumn。
     Column(verticalArrangement = Arrangement.spacedBy(Tokens.Space.block.dp)) {
         items.forEach { item ->
             val example = item.example

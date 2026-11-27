@@ -39,13 +39,15 @@ internal fun buildInput(
 internal suspend fun performSave(
     draft: OcrDraft,
     deps: P20FormDeps,
-    state: P20CaptureState,
     model: P20FormViewModel,
     onSaved: (String, List<IdiomRef>) -> Unit,
 ) {
+    // 点击时的快照不作落库依据：进入协程后重读，避免 saving 期间的改动落库与界面不一致。
+    val current = model.state.value
+    if (!current.canSave) return
     model.form.setSaveState(saving = true)
     try {
-        val saved: SavedCapture = withContext(Dispatchers.IO) { deps.saver.save(buildInput(draft, deps, state)) }
+        val saved: SavedCapture = withContext(Dispatchers.IO) { deps.saver.save(buildInput(draft, deps, current)) }
         model.form.setSaveState(saving = false)
         onSaved(saved.userExampleId, saved.idioms.map { IdiomRef(it.id, it.word) })
     } catch (cancelled: CancellationException) {

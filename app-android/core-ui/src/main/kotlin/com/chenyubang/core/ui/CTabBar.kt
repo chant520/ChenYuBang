@@ -2,7 +2,6 @@ package com.chenyubang.core.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,7 +26,7 @@ fun CTabBar(
     onSelect: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val colors = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
+    val colors = LocalColorSet.current
     val icons = listOf(CChromeIcon.Book, CChromeIcon.Example, CChromeIcon.Mistake, CChromeIcon.Me)
     require(labels.size == icons.size)
     Column(modifier.background(colors.tabbg)) {
@@ -53,7 +52,7 @@ fun CTabBar(
                             label,
                             Modifier.padding(top = Tokens.Space.tabIconGap.dp),
                             color = color,
-                            fontSize = Tokens.Font.n11.sp,
+                            fontSize = Tokens.FontRole.label.sp,
                             fontWeight = if (active) FontWeight.Bold else FontWeight.Normal,
                         )
                     }

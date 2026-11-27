@@ -25,7 +25,6 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -35,8 +34,6 @@ import com.chenyubang.core.ui.CBarKind
 import com.chenyubang.core.ui.CButton
 import com.chenyubang.core.ui.CButtonVariant
 import com.chenyubang.core.ui.CCard
-import com.chenyubang.core.ui.CChromeGlyph
-import com.chenyubang.core.ui.CChromeIcon
 import com.chenyubang.core.ui.CImagePlaceholder
 import com.chenyubang.core.ui.CInput
 import com.chenyubang.core.ui.CLabel
@@ -51,36 +48,13 @@ internal fun OcrHeader(
     onBack: () -> Unit,
     colors: Tokens.ColorSet,
 ) {
-    Column(Modifier.fillMaxWidth().background(colors.page)) {
-        Row(
-            Modifier.fillMaxWidth().padding(
-                start = Tokens.Space.pageX.dp,
-                end = Tokens.Space.pageX.dp,
-                top = Tokens.Space.cropHeadTop.dp,
-                bottom = Tokens.Space.cropHeadBottom.dp,
-            ),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Box(
-                Modifier.size(Tokens.Space.hitMin.dp)
-                    .clickable(onClick = onBack)
-                    .semantics { contentDescription = "返回裁切" },
-                contentAlignment = Alignment.Center,
-            ) {
-                CChromeGlyph(CChromeIcon.Back, colors.text2, Modifier.size(Tokens.Icon.n21.dp))
-            }
-            Spacer(Modifier.width(Tokens.Space.camTopGap.dp))
-            Text(
-                "识别结果",
-                color = colors.head,
-                fontSize = Tokens.Font.n15.sp,
-                fontWeight = FontWeight.W700,
-                modifier = Modifier.weight(1f),
-            )
-            Text("第 3 步 / 共 5 步", color = colors.text3, fontSize = Tokens.Font.n11.sp)
-        }
-        Box(Modifier.fillMaxWidth().height(Tokens.Space.cropEdge.dp).background(colors.line))
-    }
+    CaptureStepHeader(
+        title = "识别结果",
+        step = "第 3 步 / 共 5 步",
+        backDescription = "返回裁切",
+        onBack = onBack,
+        colors = colors,
+    )
 }
 
 @Composable
@@ -117,7 +91,7 @@ internal fun OcrThumbRow(
         Text(
             "裁切图 · 可点开放大",
             color = colors.text3,
-            fontSize = Tokens.Font.n11.sp,
+            fontSize = Tokens.FontRole.caption.sp,
             modifier = Modifier.weight(1f),
         )
         CTag("识别到 $lineCount 行")
@@ -144,7 +118,7 @@ internal fun OcrZoomDialog(
                 contentScale = ContentScale.Fit,
                 modifier = Modifier.weight(1f).fillMaxWidth(),
             )
-            Text("点击任意处关闭", color = colors.text3, fontSize = Tokens.Font.n11.sp)
+            Text("点击任意处关闭", color = colors.text3, fontSize = Tokens.FontRole.caption.sp)
         }
     }
 }
@@ -157,7 +131,7 @@ internal fun OcrScanning(colors: Tokens.ColorSet) {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         CSpinner(color = colors.accent, modifier = Modifier.size(Tokens.Icon.n14.dp))
-        Text("正在识别…", color = colors.text2, fontSize = Tokens.Font.n12.sp)
+        Text("正在识别…", color = colors.text2, fontSize = Tokens.FontRole.supporting.sp)
     }
 }
 
@@ -169,6 +143,7 @@ internal fun OcrFields(
     onChange: (OcrDraft) -> Unit,
     onRerun: () -> Unit,
     onNext: () -> Unit,
+    guessed: Boolean = false,
 ) {
     val options = draft.paddedOptions()
     CLabel("题干")
@@ -191,9 +166,9 @@ internal fun OcrFields(
         )
     }
     Text(
-        "识别有缺漏就在这里逐字补",
+        if (guessed) "推测选项，请复核；识别有缺漏就在这里逐字补" else "识别有缺漏就在这里逐字补",
         color = colors.text3,
-        fontSize = Tokens.Font.n11.sp,
+        fontSize = Tokens.FontRole.caption.sp,
         modifier = Modifier.padding(bottom = Tokens.Space.ocrHintBottom.dp),
     )
     CButton(
@@ -244,13 +219,13 @@ internal fun OcrFailure(
                 "回上一步重新框选：只框这一道题，邻题不要。\n" +
                 "手动补字：直接进入修正页，以空文本起填。",
             color = colors.text2,
-            fontSize = Tokens.Font.n12.sp,
+            fontSize = Tokens.FontRole.supporting.sp,
         )
     }
     Text(
         "手动补字不影响已拍的图，之后还能再识别。",
         color = colors.text3,
-        fontSize = Tokens.Font.n11.sp,
+        fontSize = Tokens.FontRole.caption.sp,
         modifier = Modifier.padding(top = Tokens.Space.ocrNoteTop.dp),
     )
 }

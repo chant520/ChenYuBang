@@ -49,12 +49,16 @@ class P20CandidateController(
         stateFlow.update { it.copy(checked = checkedRefs(), info = null, candidateHint = null) }
     }
 
-    /** 换一组：仅推进展示窗口（K=3），不改已勾选集合；到池尾回卷。 */
+    /** 换一组：仅推进展示窗口（K=3），不改已勾选集合；到池尾不再回卷，改提示「没有更多候选」。 */
     fun cycle() {
         // 换一组仅在 canCycle（池 > K）时可点：池 ≤ K 时静默返回（防御测试直调除零）。
-        // 「没有更多候选」不在此写入——它由 CandidateRows 按 !canCycle 静态派生，常显可见。
+        // 「没有更多候选」常态句由 CandidateRows 按 !canCycle 静态派生；池尾回卷被禁后在此显式提示。
         if (pool.size <= P20Matcher.WINDOW_SIZE) return
-        windowStart = (windowStart + P20Matcher.WINDOW_SIZE) % pool.size
+        if (windowStart + P20Matcher.WINDOW_SIZE >= pool.size) {
+            stateFlow.update { it.copy(candidateHint = P20Matcher.NO_MORE_CANDIDATES) }
+            return
+        }
+        windowStart += P20Matcher.WINDOW_SIZE
         stateFlow.update {
             it.copy(
                 candidates = pool.drop(windowStart).take(P20Matcher.WINDOW_SIZE),

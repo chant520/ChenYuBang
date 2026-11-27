@@ -41,6 +41,23 @@ internal object OcrBitmapOps {
         return IntArray(width * height).also { bitmap.getPixels(it, 0, width, 0, 0, width, height) }
     }
 
+    /**
+     * 缩放取像素并在用完后回收临时位图；尺寸一致时 [scaled] 返回原图，此处不回收调用方持有的图。
+     */
+    inline fun <T> scaledPixels(
+        source: Bitmap,
+        width: Int,
+        height: Int,
+        compute: (IntArray) -> T,
+    ): T {
+        val scaled = scaled(source, width, height)
+        return try {
+            compute(pixels(scaled))
+        } finally {
+            if (scaled !== source) scaled.recycle()
+        }
+    }
+
     /** 框坐标是上采样图尺度；越界、空框直接返回 null，由调用方丢行。 */
     fun crop(
         source: Bitmap,

@@ -1,10 +1,10 @@
 // GENERATED FILE — DO NOT EDIT.
-// Source: shared/tokens/tokens.json (docs/设计规范-v1.3.md)
+// Source: shared/tokens/tokens.json (docs/设计规范-v1.6.md)
 // Regenerate: python tools/gen_tokens.py
 
 import SwiftUI
 
-/// 设计令牌。数值唯一来源：docs/设计规范-v1.3.md
+/// 设计令牌。数值唯一来源：docs/设计规范-v1.6.md
 public struct TokenColors: Sendable {
     public let accent: Color
     public let accent2: Color
@@ -339,6 +339,7 @@ public enum Tokens {
         public static let fabRight: CGFloat = 20
         public static let fabBottom: CGFloat = 88
         public static let hitMin: CGFloat = 44
+        public static let n64: CGFloat = 64
         public static let lrowX: CGFloat = 16
         public static let lrowY: CGFloat = 13
         public static let lt1Gap: CGFloat = 8

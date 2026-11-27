@@ -3,8 +3,10 @@ package com.chenyubang.core.ui
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
@@ -15,6 +17,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.dp
+import com.chenyubang.core.ui.tokens.Tokens
 import com.github.takahirom.roborazzi.captureRoboImage
 import org.junit.Rule
 import org.junit.Test
@@ -76,13 +79,41 @@ class CInputSnapshotTest {
         composeTestRule.onRoot().captureRoboImage()
     }
 
-    private fun captureInputFocused(night: Boolean) {
+    private fun captureInputFocused(
+        night: Boolean,
+        withSlots: Boolean = false,
+    ) {
         composeTestRule.mainClock.autoAdvance = false
         composeTestRule.setContent {
             Themed(night) {
+                val colors = if (night) Tokens.Dark else Tokens.Light
+                val leadingIcon: (@Composable () -> Unit)? =
+                    if (withSlots) {
+                        {
+                            CChromeGlyph(CChromeIcon.Search, colors.text3, Modifier.size(Tokens.Icon.n15.dp))
+                        }
+                    } else {
+                        null
+                    }
+                val trailing: (@Composable () -> Unit)? =
+                    if (withSlots) {
+                        {
+                            Box(Modifier.size(Tokens.Space.hitMin.dp), contentAlignment = Alignment.Center) {
+                                CChromeGlyph(CChromeIcon.Close, colors.text3, Modifier.size(Tokens.Icon.n18.dp))
+                            }
+                        }
+                    } else {
+                        null
+                    }
                 // 留出外绘焦点光环的空间；只截此容器，不匹配光标手柄的 Popup 根节点。
                 Box(Modifier.testTag("focusedInput").padding(4.dp)) {
-                    CInput(value = "输入", onValueChange = {}, placeholder = "占位")
+                    CInput(
+                        value = "输入",
+                        onValueChange = {},
+                        placeholder = "占位",
+                        leadingIcon = leadingIcon,
+                        trailing = trailing,
+                    )
                 }
             }
         }
@@ -116,4 +147,10 @@ class CInputSnapshotTest {
 
     @Test
     fun inputFocusedDark() = captureInputFocused(night = true)
+
+    @Test
+    fun inputFocusedWithSlotsLight() = captureInputFocused(night = false, withSlots = true)
+
+    @Test
+    fun inputFocusedWithSlotsDark() = captureInputFocused(night = true, withSlots = true)
 }

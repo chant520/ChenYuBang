@@ -20,7 +20,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,29 +45,22 @@ import com.chenyubang.core.ui.CLink
 import com.chenyubang.core.ui.CTag
 import com.chenyubang.core.ui.CTagStyle
 import com.chenyubang.core.ui.tokens.Tokens
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 
-/** P05 路由入口：装配只读详情 ViewModel。读音朗读、收藏、学习状态均为预留位，本期不接。 */
+/**
+ * P05 路由入口：装配只读详情 ViewModel。读音朗读为预留位，本期不接。
+ * onOpenMistakes 走 A5 数字进 P09；onOpenMistakeBook 是独立的「去错题本」P08 入口。
+ */
 @Composable
 fun P05IdiomDetailRoute(
     idiomId: String,
     database: AppDatabase,
     onBack: () -> Unit,
     onOpenMistakes: () -> Unit,
+    onOpenMistakeBook: () -> Unit = {},
     onOpenExample: (String) -> Unit,
     onReviewIdiom: (Int) -> Unit = {},
     revision: Long = 0,
 ) {
-    var pendingCount by remember { mutableStateOf(0) }
-    val pendingCountMutex = remember { Mutex() }
-    val scope = rememberCoroutineScope()
-    LaunchedEffect(idiomId, revision) {
-        pendingCountMutex.withLock {
-            pendingCount = database.reviewDao().pendingCount(idiomId)
-        }
-    }
     val factory =
         remember(database) {
             viewModelFactory {
@@ -76,9 +68,11 @@ fun P05IdiomDetailRoute(
                     P05IdiomDetailViewModel(
                         loadIdiom = { id -> database.idiomDao().byId(id) },
                         loadExamples = { id -> database.exampleDao().listByIdiom(id) },
+                        countUserExamples = { id -> database.mistakeQueryDao().countUserExamplesByIdiom(id) },
                         loadState = { id -> database.idiomStateDao().state(id) },
                         writeStatus = { id, status -> database.idiomStateDao().setStatus(id, status) },
                         writeFavorite = { id, favorite -> database.idiomStateDao().setFavorite(id, favorite) },
+                        loadPendingCount = { id -> database.reviewDao().pendingCount(id) },
                     )
                 }
             }
@@ -86,23 +80,18 @@ fun P05IdiomDetailRoute(
     val model: P05IdiomDetailViewModel = viewModel(key = "p05-idiom-detail", factory = factory)
     val state by model.state.collectAsState()
     LaunchedEffect(idiomId) { model.load(idiomId) }
+    LaunchedEffect(revision) {
+        if (revision > 0) model.refreshPendingCount()
+    }
     P05IdiomDetailContent(
         state = state,
         onBack = onBack,
         onOpenMistakes = onOpenMistakes,
+        onOpenMistakeBook = onOpenMistakeBook,
         onOpenExample = onOpenExample,
         onRetry = { model.load(idiomId) },
-        canReview = pendingCount > 0,
-        onReviewIdiom = {
-            // 点击时再查一次，避免展示计数与当前队列之间发生掌握状态变化。
-            scope.launch {
-                pendingCountMutex.withLock {
-                    val latest = database.reviewDao().pendingCount(idiomId)
-                    pendingCount = latest
-                    if (latest > 0) onReviewIdiom(latest)
-                }
-            }
-        },
+        canReview = state.pendingCount > 0,
+        onReviewIdiom = { model.requestReview(onReviewIdiom) },
         onUpdateStatus = model::updateStatus,
         onUpdateFavorite = model::updateFavorite,
     )
@@ -112,14 +101,15 @@ fun P05IdiomDetailRoute(
  * P05 成语详情长页（信息架构 v1.4 P05 ①–⑪）。
  *
  * 五项齐全：读音 / 释义 / 感情色彩 / 易错点 / 近反义辨析；出处一并展示。缺字段一律「暂无」。
- * 相关题目（系统题库）列出该成语关联真题，点击进 P07（1.6）；「我的录入题 N」为本期占位，
- * 数据待阶段 2 user_example 接入。
+ * 相关题目（系统题库）列出该成语关联真题，点击进 P07（1.6）；A5「我的录入题 N」取真实计数，
+ * N>0 可点进 P09，标错者由 P09 沿用错题样式与标记展示。
  */
 @Composable
 fun P05IdiomDetailContent(
     state: P05IdiomDetailUiState,
     onBack: () -> Unit = {},
     onOpenMistakes: () -> Unit = {},
+    onOpenMistakeBook: () -> Unit = {},
     onOpenExample: (String) -> Unit = {},
     onRetry: () -> Unit = {},
     canReview: Boolean = false,
@@ -142,6 +132,7 @@ fun P05IdiomDetailContent(
             onUpdateStatus = onUpdateStatus,
             onUpdateFavorite = onUpdateFavorite,
         )
+        if (state.updateFailed) CBar(CBarKind.Warn, "学习状态保存失败，请重试", subtitle = "已保留页面原有状态，不影响已录入内容。")
         when {
             state.loading ->
                 CBar(
@@ -169,7 +160,9 @@ fun P05IdiomDetailContent(
                     colors = colors,
                     actions =
                         IdiomDetailActions(
+                            userExampleCount = state.userExampleCount,
                             onOpenMistakes = onOpenMistakes,
+                            onOpenMistakeBook = onOpenMistakeBook,
                             onOpenExample = onOpenExample,
                             canReview = canReview,
                             onReviewIdiom = onReviewIdiom,
@@ -200,7 +193,7 @@ private fun DetailHeader(
         Text(
             text = "成语详情",
             color = colors.head,
-            fontSize = Tokens.Font.n15.sp,
+            fontSize = Tokens.FontRole.pageTitle.sp,
             fontWeight = FontWeight.W700,
             modifier = Modifier.padding(start = Tokens.Space.lmetaGap.dp),
         )
@@ -248,7 +241,9 @@ private fun DetailHeader(
 
 /** P05 正文区的导航与单成语复习入口，打包避免 detailBody 参数过多。 */
 data class IdiomDetailActions(
+    val userExampleCount: Int,
     val onOpenMistakes: () -> Unit,
+    val onOpenMistakeBook: () -> Unit,
     val onOpenExample: (String) -> Unit,
     val canReview: Boolean,
     val onReviewIdiom: () -> Unit,
@@ -267,13 +262,13 @@ private fun detailBody(
             Text(
                 text = detail.word,
                 color = colors.head,
-                fontSize = Tokens.Font.n20.sp,
+                fontSize = Tokens.FontRole.contentTitle.sp,
                 fontWeight = FontWeight.W700,
             )
             Text(
                 text = detail.pinyin,
                 color = colors.text3,
-                fontSize = Tokens.Font.n12.sp,
+                fontSize = Tokens.FontRole.caption.sp,
                 modifier = Modifier.padding(top = Tokens.Space.lsubTop.dp),
             )
         }
@@ -301,8 +296,18 @@ private fun detailBody(
         BodyText(text = "反义：${IdiomDetail.presentList(detail.antonyms)}", colors = colors)
     }
 
-    RelatedExamplesCard(examples = examples, colors = colors, onOpenExample = actions.onOpenExample)
-    MyExamplesPlaceholder(onOpenMistakes = actions.onOpenMistakes, colors = colors)
+    RelatedExamplesCard(
+        examples = examples,
+        userExampleCount = actions.userExampleCount,
+        colors = colors,
+        onOpenExample = actions.onOpenExample,
+    )
+    MyExamplesCard(
+        count = actions.userExampleCount,
+        onOpenMistakes = actions.onOpenMistakes,
+        onOpenMistakeBook = actions.onOpenMistakeBook,
+        colors = colors,
+    )
 
     // D1 单成语复习入口（决策 H）：该成语无待复习错题时保持置灰并说明原因；可点进 P11 单成语模式。
     CButton(text = "复习这个成语", onClick = actions.onReviewIdiom, enabled = actions.canReview)
@@ -310,7 +315,7 @@ private fun detailBody(
         Text(
             text = "这个成语下还没有待复习的错题",
             color = colors.text3,
-            fontSize = Tokens.Font.n12.sp,
+            fontSize = Tokens.FontRole.supporting.sp,
         )
     }
 }
@@ -327,7 +332,7 @@ private fun InfoCard(
         Text(
             text = value,
             color = if (strong) colors.text else colors.text2,
-            fontSize = Tokens.Font.n13.sp,
+            fontSize = Tokens.FontRole.body.sp,
             fontWeight = if (strong) FontWeight.W600 else FontWeight.Normal,
         )
     }
@@ -341,7 +346,7 @@ private fun BodyText(
     Text(
         text = text,
         color = colors.text2,
-        fontSize = Tokens.Font.n13.sp,
+        fontSize = Tokens.FontRole.body.sp,
         modifier = Modifier.padding(top = Tokens.Space.lsubTop.dp),
     )
 }
@@ -349,12 +354,13 @@ private fun BodyText(
 /**
  * A4「相关题目」双来源（信息架构 v1.4 P05 ⑧、高保真稿 A P05 v2.1）。
  * 系统题库：按 example_idiom 列出关联真题，每条题干摘要 + 年份 · 地区 · 考试类型 + 题型，点击进 P07；
- * 暂无时保留「暂无真题，后续补充」不隐藏。
- * TODO(阶段2): 我录入的题接 user_example；暂无时保留「还没在这个成语下录入题」不隐藏。
+ * 暂无时保留「暂无真题，后续补充」不隐藏；我录入的题暂无时保留「还没在这个成语下录入题」不隐藏，
+ * 具体条目由 P09 按 UserExampleWithMistake 口径展示（标错者带错题样式与标记）。
  */
 @Composable
 private fun RelatedExamplesCard(
     examples: List<IdiomExampleView>,
+    userExampleCount: Int,
     colors: Tokens.ColorSet,
     onOpenExample: (String) -> Unit,
 ) {
@@ -369,7 +375,15 @@ private fun RelatedExamplesCard(
             }
         }
         SectionCaption(text = "我录入的题（标错才进错题本）", colors = colors)
-        BodyText(text = "还没在这个成语下录入题", colors = colors)
+        BodyText(
+            text =
+                if (userExampleCount > 0) {
+                    "点下方数字查看全部录入题（标错的按错题展示）"
+                } else {
+                    "还没在这个成语下录入题"
+                },
+            colors = colors,
+        )
     }
 }
 
@@ -389,7 +403,7 @@ private fun RelatedExampleRow(
         Text(
             text = example.stem,
             color = colors.text2,
-            fontSize = Tokens.Font.n13.sp,
+            fontSize = Tokens.FontRole.body.sp,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
         )
@@ -397,8 +411,8 @@ private fun RelatedExampleRow(
             modifier = Modifier.padding(top = Tokens.Space.lsubTop.dp),
             horizontalArrangement = Arrangement.spacedBy(Tokens.Space.lmetaGap.dp),
         ) {
-            Text(text = example.sourceLine, color = colors.text3, fontSize = Tokens.Font.n12.sp)
-            Text(text = example.questionType, color = colors.text3, fontSize = Tokens.Font.n12.sp)
+            Text(text = example.sourceLine, color = colors.text3, fontSize = Tokens.FontRole.caption.sp)
+            Text(text = example.questionType, color = colors.text3, fontSize = Tokens.FontRole.caption.sp)
         }
     }
 }
@@ -411,38 +425,43 @@ private fun SectionCaption(
     Text(
         text = text,
         color = colors.text3,
-        fontSize = Tokens.Font.n12.sp,
+        fontSize = Tokens.FontRole.caption.sp,
         modifier = Modifier.padding(top = Tokens.Space.lmetaTop.dp),
     )
 }
 
 /**
- * A5「我的录入题 N」数字入口占位（N 为该成语下全部录入题数，含未标错）。
- * TODO(阶段2): N 接 user_example 计数，N>0 可点进 P09；标错者以错题样式与标记体现。
- * 本期 N 固定为 0、灰显不可点，并保留「去错题本」导航，不出现拍照入口（决策 D）。
+ * A5「我的录入题 N」数字入口（N 为该成语下全部录入题数，含未标错）。
+ * N>0 数字可点进 P09，标错者由 P09 沿用错题样式与标记；N=0 灰显不可点并保留空态文案。
+ * 「去错题本」是独立 P08 导航，不与 A5 数字共用回调；本区不出现拍照入口（决策 D）。
  */
 @Composable
-private fun MyExamplesPlaceholder(
+private fun MyExamplesCard(
+    count: Int,
     onOpenMistakes: () -> Unit,
+    onOpenMistakeBook: () -> Unit,
     colors: Tokens.ColorSet,
 ) {
     CCard {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = if (count > 0) Modifier.clickable(onClick = onOpenMistakes) else Modifier,
+        ) {
             CLabel(text = "我在这个成语下录入了")
             Text(
-                text = " 0 道题",
-                color = colors.disfg,
-                fontSize = Tokens.Font.n20.sp,
+                text = " $count 道题",
+                color = if (count > 0) colors.head else colors.disfg,
+                fontSize = Tokens.FontRole.metric.sp,
                 fontWeight = FontWeight.W700,
             )
         }
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Text(
-                text = "还没在这个成语下录入题",
+                text = if (count > 0) "点数字查看该成语下的录入题" else "还没在这个成语下录入题",
                 color = colors.text3,
-                fontSize = Tokens.Font.n12.sp,
+                fontSize = Tokens.FontRole.supporting.sp,
             )
-            CLink(text = "去错题本", onClick = onOpenMistakes)
+            CLink(text = "去错题本", onClick = onOpenMistakeBook)
         }
     }
 }

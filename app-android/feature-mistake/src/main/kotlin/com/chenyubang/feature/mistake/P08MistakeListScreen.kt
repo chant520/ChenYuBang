@@ -1,14 +1,14 @@
 package com.chenyubang.feature.mistake
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -70,22 +70,43 @@ fun P08MistakeListContent(
     viewMode: MistakeViewMode,
     actions: P08MistakeActions,
 ) {
-    Column(
+    LazyColumn(
         modifier =
             Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
                 .padding(horizontal = Tokens.Space.pageX.dp, vertical = Tokens.Space.contentTop.dp),
-        verticalArrangement = Arrangement.spacedBy(Tokens.Space.block.dp),
     ) {
-        P08Header(onCapture = actions.onCapture)
-        actions.pageMessage?.let { P08ReviewHint(it, actions.onDismissMessage) }
-        when {
-            state.loading -> CBar(CBarKind.Info, "正在读取错题", subtitle = "只读本机题库，不联网。")
-            state.failed -> CBar(CBarKind.Warn, "错题读取失败，请重试", subtitle = "再进一次本页会重新读取。")
-            state.total == 0 -> {
-                P08Overview(total = state.total, pending = state.pending)
-                mistakeViewSelector(viewMode, actions)
+        item { P08Header(onCapture = actions.onCapture) }
+        actions.pageMessage?.let { message ->
+            sectionGap()
+            item { P08ReviewHint(message, actions.onDismissMessage) }
+        }
+        p08StateBody(state, viewMode, actions)
+    }
+}
+
+/** P08 状态分发：加载/失败/空态与三种视图。 */
+private fun LazyListScope.p08StateBody(
+    state: P08MistakeListUiState,
+    viewMode: MistakeViewMode,
+    actions: P08MistakeActions,
+) {
+    when {
+        state.loading -> {
+            sectionGap()
+            item { CBar(CBarKind.Info, "正在读取错题", subtitle = "只读本机题库，不联网。") }
+        }
+        state.failed -> {
+            sectionGap()
+            item { CBar(CBarKind.Warn, "错题读取失败，请重试", subtitle = "再进一次本页会重新读取。") }
+        }
+        state.total == 0 -> {
+            sectionGap()
+            item { P08Overview(total = state.total, pending = state.pending) }
+            sectionGap()
+            item { mistakeViewSelector(viewMode, actions) }
+            sectionGap()
+            item {
                 CEmptyState(
                     title = "还没有错题",
                     description = "拍一张卷子上的题录进题库，标记为做错后就会归到对应成语下",
@@ -95,34 +116,55 @@ fun P08MistakeListContent(
                     icon = CChromeIcon.Camera,
                 )
             }
-            else -> {
-                P08Overview(total = state.total, pending = state.pending)
-                mistakeViewSelector(viewMode, actions)
-                if (state.pending == 0) {
-                    CBar(
-                        kind = CBarKind.Info,
-                        title = "待复习已清空",
-                        subtitle = "这批错题都标过已掌握，可以按成语回看。",
-                        actionText = "按成语看全部错题",
-                        onAction = { actions.onViewModeChange(MistakeViewMode.ByIdiom) },
-                    )
-                }
-                when (viewMode) {
-                    MistakeViewMode.ByIdiom ->
-                        P08IdiomGroups(groups = state.groups, onOpenIdiom = actions.onOpenIdiom)
-                    MistakeViewMode.ByTime ->
-                        P08MistakeRows(items = state.mistakes, onOpenMistake = actions.onOpenMistake)
-                    MistakeViewMode.ByExamType ->
-                        P08ExamTypeGroups(items = state.mistakes, onOpenMistake = actions.onOpenMistake)
-                }
-                CButton(
-                    text = "开始复习 · ${state.pending} 道待复习",
-                    onClick = { actions.onStartReview(state.pending) },
-                    enabled = state.pending > 0,
-                )
-            }
+        }
+        else -> p08LoadedBody(state, viewMode, actions)
+    }
+}
+
+/** P08 有错题时的列表与复习入口。 */
+private fun LazyListScope.p08LoadedBody(
+    state: P08MistakeListUiState,
+    viewMode: MistakeViewMode,
+    actions: P08MistakeActions,
+) {
+    sectionGap()
+    item { P08Overview(total = state.total, pending = state.pending) }
+    sectionGap()
+    item { mistakeViewSelector(viewMode, actions) }
+    if (state.pending == 0) {
+        sectionGap()
+        item {
+            CBar(
+                kind = CBarKind.Info,
+                title = "待复习已清空",
+                subtitle = "这批错题都标过已掌握，可以按成语回看。",
+                actionText = "按成语看全部错题",
+                onAction = { actions.onViewModeChange(MistakeViewMode.ByIdiom) },
+            )
         }
     }
+    sectionGap()
+    when (viewMode) {
+        MistakeViewMode.ByIdiom ->
+            p08IdiomGroups(groups = state.groups, onOpenIdiom = actions.onOpenIdiom)
+        MistakeViewMode.ByTime ->
+            p08MistakeRows(items = state.mistakes, onOpenMistake = actions.onOpenMistake)
+        MistakeViewMode.ByExamType ->
+            p08ExamTypeGroups(items = state.mistakes, onOpenMistake = actions.onOpenMistake)
+    }
+    sectionGap()
+    item {
+        CButton(
+            text = "开始复习 · ${state.pending} 道待复习",
+            onClick = { actions.onStartReview(state.pending) },
+            enabled = state.pending > 0,
+        )
+    }
+}
+
+/** 原 Column 的 spacedBy(block) 区块间距；行内分隔由各列表自己画，避免给每条错题加 16dp 空隙。 */
+private fun LazyListScope.sectionGap() {
+    item { Spacer(Modifier.height(Tokens.Space.block.dp)) }
 }
 
 @Composable
@@ -152,7 +194,7 @@ private fun P08Header(onCapture: () -> Unit) {
         Text(
             text = "错题",
             color = c.head,
-            fontSize = Tokens.Font.n20.sp,
+            fontSize = Tokens.FontRole.pageTitle.sp,
             fontWeight = FontWeight.W700,
             modifier = Modifier.weight(1f),
         )

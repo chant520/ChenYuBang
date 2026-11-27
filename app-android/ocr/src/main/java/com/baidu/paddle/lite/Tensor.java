@@ -54,12 +54,21 @@ public class Tensor {
     }
 
     /** Deletes C++ Tensor pointer when Java Tensor object is destroyed */
+    @Override
     protected void finalize() throws Throwable {
+        release();
+        super.finalize();
+    }
+
+    /**
+     * 显式释放 native Tensor，幂等且不改 JNI 签名。C++ 侧 GetInput/GetOutput 返回
+     * 调用方持有的 unique_ptr 包装，故这里 delete 安全；调用方须先于 predictor 释放。
+     */
+    public void release() {
         if (cppTensorPointer != 0L) {
             deleteCppTensor(cppTensorPointer);
             cppTensorPointer = 0L;
         }
-        super.finalize();
     }
 
     /**
