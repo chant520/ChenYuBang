@@ -4,7 +4,7 @@ import GRDB
 import XCTest
 
 /// 迁移中断模拟错误，文件内两个测试类共用。
-fileprivate enum Interruption: Error {
+private enum Interruption: Error {
     case simulated
 }
 
