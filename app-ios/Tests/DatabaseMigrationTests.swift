@@ -3,13 +3,15 @@ import Foundation
 import GRDB
 import XCTest
 
+/// 迁移中断模拟错误，文件内两个测试类共用。
+fileprivate enum Interruption: Error {
+    case simulated
+}
+
 /// v1→v2 / v2→v3 迁移与 P20 保存事务（规范 §4.5 / §8.1 / §11.1）。
 /// 迁移覆盖正常路径、防御性回填与中断回滚；保存覆盖未标错 / 标错两分支、
 /// 多归属全部写入、图片相对路径与 DB 失败后的图片清理。
 final class DatabaseMigrationTests: XCTestCase {
-    private enum Interruption: Error {
-        case simulated
-    }
 
     func testV1ToV2AddsUserExampleAndColumnPreservingRows() throws {
         let queue = try DatabaseQueue()
