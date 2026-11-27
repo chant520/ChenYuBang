@@ -158,7 +158,7 @@ private fun DetailHeader(
         Text(
             text = "例题详情",
             color = colors.head,
-            fontSize = Tokens.Font.n15.sp,
+            fontSize = Tokens.FontRole.pageTitle.sp,
             fontWeight = FontWeight.W700,
             modifier = Modifier.padding(start = Tokens.Space.lmetaGap.dp),
         )
@@ -203,7 +203,7 @@ private fun ExampleBody(
         Text(
             text = "正确答案：${detail.answer}",
             color = colors.text,
-            fontSize = Tokens.Font.n13.sp,
+            fontSize = Tokens.FontRole.body.sp,
             fontWeight = FontWeight.W600,
         )
         AnnotatedBody(
@@ -246,7 +246,7 @@ private fun OptionRow(
         Text(
             text = letter.toString(),
             color = colors.text3,
-            fontSize = Tokens.Font.n13.sp,
+            fontSize = Tokens.FontRole.body.sp,
             fontWeight = FontWeight.W600,
         )
         AnnotatedBodyWeight(
@@ -311,6 +311,7 @@ private fun AnnotatedBodyWeight(
     topPad: Boolean = false,
 ) {
     val hits = remember(text, wordIndex) { IdiomHighlight.match(text, wordIndex) }
+    val annotated = remember(text, hits, colors, onOpenIdiom) { annotatedText(text, hits, colors, onOpenIdiom) }
     val baseColor = if (strong) colors.text else colors.text2
     val baseWeight = if (strong) FontWeight.W600 else FontWeight.Normal
     val baseModifier = if (topPad) Modifier.padding(top = Tokens.Space.lsubTop.dp) else Modifier
@@ -318,16 +319,16 @@ private fun AnnotatedBodyWeight(
         Text(
             text = text,
             color = baseColor,
-            fontSize = Tokens.Font.n13.sp,
+            fontSize = Tokens.FontRole.body.sp,
             fontWeight = baseWeight,
             modifier = baseModifier,
         )
         return
     }
     Text(
-        text = annotatedText(text, hits, colors, onOpenIdiom),
+        text = annotated,
         color = baseColor,
-        fontSize = Tokens.Font.n13.sp,
+        fontSize = Tokens.FontRole.body.sp,
         fontWeight = baseWeight,
         modifier = baseModifier,
     )
@@ -370,7 +371,7 @@ private fun BodyText(
     Text(
         text = text,
         color = colors.text2,
-        fontSize = Tokens.Font.n13.sp,
+        fontSize = Tokens.FontRole.body.sp,
         modifier = Modifier.padding(top = Tokens.Space.lsubTop.dp),
     )
 }

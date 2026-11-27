@@ -2,7 +2,6 @@ package com.chenyubang.core.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -26,7 +25,7 @@ fun CCard(
     soft: Boolean = false,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    val c = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
+    val c = LocalColorSet.current
     val shape = RoundedCornerShape(Tokens.Radius.r6.dp)
     Column(
         modifier =

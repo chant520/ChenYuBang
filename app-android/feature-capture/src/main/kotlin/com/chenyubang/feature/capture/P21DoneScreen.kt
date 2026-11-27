@@ -73,7 +73,7 @@ fun P21DoneScreen(
             Text(
                 "已存入我的题库",
                 color = colors.head,
-                fontSize = Tokens.Font.n20.sp,
+                fontSize = Tokens.FontRole.pageTitle.sp,
                 fontWeight = FontWeight.W700,
                 textAlign = TextAlign.Center,
             )
@@ -81,7 +81,7 @@ fun P21DoneScreen(
             Text(
                 attribution(idioms),
                 color = colors.text2,
-                fontSize = Tokens.Font.n13.sp,
+                fontSize = Tokens.FontRole.supporting.sp,
                 textAlign = TextAlign.Center,
             )
         }
@@ -91,7 +91,7 @@ fun P21DoneScreen(
         Text(
             "只存在本机，不会上传",
             color = colors.text3,
-            fontSize = Tokens.Font.n11.sp,
+            fontSize = Tokens.FontRole.caption.sp,
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth().padding(bottom = Tokens.Space.fabBottom.dp),
         )

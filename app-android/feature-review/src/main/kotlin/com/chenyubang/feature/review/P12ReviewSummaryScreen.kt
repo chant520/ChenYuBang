@@ -62,7 +62,7 @@ fun P12ReviewSummaryContent(
             summaryResultCard(summary, colors)
             summaryEmpty(onBackToSource)
         } else {
-            Text(text = summary.scopeLine, color = colors.text3, fontSize = Tokens.Font.n12.sp)
+            Text(text = summary.scopeLine, color = colors.text3, fontSize = Tokens.FontRole.supporting.sp)
             summaryResultCard(summary, colors)
             summaryIdiomsCard(summary, colors, onOpenIdiom)
             CButton(
@@ -93,7 +93,7 @@ private fun summaryTopBar(
         Text(
             text = "复习小结",
             color = colors.head,
-            fontSize = Tokens.Font.n15.sp,
+            fontSize = Tokens.FontRole.pageTitle.sp,
             fontWeight = FontWeight.W700,
         )
     }
@@ -109,19 +109,19 @@ private fun summaryResultCard(
         Text(
             text = "题量 ${summary.questionCount} 道",
             color = colors.text,
-            fontSize = Tokens.Font.n14.sp,
+            fontSize = Tokens.FontRole.itemTitle.sp,
             modifier = Modifier.padding(top = Tokens.Space.lsubTop.dp),
         )
         Text(
             text = "答对 ${summary.correctCount} 道",
             color = colors.text2,
-            fontSize = Tokens.Font.n13.sp,
+            fontSize = Tokens.FontRole.body.sp,
             modifier = Modifier.padding(top = Tokens.Space.lsubTop.dp),
         )
         Text(
             text = "答错 ${summary.wrongCount} 道",
             color = colors.text2,
-            fontSize = Tokens.Font.n13.sp,
+            fontSize = Tokens.FontRole.body.sp,
             modifier = Modifier.padding(top = Tokens.Space.lsubTop.dp),
         )
     }
@@ -139,7 +139,7 @@ private fun summaryIdiomsCard(
             Text(
                 text = "本轮没有涉及成语",
                 color = colors.text3,
-                fontSize = Tokens.Font.n12.sp,
+                fontSize = Tokens.FontRole.supporting.sp,
                 modifier = Modifier.padding(top = Tokens.Space.lsubTop.dp),
             )
         } else {
@@ -147,7 +147,7 @@ private fun summaryIdiomsCard(
                 Text(
                     text = idiom.word,
                     color = colors.tintfg,
-                    fontSize = Tokens.Font.n13.sp,
+                    fontSize = Tokens.FontRole.itemTitle.sp,
                     modifier =
                         Modifier
                             .fillMaxWidth()

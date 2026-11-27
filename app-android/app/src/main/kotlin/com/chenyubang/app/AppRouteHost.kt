@@ -231,11 +231,11 @@ internal fun RoutePlaceholder(
             .padding(horizontal = Tokens.Space.pageX.dp, vertical = Tokens.Space.contentTop.dp),
         verticalArrangement = Arrangement.spacedBy(Tokens.Space.block.dp),
     ) {
-        Text("页面待接入", color = colors.text2, fontSize = Tokens.Font.n13.sp)
-        router.current.id?.let { Text(it, color = colors.text3, fontSize = Tokens.Font.n11.sp) }
+        Text("页面待接入", color = colors.text2, fontSize = Tokens.FontRole.body.sp)
+        router.current.id?.let { Text(it, color = colors.text3, fontSize = Tokens.FontRole.caption.sp) }
         val step = RouteRegistry.captureSteps.indexOf(router.current.route)
         if (step >= 0) {
-            Text("第 ${step + 1} 步 / 共 5 步", color = colors.text3, fontSize = Tokens.Font.n11.sp)
+            Text("第 ${step + 1} 步 / 共 5 步", color = colors.text3, fontSize = Tokens.FontRole.caption.sp)
             CButton("取消录题", { update(router.cancelCapture()) }, variant = CButtonVariant.Ghost)
             CButton("下一步（拍照业务待接入）", {}, enabled = false)
         }
@@ -303,7 +303,7 @@ private fun ReviewPlaceholder(
     Text(
         router.review?.idiomId?.let { "只看『$it』" } ?: "全部待复习",
         color = colors.text2,
-        fontSize = Tokens.Font.n12.sp,
+        fontSize = Tokens.FontRole.supporting.sp,
     )
     if (router.current.route == Route.Summary) {
         CButton(if (router.review?.idiomId == null) "回错题本" else "回成语详情", { update(router.exitReview()) })
@@ -329,11 +329,17 @@ private fun PlaceholderFilters(labels: List<String>) {
 @Composable
 private fun RouteScopeLine(scope: ExamScopeSelection) {
     val colors = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
-    Text(scope.description, color = colors.text2, fontSize = Tokens.Font.n13.sp)
+    Text(scope.description, color = colors.text2, fontSize = Tokens.FontRole.body.sp)
     if (scope.provincial) {
-        Text("省份用于筛选省考内容，可自行增减", color = colors.text3, fontSize = Tokens.Font.n12.sp)
+        Text("省份用于筛选省考内容，可自行增减", color = colors.text3, fontSize = Tokens.FontRole.supporting.sp)
     }
-    if (scope.isEmpty) Text("不选范围时成语库和例题库会是空的，可以稍后在『我的』里改", color = colors.text3, fontSize = Tokens.Font.n12.sp)
+    if (scope.isEmpty) {
+        Text(
+            "不选范围时成语库和例题库会是空的，可以稍后在『我的』里改",
+            color = colors.text3,
+            fontSize = Tokens.FontRole.supporting.sp,
+        )
+    }
 }
 
 @Composable

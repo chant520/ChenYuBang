@@ -98,7 +98,7 @@ internal fun P15BackupContent(
             Text(
                 text = P15_LAST_BACKUP_VALUE,
                 color = colors.text3,
-                fontSize = Tokens.Font.n12.sp,
+                fontSize = Tokens.FontRole.caption.sp,
             )
         }
 
@@ -107,8 +107,8 @@ internal fun P15BackupContent(
         Text(
             text = "全程不登录、不上传、不代传：文件只在你和网盘之间走。",
             color = colors.text3,
-            fontSize = Tokens.Font.n115.sp,
-            lineHeight = (Tokens.Font.n115 * TEXT_LINE_HEIGHT).sp,
+            fontSize = Tokens.FontRole.caption.sp,
+            lineHeight = (Tokens.FontRole.caption * TEXT_LINE_HEIGHT).sp,
         )
         Spacer(Modifier.size(Tokens.Space.fabBottom.dp))
     }
@@ -126,8 +126,8 @@ private fun ExportCard(
         Text(
             text = "导出的内容：错题、录入题、收藏、学习状态。不含题库本身。",
             color = colors.text2,
-            fontSize = Tokens.Font.n13.sp,
-            lineHeight = (Tokens.Font.n13 * TEXT_LINE_HEIGHT).sp,
+            fontSize = Tokens.FontRole.body.sp,
+            lineHeight = (Tokens.FontRole.body * TEXT_LINE_HEIGHT).sp,
         )
         Spacer(Modifier.size(Tokens.Space.lmetaTop.dp))
         CList {
@@ -146,8 +146,8 @@ private fun ImportCard(onPick: () -> Unit) {
         Text(
             text = "读入前会先问你：覆盖还是合并（见 P22）。",
             color = colors.text2,
-            fontSize = Tokens.Font.n13.sp,
-            lineHeight = (Tokens.Font.n13 * TEXT_LINE_HEIGHT).sp,
+            fontSize = Tokens.FontRole.body.sp,
+            lineHeight = (Tokens.FontRole.body * TEXT_LINE_HEIGHT).sp,
         )
         Spacer(Modifier.size(Tokens.Space.lmetaTop.dp))
         CList {

@@ -86,7 +86,7 @@ internal object BackupWriter {
         return BackupReferences(
             idiomIds = idiomIds,
             userExampleIds = userExampleIds,
-            mistakeIds = localMistakes + backup.snapshot.mistakes.map { it.id },
+            mistakeIds = localMistakes,
         )
     }
 

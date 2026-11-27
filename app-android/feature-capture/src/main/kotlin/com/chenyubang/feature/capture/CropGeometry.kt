@@ -47,28 +47,29 @@ internal fun moveCorner(
     drag: Offset,
     size: IntSize,
     minSizePx: Float,
+    bounds: RectF = RectF(0f, 0f, 1f, 1f),
 ): RectF {
-    val minWidth = (minSizePx / size.width).coerceAtMost(1f)
-    val minHeight = (minSizePx / size.height).coerceAtMost(1f)
+    val minWidth = (minSizePx / size.width).coerceAtMost(bounds.width())
+    val minHeight = (minSizePx / size.height).coerceAtMost(bounds.height())
     val dx = drag.x / size.width
     val dy = drag.y / size.height
     val moved = RectF(crop)
     when (corner) {
         CORNER_LEFT_TOP -> {
-            moved.left = (crop.left + dx).coerceIn(0f, crop.right - minWidth)
-            moved.top = (crop.top + dy).coerceIn(0f, crop.bottom - minHeight)
+            moved.left = (crop.left + dx).coerceIn(bounds.left, crop.right - minWidth)
+            moved.top = (crop.top + dy).coerceIn(bounds.top, crop.bottom - minHeight)
         }
         CORNER_RIGHT_TOP -> {
-            moved.right = (crop.right + dx).coerceIn(crop.left + minWidth, 1f)
-            moved.top = (crop.top + dy).coerceIn(0f, crop.bottom - minHeight)
+            moved.right = (crop.right + dx).coerceIn(crop.left + minWidth, bounds.right)
+            moved.top = (crop.top + dy).coerceIn(bounds.top, crop.bottom - minHeight)
         }
         CORNER_LEFT_BOTTOM -> {
-            moved.left = (crop.left + dx).coerceIn(0f, crop.right - minWidth)
-            moved.bottom = (crop.bottom + dy).coerceIn(crop.top + minHeight, 1f)
+            moved.left = (crop.left + dx).coerceIn(bounds.left, crop.right - minWidth)
+            moved.bottom = (crop.bottom + dy).coerceIn(crop.top + minHeight, bounds.bottom)
         }
         CORNER_RIGHT_BOTTOM -> {
-            moved.right = (crop.right + dx).coerceIn(crop.left + minWidth, 1f)
-            moved.bottom = (crop.bottom + dy).coerceIn(crop.top + minHeight, 1f)
+            moved.right = (crop.right + dx).coerceIn(crop.left + minWidth, bounds.right)
+            moved.bottom = (crop.bottom + dy).coerceIn(crop.top + minHeight, bounds.bottom)
         }
         else -> Unit
     }

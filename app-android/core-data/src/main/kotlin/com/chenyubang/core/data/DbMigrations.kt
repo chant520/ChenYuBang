@@ -16,6 +16,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 object DbMigrations {
     private const val VERSION_V2 = 2
     private const val VERSION_V3 = 3
+    private const val VERSION_V4 = 4
 
     /** v1→v2：新增 user_example（用户录入题）+ mistake.userExampleId 可空列（规范 §4.5 v2 方案）。 */
     val MIGRATION_1_2: Migration =
@@ -61,5 +62,38 @@ object DbMigrations {
             }
         }
 
-    val ALL: Array<Migration> = arrayOf(MIGRATION_1_2, MIGRATION_2_3)
+    /**
+     * v3→v4：纯数据回填，不新增表或列（规范 4.5 节 v4 方案）。
+     * 只处理未标错且无任何归属的录入题：规则一题干去首尾空白后与 example.stem 全等，
+     * 经 example_idiom 并 JOIN idiom 保证外键存在；规则二题干或 myAnswer 完整包含 idiom.word。
+     * 两规则命中多条全写、均不中跳过；INSERT OR IGNORE 配合无归属前置条件保证幂等。
+     */
+    private val BACKFILL_SQL =
+        """
+        INSERT OR IGNORE INTO user_example_idiom(userExampleId, idiomId)
+        SELECT ue.id, ei.idiomId
+        FROM user_example AS ue
+        JOIN example AS ex ON trim(ue.stem, char(9,10,13,32,12288)) = ex.stem
+        JOIN example_idiom AS ei ON ei.exampleId = ex.id
+        JOIN idiom AS i ON i.id = ei.idiomId
+        WHERE ue.isMistake = 0
+          AND NOT EXISTS (SELECT 1 FROM user_example_idiom AS link WHERE link.userExampleId = ue.id)
+        UNION
+        SELECT ue.id, i.id
+        FROM user_example AS ue
+        JOIN idiom AS i
+          ON i.word <> ''
+         AND (instr(ue.stem, i.word) > 0 OR instr(coalesce(ue.myAnswer, ''), i.word) > 0)
+        WHERE ue.isMistake = 0
+          AND NOT EXISTS (SELECT 1 FROM user_example_idiom AS link WHERE link.userExampleId = ue.id)
+        """.trimIndent()
+
+    val MIGRATION_3_4: Migration =
+        object : Migration(VERSION_V3, VERSION_V4) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(BACKFILL_SQL)
+            }
+        }
+
+    val ALL: Array<Migration> = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
 }

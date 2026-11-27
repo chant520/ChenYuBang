@@ -5,7 +5,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -39,7 +38,7 @@ fun CCheckRow(
     warning: String? = null,
     showDivider: Boolean = true,
 ) {
-    val c = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
+    val c = LocalColorSet.current
     val interaction = remember { MutableInteractionSource() }
     val pressed by interaction.collectIsPressedAsState()
     val boxShape = RoundedCornerShape(Tokens.Radius.r4.dp)
@@ -86,14 +85,14 @@ fun CCheckRow(
         Text(
             text = label,
             color = if (enabled) c.text else c.disfg,
-            fontSize = Tokens.Font.n13.sp,
+            fontSize = Tokens.FontRole.body.sp,
         )
         if (warning != null) {
             Spacer(modifier = Modifier.weight(1f))
             CInlineWarning(text = warning)
         } else if (trailing != null) {
             Spacer(modifier = Modifier.weight(1f))
-            Text(text = trailing, color = c.text3, fontSize = Tokens.Font.n11.sp)
+            Text(text = trailing, color = c.text3, fontSize = Tokens.FontRole.caption.sp)
         }
     }
 }

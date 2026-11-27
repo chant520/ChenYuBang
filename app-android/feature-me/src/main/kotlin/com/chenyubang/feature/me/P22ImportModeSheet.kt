@@ -56,8 +56,8 @@ internal fun P22ImportModeSheetContent(
         Text(
             text = "两种方式结果不同，选之前看清楚。",
             color = colors.text2,
-            fontSize = Tokens.Font.n12.sp,
-            lineHeight = (Tokens.Font.n12 * DESC_LINE_HEIGHT).sp,
+            fontSize = Tokens.FontRole.supporting.sp,
+            lineHeight = (Tokens.FontRole.supporting * DESC_LINE_HEIGHT).sp,
         )
 
         ModeCard(
@@ -94,7 +94,7 @@ private fun ModeCard(
             Text(
                 text = title,
                 color = colors.head,
-                fontSize = Tokens.Font.n13.sp,
+                fontSize = Tokens.FontRole.sectionTitle.sp,
                 fontWeight = FontWeight.W700,
             )
             Spacer(Modifier.size(Tokens.Space.chkGap.dp))
@@ -104,8 +104,8 @@ private fun ModeCard(
         Text(
             text = description,
             color = colors.text2,
-            fontSize = Tokens.Font.n13.sp,
-            lineHeight = (Tokens.Font.n13 * DESC_LINE_HEIGHT).sp,
+            fontSize = Tokens.FontRole.body.sp,
+            lineHeight = (Tokens.FontRole.body * DESC_LINE_HEIGHT).sp,
         )
     }
 }

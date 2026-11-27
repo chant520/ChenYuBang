@@ -5,7 +5,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -35,7 +34,7 @@ fun CSegmentedControl(
     modifier: Modifier = Modifier,
     disabledIndices: Set<Int> = emptySet(),
 ) {
-    val c = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
+    val c = LocalColorSet.current
     val outer = RoundedCornerShape(Tokens.Radius.r5.dp)
     val item = RoundedCornerShape(Tokens.Radius.r4.dp)
     Row(
@@ -47,7 +46,7 @@ fun CSegmentedControl(
                 .padding(Tokens.Space.segPad.dp),
     ) {
         items.forEachIndexed { index, label ->
-            key(index) {
+            key(label) {
                 // 规范 §5.14 禁用项「底不变」：选中底与字重保留，只换字色为 disfg
                 val selected = index == selectedIndex
                 val disabled = index in disabledIndices
@@ -78,7 +77,7 @@ fun CSegmentedControl(
                     Text(
                         text = label,
                         color = foreground,
-                        fontSize = Tokens.Font.n11.sp,
+                        fontSize = Tokens.FontRole.label.sp,
                         fontWeight = if (selected) FontWeight.W700 else FontWeight.Normal,
                         textAlign = TextAlign.Center,
                     )

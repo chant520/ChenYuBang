@@ -8,6 +8,7 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
@@ -18,6 +19,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.SQLiteMode
 import java.io.ByteArrayInputStream
+import java.io.File
 
 /** 验证计划第 2 节 #1/#2/#3/#4/#6/#8：合并保本机、覆盖回滚、sha/超版拒绝、原图占位、范围替换。 */
 @Suppress("MagicNumber", "TooManyFunctions")
@@ -35,7 +37,7 @@ class BackupImporterTest {
         database = BackupDb.open(context)
         BackupDb.seedIdioms(database)
         importer = BackupImporter(database, context)
-        context.cacheDir.listFiles { file -> file.name.startsWith(BackupSpec.SAFETY_PREFIX) }
+        File(context.filesDir, "backups").listFiles { file -> file.name.startsWith(BackupSpec.SAFETY_PREFIX) }
             ?.forEach { it.delete() }
     }
 
@@ -93,7 +95,7 @@ class BackupImporterTest {
             assertEquals("本机甲", localText("SELECT optionA FROM mistake WHERE id = ?", BackupFixture.MISTAKE_A))
             assertEquals("河南", localText("SELECT province FROM exam_scope WHERE id = 'old-province-id'"))
             val safety =
-                context.cacheDir.listFiles { file ->
+                File(context.filesDir, "backups").listFiles { file ->
                     file.name.startsWith(BackupSpec.SAFETY_PREFIX) && file.name.endsWith(BackupSpec.ZIP_SUFFIX)
                 }
             assertEquals(1, safety?.size)
@@ -209,6 +211,84 @@ class BackupImporterTest {
             assertEquals(listOf(deadIdiom1), result.orphans.userExampleIdiomsMissing[BackupFixture.EXAMPLE_A])
             assertEquals(listOf(BackupFixture.REVIEW_B), result.orphans.reviewsWithoutMistake)
             assertEquals(BackupCounts(mistakes = 1, userExamples = 1, reviews = 1), result.imported)
+        }
+
+    @Test
+    fun importSkipsReviewPointingToMistakeDroppedForDanglingUserExample() =
+        runBlocking {
+            val missingExample = "99999999-9999-4999-8999-999999999999"
+            val snapshot =
+                BackupSnapshot(
+                    mistakes =
+                        listOf(BackupFixture.mistake(id = BackupFixture.MISTAKE_A, userExampleId = missingExample)),
+                    reviews =
+                        listOf(BackupFixture.review(id = BackupFixture.REVIEW_A, mistakeId = BackupFixture.MISTAKE_A)),
+                )
+            val backup = importer.validate(ByteArrayInputStream(BackupFixture.zip(snapshot)))
+            val result = importer.restore(backup, ImportMode.OVERWRITE)
+
+            assertEquals(0, BackupDb.count(database, "mistake"))
+            assertEquals(0, BackupDb.count(database, "review_log"))
+            assertEquals(listOf(BackupFixture.MISTAKE_A), result.orphans.mistakesWithoutUserExample)
+            assertEquals(listOf(BackupFixture.REVIEW_A), result.orphans.reviewsWithoutMistake)
+            assertEquals(BackupCounts(), result.imported)
+        }
+
+    @Test
+    fun rejectsDuplicateIdsInIdKeyedArrays() {
+        val base = BackupFixture.incoming()
+        val duplicates =
+            listOf(
+                base.copy(mistakes = listOf(base.mistakes[0], base.mistakes[0])),
+                base.copy(userExamples = listOf(base.userExamples[0], base.userExamples[0])),
+                base.copy(reviews = listOf(base.reviews[0], base.reviews[0])),
+                base.copy(idiomStates = listOf(base.idiomStates[0], base.idiomStates[0])),
+            )
+        duplicates.forEach { snapshot ->
+            val error =
+                assertThrows(DataError.Hard::class.java) {
+                    importer.validate(ByteArrayInputStream(BackupFixture.zip(snapshot)))
+                }
+            assertTrue(error.message.orEmpty().contains("字段异常或校验失败"))
+        }
+        assertEquals(0, BackupDb.count(database, "mistake"))
+    }
+
+    @Test
+    fun deduplicatesRepeatedIdiomIdsBeforeWriting() =
+        runBlocking {
+            val snapshot =
+                BackupFixture.incoming().copy(
+                    mistakes =
+                        listOf(
+                            BackupFixture.mistake(
+                                idiomIds = listOf(BackupFixture.IDIOM_1, BackupFixture.IDIOM_1, BackupFixture.IDIOM_2),
+                            ),
+                        ),
+                    userExamples =
+                        listOf(
+                            BackupFixture.userExample(idiomIds = listOf(BackupFixture.IDIOM_1, BackupFixture.IDIOM_1)),
+                        ),
+                )
+            val backup = importer.validate(ByteArrayInputStream(BackupFixture.zip(snapshot)))
+            importer.restore(backup, ImportMode.OVERWRITE)
+            assertEquals(2, BackupDb.count(database, "mistake_idiom"))
+            assertEquals(1, BackupDb.count(database, "user_example_idiom"))
+        }
+
+    @Test
+    fun safetyCopyUsesPersistentDirAndUniqueNames() =
+        runBlocking {
+            val backup = importer.validate(ByteArrayInputStream(BackupFixture.zip(BackupFixture.incoming())))
+            val first = requireNotNull(importer.restore(backup, ImportMode.OVERWRITE).safetyCopy)
+            val second = requireNotNull(importer.restore(backup, ImportMode.OVERWRITE).safetyCopy)
+            val dir = File(context.filesDir, "backups")
+
+            assertTrue(first.startsWith(dir.absolutePath))
+            assertTrue(second.startsWith(dir.absolutePath))
+            assertNotEquals(first, second)
+            assertTrue(File(first).exists())
+            assertTrue(File(second).exists())
         }
 
     private fun localText(

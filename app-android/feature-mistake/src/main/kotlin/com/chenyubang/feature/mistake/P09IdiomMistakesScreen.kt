@@ -8,12 +8,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,7 +43,6 @@ import com.chenyubang.core.ui.CChromeGlyph
 import com.chenyubang.core.ui.CChromeIcon
 import com.chenyubang.core.ui.CEmptyState
 import com.chenyubang.core.ui.CLabel
-import com.chenyubang.core.ui.CList
 import com.chenyubang.core.ui.CTag
 import com.chenyubang.core.ui.CTagStyle
 import com.chenyubang.core.ui.tokens.Tokens
@@ -93,24 +94,40 @@ fun P09IdiomMistakesContent(
     onRetry: () -> Unit,
     onOpenExample: (String) -> Unit = {},
 ) {
-    Column(
+    LazyColumn(
         modifier =
             Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
                 .padding(horizontal = Tokens.Space.pageX.dp, vertical = Tokens.Space.contentTop.dp),
-        verticalArrangement = Arrangement.spacedBy(Tokens.Space.block.dp),
     ) {
-        P09Header(word = state.word, onBack = onBack)
-        when {
-            state.missing ->
+        item { P09Header(word = state.word, onBack = onBack) }
+        p09StateBody(state, onBack, onOpenIdiom, onRetry, onOpenExample)
+    }
+}
+
+/** P09 状态分发：缺失/失败/加载与录入题列表。 */
+private fun LazyListScope.p09StateBody(
+    state: P09IdiomMistakesUiState,
+    onBack: () -> Unit,
+    onOpenIdiom: (String) -> Unit,
+    onRetry: () -> Unit,
+    onOpenExample: (String) -> Unit,
+) {
+    when {
+        state.missing -> {
+            sectionGap()
+            item {
                 CEmptyState(
                     title = "没有找到这个成语",
                     description = "它可能已随题库更新被替换，回错题本看看别的成语。",
                     actionText = "返回错题本",
                     onAction = onBack,
                 )
-            state.failed ->
+            }
+        }
+        state.failed -> {
+            sectionGap()
+            item {
                 CBar(
                     kind = CBarKind.Warn,
                     title = "录入题读取失败，请重试",
@@ -118,37 +135,65 @@ fun P09IdiomMistakesContent(
                     actionText = "重试",
                     onAction = onRetry,
                 )
-            state.loading -> CBar(CBarKind.Info, "正在读取录入题", subtitle = "只读本机题库，不联网。")
-            else -> {
-                if (state.senseLine.isNotEmpty()) {
-                    P09SenseCard(senseLine = state.senseLine, onOpenIdiom = { onOpenIdiom(state.idiomId) })
-                }
-                CLabel(text = "我录入的题（标错的按错题展示）")
-                if (state.rows.isEmpty()) {
-                    CEmptyState(
-                        title = "这个成语下还没有录入题",
-                        description = "之前录的题已经删掉或已归到别的成语下。",
-                        actionText = "返回错题本",
-                        onAction = onBack,
-                    )
-                } else {
-                    CList {
-                        state.rows.forEachIndexed { index, row ->
-                            UserExampleRow(row = row, onClick = { onOpenExample(row.id) })
-                            if (index != state.rows.lastIndex) RowDivider()
-                        }
-                    }
-                    Text(
-                        text = state.rows.size.toString() + " 道 · 已到末尾",
-                        color = if (isSystemInDarkTheme()) Tokens.Dark.text3 else Tokens.Light.text3,
-                        fontSize = Tokens.Font.n11.sp,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth().padding(top = Tokens.Space.lmetaTop.dp),
-                    )
-                }
             }
         }
+        state.loading -> {
+            sectionGap()
+            item { CBar(CBarKind.Info, "正在读取录入题", subtitle = "只读本机题库，不联网。") }
+        }
+        else -> p09LoadedBody(state, onBack, onOpenIdiom, onOpenExample)
     }
+}
+
+/** P09 正常态：释义卡、录入题列表与末尾提示。 */
+private fun LazyListScope.p09LoadedBody(
+    state: P09IdiomMistakesUiState,
+    onBack: () -> Unit,
+    onOpenIdiom: (String) -> Unit,
+    onOpenExample: (String) -> Unit,
+) {
+    if (state.senseLine.isNotEmpty()) {
+        sectionGap()
+        item {
+            P09SenseCard(senseLine = state.senseLine, onOpenIdiom = { onOpenIdiom(state.idiomId) })
+        }
+    }
+    sectionGap()
+    item { CLabel(text = "我录入的题（标错的按错题展示）") }
+    if (state.rows.isEmpty()) {
+        sectionGap()
+        item {
+            CEmptyState(
+                title = "这个成语下还没有录入题",
+                description = "之前录的题已经删掉或已归到别的成语下。",
+                actionText = "返回错题本",
+                onAction = onBack,
+            )
+        }
+    } else {
+        sectionGap()
+        state.rows.forEachIndexed { index, row ->
+            item(key = row.id) {
+                UserExampleRow(row = row, onClick = { onOpenExample(row.id) })
+                if (index != state.rows.lastIndex) RowDivider()
+            }
+        }
+        sectionGap()
+        item {
+            Text(
+                text = state.rows.size.toString() + " 道 · 已到末尾",
+                color = if (isSystemInDarkTheme()) Tokens.Dark.text3 else Tokens.Light.text3,
+                fontSize = Tokens.FontRole.caption.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth().padding(top = Tokens.Space.lmetaTop.dp),
+            )
+        }
+    }
+}
+
+/** 与原 Column 的 spacedBy(block) 等价的区块间距；录入题行内分隔由行自身绘制。 */
+private fun LazyListScope.sectionGap() {
+    item { Spacer(Modifier.height(Tokens.Space.block.dp)) }
 }
 
 @Composable
@@ -167,7 +212,7 @@ private fun P09Header(
         Text(
             text = word.ifBlank { "录入题" },
             color = c.head,
-            fontSize = Tokens.Font.n15.sp,
+            fontSize = Tokens.FontRole.pageTitle.sp,
             fontWeight = FontWeight.W700,
             modifier = Modifier.padding(start = Tokens.Space.lt1Gap.dp),
         )
@@ -188,8 +233,8 @@ private fun P09SenseCard(
             Text(
                 text = senseLine,
                 color = c.text3,
-                fontSize = Tokens.Font.n12.sp,
-                lineHeight = Tokens.Font.n12.sp * 1.65f,
+                fontSize = Tokens.FontRole.supporting.sp,
+                lineHeight = Tokens.FontRole.supporting.sp * 1.65f,
                 modifier = Modifier.weight(1f),
             )
             CChromeGlyph(
@@ -218,8 +263,8 @@ private fun UserExampleRow(
         Text(
             text = row.stem,
             color = c.text2,
-            fontSize = Tokens.Font.n12.sp,
-            lineHeight = Tokens.Font.n12.sp * 1.6f,
+            fontSize = Tokens.FontRole.supporting.sp,
+            lineHeight = Tokens.FontRole.supporting.sp * 1.6f,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
         )
@@ -231,17 +276,17 @@ private fun UserExampleRow(
             val mark = row.mistake
             if (mark == null) {
                 CTag(text = "我录入", style = CTagStyle.Ghost)
-                Text(text = row.recordedAt, color = c.text3, fontSize = Tokens.Font.n11.sp)
-                Text(text = "未标错", color = c.text3, fontSize = Tokens.Font.n11.sp)
+                Text(text = row.recordedAt, color = c.text3, fontSize = Tokens.FontRole.caption.sp)
+                Text(text = "未标错", color = c.text3, fontSize = Tokens.FontRole.caption.sp)
             } else {
                 CBadge(text = "错题", kind = CBadgeKind.Error)
-                Text(text = row.recordedAt, color = c.text3, fontSize = Tokens.Font.n11.sp)
+                Text(text = row.recordedAt, color = c.text3, fontSize = Tokens.FontRole.caption.sp)
                 CTag(
                     text = mark.state,
                     style = if (mark.state == MISTAKE_STATE_PENDING) CTagStyle.Solid else CTagStyle.Ghost,
                 )
                 mark.tagNames.forEach { tag ->
-                    Text(text = tag, color = c.text3, fontSize = Tokens.Font.n11.sp)
+                    Text(text = tag, color = c.text3, fontSize = Tokens.FontRole.label.sp)
                 }
             }
         }

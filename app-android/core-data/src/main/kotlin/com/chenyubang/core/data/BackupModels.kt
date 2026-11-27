@@ -5,6 +5,7 @@ import java.time.Instant
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
+import java.util.UUID
 
 /**
  * 备份交换格式常量。schemaVersion 是交换格式版本，与 @Database(version = 3) 无关；
@@ -26,10 +27,14 @@ internal object BackupTime {
     private val UTC =
         DateTimeFormatter.ISO_INSTANT
     private val STAMP = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss")
+    private val SAFETY_STAMP = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss-SSS")
 
     fun nowUtc(): String = UTC.format(Instant.now().truncatedTo(ChronoUnit.SECONDS))
 
     fun fileStamp(): String = STAMP.format(LocalDateTime.now())
+
+    /** 安全副本名：毫秒时间戳 + UUID 后缀，避免同秒两次覆盖导入相互覆盖。 */
+    fun safetyStamp(): String = SAFETY_STAMP.format(LocalDateTime.now()) + "-" + UUID.randomUUID()
 }
 
 /**

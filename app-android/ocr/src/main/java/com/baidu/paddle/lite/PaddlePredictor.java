@@ -103,8 +103,13 @@ public class PaddlePredictor {
      */
     @Override
     protected void finalize() throws Throwable {
-        clear();
+        release();
         super.finalize();
+    }
+
+    /** 显式释放 native predictor，幂等且不改 JNI 签名；调用方须先释放缓存的 Tensor 包装。 */
+    public void release() {
+        clear();
     }
 
     /**

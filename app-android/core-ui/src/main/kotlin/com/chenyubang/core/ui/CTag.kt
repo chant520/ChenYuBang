@@ -2,7 +2,6 @@ package com.chenyubang.core.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,7 +22,7 @@ fun CTag(
     modifier: Modifier = Modifier,
     style: CTagStyle = CTagStyle.Solid,
 ) {
-    val c = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
+    val c = LocalColorSet.current
     val shape = RoundedCornerShape(Tokens.Radius.r4.dp)
     val background =
         when (style) {
@@ -62,8 +61,8 @@ fun CTag(
         Text(
             text = text,
             color = foreground,
-            fontSize = Tokens.Font.n11.sp,
-            lineHeight = (Tokens.Font.n11 * TAG_LINE_HEIGHT).sp,
+            fontSize = Tokens.FontRole.label.sp,
+            lineHeight = (Tokens.FontRole.label * TAG_LINE_HEIGHT).sp,
         )
     }
 }

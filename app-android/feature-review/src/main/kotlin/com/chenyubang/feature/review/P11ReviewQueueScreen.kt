@@ -114,12 +114,12 @@ private fun reviewQueueTopBar(
         Text(
             text = state.topBarTitle,
             color = colors.head,
-            fontSize = Tokens.Font.n15.sp,
+            fontSize = Tokens.FontRole.pageTitle.sp,
             fontWeight = FontWeight.W700,
         )
     }
     if (state.total > 0) {
-        Text(text = state.scopeLine, color = colors.text3, fontSize = Tokens.Font.n12.sp)
+        Text(text = state.scopeLine, color = colors.text3, fontSize = Tokens.FontRole.supporting.sp)
     }
 }
 
@@ -155,7 +155,7 @@ private fun reviewQuestionBody(
     Text(
         question.stem,
         color = colors.text,
-        fontSize = Tokens.Font.n15.sp,
+        fontSize = Tokens.FontRole.contentTitle.sp,
         fontWeight = FontWeight.W600,
     )
     question.options.forEachIndexed { index, text ->
@@ -175,11 +175,11 @@ private fun reviewQuestionBody(
         Text(
             text = verdict.message,
             color = if (verdict.comparable) colors.tintfg else colors.text3,
-            fontSize = Tokens.Font.n13.sp,
+            fontSize = Tokens.FontRole.body.sp,
             fontWeight = FontWeight.W600,
         )
         if (verdict.comparable) {
-            Text(text = "本题未记录正确答案", color = colors.text3, fontSize = Tokens.Font.n12.sp)
+            Text(text = "本题未记录正确答案", color = colors.text3, fontSize = Tokens.FontRole.supporting.sp)
         }
         CButton(text = "下一题", onClick = if (state.isLast) onFinish else onNext)
     }
@@ -203,7 +203,7 @@ private fun reviewOptionRow(
         Text(
             text = "${LETTERS.getOrNull(view.index).orEmpty()}. ${view.text?.takeIf { it.isNotBlank() } ?: "暂无"}",
             color = if (view.selected) colors.tintfg else colors.text2,
-            fontSize = Tokens.Font.n135.sp,
+            fontSize = Tokens.FontRole.body.sp,
         )
     }
 }

@@ -65,8 +65,8 @@ internal fun P23ClearDialogContent(
         Text(
             text = "这一步不可撤销。清掉的是你录的东西，不是题库本身。",
             color = colors.text2,
-            fontSize = Tokens.Font.n12.sp,
-            lineHeight = (Tokens.Font.n12 * DESC_LINE_HEIGHT).sp,
+            fontSize = Tokens.FontRole.supporting.sp,
+            lineHeight = (Tokens.FontRole.supporting * DESC_LINE_HEIGHT).sp,
         )
 
         CCard {
@@ -75,7 +75,7 @@ internal fun P23ClearDialogContent(
             Text(
                 text = "错题 ${state.mistakes} 道 · 录入题 ${state.userExamples} 条 · 收藏 ${state.favorites} 个 · 学习状态",
                 color = colors.text2,
-                fontSize = Tokens.Font.n13.sp,
+                fontSize = Tokens.FontRole.body.sp,
             )
         }
 
@@ -85,7 +85,7 @@ internal fun P23ClearDialogContent(
             Text(
                 text = "成语库与例题库照常可用，考试范围设置保留",
                 color = colors.text2,
-                fontSize = Tokens.Font.n13.sp,
+                fontSize = Tokens.FontRole.body.sp,
             )
         }
 

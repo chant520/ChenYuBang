@@ -3,7 +3,6 @@ package com.chenyubang.core.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,7 +31,7 @@ fun COverlay(
     onCancel: () -> Unit,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    val colors = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
+    val colors = LocalColorSet.current
     val shape =
         if (centered) {
             RoundedCornerShape(Tokens.Radius.r6.dp)
@@ -56,7 +55,12 @@ fun COverlay(
                     ),
                 verticalArrangement = Arrangement.spacedBy(Tokens.Space.block.dp),
             ) {
-                Text(title, color = colors.head, fontSize = Tokens.Font.n15.sp, fontWeight = FontWeight.Bold)
+                Text(
+                    title,
+                    color = colors.head,
+                    fontSize = Tokens.FontRole.sectionTitle.sp,
+                    fontWeight = FontWeight.Bold,
+                )
                 content()
             }
         }

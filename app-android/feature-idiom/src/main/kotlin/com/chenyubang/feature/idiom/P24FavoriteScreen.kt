@@ -116,7 +116,7 @@ private fun FavoriteHeader(
         Text(
             text = "我的收藏",
             color = colors.head,
-            fontSize = Tokens.Font.n20.sp,
+            fontSize = Tokens.FontRole.pageTitle.sp,
             fontWeight = FontWeight.W700,
             modifier = Modifier.padding(start = Tokens.Space.lmetaGap.dp),
         )

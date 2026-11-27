@@ -94,4 +94,15 @@ interface MistakeQueryDao {
             "ORDER BY user_example.createdAt DESC, user_example.id",
     )
     fun userExamplesByIdiom(idiomId: String): Flow<List<UserExampleWithMistake>>
+
+    /**
+     * A5：某成语下全部录入题数（含未标错），与 [userExamplesByIdiom] 同一 INNER JOIN 口径。
+     * 只按归属关联计数，不看 mistake / isMistake；一题多成语时在各自成语下各计一次。
+     */
+    @Query(
+        "SELECT COUNT(*) FROM user_example " +
+            "INNER JOIN user_example_idiom ON user_example_idiom.userExampleId = user_example.id " +
+            "WHERE user_example_idiom.idiomId = :idiomId",
+    )
+    suspend fun countUserExamplesByIdiom(idiomId: String): Int
 }

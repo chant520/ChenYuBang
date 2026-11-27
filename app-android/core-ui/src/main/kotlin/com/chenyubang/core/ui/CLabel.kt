@@ -1,6 +1,5 @@
 package com.chenyubang.core.ui
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -18,11 +17,11 @@ fun CLabel(
     text: String,
     modifier: Modifier = Modifier,
 ) {
-    val c = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
+    val c = LocalColorSet.current
     Text(
         text = text,
         color = c.text3,
-        fontSize = Tokens.Font.n11.sp,
+        fontSize = Tokens.FontRole.label.sp,
         fontWeight = FontWeight.W700,
         letterSpacing = LABEL_LETTER_SPACING.em,
         modifier = modifier,

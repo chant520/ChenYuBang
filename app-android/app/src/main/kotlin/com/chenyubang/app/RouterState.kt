@@ -25,6 +25,7 @@ internal fun systemBackEnabled(router: RouterState): Boolean =
         router.current.route != Route.SelfTest &&
         (router.stack.size > 1 || router.modal != null)
 
+@Suppress("TooManyFunctions")
 data class RouterState(
     val tab: AppTab = AppTab.Idiom,
     val stacks: Map<AppTab, List<RouteEntry>> = AppTab.entries.associateWith { listOf(RouteEntry(it.root)) },
@@ -82,6 +83,16 @@ data class RouterState(
         return append(RouteEntry(route, id, sequence))
     }
 
+    /** 全屏路由唯一入栈口：只接受白名单内的 FullScreen，避免任意 internal 调用构造非法栈。 */
+    internal fun pushFullScreen(
+        route: Route,
+        id: String? = null,
+        instance: Long = sequence,
+    ): RouterState {
+        require(route.presentation == Presentation.FullScreen && route in fullScreenWhitelist)
+        return append(RouteEntry(route, id, instance))
+    }
+
     fun goToMistakes(): RouterState =
         copy(
             tab = AppTab.Mistake,
@@ -121,14 +132,27 @@ data class RouterState(
 
     fun bumpContentRevision(): RouterState = copy(contentRevision = contentRevision + 1)
 
-    internal fun append(entry: RouteEntry): RouterState = withStack(stack + entry).copy(sequence = sequence + 1)
+    private fun append(entry: RouteEntry): RouterState = withStack(stack + entry).copy(sequence = sequence + 1)
 
-    internal fun replaceTop(entry: RouteEntry): RouterState =
-        withStack(stack.dropLast(1) + entry).copy(sequence = sequence + 1)
+    internal fun replaceTop(entry: RouteEntry): RouterState {
+        require(entry.route.presentation == Presentation.FullScreen && entry.route in fullScreenWhitelist)
+        return withStack(stack.dropLast(1) + entry).copy(sequence = sequence + 1)
+    }
 
     internal fun withStack(entries: List<RouteEntry>): RouterState = copy(stacks = stacks + (tab to entries))
 
     companion object {
         private const val serialVersionUID = 1L
+        private val fullScreenWhitelist =
+            setOf(
+                Route.Queue,
+                Route.Summary,
+                Route.SelfTest,
+                Route.Camera,
+                Route.Crop,
+                Route.Ocr,
+                Route.Match,
+                Route.Done,
+            )
     }
 }

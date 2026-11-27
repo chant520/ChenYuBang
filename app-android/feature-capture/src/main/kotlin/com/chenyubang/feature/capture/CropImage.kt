@@ -9,9 +9,12 @@ import android.graphics.RectF
 import androidx.exifinterface.media.ExifInterface
 import java.io.File
 import java.io.IOException
+import kotlin.math.abs
+import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
+import kotlin.math.sin
 
 /** 一次导出所需输入：源图、框选与摆正、预览容器尺寸、目标文件。 */
 internal data class CropExport(
@@ -20,6 +23,15 @@ internal data class CropExport(
     val containerWidth: Float,
     val containerHeight: Float,
     val target: File,
+)
+
+internal data class CropViewport(
+    val imageWidth: Int,
+    val imageHeight: Int,
+    val containerWidth: Float,
+    val containerHeight: Float,
+    val quarterTurns: Int,
+    val fineDegrees: Float,
 )
 
 /**
@@ -35,7 +47,7 @@ internal object CropImage {
     private const val MIN_INK_LUMINANCE = 40f
     private const val FALLBACK_BACKGROUND = 200f
     private const val EDGE_INSET = 0.06f
-    private const val CONTENT_MARGIN = 0.05f
+    private const val CONTENT_PADDING = 0.05f
     private const val MIN_CONTENT_FRACTION = 0.08f
     private const val JPEG_QUALITY = 90
     private const val MAX_OUTPUT_DIM = 4096
@@ -59,33 +71,24 @@ internal object CropImage {
 
     /**
      * 初始框建议：按画面亮度找出文字/纸张内容的包围盒（深色像素的行列投影），
-     * 再向内留 5% 余量。只是启发式建议，用户可拖动四角调整；识别只看导出图。
+     * 再向外扩 5% 余量，避免阈值边缘和抗锯齿笔画被裁掉。只是启发式建议，用户可拖动四角调整；识别只看导出图。
      */
     fun suggest(bitmap: Bitmap): RectF {
         val width = ANALYSIS_WIDTH
         val height = max(1, bitmap.height * width / bitmap.width)
         val scaled = Bitmap.createScaledBitmap(bitmap, width, height, false)
         val pixels = IntArray(width * height)
-        scaled.getPixels(pixels, 0, width, 0, 0, width, height)
-        scaled.recycle()
+        try {
+            scaled.getPixels(pixels, 0, width, 0, 0, width, height)
+        } finally {
+            // 源宽恰为 ANALYSIS_WIDTH 时 createScaledBitmap 返回源对象，不能回收调用方持有的图。
+            if (scaled !== bitmap) scaled.recycle()
+        }
         val background = borderMedian(pixels, width, height)
         val threshold = (background - INK_LUMINANCE_DROP).coerceAtLeast(MIN_INK_LUMINANCE)
         val ink = BooleanArray(pixels.size) { index -> luminance(pixels[index]) < threshold }
         val rect = inkBounds(ink, width, height)
-        return inset(rect, CONTENT_MARGIN)
-    }
-
-    fun fitScale(
-        imageWidth: Int,
-        imageHeight: Int,
-        containerWidth: Float,
-        containerHeight: Float,
-        quarterTurns: Int,
-    ): Float {
-        val swapped = quarterTurns % 2 != 0
-        val displayWidth = if (swapped) imageHeight.toFloat() else imageWidth.toFloat()
-        val displayHeight = if (swapped) imageWidth.toFloat() else imageHeight.toFloat()
-        return min(containerWidth / displayWidth, containerHeight / displayHeight)
+        return expand(rect, CONTENT_PADDING)
     }
 
     /** 导出框内画面；quarterTurns 为 90° 整转，fineDegrees 为「摆正」微调。 */
@@ -95,23 +98,15 @@ internal object CropImage {
             return false
         }
         val source = request.source
-        val scale =
-            fitScale(
-                source.width,
-                source.height,
-                request.containerWidth,
-                request.containerHeight,
-                request.crop.quarterTurns,
-            )
-        val cropWidth = crop.width() * request.containerWidth * scale
-        val cropHeight = crop.height() * request.containerHeight * scale
-        val shrink = min(1f, MAX_OUTPUT_DIM / max(cropWidth, cropHeight))
-        val outputWidth = (cropWidth * shrink).roundToInt().coerceAtLeast(1)
-        val outputHeight = (cropHeight * shrink).roundToInt().coerceAtLeast(1)
+        val cropWidth = crop.width() * request.containerWidth
+        val cropHeight = crop.height() * request.containerHeight
+        val outputScale = min(1f, MAX_OUTPUT_DIM / max(cropWidth, cropHeight))
+        val outputWidth = (cropWidth * outputScale).roundToInt().coerceAtLeast(1)
+        val outputHeight = (cropHeight * outputScale).roundToInt().coerceAtLeast(1)
         val output = Bitmap.createBitmap(outputWidth, outputHeight, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(output)
         canvas.drawColor(Color.WHITE)
-        canvas.drawBitmap(source, exportMatrix(request, scale * shrink), null)
+        canvas.drawBitmap(source, CropDisplayGeometry.exportMatrix(request, outputScale), null)
         val written =
             try {
                 request.target.outputStream().use { output.compress(Bitmap.CompressFormat.JPEG, JPEG_QUALITY, it) }
@@ -122,21 +117,7 @@ internal object CropImage {
         return written
     }
 
-    private fun exportMatrix(
-        request: CropExport,
-        scale: Float,
-    ): Matrix =
-        Matrix().apply {
-            val source = request.source
-            val crop = request.crop
-            postTranslate(-source.width / 2f, -source.height / 2f)
-            postScale(scale, scale)
-            postRotate(crop.quarterTurns * STRAIGHT_ANGLE + crop.fineDegrees)
-            postTranslate(request.containerWidth / 2f * scale, request.containerHeight / 2f * scale)
-            postTranslate(-crop.left * request.containerWidth * scale, -crop.top * request.containerHeight * scale)
-        }
-
-    private fun applyExifOrientation(
+    internal fun applyExifOrientation(
         path: String,
         bitmap: Bitmap,
     ): Bitmap {
@@ -168,7 +149,9 @@ internal object CropImage {
         return if (matrix.isIdentity) {
             bitmap
         } else {
-            Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+            val rotated = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+            bitmap.recycle()
+            rotated
         }
     }
 
@@ -226,26 +209,156 @@ internal object CropImage {
         }
     }
 
-    private fun inset(
+    private fun expand(
         rect: RectF,
-        margin: Float,
+        padding: Float,
     ): RectF {
-        val marginX = rect.width() * margin
-        val marginY = rect.height() * margin
-        val insetRect =
+        val paddingX = rect.width() * padding
+        val paddingY = rect.height() * padding
+        val expanded =
             RectF(
-                (rect.left + marginX).coerceIn(0f, 1f),
-                (rect.top + marginY).coerceIn(0f, 1f),
-                (rect.right - marginX).coerceIn(0f, 1f),
-                (rect.bottom - marginY).coerceIn(0f, 1f),
+                (rect.left - paddingX).coerceIn(0f, 1f),
+                (rect.top - paddingY).coerceIn(0f, 1f),
+                (rect.right + paddingX).coerceIn(0f, 1f),
+                (rect.bottom + paddingY).coerceIn(0f, 1f),
             )
-        return if (insetRect.width() < MIN_CONTENT_FRACTION || insetRect.height() < MIN_CONTENT_FRACTION) {
+        return if (expanded.width() < MIN_CONTENT_FRACTION || expanded.height() < MIN_CONTENT_FRACTION) {
             RectF(EDGE_INSET, EDGE_INSET, 1f - EDGE_INSET, 1f - EDGE_INSET)
         } else {
-            insetRect
+            expanded
         }
     }
 
     private fun luminance(color: Int): Float =
         Color.red(color) * LUMINANCE_RED + Color.green(color) * LUMINANCE_GREEN + Color.blue(color) * LUMINANCE_BLUE
+}
+
+internal object CropDisplayGeometry {
+    private const val STRAIGHT_ANGLE = 90f
+    private const val MATRIX_SCALE_X = 0
+    private const val MATRIX_SKEW_Y = 1
+    private const val MATRIX_TRANSLATE_X = 2
+    private const val MATRIX_SKEW_X = 3
+    private const val MATRIX_SCALE_Y = 4
+    private const val MATRIX_TRANSLATE_Y = 5
+
+    fun fitScale(view: CropViewport): Float {
+        val swapped = view.quarterTurns % 2 != 0
+        val displayWidth = if (swapped) view.imageHeight.toFloat() else view.imageWidth.toFloat()
+        val displayHeight = if (swapped) view.imageWidth.toFloat() else view.imageHeight.toFloat()
+        val radians = Math.toRadians(view.fineDegrees.toDouble())
+        val cosine = abs(cos(radians)).toFloat()
+        val sine = abs(sin(radians)).toFloat()
+        val rotatedWidth = displayWidth * cosine + displayHeight * sine
+        val rotatedHeight = displayWidth * sine + displayHeight * cosine
+        return min(view.containerWidth / rotatedWidth, view.containerHeight / rotatedHeight)
+    }
+
+    fun displayMatrix(view: CropViewport): Matrix = Matrix().apply { setValues(displayValues(view)) }
+
+    private fun displayValues(view: CropViewport): FloatArray {
+        val scale = fitScale(view)
+        val radians = Math.toRadians((view.quarterTurns * STRAIGHT_ANGLE + view.fineDegrees).toDouble())
+        val cosine = cos(radians).toFloat()
+        val sine = sin(radians).toFloat()
+        val a = scale * cosine
+        val b = -scale * sine
+        val c = scale * sine
+        val d = scale * cosine
+        return floatArrayOf(
+            a,
+            b,
+            view.containerWidth / 2f - a * view.imageWidth / 2f - c * view.imageHeight / 2f,
+            c,
+            d,
+            view.containerHeight / 2f - b * view.imageWidth / 2f - d * view.imageHeight / 2f,
+            0f,
+            0f,
+            1f,
+        )
+    }
+
+    fun sourceCropToDisplay(
+        crop: RectF,
+        view: CropViewport,
+    ): RectF {
+        val values = displayValues(view)
+        val topLeft = mapPoint(crop.left * view.imageWidth, crop.top * view.imageHeight, values)
+        val topRight = mapPoint(crop.right * view.imageWidth, crop.top * view.imageHeight, values)
+        val bottomLeft = mapPoint(crop.left * view.imageWidth, crop.bottom * view.imageHeight, values)
+        val bottomRight = mapPoint(crop.right * view.imageWidth, crop.bottom * view.imageHeight, values)
+        val left = minOf(topLeft[0], topRight[0], bottomLeft[0], bottomRight[0])
+        val top = minOf(topLeft[1], topRight[1], bottomLeft[1], bottomRight[1])
+        val right = maxOf(topLeft[0], topRight[0], bottomLeft[0], bottomRight[0])
+        val bottom = maxOf(topLeft[1], topRight[1], bottomLeft[1], bottomRight[1])
+        return RectF(
+            (left / view.containerWidth).coerceIn(0f, 1f),
+            (top / view.containerHeight).coerceIn(0f, 1f),
+            (right / view.containerWidth).coerceIn(0f, 1f),
+            (bottom / view.containerHeight).coerceIn(0f, 1f),
+        )
+    }
+
+    private fun mapPoint(
+        x: Float,
+        y: Float,
+        values: FloatArray,
+    ): FloatArray =
+        floatArrayOf(
+            values[MATRIX_SCALE_X] * x + values[MATRIX_SKEW_X] * y + values[MATRIX_TRANSLATE_X],
+            values[MATRIX_SKEW_Y] * x + values[MATRIX_SCALE_Y] * y + values[MATRIX_TRANSLATE_Y],
+        )
+
+    fun displayedImageBounds(view: CropViewport): RectF = sourceCropToDisplay(RectF(0f, 0f, 1f, 1f), view)
+
+    fun remapCrop(
+        crop: RectF,
+        from: CropViewport,
+        to: CropViewport,
+    ): RectF {
+        val fromBounds = displayedImageBounds(from)
+        val toBounds = displayedImageBounds(to)
+        if (!hasArea(fromBounds) || !hasArea(toBounds)) return crop
+        val relative =
+            RectF(
+                ((crop.left - fromBounds.left) / fromBounds.width()).coerceIn(0f, 1f),
+                ((crop.top - fromBounds.top) / fromBounds.height()).coerceIn(0f, 1f),
+                ((crop.right - fromBounds.left) / fromBounds.width()).coerceIn(0f, 1f),
+                ((crop.bottom - fromBounds.top) / fromBounds.height()).coerceIn(0f, 1f),
+            )
+        return RectF(
+            toBounds.left + relative.left * toBounds.width(),
+            toBounds.top + relative.top * toBounds.height(),
+            toBounds.left + relative.right * toBounds.width(),
+            toBounds.top + relative.bottom * toBounds.height(),
+        )
+    }
+
+    private fun hasArea(bounds: RectF): Boolean = bounds.width() > 0f && bounds.height() > 0f
+
+    internal fun exportMatrix(
+        request: CropExport,
+        outputScale: Float,
+    ): Matrix =
+        Matrix().apply {
+            val view =
+                CropViewport(
+                    request.source.width,
+                    request.source.height,
+                    request.containerWidth,
+                    request.containerHeight,
+                    request.crop.quarterTurns,
+                    request.crop.fineDegrees,
+                )
+            val values = displayValues(view)
+            values[MATRIX_SCALE_X] *= outputScale
+            values[MATRIX_SKEW_Y] *= outputScale
+            values[MATRIX_SKEW_X] *= outputScale
+            values[MATRIX_SCALE_Y] *= outputScale
+            values[MATRIX_TRANSLATE_X] =
+                (values[MATRIX_TRANSLATE_X] - request.crop.left * request.containerWidth) * outputScale
+            values[MATRIX_TRANSLATE_Y] =
+                (values[MATRIX_TRANSLATE_Y] - request.crop.top * request.containerHeight) * outputScale
+            setValues(values)
+        }
 }

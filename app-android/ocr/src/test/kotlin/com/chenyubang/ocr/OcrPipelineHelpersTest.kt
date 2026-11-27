@@ -4,10 +4,16 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
+import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.TemporaryFolder
+import java.io.File
 
-/** 纯 JVM 部分：上采样、张量归一、DB 后处理、CTC 解码、行合并与题干/选项切分。 */
+/** 纯 JVM 部分：上采样、张量归一、DB 后处理、CTC 解码、行合并与题干/选项切分、模型文件校验。 */
 class OcrPipelineHelpersTest {
+    @get:Rule
+    val temporaryFolder = TemporaryFolder()
+
     @Test
     fun `短边不足1400按比例放大`() {
         assertEquals(2450 to 1400, OcrUpscale.targetSize(700, 400))
@@ -44,11 +50,11 @@ class OcrPipelineHelpersTest {
     }
 
     @Test
-    fun `识别张量按零点五归一`() {
-        val tensor = OcrTensor.recTensor(intArrayOf(0xFF808080.toInt()), 1, 1)
-        assertEquals((128f / 255f - 0.5f) / 0.5f, tensor[0], 1e-5f)
-        assertEquals(tensor[0], tensor[1], 1e-6f)
-        assertEquals(tensor[1], tensor[2], 1e-6f)
+    fun `识别张量按BGR顺序归一`() {
+        val tensor = OcrTensor.recTensor(intArrayOf(0xFFFF0000.toInt()), 1, 1)
+        assertEquals(-1f, tensor[0], 1e-5f)
+        assertEquals(-1f, tensor[1], 1e-5f)
+        assertEquals(1f, tensor[2], 1e-5f)
     }
 
     @Test
@@ -90,7 +96,13 @@ class OcrPipelineHelpersTest {
                 0.9f, 0.05f, 0.05f,
                 0.1f, 0.1f, 0.8f,
             )
-        val decoded = CtcDecoder.decode(probabilities, timeSteps = 4, classes = 3, dictionary = listOf("a", "b"))
+        val decoded =
+            CtcDecoder.decode(
+                probabilities,
+                timeSteps = 4,
+                classes = 3,
+                dictionary = listOf("a", "b"),
+            )
         assertEquals("ab", decoded?.text)
         assertEquals(0.85f, decoded?.score ?: 0f, 1e-5f)
     }
@@ -122,6 +134,57 @@ class OcrPipelineHelpersTest {
     }
 
     @Test
+    fun `双列垂直错位按y行x列聚类不丢选项`() {
+        val lines =
+            listOf(
+                OcrLineGrouper.Line(OcrDetPostProcess.Box(0f, 0f, 300f, 20f, 0.9f), "题干"),
+                OcrLineGrouper.Line(OcrDetPostProcess.Box(0f, 100f, 140f, 120f, 0.9f), "A．甲"),
+                // B 标记漏识且与 A 垂直错位（重叠 40% < 50%），x 落在右列。
+                OcrLineGrouper.Line(OcrDetPostProcess.Box(160f, 112f, 300f, 132f, 0.9f), "乙"),
+                OcrLineGrouper.Line(OcrDetPostProcess.Box(0f, 140f, 140f, 160f, 0.9f), "C．丙"),
+                OcrLineGrouper.Line(OcrDetPostProcess.Box(160f, 152f, 300f, 172f, 0.9f), "丁"),
+            )
+        val classified = OcrLineClassifier.classifyWithBoxes(lines)
+        assertEquals("题干", classified.stem)
+        assertEquals(mapOf("A" to "甲", "B" to "乙", "C" to "丙", "D" to "丁"), classified.options)
+        assertFalse(classified.guessed)
+    }
+
+    @Test
+    fun `末四行长或有句末标点时不猜选项`() {
+        val longTail =
+            listOf(
+                "题干第一行",
+                "题干第二行",
+                "题干第三行",
+                "题干第四行",
+                "这是一个很长的陈述句不能当选项",
+                "另一个同样很长的陈述句不能当选项",
+                "再一行很长的陈述句也不是选项",
+                "最后一行很长的陈述句也不是选项",
+            )
+        val longResult = OcrLineClassifier.classifyDetailed(longTail)
+        assertTrue(longResult.options.isEmpty())
+        assertFalse(longResult.guessed)
+        assertEquals(longTail.joinToString("\n"), longResult.stem)
+
+        val punctuated = listOf("题干一", "题干二", "题干三", "题干四", "甲。", "乙！", "丙？", "丁；")
+        val punctuatedResult = OcrLineClassifier.classifyDetailed(punctuated)
+        assertTrue(punctuatedResult.options.isEmpty())
+        assertFalse(punctuatedResult.guessed)
+    }
+
+    @Test
+    fun `末四行短且无标点时回填并标记推测`() {
+        val result =
+            OcrLineClassifier.classifyDetailed(
+                listOf("题干第一行", "题干第二行", "题干第三行", "题干第四行", "同气连枝", "异曲同工", "同日而语", "同声相应"),
+            )
+        assertTrue(result.guessed)
+        assertEquals(mapOf("A" to "同气连枝", "B" to "异曲同工", "C" to "同日而语", "D" to "同声相应"), result.options)
+    }
+
+    @Test
     fun `按A-D标记切成题干与选项`() {
         val (stem, options) =
             OcrLineClassifier.classify(
@@ -129,6 +192,29 @@ class OcrPipelineHelpersTest {
             )
         assertEquals("下列成语使用正确的是（ ）", stem)
         assertEquals(mapOf("A" to "首当其冲", "B" to "差强人意", "C" to "罄竹难书", "D" to "同日而语"), options)
+    }
+
+    @Test
+    fun `双列两选项并成一行按标记切开`() {
+        val (_, options) =
+            OcrLineClassifier.classify(listOf("题干", "A．异曲同工B、同气连枝", "C、同日而语D）同声相应"))
+        assertEquals(
+            mapOf("A" to "异曲同工", "B" to "同气连枝", "C" to "同日而语", "D" to "同声相应"),
+            options,
+        )
+    }
+
+    @Test
+    fun `双列四个选项全并成一行按标记切开`() {
+        val (_, options) =
+            OcrLineClassifier.classify(listOf("题干", "A. 甲B、乙C)丙D：丁"))
+        assertEquals(mapOf("A" to "甲", "B" to "乙", "C" to "丙", "D" to "丁"), options)
+    }
+
+    @Test
+    fun `选项正文英文字母不误切成选项`() {
+        val (_, options) = OcrLineClassifier.classify(listOf("题干", "A．AB测试正确"))
+        assertEquals(mapOf("A" to "AB测试正确"), options)
     }
 
     @Test
@@ -144,8 +230,78 @@ class OcrPipelineHelpersTest {
     }
 
     @Test
+    fun `选项标记全部漏识时末四行回填ABCD`() {
+        val lines =
+            listOf(
+                "题干第一行",
+                "题干第二行",
+                "题干第三行",
+                "题干第四行",
+                "同气连枝",
+                "异曲同工",
+                "同日而语",
+                "同声相应",
+            )
+        val (stem, options) = OcrLineClassifier.classify(lines)
+        assertEquals("题干第一行\n题干第二行\n题干第三行\n题干第四行", stem)
+        assertEquals(mapOf("A" to "同气连枝", "B" to "异曲同工", "C" to "同日而语", "D" to "同声相应"), options)
+    }
+
+    @Test
+    fun `无标记但不足五行不猜选项`() {
+        val (stem, options) = OcrLineClassifier.classify(listOf("题干第一行", "题干第二行", "选项一", "选项二"))
+        assertEquals("题干第一行\n题干第二行\n选项一\n选项二", stem)
+        assertTrue(options.isEmpty())
+    }
+
+    @Test
+    fun `已有部分标记时不启用末四行猜测`() {
+        val (stem, options) = OcrLineClassifier.classify(listOf("题干", "A. 甲", "乙", "丙", "丁"))
+        assertEquals("题干", stem)
+        assertEquals(mapOf("A" to "甲乙丙丁"), options)
+    }
+
+    @Test
     fun `空识别结果判空`() {
         assertTrue(OcrResult(stem = null, options = emptyMap(), rawLines = emptyList(), durationMs = 0).isEmpty)
         assertFalse(OcrResult(stem = "题干", options = emptyMap(), rawLines = listOf("题干"), durationMs = 1).isEmpty)
     }
+
+    @Test
+    fun `失败结果映射P19文案且不携带识别文本`() {
+        val failed =
+            OcrResult(
+                stem = null,
+                options = emptyMap(),
+                rawLines = emptyList(),
+                durationMs = 5,
+                failureReason = "IOException",
+            )
+        assertTrue(failed.failed)
+        assertTrue(failed.isEmpty)
+        assertEquals(OcrResult.P19_FAILURE_TEXT, failed.failureText)
+        assertNull(failed.stem)
+
+        val ok = OcrResult(stem = "题干", options = mapOf("A" to "甲"), rawLines = listOf("题干", "A. 甲"), durationMs = 6)
+        assertFalse(ok.failed)
+        assertNull(ok.failureText)
+    }
+
+    @Test
+    fun `模型校验接受正确字节数与v2_10版本头`() {
+        val file = File(temporaryFolder.root, "det.nb").apply { writeBytes(modelBytes(OCR_MODEL_VERSION)) }
+        assertTrue(OcrModelValidator.isValid(file, file.length(), versioned = true))
+        assertFalse(OcrModelValidator.isValid(file, file.length() + 1, versioned = true))
+    }
+
+    @Test
+    fun `模型版本头不符即判无效字典不校验版本头`() {
+        val file = File(temporaryFolder.root, "bad.nb").apply { writeBytes(modelBytes("v3.00")) }
+        assertFalse(OcrModelValidator.isValid(file, file.length(), versioned = true))
+        assertTrue(OcrModelValidator.isValid(file, file.length(), versioned = false))
+        assertFalse(OcrModelValidator.isValid(File(temporaryFolder.root, "missing.nb"), 8, versioned = true))
+    }
+
+    private fun modelBytes(version: String): ByteArray =
+        byteArrayOf(2, 0) + version.toByteArray(Charsets.US_ASCII) + byteArrayOf(0)
 }

@@ -93,7 +93,7 @@ class P05IdiomDetailReviewEntryTest {
 
         addMistake("m-2")
         composeTestRule.runOnIdle { revision++ }
-        composeTestRule.waitForIdle()
+        awaitText("复习这个成语")
         composeTestRule.onNodeWithText("复习这个成语").performClick()
         composeTestRule.waitUntil(timeoutMillis = 5_000) { started != null }
 

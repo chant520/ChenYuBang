@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.unit.dp
 import com.chenyubang.core.ui.tokens.Tokens
 import com.chenyubang.ocr.OcrEngine
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -67,10 +68,18 @@ fun CaptureOcrScreen(
             Spacer(Modifier.height(Tokens.Space.ocrRowBottom.dp))
             when {
                 edit.scanning -> OcrScanning(colors)
-                edit.failed -> OcrFailure(colors, actions)
+                edit.failed ->
+                    OcrFailure(
+                        colors,
+                        actions.copy(onRetake = {
+                            CaptureImageStore.delete(cropPath)
+                            actions.onRetake()
+                        }),
+                    )
                 else ->
                     OcrFields(
                         draft = edit.draft(),
+                        guessed = edit.guessed,
                         colors = colors,
                         onChange = { edit.apply(it) },
                         onRerun = { edit.rerun() },
@@ -94,6 +103,7 @@ private class OcrEdit(initial: OcrDraft?) {
     var lineCount by mutableStateOf(0)
     var failed by mutableStateOf(false)
     var scanning by mutableStateOf(false)
+    var guessed by mutableStateOf(false)
 
     fun draft(): OcrDraft = OcrDraft(stem = stem, options = options)
 
@@ -115,15 +125,29 @@ private class OcrEdit(initial: OcrDraft?) {
     ) {
         if (loaded) return
         scanning = true
-        val result = engine.recognize(path)
-        lineCount = result.rawLines.size
-        failed = result.isEmpty
-        if (!result.isEmpty) {
-            stem = result.stem.orEmpty()
-            options = OcrOptionKeys.map { key -> result.options[key].orEmpty() }
+        try {
+            val result =
+                runCatching { engine.recognize(path) }.getOrElse { failure ->
+                    if (failure is CancellationException) throw failure
+                    null
+                }
+            if (result == null) {
+                // 引擎自身抛错也收敛到 P19 失败态（文案由 OcrFailure 固定呈现）。
+                failed = true
+            } else {
+                lineCount = result.rawLines.size
+                failed = result.failed || result.isEmpty
+                guessed = result.guessedOptions
+                if (!failed) {
+                    stem = result.stem.orEmpty()
+                    options = OcrOptionKeys.map { key -> result.options[key].orEmpty() }
+                }
+            }
+            loaded = true
+        } finally {
+            // 成功、引擎失败、取消都必须复位，避免卡在「正在识别…」。
+            scanning = false
         }
-        loaded = true
-        scanning = false
     }
 }
 
@@ -133,10 +157,23 @@ private const val SAVED_LOADED = 2
 private const val SAVED_ATTEMPT = 3
 private const val SAVED_LINE_COUNT = 4
 private const val SAVED_FAILED = 5
+private const val SAVED_SCANNING = 6
+private const val SAVED_GUESSED = 7
 
 private val OcrEditSaver =
     listSaver<OcrEdit, Any>(
-        save = { listOf(it.stem, ArrayList(it.options), it.loaded, it.attempt, it.lineCount, it.failed) },
+        save = {
+            listOf(
+                it.stem,
+                ArrayList(it.options),
+                it.loaded,
+                it.attempt,
+                it.lineCount,
+                it.failed,
+                it.scanning,
+                it.guessed,
+            )
+        },
         restore = { saved ->
             OcrEdit(null).apply {
                 stem = saved[SAVED_STEM] as String
@@ -146,6 +183,8 @@ private val OcrEditSaver =
                 attempt = saved[SAVED_ATTEMPT] as Int
                 lineCount = saved[SAVED_LINE_COUNT] as Int
                 failed = saved[SAVED_FAILED] as Boolean
+                if (saved.size > SAVED_SCANNING) scanning = saved[SAVED_SCANNING] as Boolean
+                if (saved.size > SAVED_GUESSED) guessed = saved[SAVED_GUESSED] as Boolean
             }
         },
     )

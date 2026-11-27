@@ -1,6 +1,7 @@
 package com.chenyubang.feature.capture
 
 import android.graphics.RectF
+import androidx.compose.ui.unit.IntSize
 import java.io.Serializable
 
 /** P19 的四个选项固定按 A–D 排列，顺序即高保真稿与 P20 的字段顺序。 */
@@ -19,7 +20,7 @@ data class OcrDraft(
     }
 }
 
-/** P18 的框选与摆正参数（相对画面归一化 0–1）；P19 返回 P18 时据此还原（IA 第 29 条）。 */
+/** P18 的框选与摆正参数（相对显示容器归一化 0–1）；P19 返回 P18 时据此还原（IA 第 29 条）。 */
 data class CropFrame(
     val left: Float,
     val top: Float,
@@ -27,6 +28,8 @@ data class CropFrame(
     val bottom: Float,
     val quarterTurns: Int,
     val fineDegrees: Float,
+    val containerWidth: Int = 0,
+    val containerHeight: Int = 0,
 ) : Serializable {
     fun toRectF(): RectF = RectF(left, top, right, bottom)
 
@@ -37,7 +40,18 @@ data class CropFrame(
             rect: RectF,
             quarterTurns: Int,
             fineDegrees: Float,
-        ): CropFrame = CropFrame(rect.left, rect.top, rect.right, rect.bottom, quarterTurns, fineDegrees)
+            containerSize: IntSize,
+        ): CropFrame =
+            CropFrame(
+                rect.left,
+                rect.top,
+                rect.right,
+                rect.bottom,
+                quarterTurns,
+                fineDegrees,
+                containerSize.width,
+                containerSize.height,
+            )
     }
 }
 

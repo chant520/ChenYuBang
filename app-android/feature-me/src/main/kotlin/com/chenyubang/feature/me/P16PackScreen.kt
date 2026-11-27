@@ -88,23 +88,27 @@ private fun RealVersionBlock(state: PackVersionState) {
     Text(
         text = state.version,
         color = colors.head,
-        fontSize = Tokens.Font.n30.sp,
+        fontSize = Tokens.FontRole.metric.sp,
         fontWeight = FontWeight.W700,
-        lineHeight = Tokens.Font.n30.sp,
+        lineHeight = Tokens.FontRole.metric.sp,
     )
     Text(
         text = "当前安装包，装好即可离线用",
         color = colors.text3,
-        fontSize = Tokens.Font.n115.sp,
+        fontSize = Tokens.FontRole.caption.sp,
     )
 
     CLabel("收录说明")
-    Text(text = countsLine(state.idiomCount, state.exampleCount), color = colors.text2, fontSize = Tokens.Font.n13.sp)
+    Text(
+        text = countsLine(state.idiomCount, state.exampleCount),
+        color = colors.text2,
+        fontSize = Tokens.FontRole.body.sp,
+    )
     Text(
         text = "覆盖国考 / 省考 / 事业编，按范围筛选后可用的条数会随之变化。",
         color = colors.text2,
-        fontSize = Tokens.Font.n13.sp,
-        lineHeight = (Tokens.Font.n13 * NOTE_LINE_HEIGHT).sp,
+        fontSize = Tokens.FontRole.body.sp,
+        lineHeight = (Tokens.FontRole.body * NOTE_LINE_HEIGHT).sp,
     )
 }
 
@@ -116,19 +120,19 @@ private fun MockVersionBlock(state: PackVersionState) {
     Text(
         text = state.version,
         color = colors.head,
-        fontSize = Tokens.Font.n30.sp,
+        fontSize = Tokens.FontRole.metric.sp,
         fontWeight = FontWeight.W700,
-        lineHeight = Tokens.Font.n30.sp,
+        lineHeight = Tokens.FontRole.metric.sp,
     )
     Text(
         text = countsLine(state.mockIdiomCount, state.mockExampleCount),
         color = colors.text2,
-        fontSize = Tokens.Font.n13.sp,
+        fontSize = Tokens.FontRole.body.sp,
     )
     Text(
         text = state.reason.orEmpty(),
         color = colors.text3,
-        fontSize = Tokens.Font.n115.sp,
+        fontSize = Tokens.FontRole.caption.sp,
     )
 }
 
@@ -161,8 +165,8 @@ private fun UpdateArea(
             Text(
                 text = "失败时会在这里显示「检查失败，请检查网络后重试」，版本号不变，可点重试。",
                 color = colors.text3,
-                fontSize = Tokens.Font.n115.sp,
-                lineHeight = (Tokens.Font.n115 * NOTE_LINE_HEIGHT).sp,
+                fontSize = Tokens.FontRole.caption.sp,
+                lineHeight = (Tokens.FontRole.caption * NOTE_LINE_HEIGHT).sp,
             )
             CButton(text = "检查题库更新", onClick = onCheck)
             CheckNote()
@@ -177,8 +181,8 @@ private fun UpdateArea(
             Text(
                 text = "当前使用本机题库，可随时检查更新。",
                 color = colors.text3,
-                fontSize = Tokens.Font.n115.sp,
-                lineHeight = (Tokens.Font.n115 * NOTE_LINE_HEIGHT).sp,
+                fontSize = Tokens.FontRole.caption.sp,
+                lineHeight = (Tokens.FontRole.caption * NOTE_LINE_HEIGHT).sp,
             )
             CButton(text = "检查题库更新", onClick = onCheck)
             CheckNote()
@@ -187,13 +191,13 @@ private fun UpdateArea(
     Text(
         text = "联网只用于获取或更新题库内容，不改动本机学习记录。",
         color = colors.text3,
-        fontSize = Tokens.Font.n115.sp,
+        fontSize = Tokens.FontRole.caption.sp,
     )
     Text(
         text = "每次进入成语库页或例题页时自动尝试拉取一次，失败后可在 P16 重试或继续离线使用。\n随安装包内置的题库作离线底座，内置包也没有时才用标注 TEST 的 mock 兜底。",
         color = colors.text3,
-        fontSize = Tokens.Font.n115.sp,
-        lineHeight = (Tokens.Font.n115 * NOTE_LINE_HEIGHT).sp,
+        fontSize = Tokens.FontRole.caption.sp,
+        lineHeight = (Tokens.FontRole.caption * NOTE_LINE_HEIGHT).sp,
     )
 }
 
@@ -214,20 +218,20 @@ private fun RecoverableArea(
     Text(
         text = "失败不影响本机学习记录",
         color = colors.text3,
-        fontSize = Tokens.Font.n115.sp,
+        fontSize = Tokens.FontRole.caption.sp,
     )
     CCard(soft = true) {
         CLabel("重试前可以确认")
         Text(
             text = "是否连上了网络；下载中断时，重新点一次通常就能接上。",
             color = colors.text2,
-            fontSize = Tokens.Font.n13.sp,
-            lineHeight = (Tokens.Font.n13 * NOTE_LINE_HEIGHT).sp,
+            fontSize = Tokens.FontRole.body.sp,
+            lineHeight = (Tokens.FontRole.body * NOTE_LINE_HEIGHT).sp,
         )
         Text(
             text = "只获取或更新题库内容，不改动错题、收藏与学习状态。",
             color = colors.text3,
-            fontSize = Tokens.Font.n115.sp,
+            fontSize = Tokens.FontRole.caption.sp,
         )
     }
 }
@@ -238,7 +242,7 @@ private fun CheckNote() {
     Text(
         text = "检查更新只获取题库，不改动本机学习记录。",
         color = colors.text3,
-        fontSize = Tokens.Font.n11.sp,
+        fontSize = Tokens.FontRole.caption.sp,
     )
 }
 

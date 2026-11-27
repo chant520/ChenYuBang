@@ -231,6 +231,24 @@ class RouterStateTest {
     }
 
     @Test
+    fun newCaptureClearsPreviousImageCropAndDraft() {
+        val stale =
+            RouterState(
+                tab = AppTab.Example,
+                captureImagePath = "/tmp/old-photo.jpg",
+                captureCropPath = "/tmp/old-crop.jpg",
+                captureCrop = frame(),
+                captureDraft = OcrDraft(stem = "旧题干", options = listOf("旧选项")),
+            )
+        val fresh = stale.startCapture()
+        assertEquals(Route.Camera, fresh.current.route)
+        assertEquals(null, fresh.captureImagePath)
+        assertEquals(null, fresh.captureCropPath)
+        assertEquals(null, fresh.captureCrop)
+        assertEquals(null, fresh.captureDraft)
+    }
+
+    @Test
     fun cameraBackClearsCaptureSession() {
         val source = RouterState(tab = AppTab.Example)
         val returned = source.startCapture().back()
@@ -355,5 +373,23 @@ class RouterStateTest {
             time.startCapture().nextCapture().nextCapture().nextCapture()
                 .captureSaved("saved-id", listOf(IdiomRef("idiom-id", "按部就班")))
         assertEquals(MistakeViewMode.ByTime, done.captureDestination(Route.Mistakes).mistakesView)
+    }
+
+    @Test
+    fun fullScreenAppendOnlyAcceptsWhitelistedRoutes() {
+        val state = RouterState()
+        listOf(Route.Onboarding, Route.Library, Route.ImportMode, Route.Clear, Route.Search).forEach { route ->
+            assertThrows(IllegalArgumentException::class.java) { state.pushFullScreen(route) }
+        }
+        assertThrows(IllegalArgumentException::class.java) { state.replaceTop(RouteEntry(Route.ImportMode)) }
+        assertEquals(Route.Recommend, state.current.route)
+
+        val queue = state.pushFullScreen(Route.Queue)
+        assertEquals(Route.Queue, queue.current.route)
+        assertFalse(queue.showTabs)
+        val done = queue.pushFullScreen(Route.Done, "ue-id")
+        assertEquals(Route.Done, done.current.route)
+        assertEquals("ue-id", done.current.id)
+        assertEquals(Presentation.FullScreen, Route.Done.presentation)
     }
 }

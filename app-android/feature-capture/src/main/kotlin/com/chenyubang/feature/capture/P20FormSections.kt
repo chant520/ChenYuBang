@@ -48,7 +48,7 @@ internal fun P20FormReviewCard(
             CLink("改文字", onEdit)
         }
         Spacer(Modifier.height(Tokens.Space.lt1Gap.dp))
-        Text(text = text.ifEmpty { P20Matcher.NO_TEXT }, color = colors.text, fontSize = Tokens.Font.n13.sp)
+        Text(text = text.ifEmpty { P20Matcher.NO_TEXT }, color = colors.text, fontSize = Tokens.FontRole.body.sp)
     }
 }
 
@@ -62,7 +62,7 @@ internal fun CandidateCard(
         CLabel("系统匹配的成语候选")
         Spacer(Modifier.height(Tokens.Space.lmetaTop.dp))
         when {
-            state.loading -> Text("正在匹配…", color = colors.text3, fontSize = Tokens.Font.n12.sp)
+            state.loading -> Text("正在匹配…", color = colors.text3, fontSize = Tokens.FontRole.supporting.sp)
             state.empty ->
                 CEmptyState(
                     title = P20Matcher.EMPTY_TITLE,
@@ -131,7 +131,7 @@ internal fun CandidateRows(
         Text(
             hints.joinToString("；"),
             color = colors.text3,
-            fontSize = Tokens.Font.n11.sp,
+            fontSize = Tokens.FontRole.caption.sp,
             modifier = Modifier.padding(top = Tokens.Space.ghostY.dp),
         )
     }
@@ -256,7 +256,7 @@ private fun TagEditor(
     Text(
         P20Matcher.TAG_RULE,
         color = colors.text3,
-        fontSize = Tokens.Font.n11.sp,
+        fontSize = Tokens.FontRole.caption.sp,
         modifier = Modifier.padding(top = Tokens.Space.lmetaTop.dp),
     )
 }
@@ -277,7 +277,7 @@ private fun MistakeToggleCard(
         Text(
             "仅勾选后才进错题本；不勾只存入我的题库。",
             color = colors.text3,
-            fontSize = Tokens.Font.n11.sp,
+            fontSize = Tokens.FontRole.caption.sp,
             modifier = Modifier.padding(top = Tokens.Space.ghostY.dp),
         )
     }
@@ -312,7 +312,7 @@ internal fun SourceCard(
         Text(
             "教师编题库到位后开放；来源信息只存在本机。",
             color = colors.text3,
-            fontSize = Tokens.Font.n11.sp,
+            fontSize = Tokens.FontRole.caption.sp,
             modifier = Modifier.padding(top = Tokens.Space.ghostY.dp),
         )
     }

@@ -63,7 +63,7 @@ class P08MistakeListViewModel(
             initialValue = P08MistakeListUiState(),
         )
 
-    private fun buildState(
+    internal fun buildState(
         overview: MistakeOverview,
         groups: List<MistakeIdiomGroup>,
         mistakes: List<MistakeWithIdioms>,
@@ -79,17 +79,20 @@ class P08MistakeListViewModel(
                     userExampleId = row.mistake.userExampleId,
                 )
             }
+        // 一次遍历把每道错题的 tag 按关联成语铺开，分组行 O(1) 查表；避免 G×M 嵌套扫描。
+        val tagsByIdiom = HashMap<String, MutableList<String>>()
+        mistakes.forEach { row ->
+            row.idioms.forEach { idiom ->
+                tagsByIdiom.getOrPut(idiom.id) { mutableListOf() }.addAll(row.mistake.tagNames)
+            }
+        }
         val grouped =
             groups.map { group ->
-                val tags =
-                    mistakes
-                        .filter { row -> row.idioms.any { it.id == group.idiomId } }
-                        .flatMap { it.mistake.tagNames }
                 MistakeIdiomGroupView(
                     idiomId = group.idiomId,
                     word = group.word,
                     count = group.mistakeCount,
-                    reasonLine = tagSummaryLine(tags),
+                    reasonLine = tagSummaryLine(tagsByIdiom[group.idiomId].orEmpty()),
                 )
             }
         return P08MistakeListUiState(

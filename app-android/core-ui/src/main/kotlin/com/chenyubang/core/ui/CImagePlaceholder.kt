@@ -1,7 +1,6 @@
 package com.chenyubang.core.ui
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,7 +40,7 @@ fun CImagePlaceholder(
     subtitle: String? = null,
     cutLabel: String? = null,
 ) {
-    val c = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
+    val c = LocalColorSet.current
     if (kind == CPlaceholderKind.Skeleton) {
         CSkeletonBlock(height = height, modifier = modifier.fillMaxWidth())
         return
@@ -70,16 +69,16 @@ fun CImagePlaceholder(
                         Text(
                             text = text,
                             color = c.warnfg,
-                            fontSize = Tokens.Font.n125.sp,
+                            fontSize = Tokens.FontRole.sectionTitle.sp,
                             fontWeight = FontWeight.W700,
                         )
                     }
                     if (subtitle != null) {
-                        Text(text = subtitle, color = c.text2, fontSize = Tokens.Font.n11.sp)
+                        Text(text = subtitle, color = c.text2, fontSize = Tokens.FontRole.caption.sp)
                     }
                 }
             } else if (text != null) {
-                Text(text = text, color = c.text3, fontSize = Tokens.Font.n115.sp)
+                Text(text = text, color = c.text3, fontSize = Tokens.FontRole.caption.sp)
             }
         }
         if (kind == CPlaceholderKind.Truncated && cutLabel != null) {
@@ -97,7 +96,7 @@ private fun CutLabel(
     Text(
         text = label,
         color = textColor,
-        fontSize = Tokens.Font.n10.sp,
+        fontSize = Tokens.FontRole.label.sp,
         letterSpacing = CUT_LETTER_SPACING.em,
         modifier =
             Modifier

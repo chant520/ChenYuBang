@@ -6,14 +6,20 @@ import com.chenyubang.feature.capture.OcrDraft
 
 fun RouterState.startCapture(): RouterState {
     if (!showFab) return this
-    return append(RouteEntry(Route.Camera, instance = sequence)).copy(captureBaseDepth = stack.size)
+    return pushFullScreen(Route.Camera, instance = sequence).copy(
+        captureBaseDepth = stack.size,
+        captureImagePath = null,
+        captureCropPath = null,
+        captureCrop = null,
+        captureDraft = null,
+    )
 }
 
 fun RouterState.nextCapture(): RouterState {
     require(captureBaseDepth != null)
     val step = RouteRegistry.captureSteps.indexOf(current.route)
     require(step in 0..2)
-    return append(RouteEntry(RouteRegistry.captureSteps[step + 1], instance = sequence))
+    return pushFullScreen(RouteRegistry.captureSteps[step + 1], instance = sequence)
 }
 
 /** P17 → P18：先记下本机图片路径再推进；P18 起各步只读这份路径。 */
@@ -60,7 +66,7 @@ fun RouterState.captureSaved(
     )
     val base = stack.take(requireNotNull(captureBaseDepth))
     return withStack(base)
-        .append(RouteEntry(Route.Done, userExampleId, sequence))
+        .pushFullScreen(Route.Done, userExampleId, sequence)
         .copy(capturedIdioms = idioms)
         .bumpContentRevision()
 }

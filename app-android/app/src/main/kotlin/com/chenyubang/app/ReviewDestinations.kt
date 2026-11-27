@@ -1,6 +1,8 @@
 package com.chenyubang.app
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -8,6 +10,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.ViewModelStore
+import androidx.lifecycle.ViewModelStoreOwner
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -28,14 +33,27 @@ internal data class ReviewQueueActions(
     val onBackToSource: () -> Unit,
 )
 
-/** P11 复习队列：每次进入新建一轮 ViewModel，不保留中间状态；范围词异步回填。 */
+/** P11 复习队列：每轮独立 ViewModelStore，离开或换轮即 clear；范围词异步回填。 */
 @Composable
 internal fun ReviewQueueDestination(
     scopeIdiomId: String?,
     instance: Long,
     database: AppDatabase,
     actions: ReviewQueueActions,
+    storeOwner: ViewModelStoreOwner? = null,
 ) {
+    // lifecycle 2.8.7 的 ViewModelStore 没有 remove(key)，按 instance 建 key 会让 VM 永久留在宿主 store。
+    // 每轮换一个 store，DisposableEffect 在离组合 / 换轮时 clear()，才真正触发 onCleared。
+    val localOwner =
+        remember(instance) {
+            object : ViewModelStoreOwner {
+                override val viewModelStore = ViewModelStore()
+            }
+        }
+    val owner = storeOwner ?: localOwner
+    DisposableEffect(owner) {
+        onDispose { owner.viewModelStore.clear() }
+    }
     val factory =
         remember(database, scopeIdiomId) {
             viewModelFactory {
@@ -48,29 +66,31 @@ internal fun ReviewQueueDestination(
                 }
             }
         }
-    val model: ReviewViewModel = viewModel(key = "review-queue-$instance", factory = factory)
-    val state by model.state.collectAsState()
-    var handedOff by remember { mutableStateOf(false) }
-    val handOff: (ReviewSummary) -> Unit = { summary ->
-        if (!handedOff) {
-            handedOff = true
-            actions.onFinished(summary)
+    CompositionLocalProvider(LocalViewModelStoreOwner provides owner) {
+        val model: ReviewViewModel = viewModel(key = "review-queue-$instance", factory = factory)
+        val state by model.state.collectAsState()
+        var handedOff by remember { mutableStateOf(false) }
+        val handOff: (ReviewSummary) -> Unit = { summary ->
+            if (!handedOff) {
+                handedOff = true
+                actions.onFinished(summary)
+            }
         }
+        LaunchedEffect(scopeIdiomId) {
+            val word = scopeIdiomId?.let { database.idiomDao().byId(it)?.word }
+            if (word != null) model.setScopeWord(word)
+        }
+        P11ReviewQueueContent(
+            state = state,
+            onPick = { model.pick(it) },
+            onNext = { model.next() },
+            onClose = actions.onClose,
+            onBackToSource = actions.onBackToSource,
+            onRetry = { model.load() },
+            onRetryRecord = { model.retryRecord() },
+            onFinish = { handOff(ReviewFlow.summary(state)) },
+        )
     }
-    LaunchedEffect(scopeIdiomId) {
-        val word = scopeIdiomId?.let { database.idiomDao().byId(it)?.word }
-        if (word != null) model.setScopeWord(word)
-    }
-    P11ReviewQueueContent(
-        state = state,
-        onPick = { model.pick(it) },
-        onNext = { model.next() },
-        onClose = actions.onClose,
-        onBackToSource = actions.onBackToSource,
-        onRetry = { model.load() },
-        onRetryRecord = { model.retryRecord() },
-        onFinish = { handOff(ReviewFlow.summary(state)) },
-    )
 }
 
 internal data class ReviewSummaryActions(

@@ -2,7 +2,6 @@ package com.chenyubang.core.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -73,7 +72,7 @@ fun CInput(
     leadingIcon: (@Composable () -> Unit)? = null,
     trailing: (@Composable () -> Unit)? = null,
 ) {
-    val c = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
+    val c = LocalColorSet.current
     var focused by remember { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
     LaunchedEffect(autoFocus) {
@@ -83,7 +82,7 @@ fun CInput(
     val background = if (enabled) c.inputbg else c.disbg
     val foreground = inputForeground(c, enabled, error)
     val border = inputBorder(c, enabled, error, focused)
-    val fontSize = if (enabled) Tokens.Font.n12.sp else Tokens.Font.n125.sp
+    val fontSize = Tokens.FontRole.input.sp
     val lineHeight = fontSize.value * INPUT_LINE_HEIGHT
     Column(modifier = modifier.fillMaxWidth()) {
         BasicTextField(
@@ -200,8 +199,8 @@ private fun ErrorHint(
     Text(
         text = text,
         color = color,
-        fontSize = Tokens.Font.n115.sp,
-        lineHeight = (Tokens.Font.n115 * ERROR_HINT_LINE_HEIGHT).sp,
+        fontSize = Tokens.FontRole.supporting.sp,
+        lineHeight = (Tokens.FontRole.supporting * ERROR_HINT_LINE_HEIGHT).sp,
         modifier = Modifier.padding(top = ERROR_HINT_TOP.dp),
     )
 }

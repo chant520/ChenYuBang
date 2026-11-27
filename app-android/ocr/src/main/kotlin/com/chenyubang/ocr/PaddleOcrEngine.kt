@@ -5,6 +5,8 @@ import android.graphics.Bitmap
 import com.baidu.paddle.lite.MobileConfig
 import com.baidu.paddle.lite.PaddlePredictor
 import com.baidu.paddle.lite.PowerMode
+import com.baidu.paddle.lite.Tensor
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -12,7 +14,8 @@ import kotlinx.coroutines.withContext
 import java.io.File
 
 /**
- * 端侧实现：Paddle-Lite 2.10 + PP-OCRv3 slim det/rec，模型随包、零联网。
+ * 端侧实现：Paddle-Lite 2.10 + 官方 PP-OCRv3 det/rec .nb（opt v2.10），模型随包、零联网。
+ * det/rec 模型与 so 的 opt 版本必须一致，否则 native 层 Fatal；替换任一模型前先核对 .nb 版本头。
  * 推理全程在 [Dispatchers.Default]，同一实例串行执行（PaddlePredictor 非线程安全）。
  * 真机精度复测后置（B1）；代理实测 18/20＝90% 只作参考，不视为达标。
  */
@@ -27,23 +30,46 @@ class PaddleOcrEngine(context: Context) : OcrEngine {
         withContext(Dispatchers.Default) {
             val started = System.nanoTime()
             mutex.withLock {
-                val lines = runCatching { runPipeline(imagePath) }.getOrNull().orEmpty()
-                val (stem, options) = OcrLineClassifier.classify(lines)
-                OcrResult(
-                    stem = stem.ifBlank { null },
-                    options = options,
-                    rawLines = lines,
-                    durationMs = (System.nanoTime() - started) / NANOS_PER_MILLI,
+                runCatching { runPipeline(imagePath) }.fold(
+                    onSuccess = { lines ->
+                        val classified = OcrLineClassifier.classifyWithBoxes(lines)
+                        OcrResult(
+                            stem = classified.stem.ifBlank { null },
+                            options = classified.options,
+                            rawLines = lines.map { it.text },
+                            durationMs = elapsedMillis(started),
+                            guessedOptions = classified.guessed,
+                        )
+                    },
+                    onFailure = { failure ->
+                        if (failure is CancellationException) throw failure
+                        // 失败原因只进 OcrResult 并映射到 P19 文案；不打印堆栈，更不记录识别文本/学习内容。
+                        invalidateSession()
+                        OcrResult(
+                            stem = null,
+                            options = emptyMap(),
+                            rawLines = emptyList(),
+                            durationMs = elapsedMillis(started),
+                            failureReason = failure.javaClass.simpleName,
+                        )
+                    },
                 )
             }
         }
 
-    private fun runPipeline(imagePath: String): List<String> {
+    private fun runPipeline(imagePath: String): List<OcrLineGrouper.Line> {
         val active = ensureSession()
-        val source = OcrBitmapOps.upscale(OcrBitmapOps.decode(imagePath))
-        val boxes = detect(active.detector, source)
-        val lines = boxes.mapNotNull { box -> readLine(active.recognizer, source, box, active.dictionary) }
-        return OcrLineGrouper.group(lines)
+        val decoded = OcrBitmapOps.decode(imagePath)
+        val source = OcrBitmapOps.upscale(decoded)
+        return try {
+            val boxes = detect(active, source)
+            val lines = boxes.mapNotNull { box -> readLine(active, source, box, active.dictionary) }
+            OcrLineGrouper.groupRows(lines).flatten()
+        } finally {
+            // upscale 尺寸一致时返回 decoded 本身，只回收一次；不回收调用方持有的图。
+            if (source !== decoded) source.recycle()
+            decoded.recycle()
+        }
     }
 
     private fun ensureSession(): Session {
@@ -56,11 +82,24 @@ class PaddleOcrEngine(context: Context) : OcrEngine {
 
     private fun loadSession(): Session {
         val files = modelStore.files()
-        return Session(
-            detector = createPredictor(files.detector),
-            recognizer = createPredictor(files.recognizer),
-            dictionary = readDictionary(files.dictionary),
-        )
+        var detector: PaddlePredictor? = null
+        var recognizer: PaddlePredictor? = null
+        return runCatching {
+            val createdDetector = createPredictor(files.detector).also { detector = it }
+            val createdRecognizer = createPredictor(files.recognizer).also { recognizer = it }
+            Session(createdDetector, createdRecognizer, readDictionary(files.dictionary))
+        }.getOrElse { failure ->
+            if (failure is CancellationException) throw failure
+            recognizer?.release()
+            detector?.release()
+            throw failure
+        }
+    }
+
+    /** Session 替换/销毁时显式释放 native 指针，不依赖 finalize 的 GC 时机。 */
+    private fun invalidateSession() {
+        session?.release()
+        session = null
     }
 
     private fun createPredictor(model: File): PaddlePredictor {
@@ -70,82 +109,103 @@ class PaddleOcrEngine(context: Context) : OcrEngine {
                 setThreads(THREADS)
                 setPowerMode(PowerMode.LITE_POWER_HIGH)
             }
-        return checkNotNull(PaddlePredictor.createPaddlePredictor(config)) { "predictor init failed" }
+        val predictor = PaddlePredictor.createPaddlePredictor(config)
+        return checkNotNull(predictor) { "predictor init failed: ${model.name}" }
     }
 
-    /** rec 模型训练时 use_space_char=true：字符类 = 字典 + 空格，调用方须追加。 */
-    private fun readDictionary(file: File): List<String> =
-        file.readLines(Charsets.UTF_8).filter { it.isNotEmpty() } + SPACE_TOKEN
-
     private fun detect(
-        predictor: PaddlePredictor,
+        active: Session,
         source: Bitmap,
     ): List<OcrDetPostProcess.Box> {
         val (width, height) = OcrTensor.detSize(source.width, source.height)
-        val pixels = OcrBitmapOps.pixels(OcrBitmapOps.scaled(source, width, height))
-        val tensor = checkNotNull(predictor.getInput(0)) { "det input missing" }
-        tensor.resize(longArrayOf(1, CHANNEL_COUNT.toLong(), height.toLong(), width.toLong()))
-        check(tensor.setData(OcrTensor.detTensor(pixels, width, height))) { "det data rejected" }
-        check(predictor.run()) { "det run failed" }
-        val output = checkNotNull(predictor.getOutput(0)) { "det output missing" }
-        val shape = output.shape()
+        OcrBitmapOps.scaledPixels(source, width, height) { pixels ->
+            active.detInput.resize(longArrayOf(1, CHANNEL_COUNT.toLong(), height.toLong(), width.toLong()))
+            check(active.detInput.setData(OcrTensor.detTensor(pixels, width, height))) { "det data rejected" }
+        }
+        check(active.detector.run()) { "det run failed" }
         val scaleX = source.width.toFloat() / width
         val scaleY = source.height.toFloat() / height
-        return OcrDetPostProcess.boxes(output.getFloatData(), width, height)
+        return OcrDetPostProcess.boxes(active.detOutput.getFloatData(), width, height)
             .map { it.scaled(scaleX, scaleY) }
             .filter { it.width >= MIN_BOX_SIDE && it.height >= MIN_BOX_SIDE }
     }
 
     private fun readLine(
-        predictor: PaddlePredictor,
+        active: Session,
         source: Bitmap,
         box: OcrDetPostProcess.Box,
         dictionary: List<String>,
-    ): OcrLineGrouper.Line? =
-        OcrBitmapOps.crop(source, box)?.let { crop ->
-            recognizeCrop(predictor, crop, dictionary)?.let { text -> OcrLineGrouper.Line(box, text) }
+    ): OcrLineGrouper.Line? {
+        val crop = OcrBitmapOps.crop(source, box) ?: return null
+        return try {
+            recognizeCrop(active, crop, dictionary)?.let { text -> OcrLineGrouper.Line(box, text) }
+        } finally {
+            crop.recycle()
         }
+    }
 
     /** 单行失败（空框、低置信）只丢这一行，不拖垮整张图。 */
     private fun recognizeCrop(
-        predictor: PaddlePredictor,
+        active: Session,
         crop: Bitmap,
         dictionary: List<String>,
     ): String? =
-        runCatching { runModel(predictor, crop, dictionary) }
+        runCatching { runModel(active, crop, dictionary) }
             .getOrNull()
             ?.takeIf { it.score >= MIN_LINE_SCORE }
             ?.text
             ?.takeIf { it.isNotBlank() }
 
     private fun runModel(
-        predictor: PaddlePredictor,
+        active: Session,
         crop: Bitmap,
         dictionary: List<String>,
     ): CtcDecoder.Decoded? {
         val (width, height) = OcrTensor.recSize(crop.width, crop.height)
-        val pixels = OcrBitmapOps.pixels(OcrBitmapOps.scaled(crop, width, height))
-        val tensor = checkNotNull(predictor.getInput(0)) { "rec input missing" }
-        tensor.resize(longArrayOf(1, CHANNEL_COUNT.toLong(), height.toLong(), width.toLong()))
-        check(tensor.setData(OcrTensor.recTensor(pixels, width, height))) { "rec data rejected" }
-        check(predictor.run()) { "rec run failed" }
-        val output = checkNotNull(predictor.getOutput(0)) { "rec output missing" }
+        OcrBitmapOps.scaledPixels(crop, width, height) { pixels ->
+            active.recInput.resize(longArrayOf(1, CHANNEL_COUNT.toLong(), height.toLong(), width.toLong()))
+            check(active.recInput.setData(OcrTensor.recTensor(pixels, width, height))) { "rec data rejected" }
+        }
+        check(active.recognizer.run()) { "rec run failed" }
+        val output = active.recOutput
         val shape = output.shape()
         return CtcDecoder.decode(output.getFloatData(), shape[1].toInt(), shape[2].toInt(), dictionary)
     }
 
+    /** 输入/输出 Tensor 包装在 Session 内缓存复用，替换/销毁时与 predictor 一起显式释放。 */
     private class Session(
         val detector: PaddlePredictor,
         val recognizer: PaddlePredictor,
         val dictionary: List<String>,
-    )
+    ) {
+        val detInput: Tensor = checkNotNull(detector.getInput(0)) { "det input missing" }
+        val detOutput: Tensor = checkNotNull(detector.getOutput(0)) { "det output missing" }
+        val recInput: Tensor = checkNotNull(recognizer.getInput(0)) { "rec input missing" }
+        val recOutput: Tensor = checkNotNull(recognizer.getOutput(0)) { "rec output missing" }
+
+        fun release() {
+            detInput.release()
+            detOutput.release()
+            recInput.release()
+            recOutput.release()
+            detector.release()
+            recognizer.release()
+        }
+    }
 
     private companion object {
         const val THREADS = 2
         const val CHANNEL_COUNT = 3
         const val MIN_LINE_SCORE = 0.5f
         const val MIN_BOX_SIDE = 2f
-        const val NANOS_PER_MILLI = 1_000_000L
-        const val SPACE_TOKEN = " "
     }
 }
+
+private const val NANOS_PER_MILLI = 1_000_000L
+private const val SPACE_TOKEN = " "
+
+private fun elapsedMillis(started: Long): Long = (System.nanoTime() - started) / NANOS_PER_MILLI
+
+/** rec 模型训练时 use_space_char=true：字符类 = 字典 + 空格，调用方须追加。 */
+private fun readDictionary(file: File): List<String> =
+    file.readLines(Charsets.UTF_8).filter { it.isNotEmpty() } + SPACE_TOKEN

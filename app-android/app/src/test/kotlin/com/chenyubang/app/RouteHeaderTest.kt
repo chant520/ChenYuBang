@@ -10,6 +10,7 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.runComposeUiTest
 import androidx.test.core.app.ApplicationProvider
 import com.chenyubang.core.ui.ChenYuBangTheme
+import com.chenyubang.feature.capture.OcrDraft
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -49,6 +50,22 @@ class RouteHeaderTest {
             onNodeWithText("返回").assertDoesNotExist()
             onNodeWithText("考试范围设置").assertExists()
             assertEquals(1, backCount)
+        }
+
+    @Test
+    fun matchPageSkipsShellHeaderToAvoidDuplicateTitles() =
+        runComposeUiTest {
+            val router =
+                RouterState().startCapture().nextCapture().nextCapture()
+                    .attachOcrText(OcrDraft(stem = "题干", options = listOf("甲")))
+            setContent {
+                ChenYuBangTheme {
+                    RouteHeader(router = router, back = {})
+                }
+            }
+
+            onNodeWithText("匹配修正").assertDoesNotExist()
+            onNodeWithContentDescription("返回").assertDoesNotExist()
         }
 
     @Test

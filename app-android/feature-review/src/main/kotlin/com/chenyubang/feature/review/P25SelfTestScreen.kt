@@ -108,7 +108,7 @@ private fun SelfTestTopBar(onExit: () -> Unit) {
         Text(
             text = "成语自测",
             color = colors.head,
-            fontSize = Tokens.Font.n15.sp,
+            fontSize = Tokens.FontRole.pageTitle.sp,
             fontWeight = FontWeight.W700,
         )
     }
@@ -124,16 +124,16 @@ private fun SelfTestQuestionContent(
     Text(
         text = "第 ${state.questionNumber} 题 / 共 ${SelfTestEngine.QUESTION_COUNT} 题",
         color = colors.text2,
-        fontSize = Tokens.Font.n12.sp,
+        fontSize = Tokens.FontRole.caption.sp,
         fontWeight = FontWeight.W600,
     )
-    Text(text = state.current.type.label, color = colors.text3, fontSize = Tokens.Font.n11.sp)
+    Text(text = state.current.type.label, color = colors.text3, fontSize = Tokens.FontRole.caption.sp)
     Text(
         text = state.current.prompt,
         color = colors.text,
-        fontSize = Tokens.Font.n15.sp,
+        fontSize = Tokens.FontRole.contentTitle.sp,
         fontWeight = FontWeight.W600,
-        lineHeight = (Tokens.Font.n15 * 1.6f).sp,
+        lineHeight = (Tokens.FontRole.contentTitle * 1.6f).sp,
     )
     val answer = state.answer
     state.current.options.forEachIndexed { index, option ->
@@ -226,14 +226,14 @@ private fun SelfTestOptionVisual(
             Text(
                 text = letter,
                 color = if (enabled) colors.text3 else palette.foreground,
-                fontSize = Tokens.Font.n13.sp,
+                fontSize = Tokens.FontRole.body.sp,
                 fontWeight = FontWeight.W600,
             )
             Text(
                 text = text,
                 color = palette.foreground,
-                fontSize = Tokens.Font.n13.sp,
-                lineHeight = (Tokens.Font.n13 * 1.6f).sp,
+                fontSize = Tokens.FontRole.body.sp,
+                lineHeight = (Tokens.FontRole.body * 1.6f).sp,
                 modifier = Modifier.padding(start = Tokens.Space.lt1Gap.dp).weight(1f),
             )
         }
@@ -241,7 +241,7 @@ private fun SelfTestOptionVisual(
             Text(
                 text = state.label,
                 color = palette.foreground,
-                fontSize = Tokens.Font.n12.sp,
+                fontSize = Tokens.FontRole.supporting.sp,
                 fontWeight = FontWeight.W600,
             )
         }
@@ -274,7 +274,7 @@ private fun SelfTestSummaryContent(
     Text(
         "本轮小结",
         color = if (isSystemInDarkTheme()) Tokens.Dark.head else Tokens.Light.head,
-        fontSize = Tokens.Font.n20.sp,
+        fontSize = Tokens.FontRole.sectionTitle.sp,
         fontWeight = FontWeight.W700,
     )
     SummaryCount("题量", summary.questionCount)
@@ -291,8 +291,8 @@ private fun SummaryCount(
 ) {
     val colors = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-        Text(label, color = colors.text2, fontSize = Tokens.Font.n13.sp)
-        Text(value.toString(), color = colors.text, fontSize = Tokens.Font.n15.sp, fontWeight = FontWeight.W700)
+        Text(label, color = colors.text2, fontSize = Tokens.FontRole.body.sp)
+        Text(value.toString(), color = colors.text, fontSize = Tokens.FontRole.metric.sp, fontWeight = FontWeight.W700)
     }
 }
 

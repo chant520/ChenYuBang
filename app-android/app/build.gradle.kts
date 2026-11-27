@@ -15,11 +15,16 @@ android {
         versionCode = 1
         versionName = "0.10.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        // OCR 原生库只提供 arm64-v8a；排除传递依赖带入的 x86/x86_64/armeabi-v7a so。
+        ndk {
+            abiFilters += "arm64-v8a"
+        }
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
@@ -52,7 +57,7 @@ dependencies {
     implementation(project(":core-data"))
     implementation(project(":ocr"))
 
-    // 六个 feature 页面簇（页面归属见 docs/开发规范-v1.6.md §3）。
+    // 六个 feature 页面簇（页面归属见 docs/开发规范-v1.11.md §3）。
     // app 只做路由接线与依赖注入，不承载页面业务逻辑。
     implementation(project(":feature-idiom"))
     implementation(project(":feature-example"))

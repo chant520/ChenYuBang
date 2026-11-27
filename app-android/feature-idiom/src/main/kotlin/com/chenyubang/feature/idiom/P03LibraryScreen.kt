@@ -165,7 +165,7 @@ fun P03LibraryContent(
             Text(
                 text = "共 ${state.page.count} 条 · 已到末尾",
                 color = colors.text3,
-                fontSize = Tokens.Font.n11.sp,
+                fontSize = Tokens.FontRole.caption.sp,
                 textAlign = TextAlign.Center,
                 modifier =
                     Modifier
@@ -216,7 +216,7 @@ private fun RangeCard(
             Text(
                 text = rangeText(state, colors.text),
                 color = colors.text2,
-                fontSize = Tokens.Font.n13.sp,
+                fontSize = Tokens.FontRole.body.sp,
                 modifier = Modifier.weight(1f),
             )
             CLink(text = "调整省份", onClick = onOpenScope)
@@ -226,14 +226,14 @@ private fun RangeCard(
             Text(
                 text = "省份用于筛选省考内容，可自行增减",
                 color = colors.text3,
-                fontSize = Tokens.Font.n12.sp,
+                fontSize = Tokens.FontRole.supporting.sp,
             )
         }
         if (state.scopeEmpty) {
             Text(
                 text = "不选范围时成语库和例题库会是空的，可以稍后在『我的』里改。",
                 color = colors.text3,
-                fontSize = Tokens.Font.n12.sp,
+                fontSize = Tokens.FontRole.supporting.sp,
                 modifier = Modifier.padding(top = Tokens.Space.lsubTop.dp),
             )
         }
@@ -289,7 +289,7 @@ private fun LibraryList(
                     Text(
                         text = section.letter,
                         color = colors.text3,
-                        fontSize = Tokens.Font.n10.sp,
+                        fontSize = Tokens.FontRole.label.sp,
                         modifier =
                             Modifier.padding(
                                 top = Tokens.Space.lmetaTop.dp,
@@ -297,6 +297,8 @@ private fun LibraryList(
                             ),
                     )
                 }
+                // 题库随安装包内置、条目数固定（content/idioms/idioms.json 当前 59 条），
+                // 不随用户录入增长；一次组合全量有明确上界，故保留 CList，不引入 LazyColumn。
                 CList {
                     section.items.forEachIndexed { index, idiom ->
                         CListRow(

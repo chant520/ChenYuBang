@@ -1,12 +1,12 @@
 // GENERATED FILE — DO NOT EDIT.
-// Source: shared/tokens/tokens.json (docs/设计规范-v1.5.md)
+// Source: shared/tokens/tokens.json (docs/设计规范-v1.6.md)
 // Regenerate: python tools/gen_tokens.py
 
 package com.chenyubang.core.ui.tokens
 
 import androidx.compose.ui.graphics.Color
 
-/** 设计令牌。数值唯一来源：docs/设计规范-v1.5.md */
+/** 设计令牌。数值唯一来源：docs/设计规范-v1.6.md */
 object Tokens {
 
     /** 浅/深色组共同接口：if/else 选色组时保留类型 */
@@ -180,19 +180,35 @@ object Tokens {
         override val warnline = Color(0x6BFF8A00)
     }
 
-    /** 字号（规范 3.2 / 3.4，Android 倍率，11 档），单位 dp/sp */
+    /** 字号（规范 3.2，11 档），单位 dp/sp */
     object Font {
-        val n30 = 36
-        val n20 = 24
-        val n15 = 18
-        val n14 = 16.8
-        val n135 = 16.2
-        val n13 = 15.6
-        val n125 = 15
-        val n12 = 14.4
-        val n115 = 13.8
-        val n11 = 13.2
-        val n10 = 12
+        val n30 = 30
+        val n20 = 20
+        val n15 = 15
+        val n14 = 14
+        val n135 = 13.5
+        val n13 = 13
+        val n125 = 12.5
+        val n12 = 12
+        val n115 = 11.5
+        val n11 = 11
+        val n10 = 10
+    }
+
+    /** Android 语义字号（规范 3.4），单位 dp/sp */
+    object FontRole {
+        val displayNumber = 36
+        val metric = 20
+        val pageTitle = 20
+        val contentTitle = 18
+        val sectionTitle = 16
+        val itemTitle = 16
+        val body = 16
+        val input = 16
+        val supporting = 14
+        val caption = 13
+        val label = 12
+        val button = 14
     }
 
     /** 圆角（规范 4.1），单位 dp/sp */
@@ -222,6 +238,7 @@ object Tokens {
         val fabRight = 20
         val fabBottom = 88
         val hitMin = 44
+        val n64 = 64
         val lrowX = 16
         val lrowY = 13
         val lt1Gap = 8
