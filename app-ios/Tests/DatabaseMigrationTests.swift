@@ -200,7 +200,7 @@ final class UserExampleBackfillMigrationTests: XCTestCase {
         failing.registerMigration("v2") { _ in }
         failing.registerMigration("v3") { _ in }
         failing.registerMigration("v4-interrupted") { db in
-            try db.execute(sql: backfillSQL)
+            try db.execute(sql: self.backfillSQL)
             throw Interruption.simulated
         }
         XCTAssertThrowsError(try failing.migrate(queue))
