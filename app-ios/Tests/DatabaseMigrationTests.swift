@@ -148,9 +148,10 @@ final class DatabaseMigrationTests: XCTestCase {
             XCTAssertFalse(try db.tableExists("user_example_idiom"))
         }
     }
+}
 
-    // MARK: - v4 未标错录入题归属回填（规范 4.5 节）
-
+/// v3→v4 未标错录入题归属纯回填（规范 §4.5）：多命中、无命中、悬空与幂等。
+final class UserExampleBackfillMigrationTests: XCTestCase {
     func testV3ToV4BackfillsUnlinkedUnmarkedExamples() throws {
         let queue = try DatabaseQueue()
         let migrator = ChenYuBangDatabase.makeMigrator()
@@ -159,10 +160,10 @@ final class DatabaseMigrationTests: XCTestCase {
             try insertIdiom(db, id: "i1", word: "一字千金")
             try insertIdiom(db, id: "i2", word: "画蛇添足")
             try insertIdiom(db, id: "i3", word: "守株待兔")
-            try insertExample(db, id: "ex1", stem: Self.exactStem)
+            try insertExample(db, id: "ex1", stem: exactStem)
             try db.execute(sql: "INSERT INTO example_idiom (exampleId, idiomId) VALUES ('ex1', 'i1')")
             // u1 题干带首尾空白，规则一去空白后全等命中 → i1
-            try insertUserExample(db, id: "u1", stem: "  \(Self.exactStem)  ")
+            try insertUserExample(db, id: "u1", stem: "  \(exactStem)  ")
             // u2 / u3 分别由题干、myAnswer 完整包含成语词命中规则二
             try insertUserExample(db, id: "u2", stem: "这道题说画蛇添足不对")
             try insertUserExample(db, id: "u3", stem: "无关题干", myAnswer: "答案应为守株待兔")
@@ -187,9 +188,9 @@ final class DatabaseMigrationTests: XCTestCase {
         try ChenYuBangDatabase.makeMigrator().migrate(queue, upTo: "v3")
         try queue.write { db in
             try insertIdiom(db, id: "i1", word: "一字千金")
-            try insertExample(db, id: "ex1", stem: Self.exactStem)
+            try insertExample(db, id: "ex1", stem: exactStem)
             try db.execute(sql: "INSERT INTO example_idiom (exampleId, idiomId) VALUES ('ex1', 'i1')")
-            try insertUserExample(db, id: "u1", stem: "  \(Self.exactStem)  ")
+            try insertUserExample(db, id: "u1", stem: "  \(exactStem)  ")
         }
 
         var failing = DatabaseMigrator()
@@ -197,7 +198,7 @@ final class DatabaseMigrationTests: XCTestCase {
         failing.registerMigration("v2") { _ in }
         failing.registerMigration("v3") { _ in }
         failing.registerMigration("v4-interrupted") { db in
-            try db.execute(sql: Self.backfillSQL)
+            try db.execute(sql: backfillSQL)
             throw Interruption.simulated
         }
         XCTAssertThrowsError(try failing.migrate(queue))
@@ -216,11 +217,11 @@ final class DatabaseMigrationTests: XCTestCase {
             try insertIdiom(db, id: "i1", word: "一字千金")
             try insertIdiom(db, id: "i2", word: "画蛇添足")
             try insertIdiom(db, id: "i3", word: "守株待兔")
-            try insertExample(db, id: "ex1", stem: Self.multiStem)
+            try insertExample(db, id: "ex1", stem: multiStem)
             try db.execute(sql: "INSERT INTO example_idiom (exampleId, idiomId) VALUES ('ex1', 'i1')")
             try db.execute(sql: "INSERT INTO example_idiom (exampleId, idiomId) VALUES ('ex1', 'i2')")
             // 规则一命中 i1/i2，规则二命中 i2/i3；i2 重复命中只写一行
-            try insertUserExample(db, id: "u1", stem: "  \(Self.multiStem)  ")
+            try insertUserExample(db, id: "u1", stem: "  \(multiStem)  ")
         }
         try migrator.migrate(queue, upTo: "v4")
         try queue.read { db in
@@ -248,10 +249,10 @@ final class DatabaseMigrationTests: XCTestCase {
         try migrator.migrate(queue, upTo: "v3")
         try queue.write { db in
             try insertIdiom(db, id: "i1", word: "一字千金")
-            try insertExample(db, id: "ex1", stem: Self.exactStem)
+            try insertExample(db, id: "ex1", stem: exactStem)
             try db.execute(sql: "INSERT INTO example_idiom (exampleId, idiomId) VALUES ('ex1', 'i1')")
             try db.execute(sql: "INSERT INTO example_idiom (exampleId, idiomId) VALUES ('ex1', 'ghost')")
-            try insertUserExample(db, id: "u1", stem: Self.exactStem)
+            try insertUserExample(db, id: "u1", stem: exactStem)
         }
         try migrator.migrate(queue, upTo: "v4")
         try queue.read { db in
@@ -266,27 +267,33 @@ final class DatabaseMigrationTests: XCTestCase {
         try migrator.migrate(queue, upTo: "v3")
         try queue.write { db in
             try insertIdiom(db, id: "i1", word: "一字千金")
-            try insertExample(db, id: "ex1", stem: Self.exactStem)
+            try insertExample(db, id: "ex1", stem: exactStem)
             try db.execute(sql: "INSERT INTO example_idiom (exampleId, idiomId) VALUES ('ex1', 'i1')")
-            try insertUserExample(db, id: "u1", stem: "  \(Self.exactStem)  ")
+            try insertUserExample(db, id: "u1", stem: "  \(exactStem)  ")
         }
         try migrator.migrate(queue, upTo: "v4")
         let before = try queue.read { try links($0) }
-        try queue.write { db in try db.execute(sql: Self.backfillSQL) }
+        try queue.write { db in try db.execute(sql: backfillSQL) }
         let after = try queue.read { try links($0) }
         XCTAssertEqual(after, before)
         XCTAssertEqual(after, ["u1:i1"])
     }
 
-    private func insertIdiom(_ db: Database, id: String, word: String) throws {
+}
+
+// 迁移测试共享辅助（文件内可见，两个测试类复用）。
+fileprivate extension XCTestCase {
+
+    func insertIdiom(_ db: Database, id: String, word: String) throws {
         try db.execute(
-            sql: "INSERT INTO idiom (id, word, pinyin, initials, sense, color, pitfalls, synonyms, antonyms, frequency) " +
+            sql: "INSERT INTO idiom (id, word, pinyin, initials, sense, color, " +
+                "pitfalls, synonyms, antonyms, frequency) " +
                 "VALUES (?, ?, 'py', 'py', '义', '中', '[]', '[]', '[]', 1)",
             arguments: [id, word]
         )
     }
 
-    private func insertExample(_ db: Database, id: String, stem: String) throws {
+    func insertExample(_ db: Database, id: String, stem: String) throws {
         try db.execute(
             sql: "INSERT INTO example (id, stem, optionA, optionB, optionC, optionD, answer, explain, " +
                 "examType, year, region, questionType) " +
@@ -295,7 +302,7 @@ final class DatabaseMigrationTests: XCTestCase {
         )
     }
 
-    private func insertUserExample(
+    func insertUserExample(
         _ db: Database,
         id: String,
         stem: String,
@@ -308,11 +315,11 @@ final class DatabaseMigrationTests: XCTestCase {
         )
     }
 
-    private func links(_ db: Database) throws -> [String] {
+    func links(_ db: Database) throws -> [String] {
         try String.fetchAll(db, sql: "SELECT userExampleId || ':' || idiomId FROM user_example_idiom ORDER BY 1")
     }
 
-    private func danglingCount(_ db: Database) throws -> Int {
+    func danglingCount(_ db: Database) throws -> Int {
         (try Int.fetchOne(
             db,
             sql: "SELECT COUNT(*) FROM user_example_idiom AS link WHERE " +
@@ -321,10 +328,11 @@ final class DatabaseMigrationTests: XCTestCase {
         )) ?? 0
     }
 
-    private static let exactStem = "请补全：一行白鹭上青天"
-    private static let multiStem = "画蛇添足与守株待兔"
+    var exactStem: String { "请补全：一行白鹭上青天" }
+    var multiStem: String { "画蛇添足与守株待兔" }
 
-    private static let backfillSQL = """
+    var backfillSQL: String {
+        """
         INSERT OR IGNORE INTO user_example_idiom(userExampleId, idiomId)
         SELECT ue.id, ei.idiomId
         FROM user_example AS ue
@@ -342,4 +350,5 @@ final class DatabaseMigrationTests: XCTestCase {
         WHERE ue.isMistake = 0
           AND NOT EXISTS (SELECT 1 FROM user_example_idiom AS link WHERE link.userExampleId = ue.id)
         """
+    }
 }
