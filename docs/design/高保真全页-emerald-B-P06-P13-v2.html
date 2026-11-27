@@ -102,6 +102,7 @@
                border: 1px solid var(--errline); }
   .topbtn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 11px; border-radius: 5px;
             background: var(--btnbg); color: var(--btnfg); font-size: 11.5px; font-weight: 700; white-space: nowrap; }
+  .topbtn.quiet { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
   .topbtn svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.7; }
   .smallrow { display: flex; gap: 8px; margin: 10px 0 0; }
   .ghostbtn { flex: 1; padding: 10px 0; text-align: center; font-size: 11.5px; border-radius: 5px;
@@ -379,6 +380,8 @@
 
 <p><b>v2.2 变更说明</b>（2026-11-19，省份口径同步）：省考勾选时省份默认全选、省份仅作筛选维度，取消「未选省份」异常态与橙警示。P13「我的」页考试范围行的「省考（未选省份）」改普通「省考」。仅文案与措辞同步，颜色/字号/圆角/间距/图标数值不变。</p>
 
+<p><b>v2.3 变更说明</b>（2026-11-27，UI 审核六条·B 稿）：P08 顶部「拍照录题」由绿填充改绿描边幽灵样式（`.topbtn.quiet`），把绿主行动留给底部「开始复习」按钮；FAB 与 tab 选中指示条按既定口径保留。新增通用类 `.topbtn.quiet`，色值/字号/圆角/间距档与 P06–P13 编号不变。</p>
+
   <p>第二批 P06–P13：例题两条、错题三条、复习两条、我的。同上批一致，全部取自规范第 2–4 章；深色按页底口径。</p>
   <p>两处按规范做了取舍：P10 顶部「删除」改中性色，把红留给底部「删除这道错题」（一处红规则）；P11 判错不铺红——判错不是状态错误，红只归破坏性动作与硬错误。</p>
 
@@ -586,7 +589,7 @@
 
     <div class="phone h812 lt">
 <div class="top"><div class="pname">错题</div>
-  <span class="topbtn"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13"/><circle cx="12" cy="13.5" r="3.6"/><path d="M8.5 7l1.4-3h4.2l1.4 3"/></svg>拍照录题</span></div>
+  <span class="topbtn quiet"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13"/><circle cx="12" cy="13.5" r="3.6"/><path d="M8.5 7l1.4-3h4.2l1.4 3"/></svg>拍照录题</span></div>
 <div class="body">
   <div class="card" style="margin-bottom:14px">
     <div class="nums" style="margin-top:0">
@@ -641,7 +644,7 @@
 
     <div class="phone h812 dk">
 <div class="top"><div class="pname">错题</div>
-  <span class="topbtn"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13"/><circle cx="12" cy="13.5" r="3.6"/><path d="M8.5 7l1.4-3h4.2l1.4 3"/></svg>拍照录题</span></div>
+  <span class="topbtn quiet"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13"/><circle cx="12" cy="13.5" r="3.6"/><path d="M8.5 7l1.4-3h4.2l1.4 3"/></svg>拍照录题</span></div>
 <div class="body">
   <div class="card" style="margin-bottom:14px">
     <div class="nums" style="margin-top:0">

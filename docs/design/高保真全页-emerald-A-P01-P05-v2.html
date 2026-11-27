@@ -52,6 +52,7 @@
           background: var(--surface); border: 1px solid var(--line); }
   .card.soft { background: var(--surface2); }
   .card.flat { background: transparent; }
+  .card.primary { border-left: 3px solid var(--accent); }
   .ctitle { font-size: 15px; font-weight: 700; color: var(--head); letter-spacing: .01em; }
   .row1 { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
   .range { margin: 10px 0 0; font-size: 13px; line-height: 1.65; color: var(--text2); }
@@ -145,7 +146,7 @@
   .imgph svg { width: 26px; height: 26px; fill: none; stroke: var(--warnfg); stroke-width: 1.7; }
   .imgph p { margin: 0; font-size: 12.5px; font-weight: 700; color: var(--warnfg); }
   .imgph span { font-size: 11px; color: var(--text2); }
-  .ph-rec { flex: 1 1 auto; min-height: 140px; max-height: 250px; margin-bottom: 16px;
+  .ph-rec { flex: 0 0 auto; min-height: 96px; max-height: 120px; margin-bottom: 16px;
             display: flex; align-items: center; justify-content: center; padding: 0 26px;
             background: var(--phbg); border: 1px dashed var(--phline); border-radius: 6px; }
   .ph-rec p { margin: 0; font-size: 13px; line-height: 1.75; color: var(--text3); text-align: center; }
@@ -378,6 +379,8 @@
 <p><b>v2.1 变更说明</b>（2026-11-19，语义修正同步）：P05「相关真题」区扩展为双来源——「系统题库」+「我录入的题」，区块标题改「相关题目」并分组标注来源；标错的录入题挂「做错」徽标；P05 底部卡片「我在这个成语上错过 3 道题 / 点数字看这 3 道题」改「我在这个成语下录入了 N 道题 / 点数字看这些录入题」（N 为全部录入题数，含未标错，示意值 3）。仅文案与措辞同步，颜色/字号/圆角/间距/图标数值不变。</p>
 
 <p><b>v2.2 变更说明</b>（2026-11-19，省份口径同步）：省考勾选时省份默认全选、省份仅作筛选维度，取消「未选省份」异常态与整套橙警示。P01 启动引导省考项改中性「省份全选」并去橙字与警示行；P02 推荐首页范围行「省考（未选省份）」改普通「省考」、删警示行；P03 范围卡按已拍板的方案 A 同排布局（范围文字与「调整省份」链接同排，下方说明行改中性筛选说明）。仅文案、措辞与同排结构同步，颜色/字号/圆角/间距/图标数值不变，P01–P05 编号不变。</p>
+
+<p><b>v2.3 变更说明</b>（2026-11-27，UI 审核六条·A 稿）：P02 每日推荐占位由弹性 140–250px 压为固定 96–120px，两张功能卡上移进首屏；P05 释义卡加 3px 主色左边条领读，出处/易错点/近义与反义/相关题目四卡改浅底弱化，统计卡保持白底；P03 右侧字母索引右缘 4px→8px、行距 1px→4px、字号 10px→11px，避免贴边并扩大触控行距。新增通用类 `.card.primary`，其余颜色/圆角/字号档不变，P01–P05 编号不变。</p>
 
   <p>按《设计规范 v1.1》铺全 23 页，本文件是第一批 P01–P05。色值、字号、圆角、间距全部取自规范第 2–4 章，未新增规范外数值；深色按<b>页底 #101E17 口径</b>。</p>
     <p>规则落地要点：P10 顶部「删除」改中性色以守一处红（见文件 C）；P19 识别失败、P10 原图丢失沿用警示橙；P01 三项默认勾选、省考勾选时省份默认全选，省份仅作筛选，不设橙提示。</p>
@@ -624,8 +627,8 @@
 
   <p class="listfoot">共 1,286 条 · 已到末尾</p>
 
-  <div style="position:absolute;right:4px;top:250px;display:flex;flex-direction:column;gap:1px;
-              font-size:10px;line-height:1.45;color:var(--text3);text-align:center">
+  <div style="position:absolute;right:8px;top:250px;display:flex;flex-direction:column;gap:4px;
+              font-size:11px;line-height:1.45;color:var(--text3);text-align:center">
     <span style="color:var(--accent);font-weight:700">A</span><span>B</span><span>C</span><span>D</span>
     <span>E</span><span>F</span><span>G</span><span>H</span><span>J</span><span>K</span><span>L</span>
   </div>
@@ -682,8 +685,8 @@
 
   <p class="listfoot">共 1,286 条 · 已到末尾</p>
 
-  <div style="position:absolute;right:4px;top:250px;display:flex;flex-direction:column;gap:1px;
-              font-size:10px;line-height:1.45;color:var(--text3);text-align:center">
+  <div style="position:absolute;right:8px;top:250px;display:flex;flex-direction:column;gap:4px;
+              font-size:11px;line-height:1.45;color:var(--text3);text-align:center">
     <span style="color:var(--accent);font-weight:700">A</span><span>B</span><span>C</span><span>D</span>
     <span>E</span><span>F</span><span>G</span><span>H</span><span>J</span><span>K</span><span>L</span>
   </div>
@@ -796,29 +799,29 @@
     </div>
   </div>
 
-  <div class="card">
+  <div class="card primary">
     <p class="lbl">释义</p>
     <p class="txt k">按：依照；部、班：门类与次序。原指安排事务依照一定条理，后多指照老规矩办事，缺乏变革。</p>
   </div>
 
-  <div class="card">
+  <div class="card soft">
     <p class="lbl">出处</p>
     <p class="txt">清·李宝嘉《官场现形记》第五十三回：「这算什么按部就班呢？」</p>
   </div>
 
-  <div class="card">
+  <div class="card soft">
     <p class="lbl">易错点</p>
     <p class="txt"><b>望文生义</b>：常被误解为「按步骤有序完成」，误当褒义用。</p>
     <p class="txt"><b>对象误用</b>：只能形容做事方式，不形容成绩与进度。</p>
   </div>
 
-  <div class="card">
+  <div class="card soft">
     <p class="lbl">近义与反义</p>
     <p class="txt">近义：墨守成规、循规蹈矩</p>
     <p class="txt">反义：别出心裁、标新立异</p>
   </div>
 
-  <div class="card">
+  <div class="card soft">
     <p class="lbl">相关题目</p>
     <p class="dims">系统题库</p>
     <div class="lrow" style="padding:0 0 10px;border-bottom:1px solid var(--line2)">
@@ -872,29 +875,29 @@
     </div>
   </div>
 
-  <div class="card">
+  <div class="card primary">
     <p class="lbl">释义</p>
     <p class="txt k">按：依照；部、班：门类与次序。原指安排事务依照一定条理，后多指照老规矩办事，缺乏变革。</p>
   </div>
 
-  <div class="card">
+  <div class="card soft">
     <p class="lbl">出处</p>
     <p class="txt">清·李宝嘉《官场现形记》第五十三回：「这算什么按部就班呢？」</p>
   </div>
 
-  <div class="card">
+  <div class="card soft">
     <p class="lbl">易错点</p>
     <p class="txt"><b>望文生义</b>：常被误解为「按步骤有序完成」，误当褒义用。</p>
     <p class="txt"><b>对象误用</b>：只能形容做事方式，不形容成绩与进度。</p>
   </div>
 
-  <div class="card">
+  <div class="card soft">
     <p class="lbl">近义与反义</p>
     <p class="txt">近义：墨守成规、循规蹈矩</p>
     <p class="txt">反义：别出心裁、标新立异</p>
   </div>
 
-  <div class="card">
+  <div class="card soft">
     <p class="lbl">相关题目</p>
     <p class="dims">系统题库</p>
     <div class="lrow" style="padding:0 0 10px;border-bottom:1px solid var(--line2)">
