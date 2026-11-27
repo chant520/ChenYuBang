@@ -1,6 +1,6 @@
 {
   "$comment": "数据库迁移版本表。口径写在 docs/开发规范-v1.11.md 第 4.5 节。两端各有一份实现，但版本号与表结构必须一致。",
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "currentVersion": 4,
   "rules": [
     "只增：新版本只能新增表、新增可空列或做纯数据回填，不删除、不改名、不改类型。",
