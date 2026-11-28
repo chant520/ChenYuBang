@@ -1,6 +1,5 @@
 {
-  "source": "docs/design/*-v2.html",
-  "note": "v2.2（2026-11-19，省份口径同步）：D/P03 页面标签「成语库 · 省考未选省份」改「成语库 · 省份筛选后无匹配」（省份默认全选、仅作筛选，取消未选省份异常态）；文件名、375×812 尺寸、截图路径与 sha256 均为既有基线资产，保持不变（本版不重生成基线）。v2.1（2026-11-19，语义修正同步）：仅同步 P09 / P21 页面标签措辞；文件名、375×812 尺寸、截图路径与 sha256 均为既有基线资产，保持不变。",
+  "source": "docs/design/*-v2.html + *-v3.html",
   "groups": [
     {
       "group": "A",
@@ -18,13 +17,25 @@
       "group": "C",
       "source": "高保真全页-emerald-C-P14-P23-v2.html",
       "desc": "P14–P23 主态",
-      "screens": 20
+      "screens": 30
     },
     {
       "group": "D",
       "source": "高保真空态与异常态-emerald-D-v2.html",
       "desc": "空态与异常态",
-      "screens": 44
+      "screens": 74
+    },
+    {
+      "group": "E",
+      "source": "高保真全页-emerald-E-P24-P25-v3.html",
+      "desc": "P24–P25 阶段6 主态（v3）",
+      "screens": 20
+    },
+    {
+      "group": "F",
+      "source": "高保真空态与异常态-emerald-F-v3.html",
+      "desc": "阶段6 变更状态（v3）",
+      "screens": 24
     }
   ],
   "screens": [
@@ -38,7 +49,7 @@
         375,
         812
       ],
-      "sha256": "eee2fdbc5145be3039c9a10f8e77f84303ea74be5274e34c8ed806fa9d0b4303"
+      "sha256": "7457b79f76e7bd079714a67ebd1933076a5ad8a000a79c7637d23f804a28abfe"
     },
     {
       "group": "A",
@@ -50,7 +61,7 @@
         375,
         812
       ],
-      "sha256": "724bcf30ad50cb21502d84e036de0c191824859c45c7c6c3835b3cee54091731"
+      "sha256": "a1fbbf077dd54860640744f1ebe8ce866bb1d9aeea1308b96ccd3b5f2b96cccb"
     },
     {
       "group": "A",
@@ -62,7 +73,7 @@
         375,
         812
       ],
-      "sha256": "d9620db4ca8966e228a152c5ef5f90096e338a15260b82c68a3270d73c56cdca"
+      "sha256": "ac5b933b345231555075d0a09f31f2484690e355b4eb813c0a5b91cef43de33e"
     },
     {
       "group": "A",
@@ -74,7 +85,7 @@
         375,
         812
       ],
-      "sha256": "b1bb0f202560ecd492fe3c0ed8bca067b8e355a904259fbb129839ed6cf501b2"
+      "sha256": "79154f04df75336d85e1ee34221d71cc21459b8ad3fba20a3808fd95a4f0f3d0"
     },
     {
       "group": "A",
@@ -86,7 +97,7 @@
         375,
         812
       ],
-      "sha256": "ccd4bc38cbd8e559d76cd61ab5dc73d76c949b0bf488751bbde6646d575040f2"
+      "sha256": "4595535840bb41bf0ffa2c0b0c096ada9726f095ab40a13cde1b1b2fd2cdf723"
     },
     {
       "group": "A",
@@ -98,7 +109,7 @@
         375,
         812
       ],
-      "sha256": "0b46176fd8e4d873ea8b74db54e3dd148b6e5e33c00aecd3337bace2b7655932"
+      "sha256": "3ccc4af18292b6110d7fea58cd99674b97ce9eb4cf685a44d61d7afe9b86546c"
     },
     {
       "group": "A",
@@ -110,7 +121,7 @@
         375,
         812
       ],
-      "sha256": "17d7d2c1ef16682b57c33818c9fb9e7b85a055f2f553ae105bf88e095cb77bc8"
+      "sha256": "7d2000115905afa9befa4086e2f1d8f54ec703ab49ae71119467861f5cc1162b"
     },
     {
       "group": "A",
@@ -122,7 +133,7 @@
         375,
         812
       ],
-      "sha256": "4ad128994d8bcd482a92bb971525cf6252771331b002397a5488c6df7b68b28c"
+      "sha256": "cd0fc249e62a3e8228bf446465fed1a05a58bada4e0aa33e3332795b4715684e"
     },
     {
       "group": "A",
@@ -132,9 +143,9 @@
       "label": "浅色模式 · 成语详情",
       "size": [
         375,
-        1028
+        1168
       ],
-      "sha256": "70c4f672d2c3bbea2df9fa50260ba503d11fd7477cd417fcc0def94d83d69da3"
+      "sha256": "d5517b7f252a1f81a5b6fa19380c5a2b2ca7d1cf4a3bf16108f050a07d17a950"
     },
     {
       "group": "A",
@@ -144,9 +155,9 @@
       "label": "深色模式 · 成语详情",
       "size": [
         375,
-        1028
+        1168
       ],
-      "sha256": "c9e70a922ed11fb3133b3480e924e430c4b43c0e54638b6d8727e029727b2575"
+      "sha256": "79bf2465dd6ec036848db2b96f9a1f5516e7ddb4ac360366b78d639fee346bbb"
     },
     {
       "group": "B",
@@ -158,7 +169,7 @@
         375,
         812
       ],
-      "sha256": "06cd9df572745b8a723842408d201544472e6876d4056d5a5f2f5412a67c15cd"
+      "sha256": "94daede0014ad644dec3309c878a2caaa85dc18c733109ca27df6dc43b3b4e0d"
     },
     {
       "group": "B",
@@ -170,7 +181,7 @@
         375,
         812
       ],
-      "sha256": "8213b5366c17595a9b55e8af77fd43f596989e26bdcd1b52147ef002944e36ba"
+      "sha256": "2d25bf81b3ffafbfd6a852fadae0188cc202df228cdd7c07ddb94673a095cd17"
     },
     {
       "group": "B",
@@ -182,7 +193,7 @@
         375,
         812
       ],
-      "sha256": "f742aaefa2bee2eebca2af93e54d9a1d5dec5ae4290562bb05bf2abe1848756d"
+      "sha256": "315f360c4f649ee8992a557b11fb6b6b98469a131910de0960121bb67bac17d9"
     },
     {
       "group": "B",
@@ -194,7 +205,7 @@
         375,
         812
       ],
-      "sha256": "44697fafcd1f349fa879da6d0b5d4713020b95d32b34cbc0e0f1f480a28fa0af"
+      "sha256": "c1f01e7613331fc0ee2d5cf25a870bb065f19eb49d47486b5322c67815b75953"
     },
     {
       "group": "B",
@@ -206,7 +217,7 @@
         375,
         812
       ],
-      "sha256": "6b5c062e2fc19d07b59bad3fd8d68773313c090f0630ba97f532dac4cab4f0f4"
+      "sha256": "1fb2d3ef7bd9e6256b50d0269783208960eb84a811ad34c27bc77657188d92ed"
     },
     {
       "group": "B",
@@ -218,11 +229,11 @@
         375,
         812
       ],
-      "sha256": "1896fdb4099c5bd8cf3108870c4e5f8af8b26cab77e9bf61814d012cbaddd733"
+      "sha256": "957bdc4b3d1d61891577e6e9476e11c7ef248cd9afab86d397af35d4d78eacf9"
     },
     {
       "group": "B",
-      "file": "B/P09_light_某成语下的错题列表.png",
+      "file": "B/P09_light_某成语下的录入题.png",
       "page": "P09",
       "mode": "light",
       "label": "浅色模式 · 某成语下的录入题",
@@ -230,11 +241,11 @@
         375,
         812
       ],
-      "sha256": "fe1117c69194c483275ccd894635fbc9aa3b3e69e5de64aed734d8dc97b073be"
+      "sha256": "2b3850f9e81332b057025394bc76abfef21eb7c2ff12ac466b7b7f8af5740a68"
     },
     {
       "group": "B",
-      "file": "B/P09_dark_某成语下的错题列表.png",
+      "file": "B/P09_dark_某成语下的录入题.png",
       "page": "P09",
       "mode": "dark",
       "label": "深色模式 · 某成语下的录入题",
@@ -242,7 +253,7 @@
         375,
         812
       ],
-      "sha256": "a857b6b6c76795c88e9fd9ef4bb560c28b36f140c41f53a87cd113dfc3198962"
+      "sha256": "902e82ee751fcc49d187acf0b5b8f441664cd046df1791bcaf86dec7ff4ea2ba"
     },
     {
       "group": "B",
@@ -252,9 +263,9 @@
       "label": "浅色模式 · 错题详情",
       "size": [
         375,
-        1181
+        1140
       ],
-      "sha256": "71dab387358ea579c834da9404cc70f6cf97413fb2f95be2c583172422427c1b"
+      "sha256": "bd09507ac28adc6bd79a6d47f872d39de09ed1ff30f0f7a5b2224c4eae41c575"
     },
     {
       "group": "B",
@@ -264,9 +275,9 @@
       "label": "深色模式 · 错题详情",
       "size": [
         375,
-        1181
+        1140
       ],
-      "sha256": "8bd2d2cb8c999ea91aa991fb44a447f6dcd5e7b1d8ee7e1f88c22e4b859ff8d0"
+      "sha256": "ff0dacca4f84c156e1351ea69f20e9f9ec75448fd9ce6498a6d4e02b2bdfd0bc"
     },
     {
       "group": "B",
@@ -278,7 +289,7 @@
         375,
         812
       ],
-      "sha256": "2e836423616ffaf3b9d8e9534e5d570a1b0096d0d2b77e487b6e348a06771bb8"
+      "sha256": "e4d0b1c6bf6e207fa6429a792aee98152401712f5278b742cc0034163c8f8e5d"
     },
     {
       "group": "B",
@@ -290,7 +301,7 @@
         375,
         812
       ],
-      "sha256": "b0918044086256568f7177ddbf0233b14fb179e66e213dba544dd5874514fd4f"
+      "sha256": "0d6fc29ca19f184d5fbf7f534f80331226af9035ba31c2e308d8141e69e0b515"
     },
     {
       "group": "B",
@@ -302,7 +313,7 @@
         375,
         812
       ],
-      "sha256": "7b7fd5997ea570d299c9c3806fad41ea4602d4ec70b6b683e36d7cf8b6f7f022"
+      "sha256": "bc64d20a657dbd16a254ff03d8de8b00aa774e168ba69c257a5c08fff12c6c75"
     },
     {
       "group": "B",
@@ -314,7 +325,7 @@
         375,
         812
       ],
-      "sha256": "f80780eb33eb5efc8f1f7d7a181f2d46ec6120c0845ab99e9618a50123a562d1"
+      "sha256": "030130ecc86875cd62d0da53cdf0dbb0f50111be4f7ad3a36a8f51d520f9b3f2"
     },
     {
       "group": "B",
@@ -326,7 +337,7 @@
         375,
         812
       ],
-      "sha256": "e3b63245f52584e072a0971e4aa9fdcd21688883b471760b8548e52ca3fb034c"
+      "sha256": "2abe6d35b6edfb067f927027b43ca8f81823865d1117344a15b432dc2c48ea03"
     },
     {
       "group": "B",
@@ -338,7 +349,7 @@
         375,
         812
       ],
-      "sha256": "4b45cdfc49cf33cee55f57e5da7875225d68ba76836c43c7efed35882007df18"
+      "sha256": "05052484e9b351a5860af9d740b0cba62d044d01203f7d1c3c65b836d743815b"
     },
     {
       "group": "C",
@@ -350,7 +361,7 @@
         375,
         812
       ],
-      "sha256": "228c6c61403d86ee52a7825b423b952bfcccd0651a3700f9a69db0b1ea8d6e81"
+      "sha256": "c011270d65423b5263770c76ae43003ac42e5e3104a385231679b2e166cfd18f"
     },
     {
       "group": "C",
@@ -362,7 +373,31 @@
         375,
         812
       ],
-      "sha256": "569b92db48f0ac28149837b42e757a8452e78cbef4e001fd75390086080ed5c0"
+      "sha256": "1a51edfc782f0d53a0e911e169a328ad09b61ed7983353a8a009330fc06f1d0c"
+    },
+    {
+      "group": "C",
+      "file": "C/P14_light_考试范围设置（省考未勾选）.png",
+      "page": "P14",
+      "mode": "light",
+      "label": "浅色模式 · 考试范围设置（省考未勾选）",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "24bdd0df74694e9c125d92394a967135bdc892469069babe6013b249702243bd"
+    },
+    {
+      "group": "C",
+      "file": "C/P14_dark_考试范围设置（省考未勾选）.png",
+      "page": "P14",
+      "mode": "dark",
+      "label": "深色模式 · 考试范围设置（省考未勾选）",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "6b8596f8279db2ba99db799e7006cd505bf435cfa184f0798ca9fd8aa5ffa8c4"
     },
     {
       "group": "C",
@@ -374,7 +409,7 @@
         375,
         812
       ],
-      "sha256": "b37f5280f2a720f692e8fc67aa034998b2e99e9cc3a37364fc73e8c3fb3d9455"
+      "sha256": "1a044f2fa4d9eb58cc32abb3b099cda22031069e900ceb4b3debbd694213dca4"
     },
     {
       "group": "C",
@@ -386,7 +421,7 @@
         375,
         812
       ],
-      "sha256": "eeef5abc0bd74ff86d318d24e6497012224437b51ce611c0b87b79575a3c72d8"
+      "sha256": "00e02d4341d6737b0b6531055f40712e9b899ec60f14c48e9602efbf0783baa0"
     },
     {
       "group": "C",
@@ -398,7 +433,7 @@
         375,
         812
       ],
-      "sha256": "3bce10fa37cdafcd399d26f9d003c3fc2e12429174f14e10fb3c2eaaac11834f"
+      "sha256": "17f07fc8cf8b9b2e34bd72384d29842097cdd6dc4e0d5f0b2664773918fbf276"
     },
     {
       "group": "C",
@@ -410,7 +445,31 @@
         375,
         812
       ],
-      "sha256": "7e280adecb61c6a57c639d2d9087aa7e35a9bf327824856c2b0f21ece064e3fe"
+      "sha256": "6003c52ffe35aaef208f814ee33cdc6b687ae31988f49d2d40698e45363f715f"
+    },
+    {
+      "group": "C",
+      "file": "C/P16_light_题库更新失败态.png",
+      "page": "P16",
+      "mode": "light",
+      "label": "浅色模式 · 题库更新失败态",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "190755d84a4b39bce2f5f48559370db4aae4918a4c4748013310a4565a1bd98b"
+    },
+    {
+      "group": "C",
+      "file": "C/P16_dark_题库更新失败态.png",
+      "page": "P16",
+      "mode": "dark",
+      "label": "深色模式 · 题库更新失败态",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "e26b3e435baab93697c52b191ce994ca9b7206a7d59636c8a6c8c410b09ea69a"
     },
     {
       "group": "C",
@@ -422,7 +481,7 @@
         375,
         812
       ],
-      "sha256": "dc85e2c88eaa63a94b49f7dfb2ea3498af87452e967e88b44dbff5bad3bfcaea"
+      "sha256": "4498c56dfb72d2bdea3d3d578b05636ac5fdabb96cd22d9e1bec8d5a90b2314f"
     },
     {
       "group": "C",
@@ -434,7 +493,7 @@
         375,
         812
       ],
-      "sha256": "7aa46c728d2e460de95a109fd2d837ee45ac2d89806e4cb1c9bb6c92d3f57838"
+      "sha256": "c66c136509ac6f05ad3edf374d423db3765d14fdf71769c003403531dfb7d27b"
     },
     {
       "group": "C",
@@ -446,7 +505,7 @@
         375,
         812
       ],
-      "sha256": "eb5766a468280cc379f2e13d8e49d3dbdd2f8b39407d4351100e6bee5ec3975e"
+      "sha256": "9df75e97e81d9677157257cb1c1925a8dc36e61e8d6d7d80dfc9a8848c1e9866"
     },
     {
       "group": "C",
@@ -458,7 +517,7 @@
         375,
         812
       ],
-      "sha256": "82b011d2993dbccd3b33fb53e229849988f559d8bfdfc98b8dc62ee0a7b21e7c"
+      "sha256": "aa1e648de630e6c295a91369337f540e77e063204142e68c916d157da0860db2"
     },
     {
       "group": "C",
@@ -470,7 +529,7 @@
         375,
         812
       ],
-      "sha256": "34e7e5d125221df6a63b72b69b3f6810233bf44e760fc049afbca08ff3012149"
+      "sha256": "6e3be52f979d029de090dd1e0e0194caa1afff9ed238477b8fa37d1a19c6c01e"
     },
     {
       "group": "C",
@@ -482,7 +541,7 @@
         375,
         812
       ],
-      "sha256": "ba26a6a3c5b9e3d1f3999813a84bed6a24b6db38534c1b16b39528ff89836b65"
+      "sha256": "d5311c8cfbcf38728c7f15ec181c16f8261a17d1f862c65afc6d88502b5613ca"
     },
     {
       "group": "C",
@@ -492,9 +551,9 @@
       "label": "浅色模式 · 成语匹配与修正",
       "size": [
         375,
-        928
+        1261
       ],
-      "sha256": "b86b23451b01f9159ab205fa27f4e2ae447e57d6ba6fb4a16261b1b505c51ed6"
+      "sha256": "55a44c88d82773e2b74833a054e030bc65cec2b7f6132582a86454168f0845a7"
     },
     {
       "group": "C",
@@ -504,13 +563,37 @@
       "label": "深色模式 · 成语匹配与修正",
       "size": [
         375,
-        928
+        1261
       ],
-      "sha256": "c4d71f9607d3e3b61a7f354b62def1eb7c2768e004aa91d6383ea89f6dfe8bb9"
+      "sha256": "c6bdf8dbfa0ffc269361177ef4906a313c41cfe5badc3a46f45df78735c17fa4"
     },
     {
       "group": "C",
-      "file": "C/P21_light_保存成功.png",
+      "file": "C/P20_light_匹配与修正（空选阻断）.png",
+      "page": "P20",
+      "mode": "light",
+      "label": "浅色模式 · 匹配与修正（空选阻断）",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "06a0f602838ea183de965c4893a7fd337e12c5e1ac2e06a72384c9c120d0abd1"
+    },
+    {
+      "group": "C",
+      "file": "C/P20_dark_匹配与修正（空选阻断）.png",
+      "page": "P20",
+      "mode": "dark",
+      "label": "深色模式 · 匹配与修正（空选阻断）",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "a67d89058422fc35ad4cb1c2d1ce1a60d1a35625fb69edd0fa2d0a28973a9d13"
+    },
+    {
+      "group": "C",
+      "file": "C/P21_light_已存入我的题库.png",
       "page": "P21",
       "mode": "light",
       "label": "浅色模式 · 已存入我的题库",
@@ -518,11 +601,11 @@
         375,
         812
       ],
-      "sha256": "506c719a3bc631530806644ce4dd5fc97122e2d901513eda1a002f794314f6af"
+      "sha256": "c6ba8565c02c80dac979dc913e194fc2610d5664683e491797af5375bc39272f"
     },
     {
       "group": "C",
-      "file": "C/P21_dark_保存成功.png",
+      "file": "C/P21_dark_已存入我的题库.png",
       "page": "P21",
       "mode": "dark",
       "label": "深色模式 · 已存入我的题库",
@@ -530,7 +613,31 @@
         375,
         812
       ],
-      "sha256": "e36523b51783334fd8076d28a0c3d0b913ed1cb863300189d0d68b3be7197e2e"
+      "sha256": "53b9d285020f13523561a2dc1e7beb348be8df7aef714b94380566d424744592"
+    },
+    {
+      "group": "C",
+      "file": "C/P21_light_已存入我的题库（未标错题）.png",
+      "page": "P21",
+      "mode": "light",
+      "label": "浅色模式 · 已存入我的题库（未标错题）",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "ba9f2aad556351645ef822ab0aa4428ac732e51bcfa50ca646e70adad4c5e0f9"
+    },
+    {
+      "group": "C",
+      "file": "C/P21_dark_已存入我的题库（未标错题）.png",
+      "page": "P21",
+      "mode": "dark",
+      "label": "深色模式 · 已存入我的题库（未标错题）",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "9d63b1b5a298ac9e25ec525098e99772af22ead2d8bd3be1a190c66c16e1fb08"
     },
     {
       "group": "C",
@@ -542,7 +649,7 @@
         375,
         812
       ],
-      "sha256": "f75e16af0d1c5d9c47d578f90051caf9dbfe6fadefb38664b12fad1fbda6c521"
+      "sha256": "83d8e0a4ddccb9d52eaa42c8fc5ad6b341ff0e65c598edb525822f858b0efb1f"
     },
     {
       "group": "C",
@@ -554,7 +661,7 @@
         375,
         812
       ],
-      "sha256": "dde26752af59f57e3d90a19b036cd58f30e9054424929ce451c4ea7b8fbef7b5"
+      "sha256": "1f1e3f52cf550d83cc436a7ee5d0c380f013aa22031e028c212089599b5bec40"
     },
     {
       "group": "C",
@@ -566,7 +673,7 @@
         375,
         812
       ],
-      "sha256": "34fd17cdc88a376d13b94eb311e8349d6a9aef79b0871067c6b0504c52918e6b"
+      "sha256": "a6a60a1a2e6ae9a90b6460be622bbb3bc60144ec2bccdd1823019f5a5ec827c6"
     },
     {
       "group": "C",
@@ -578,7 +685,31 @@
         375,
         812
       ],
-      "sha256": "dcd583f5eb7a6763d72a0986707acac0dc25f1157099653bac991555bc8480ef"
+      "sha256": "7ff83aaa0dd3971ac67c23415cd228657bb0bb18a21d4f1d50f223399f777bc1"
+    },
+    {
+      "group": "C",
+      "file": "C/P08_light_成语列表（超长列表）.png",
+      "page": "P08",
+      "mode": "light",
+      "label": "浅色模式 · 成语列表（超长列表）",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "7139a0fb54998633db78fce8f25159faddc9871a37778bb9a8c0717dc6c79c72"
+    },
+    {
+      "group": "C",
+      "file": "C/P08_dark_成语列表（超长列表）.png",
+      "page": "P08",
+      "mode": "dark",
+      "label": "深色模式 · 成语列表（超长列表）",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "28afeadb89a3ea19a79fedf82d74a89393f258b3d66bd70b1ff7af6d156a2341"
     },
     {
       "group": "D",
@@ -590,7 +721,7 @@
         375,
         812
       ],
-      "sha256": "2cb37bbc9b152a2415244a75433eff8dd01eb37c1cd5c4ed1cbf41e09e9c35c5"
+      "sha256": "d73b36b1becf27d7fbdf8a2e7e4aedc3d9a83a3eb6e0b31cbc8c1e19214d8222"
     },
     {
       "group": "D",
@@ -602,7 +733,7 @@
         375,
         812
       ],
-      "sha256": "9b21fd250a721eb8b198ae9283cc2a25f9af717054def97db41fcfc1dfec3a5a"
+      "sha256": "77c140ae99ad2279f71ff2a73e9f472a966784cecc83716dfb9c1a19ca94d7f7"
     },
     {
       "group": "D",
@@ -614,7 +745,7 @@
         375,
         812
       ],
-      "sha256": "0f185de163de39da65b2a7d19d0b8563191853a91dab4f05d450472f8d83636d"
+      "sha256": "a4977ed4dd96e5a9a1dfc48e6d6d71864bb367cb9f87af17be7c77fca5e9f53b"
     },
     {
       "group": "D",
@@ -626,7 +757,7 @@
         375,
         812
       ],
-      "sha256": "cc91f617ea2d411a4e34f6c804707d4bc0b14a4e4a2b17fe35520865f7d92494"
+      "sha256": "76672d5c631f6d4999652c4060c518f05784a649e8e691a614904b34c7ac9098"
     },
     {
       "group": "D",
@@ -638,7 +769,7 @@
         375,
         812
       ],
-      "sha256": "a074a22f737ab7dc96219244db4d0c24eee64389e6fe8c228ae03e2d2e9141d2"
+      "sha256": "0eb1690c5d45a5ae87a8d5f4a693c8fb8614ac2fa0d696d06ec077d714e7c5de"
     },
     {
       "group": "D",
@@ -650,11 +781,11 @@
         375,
         812
       ],
-      "sha256": "2423ff4759c3e9d9848568894230a773b77d5cabcf70b7ae7616ca27741c05bf"
+      "sha256": "5b247f39b9bd4d2ec7df8463fa86810303af9e90bd1fa493712c16383dd635af"
     },
     {
       "group": "D",
-      "file": "D/P03_light_成语库_省考未选省份.png",
+      "file": "D/P03_light_成语库_省份筛选后无匹配.png",
       "page": "P03",
       "mode": "light",
       "label": "浅色模式 · 成语库 · 省份筛选后无匹配",
@@ -662,11 +793,11 @@
         375,
         812
       ],
-      "sha256": "9e5f8fc5ef5ece32b836bde019ca57f4f18e449f91791af79a41b8e88cc6f95e"
+      "sha256": "f1ef0ca6257f5949c61f914e8a3135810ecabab9d1f309f36c004250f29415c8"
     },
     {
       "group": "D",
-      "file": "D/P03_dark_成语库_省考未选省份.png",
+      "file": "D/P03_dark_成语库_省份筛选后无匹配.png",
       "page": "P03",
       "mode": "dark",
       "label": "深色模式 · 成语库 · 省份筛选后无匹配",
@@ -674,7 +805,7 @@
         375,
         812
       ],
-      "sha256": "39b0a2e0feb5195bdb2b6cb194c1d5fb1bbe314813f0d0afd47b4cd6c56af569"
+      "sha256": "6de3c0733a7eb2a0beb6ec9b3fbbac41dc215004c7b2c6eb7a4884aec98e3168"
     },
     {
       "group": "D",
@@ -686,7 +817,7 @@
         375,
         812
       ],
-      "sha256": "64b3f53a67c57c962af5afedbe6a95fb23ea3ee842bde38fa1a515afe66225ea"
+      "sha256": "f048353e3f851f5be8b4964621bd809d4800f221903df735e43cfa51d21193b2"
     },
     {
       "group": "D",
@@ -698,7 +829,7 @@
         375,
         812
       ],
-      "sha256": "7e975bf027d4002af1ac3bd31302e07b6469de41e3094157c8fb3ba3ad900fcf"
+      "sha256": "c2e638a14989ba6776ae81a7cd4e8794bc192d91bcf9bf422d54e11aee131e84"
     },
     {
       "group": "D",
@@ -710,7 +841,7 @@
         375,
         812
       ],
-      "sha256": "35d9a7dedc0cd155eea253af3c1f7aef964ece1ea71a0b9ac3949abbe45d0c1e"
+      "sha256": "4992674413a6c10201242da30c5c076fef661e4511f7438308297488d1846be8"
     },
     {
       "group": "D",
@@ -722,7 +853,7 @@
         375,
         812
       ],
-      "sha256": "8d7c67bba8b6637d99e11251980dab26deec99e63f4cc1594fdd1a12ad9ac6f2"
+      "sha256": "d3a91b95b47765f58324c0df490737fa27135da8858a4829689d20cd72639f6d"
     },
     {
       "group": "D",
@@ -734,7 +865,7 @@
         375,
         812
       ],
-      "sha256": "5c24e9b398581ee16b7bb9e099f375fdd10db073db46870507a7cd434ebe8ccd"
+      "sha256": "efd9cb01c9ba9b6024d508494f1876bc473098836b94f1caebd62d118619443a"
     },
     {
       "group": "D",
@@ -746,7 +877,7 @@
         375,
         812
       ],
-      "sha256": "d106d7bcd1b164ae2861673d801efceb4e48fc0472019e16064a99097cb7b49b"
+      "sha256": "2d54f2169fae2e97bf455d6d0bd8c251a73b50df1d6f0efb41c29424baf6b538"
     },
     {
       "group": "D",
@@ -758,7 +889,7 @@
         375,
         812
       ],
-      "sha256": "ba5e8881cbcd559cae36cd478efde9825784a92abde3f23e2df47c4dec9166a9"
+      "sha256": "b5e93e496c36cacd7589f5c465990327c069fae77412c5512aed9823daacda9e"
     },
     {
       "group": "D",
@@ -770,7 +901,7 @@
         375,
         812
       ],
-      "sha256": "729826ed167d6072ef37d03f1a091072af63a89671c15750fa419f9332a91299"
+      "sha256": "d036f0c6d3846c353940ea7931f390319b50100f082a154b24760076b2f29fa5"
     },
     {
       "group": "D",
@@ -782,7 +913,7 @@
         375,
         812
       ],
-      "sha256": "76fcd1f2d72bd2e5c93e96bcd11d986b35c61b1d9f5fe62dbb58c8b2bd9fa16e"
+      "sha256": "b916c18cac37537156962669e7c8b81cbf5b8491872da9df00ed71d614234ba9"
     },
     {
       "group": "D",
@@ -794,7 +925,7 @@
         375,
         812
       ],
-      "sha256": "ab016765a7467c4800b0fbda342af8f2a9e818e806689b7b72d6d193159e3325"
+      "sha256": "40f2bac38eecc19714f70f5a5d497b7f9ef0c9974c8b0fb48ac9bf6e59cf9c51"
     },
     {
       "group": "D",
@@ -806,7 +937,7 @@
         375,
         812
       ],
-      "sha256": "3733a9e44bbbcc0d26dc83f0ee1d10371c9646f92dc182468712e986a492d1bf"
+      "sha256": "d2ce67262f88b16de902b488f623163604df989033b0ed1b3eb2624ee5834468"
     },
     {
       "group": "D",
@@ -818,7 +949,7 @@
         375,
         812
       ],
-      "sha256": "730b63e85031966a33394e91da08913be2e252cbfc42f1f9b9ae00f07424e56b"
+      "sha256": "3ae4d2089fcc6c290e0fc4c0564ac3d1d2f61e9470a5fdc9f49f1a9be0dfc8b0"
     },
     {
       "group": "D",
@@ -830,7 +961,7 @@
         375,
         812
       ],
-      "sha256": "efb0fd803feddc6428dd6d85a9acba3615154d8a4b52b521f9f56d3af5da18eb"
+      "sha256": "c8e5393db24061d8b9f64feb373181602277d8c1e35fbaa305a3f9db4ca746cf"
     },
     {
       "group": "D",
@@ -842,7 +973,7 @@
         375,
         812
       ],
-      "sha256": "3e36f1fa4a36f473120028479bec1394119ff1811495c8ccff3f4320cf31f4bd"
+      "sha256": "32bedc813f01a9d1291cff5da4071a80859cfef56c6871bdfcdde037735daf09"
     },
     {
       "group": "D",
@@ -854,7 +985,7 @@
         375,
         812
       ],
-      "sha256": "dae721fa3f4cbd2e369df4ac93bb7a73635c66dd9f5ef0a6e095f0aab25bf5f0"
+      "sha256": "344445eadad870b45663725b7cee81cd34e21003fff7ada9e0da85bdd5ca2781"
     },
     {
       "group": "D",
@@ -866,7 +997,7 @@
         375,
         812
       ],
-      "sha256": "b3905a77529bd9b1ec09cf09123048837f4fb9b3313320db3e4a89f5d0a89e0f"
+      "sha256": "a53233a9c8f0c489757a3284ce58583ca6bdb7b01287f2562153c56edaa880e9"
     },
     {
       "group": "D",
@@ -878,7 +1009,7 @@
         375,
         812
       ],
-      "sha256": "ed66ba10df908dfa0bc20c6736643cc2c84f365db04666518cef21325afa89d1"
+      "sha256": "40432fe924f6a80ee5dc8be30c0cae3c6fc84c5d280be2432d145297386153c7"
     },
     {
       "group": "D",
@@ -890,7 +1021,7 @@
         375,
         812
       ],
-      "sha256": "801bf4d0870c84d1c14b647770a4809ca608ab9a73948e844a2f520a93311fff"
+      "sha256": "924ce2ef10d0f2f2b1739edf25b46acfe0f6256b2e97fb389b0e40b5368a3555"
     },
     {
       "group": "D",
@@ -902,7 +1033,7 @@
         375,
         812
       ],
-      "sha256": "5815c00e18e3066eeb11b9327e839a108261621250576ae42e09e4d04271b764"
+      "sha256": "87e9350ccce6c73a3d3a8f50c2da34abc23b9ecb92b1458415d4302e30d5c0c9"
     },
     {
       "group": "D",
@@ -914,7 +1045,7 @@
         375,
         812
       ],
-      "sha256": "898b8df8f6025360036f779a8564c0f2896253b5aa9088bbb08ff44c03eebfcd"
+      "sha256": "dd5e9fa896413d620201349cbc5ac0c17570945d88b6dbe1065ada01fa25fb48"
     },
     {
       "group": "D",
@@ -926,7 +1057,7 @@
         375,
         812
       ],
-      "sha256": "52adbc8a1ee3250d22f010790099cfad151fa56389fcb022f7d60c8f955e5c8b"
+      "sha256": "2f952c8305cae1c8e1fc65321b63fee5e8fe32fa2014cf44c07e219746cdc48c"
     },
     {
       "group": "D",
@@ -938,7 +1069,7 @@
         375,
         812
       ],
-      "sha256": "ec3a50e78ae923845fd27293440f6fd357c010a84e639378d26e5e3cdb9560ce"
+      "sha256": "3c4f86d244e4180e3c295c2e6f2a32f796b028fb51a9a2b1f3414d53a71483d6"
     },
     {
       "group": "D",
@@ -950,7 +1081,7 @@
         375,
         812
       ],
-      "sha256": "42387a14c8394953036acd2168bc722f077c611f228fb07b0c1ff49dd45c5190"
+      "sha256": "e45e2651f9dcfc1b1ddac947e7189c4e56d6fd82e27f0f7edbb7b2273dc28c66"
     },
     {
       "group": "D",
@@ -962,7 +1093,7 @@
         375,
         812
       ],
-      "sha256": "93058979604bebbcf3e046adadcafb8bc65fb304908b3ee656665102cfc60402"
+      "sha256": "44eef01236e3c214df126725faea2527cfcc9478cc7a5ea781bc15f3ce935493"
     },
     {
       "group": "D",
@@ -974,7 +1105,7 @@
         375,
         812
       ],
-      "sha256": "082501f5a0b62bfd773e0f16052f8c6b1f52018c62f7e427552b49295c92ec9a"
+      "sha256": "99b2850b01cf23b93cc8f7d0cbd399372d170b830adefa1018b111506c2e994f"
     },
     {
       "group": "D",
@@ -986,7 +1117,7 @@
         375,
         812
       ],
-      "sha256": "f593d80772d87816e1baaef3f7b9579c8aefffff1597b2aad3a54bc37731bc3c"
+      "sha256": "2321ec085cd27389896118a7ce88600e9da1bdb8bfa58dfd710106ee1ef8b25f"
     },
     {
       "group": "D",
@@ -998,7 +1129,7 @@
         375,
         812
       ],
-      "sha256": "d0ff0493c5f2773013a5f3d731ac47bbba576b7cb13d8b9ba62d9d72e77a79d3"
+      "sha256": "5ce833a75688664bcaf495940aac7521544b0d85870e768095a6d255f71369d1"
     },
     {
       "group": "D",
@@ -1010,7 +1141,7 @@
         375,
         812
       ],
-      "sha256": "d0184bddb0e628f1ab70f485f342e5147d2593987633e764b085319a0df43782"
+      "sha256": "4a88d5aaaa971c06fae811cfaeb505db081de5c978b4e296380cd56b3716ef04"
     },
     {
       "group": "D",
@@ -1022,7 +1153,7 @@
         375,
         812
       ],
-      "sha256": "5e96e7efda70cbdea4cdfffcd3817a5b21f90110c6d88aaf304c8902e2edcd03"
+      "sha256": "98a12fa3afebc61a6e19a6170b5aa8d0936272a9e7ae1798d7615eef59ee002b"
     },
     {
       "group": "D",
@@ -1034,7 +1165,7 @@
         375,
         812
       ],
-      "sha256": "f6c4b71814184d0122bba99c81c5103c769779134c8c98b4c698b8bd54766741"
+      "sha256": "470bb4b0fe9c78979c323d55e34aeea3930c8e8bdbdeaa979a5cfc0b0d792c93"
     },
     {
       "group": "D",
@@ -1046,7 +1177,7 @@
         375,
         812
       ],
-      "sha256": "c3fae03e3c786cd725d3b414d54626b5763663af691f415ef3af32d18ec51d05"
+      "sha256": "40ac182e7f39db971ed8e5525a71116496c01c1c40f10c0911f4697fa2d15bd0"
     },
     {
       "group": "D",
@@ -1058,7 +1189,7 @@
         375,
         812
       ],
-      "sha256": "6a0715cc85aae051a97cb3e93d00518ac45a42dd48ba2c244363a897be0c0694"
+      "sha256": "b3b52ac6cf52e11c1661be8f2865e6b1a8b262d983351728f42e09ff76b6da3d"
     },
     {
       "group": "D",
@@ -1070,7 +1201,7 @@
         375,
         812
       ],
-      "sha256": "7e8294f8eeb45065e1a9a07670d6d2a215a207c8b28b1755e8f69415f1bd3b8d"
+      "sha256": "95d0c53a920a9a0af678cbfd537924dc35dac4b11a6db600736c75aef08c30e1"
     },
     {
       "group": "D",
@@ -1082,7 +1213,7 @@
         375,
         812
       ],
-      "sha256": "0de545cd849a3a49c0395e726e726e9da288ad032c06b97d290a1957d93cbaea"
+      "sha256": "0e6e3b0cc5f3dea29051f47406ff5eb574eb3f3f5b347ee7ad8d9db47d979f9f"
     },
     {
       "group": "D",
@@ -1094,7 +1225,7 @@
         375,
         812
       ],
-      "sha256": "f49b45b947d7d8a741d5a99d0ff8353eb0301371bbacd5a4c5e4198f01960295"
+      "sha256": "410a72d3f468a4411156b8489f353f1ade07a37214c2a1c85d5f4d4cf97a3b9d"
     },
     {
       "group": "D",
@@ -1106,7 +1237,895 @@
         375,
         812
       ],
-      "sha256": "40ec6cbeb0d82585f301dfcf547f4df0298f268e57a211b6521487efe819e36b"
+      "sha256": "cfe3c565409f5347df6c1dedb5e8f53f794d1f1f44e119d7724a617d9797049c"
+    },
+    {
+      "group": "D",
+      "file": "D/P04_light_搜索成语_未找到相关成语.png",
+      "page": "P04",
+      "mode": "light",
+      "label": "浅色模式 · 搜索成语 · 未找到相关成语",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "022fedc77425d63518c8c72afc6abc35b1dcbc87bdbc70746e8a98efa1eb7cd0"
+    },
+    {
+      "group": "D",
+      "file": "D/P04_dark_搜索成语_未找到相关成语.png",
+      "page": "P04",
+      "mode": "dark",
+      "label": "深色模式 · 搜索成语 · 未找到相关成语",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "68c61bd215c01cb591d3baa61be3759d5d3055705382e9e3e4502b560cb1de79"
+    },
+    {
+      "group": "D",
+      "file": "D/P04_light_搜索成语_输入中_加载态.png",
+      "page": "P04",
+      "mode": "light",
+      "label": "浅色模式 · 搜索成语 · 输入中 / 加载态",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "2b861f252011d7d1c84de75106a5ebff3f99243c7d0a3d210e871e245dc5eb83"
+    },
+    {
+      "group": "D",
+      "file": "D/P04_dark_搜索成语_输入中_加载态.png",
+      "page": "P04",
+      "mode": "dark",
+      "label": "深色模式 · 搜索成语 · 输入中 / 加载态",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "08fc69ec2f9b545659117016609f963529b855880624fc5a1fa3e74f948c775f"
+    },
+    {
+      "group": "D",
+      "file": "D/P04_light_搜索成语_清空后.png",
+      "page": "P04",
+      "mode": "light",
+      "label": "浅色模式 · 搜索成语 · 清空后",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "fc7b0a1e16c3f278cb7c3e37a7ba0b11e9cce59b9826f5b065f9d596fe3a1fc3"
+    },
+    {
+      "group": "D",
+      "file": "D/P04_dark_搜索成语_清空后.png",
+      "page": "P04",
+      "mode": "dark",
+      "label": "深色模式 · 搜索成语 · 清空后",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "71d702bc17f9d652327587c8b5a2acac8bfff463a110841d2d02ecfc77c086e7"
+    },
+    {
+      "group": "D",
+      "file": "D/P08_light_错题列表_还没有错题_引导录入.png",
+      "page": "P08",
+      "mode": "light",
+      "label": "浅色模式 · 错题列表 · 还没有错题 · 引导录入",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "c62b61366369d29b18278f5dd0552681382be02752099dec33846fa317f8fa3e"
+    },
+    {
+      "group": "D",
+      "file": "D/P08_dark_错题列表_还没有错题_引导录入.png",
+      "page": "P08",
+      "mode": "dark",
+      "label": "深色模式 · 错题列表 · 还没有错题 · 引导录入",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "63db1fddb8977fa99273a273b61638e4b769e8be1423a9751cc8810469ac36f9"
+    },
+    {
+      "group": "D",
+      "file": "D/P11_light_复习队列_暂无待复习.png",
+      "page": "P11",
+      "mode": "light",
+      "label": "浅色模式 · 复习队列 · 暂无待复习",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "44a1021050f0ba71c8fe65377401ffa1799631740c7d572196113c225a1cb101"
+    },
+    {
+      "group": "D",
+      "file": "D/P11_dark_复习队列_暂无待复习.png",
+      "page": "P11",
+      "mode": "dark",
+      "label": "深色模式 · 复习队列 · 暂无待复习",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "0982a36d86b9ff689cddab27187722ac32474bc1562e1460b79c3d88e760c7e5"
+    },
+    {
+      "group": "D",
+      "file": "D/P06_light_例题列表_题库未获取_筛选无结果.png",
+      "page": "P06",
+      "mode": "light",
+      "label": "浅色模式 · 例题列表 · 题库未获取 / 筛选无结果",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "e8cc32eb42eb713e8ba6c94f79fcf0a9a05a297e617e3c909f62f72909200b84"
+    },
+    {
+      "group": "D",
+      "file": "D/P06_dark_例题列表_题库未获取_筛选无结果.png",
+      "page": "P06",
+      "mode": "dark",
+      "label": "深色模式 · 例题列表 · 题库未获取 / 筛选无结果",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "943be3619318ed23391f4874e36afc115bea5a1120ee88de0f087a1d78f134ef"
+    },
+    {
+      "group": "D",
+      "file": "D/P06_light_例题列表_首载骨架.png",
+      "page": "P06",
+      "mode": "light",
+      "label": "浅色模式 · 例题列表 · 首载骨架",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "7b1d54341c0c52fe876f9669b2e3773728052826c7d9b9d3d78f28ec449dc965"
+    },
+    {
+      "group": "D",
+      "file": "D/P06_dark_例题列表_首载骨架.png",
+      "page": "P06",
+      "mode": "dark",
+      "label": "深色模式 · 例题列表 · 首载骨架",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "56fff88fa7e1238ba2f3003245bdfbfb8b7dcca203465892376cfa726fb96c65"
+    },
+    {
+      "group": "D",
+      "file": "D/P16_light_题库版本_检查中_下载中.png",
+      "page": "P16",
+      "mode": "light",
+      "label": "浅色模式 · 题库版本 · 检查中 / 下载中",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "255ebe671cbaed77aec15d8f7a792c5bd600ff264cba7610ddb98bb77b6c4cf4"
+    },
+    {
+      "group": "D",
+      "file": "D/P16_dark_题库版本_检查中_下载中.png",
+      "page": "P16",
+      "mode": "dark",
+      "label": "深色模式 · 题库版本 · 检查中 / 下载中",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "6e147445a16880965599547144037ebd1cbee2fa437431e3e826851899a08425"
+    },
+    {
+      "group": "D",
+      "file": "D/P19_light_识别结果_识别中.png",
+      "page": "P19",
+      "mode": "light",
+      "label": "浅色模式 · 识别结果 · 识别中",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "6522c8e4b0dd3b3d0cadaa7109aca74ed02bbda9bd2941e48e87bd10ba0e6d35"
+    },
+    {
+      "group": "D",
+      "file": "D/P19_dark_识别结果_识别中.png",
+      "page": "P19",
+      "mode": "dark",
+      "label": "深色模式 · 识别结果 · 识别中",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "9668ef51af0504bf47641ba3a7274894628ffff2588d3e64a2e52afb05aa0347"
+    },
+    {
+      "group": "D",
+      "file": "D/全局_light_无网络边界态_我的.png",
+      "page": "全局",
+      "mode": "light",
+      "label": "浅色模式 · 无网络边界态 · 我的",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "caaa1e6b891f03b36fbd0ab9421f4848d8ca1f12b188564bcad55c56c3da00e0"
+    },
+    {
+      "group": "D",
+      "file": "D/全局_dark_无网络边界态_我的.png",
+      "page": "全局",
+      "mode": "dark",
+      "label": "深色模式 · 无网络边界态 · 我的",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "62c702b43190ba2d0b368b2d74d4feabd63180a3005e4b5957ab09998aa14206"
+    },
+    {
+      "group": "D",
+      "file": "D/P08_light_错题列表_超长列表.png",
+      "page": "P08",
+      "mode": "light",
+      "label": "浅色模式 · 错题列表 · 超长列表",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "e8aa5737a86d45eefc408ae9ca080fdb8bd77cacb3de5bac9af12ea5765a2724"
+    },
+    {
+      "group": "D",
+      "file": "D/P08_dark_错题列表_超长列表.png",
+      "page": "P08",
+      "mode": "dark",
+      "label": "深色模式 · 错题列表 · 超长列表",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "1936c503e3aba85f6c04777e222f9d910710ccacf96c1e18f83d637125e841c3"
+    },
+    {
+      "group": "D",
+      "file": "D/P05_light_成语详情_释义超长.png",
+      "page": "P05",
+      "mode": "light",
+      "label": "浅色模式 · 成语详情 · 释义超长",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "8841833b77cbaa0a90076458ba7f5808c0247e425bfd471bffefdb929ba4aa88"
+    },
+    {
+      "group": "D",
+      "file": "D/P05_dark_成语详情_释义超长.png",
+      "page": "P05",
+      "mode": "dark",
+      "label": "深色模式 · 成语详情 · 释义超长",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "0863a21d70c6d9c69608af779a4dcbefbd8802319d1e78ad4a0d548b0e7e17fa"
+    },
+    {
+      "group": "D",
+      "file": "D/P03_light_成语库_加载中骨架.png",
+      "page": "P03",
+      "mode": "light",
+      "label": "浅色模式 · 成语库 · 加载中骨架",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "2c056215c138e70c4e58738dec7af19fd42b8267242d8c41c1f162a712478fff"
+    },
+    {
+      "group": "D",
+      "file": "D/P03_dark_成语库_加载中骨架.png",
+      "page": "P03",
+      "mode": "dark",
+      "label": "深色模式 · 成语库 · 加载中骨架",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "a57efd94221d612267121eb7e3e1ab437e372bf27fc8af3ba31d5450e3959f72"
+    },
+    {
+      "group": "D",
+      "file": "D/P03_light_成语库_数据追加.png",
+      "page": "P03",
+      "mode": "light",
+      "label": "浅色模式 · 成语库 · 数据追加",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "0cd27585e78e742dfcf0a17f6834490f296d209c9def6d3e56c3149dbdbf9ac5"
+    },
+    {
+      "group": "D",
+      "file": "D/P03_dark_成语库_数据追加.png",
+      "page": "P03",
+      "mode": "dark",
+      "label": "深色模式 · 成语库 · 数据追加",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "f2f2b7a58dc4a3157f62e2baa56f59cffde00348b3910bf4433279327699b2d2"
+    },
+    {
+      "group": "D",
+      "file": "D/P03_light_成语库_已到末尾.png",
+      "page": "P03",
+      "mode": "light",
+      "label": "浅色模式 · 成语库 · 已到末尾",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "1129fc5e0316e1b0fcba70127125566d43c140ad1219307151bdb7edf8692b95"
+    },
+    {
+      "group": "D",
+      "file": "D/P03_dark_成语库_已到末尾.png",
+      "page": "P03",
+      "mode": "dark",
+      "label": "深色模式 · 成语库 · 已到末尾",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "faae1e53f41dd89e500ecfb71959aab88f784409e8b66344818bf72cd6a4e01e"
+    },
+    {
+      "group": "E",
+      "file": "E/P24_light_列表态.png",
+      "page": "P24",
+      "mode": "light",
+      "label": "浅色模式 · 列表态",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "426da3501b2786cddb4c582a3cf1cfb36cc123e3541db7db47350cbd775d87e1"
+    },
+    {
+      "group": "E",
+      "file": "E/P24_dark_列表态.png",
+      "page": "P24",
+      "mode": "dark",
+      "label": "深色模式 · 列表态",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "ef07fa179228df43d2ce05436e377114a2b2579e07c5f343ff57a31822a778c5"
+    },
+    {
+      "group": "E",
+      "file": "E/P24_light_空态.png",
+      "page": "P24",
+      "mode": "light",
+      "label": "浅色模式 · 空态",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "5c005d011c30eb4d08e4e137a6c35eaf9ff20b540ac60f405f07c8dcbedd99f9"
+    },
+    {
+      "group": "E",
+      "file": "E/P24_dark_空态.png",
+      "page": "P24",
+      "mode": "dark",
+      "label": "深色模式 · 空态",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "cc5703a866bc1488331e8b783241f60d1f128cdcc29932b123d60698e8f335bc"
+    },
+    {
+      "group": "E",
+      "file": "E/P25_light_给释义选成语_未答.png",
+      "page": "P25",
+      "mode": "light",
+      "label": "浅色模式 · 给释义选成语·未答",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "c16fd4f71b007d3dc6ca75dc89e5ba7442b679c68d8aea6e7bf7d4a8e281e355"
+    },
+    {
+      "group": "E",
+      "file": "E/P25_dark_给释义选成语_未答.png",
+      "page": "P25",
+      "mode": "dark",
+      "label": "深色模式 · 给释义选成语·未答",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "dbf7942f055a658b9f8896a549f1f9d8e9c8df93b1e28536bc1323e6f323042f"
+    },
+    {
+      "group": "E",
+      "file": "E/P25_light_给成语选释义_未答.png",
+      "page": "P25",
+      "mode": "light",
+      "label": "浅色模式 · 给成语选释义·未答",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "8fbf86b1dc53e78c871e4f038d544c7e2b58a12cb2445e6e0c7d93189a9bd8c6"
+    },
+    {
+      "group": "E",
+      "file": "E/P25_dark_给成语选释义_未答.png",
+      "page": "P25",
+      "mode": "dark",
+      "label": "深色模式 · 给成语选释义·未答",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "93bc1d758968a6ad9642a35215a92fa5a38a5ff7652342408042b3166ee89eee"
+    },
+    {
+      "group": "E",
+      "file": "E/P25_light_回答正确.png",
+      "page": "P25",
+      "mode": "light",
+      "label": "浅色模式 · 回答正确",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "df1926f06d77ebb67bde7e7139fdc0dcaf4a016fc6d072108ea381b6751c212b"
+    },
+    {
+      "group": "E",
+      "file": "E/P25_dark_回答正确.png",
+      "page": "P25",
+      "mode": "dark",
+      "label": "深色模式 · 回答正确",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "0dd04543ba2d5bfcba527ab19ce020730499f4b3f2600c85a42ff9a876c48ad9"
+    },
+    {
+      "group": "E",
+      "file": "E/P25_light_回答错误.png",
+      "page": "P25",
+      "mode": "light",
+      "label": "浅色模式 · 回答错误",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "d380a8849fb5492ccddfbf1bd413eab5d8c4b0d4f4a56956e7250a29dc95bf3f"
+    },
+    {
+      "group": "E",
+      "file": "E/P25_dark_回答错误.png",
+      "page": "P25",
+      "mode": "dark",
+      "label": "深色模式 · 回答错误",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "f76ca287431e394c093058303c4409da4f4529921fa4eb377fd2b071dc25805b"
+    },
+    {
+      "group": "E",
+      "file": "E/P25_light_本轮小结.png",
+      "page": "P25",
+      "mode": "light",
+      "label": "浅色模式 · 本轮小结",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "54709cc4af9e749d7270f4bf747d38614c7598ba044376770a10955a774d7f03"
+    },
+    {
+      "group": "E",
+      "file": "E/P25_dark_本轮小结.png",
+      "page": "P25",
+      "mode": "dark",
+      "label": "深色模式 · 本轮小结",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "cef964509b867ca25cc11a615d9dd7637edfe6f00dfd1634b04f86737aeb3f80"
+    },
+    {
+      "group": "E",
+      "file": "E/P25_light_退出确认弹层.png",
+      "page": "P25",
+      "mode": "light",
+      "label": "浅色模式 · 退出确认弹层",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "38a899a4d73a5557cabf94fc522a4f0edf845ca15639e049dcb111d88392e92b"
+    },
+    {
+      "group": "E",
+      "file": "E/P25_dark_退出确认弹层.png",
+      "page": "P25",
+      "mode": "dark",
+      "label": "深色模式 · 退出确认弹层",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "366aa4b1426b6f536f6b8ecc5494547e74ccbf254676f25a67e41caf3841342a"
+    },
+    {
+      "group": "E",
+      "file": "E/P25_light_空范围.png",
+      "page": "P25",
+      "mode": "light",
+      "label": "浅色模式 · 空范围",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "4ddc789726e6c916c4e23f04289f9dd52c6781ddb188603fc6eb4b9bc2a6cd5f"
+    },
+    {
+      "group": "E",
+      "file": "E/P25_dark_空范围.png",
+      "page": "P25",
+      "mode": "dark",
+      "label": "深色模式 · 空范围",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "0b2be7dd159654e011c0c2f351bd615dc92a313890020d04aff73bdafd3f52d0"
+    },
+    {
+      "group": "E",
+      "file": "E/P25_light_候选项不足.png",
+      "page": "P25",
+      "mode": "light",
+      "label": "浅色模式 · 候选项不足",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "45056263b77426afeab804f056b72f8cbe1cf0460355432050f9edaeac811695"
+    },
+    {
+      "group": "E",
+      "file": "E/P25_dark_候选项不足.png",
+      "page": "P25",
+      "mode": "dark",
+      "label": "深色模式 · 候选项不足",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "1324d91d4a3cbffc0eef1bf183778ee810eecde82e2fb9125e6dfa54adff71a0"
+    },
+    {
+      "group": "F",
+      "file": "F/P03_light_成语库_三态列表.png",
+      "page": "P03",
+      "mode": "light",
+      "label": "浅色模式 · 成语库 · 三态列表",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "c465acc51565479322f56690fd495420615934312909b8615d7e4cd28b397ac5"
+    },
+    {
+      "group": "F",
+      "file": "F/P03_dark_成语库_三态列表.png",
+      "page": "P03",
+      "mode": "dark",
+      "label": "深色模式 · 成语库 · 三态列表",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "d225f9a9628906faaa3cb131809aa737a8a3c5c4dff9baaedf9c1855a2563787"
+    },
+    {
+      "group": "F",
+      "file": "F/P03_light_成语库_题库更新失败.png",
+      "page": "P03",
+      "mode": "light",
+      "label": "浅色模式 · 成语库 · 题库更新失败",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "479d27b7cd94837e71ea2a3fdb512f77f6c5efdfae55482270d075772be7fa22"
+    },
+    {
+      "group": "F",
+      "file": "F/P03_dark_成语库_题库更新失败.png",
+      "page": "P03",
+      "mode": "dark",
+      "label": "深色模式 · 成语库 · 题库更新失败",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "883d9f6b0dbfe5ec254bc3774745a684a5728aa34755f181565efb7e7ac6242e"
+    },
+    {
+      "group": "F",
+      "file": "F/P05_light_成语详情_三态自评与收藏.png",
+      "page": "P05",
+      "mode": "light",
+      "label": "浅色模式 · 成语详情 · 三态自评与收藏",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "707a427f6aee931702669e38342d45a26738c23959d713cd0cec45c473db8f37"
+    },
+    {
+      "group": "F",
+      "file": "F/P05_dark_成语详情_三态自评与收藏.png",
+      "page": "P05",
+      "mode": "dark",
+      "label": "深色模式 · 成语详情 · 三态自评与收藏",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "3f335f9ea9517122dae46c3f42e2fc98cbca2426cec5147960cd3a854daf4838"
+    },
+    {
+      "group": "F",
+      "file": "F/P05_light_成语详情_学习状态弹层.png",
+      "page": "P05",
+      "mode": "light",
+      "label": "浅色模式 · 成语详情 · 学习状态弹层",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "a149ce6e0c35ed6a2467de20e0c2942d3afa02d6fee549f4d66fed1093e8a8d7"
+    },
+    {
+      "group": "F",
+      "file": "F/P05_dark_成语详情_学习状态弹层.png",
+      "page": "P05",
+      "mode": "dark",
+      "label": "深色模式 · 成语详情 · 学习状态弹层",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "1a9085d627ad6b067b0b09d77460a71ce78f6c2cb0d29085495fc77175ba9166"
+    },
+    {
+      "group": "F",
+      "file": "F/P09_light_录入题_掌握态列表.png",
+      "page": "P09",
+      "mode": "light",
+      "label": "浅色模式 · 录入题 · 掌握态列表",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "da21ee0cc977971c7201ba3270fb3247ef8dcfe5e4aa59adb0ccd7bd408e167a"
+    },
+    {
+      "group": "F",
+      "file": "F/P09_dark_录入题_掌握态列表.png",
+      "page": "P09",
+      "mode": "dark",
+      "label": "深色模式 · 录入题 · 掌握态列表",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "943fe885232a438d0c54b7fc90db7b65cce27791f4efbe0eab08b6b671d51bd4"
+    },
+    {
+      "group": "F",
+      "file": "F/P10_light_录入题详情_掌握切换.png",
+      "page": "P10",
+      "mode": "light",
+      "label": "浅色模式 · 录入题详情 · 掌握切换",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "23da2a5d85ea0064def9c31ff513e715d900e458918e48175c09271dd3073bee"
+    },
+    {
+      "group": "F",
+      "file": "F/P10_dark_录入题详情_掌握切换.png",
+      "page": "P10",
+      "mode": "dark",
+      "label": "深色模式 · 录入题详情 · 掌握切换",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "80e63a2c14d989870ab7a9fa92d280a895438ffcd9b4d31e2b07973693ec9b3b"
+    },
+    {
+      "group": "F",
+      "file": "F/P13_light_我的_五项统计.png",
+      "page": "P13",
+      "mode": "light",
+      "label": "浅色模式 · 我的 · 五项统计",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "54dbed6ff916446cb0e3431cd75e8a116ef8ee20c466cdda20933daa2b6fb583"
+    },
+    {
+      "group": "F",
+      "file": "F/P13_dark_我的_五项统计.png",
+      "page": "P13",
+      "mode": "dark",
+      "label": "深色模式 · 我的 · 五项统计",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "69503bdda31c703ffc7d7792ea3a708c394c95889da98c53304c0e74e46e6f20"
+    },
+    {
+      "group": "F",
+      "file": "F/P13_light_我的_五项全_0_空态.png",
+      "page": "P13",
+      "mode": "light",
+      "label": "浅色模式 · 我的 · 五项全 0 空态",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "4011ea07a8c44155d74f9c057dfe1b3dd73ab5fbe4555c8a7909c04c2a0894ea"
+    },
+    {
+      "group": "F",
+      "file": "F/P13_dark_我的_五项全_0_空态.png",
+      "page": "P13",
+      "mode": "dark",
+      "label": "深色模式 · 我的 · 五项全 0 空态",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "ddda9fddb42d3cbb8f91c002034b87602f7627872d229a9d0f60d3bfd9ceff50"
+    },
+    {
+      "group": "F",
+      "file": "F/P24_light_我的收藏_加载态.png",
+      "page": "P24",
+      "mode": "light",
+      "label": "浅色模式 · 我的收藏 · 加载态",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "8b12a2e79c7c140a68ff87b7c8225fb2a24b3307c219e51d6625ec06683bfabb"
+    },
+    {
+      "group": "F",
+      "file": "F/P24_dark_我的收藏_加载态.png",
+      "page": "P24",
+      "mode": "dark",
+      "label": "深色模式 · 我的收藏 · 加载态",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "02a215cb259fb51cda8bafef754212d9bcb7262d917bdaad470cd593984e8274"
+    },
+    {
+      "group": "F",
+      "file": "F/P24_light_我的收藏_读取失败.png",
+      "page": "P24",
+      "mode": "light",
+      "label": "浅色模式 · 我的收藏 · 读取失败",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "c15344ebe3b5e28167445e488735081875a0b4e2ac01011aa2c33d5ca7c13838"
+    },
+    {
+      "group": "F",
+      "file": "F/P24_dark_我的收藏_读取失败.png",
+      "page": "P24",
+      "mode": "dark",
+      "label": "深色模式 · 我的收藏 · 读取失败",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "4ae8b10c4b8555bea9c728dd279e915b7b3fdd990fec1f16df42af28689dac24"
+    },
+    {
+      "group": "F",
+      "file": "F/P25_light_成语自测_加载态.png",
+      "page": "P25",
+      "mode": "light",
+      "label": "浅色模式 · 成语自测 · 加载态",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "2142ba23f867d51047c81db7998f696bed72d18ed0c40736e11c2147e4eade83"
+    },
+    {
+      "group": "F",
+      "file": "F/P25_dark_成语自测_加载态.png",
+      "page": "P25",
+      "mode": "dark",
+      "label": "深色模式 · 成语自测 · 加载态",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "2ecb75018865237e73a44a3abcc80719bbf1e6bced8e95cd3f2a8c3ba6adc5d2"
+    },
+    {
+      "group": "F",
+      "file": "F/P25_light_成语自测_读取失败.png",
+      "page": "P25",
+      "mode": "light",
+      "label": "浅色模式 · 成语自测 · 读取失败",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "8d255f671851ca4e5c0d80014df68ad9ddb5eb021fa465e44fb67291cbdebf37"
+    },
+    {
+      "group": "F",
+      "file": "F/P25_dark_成语自测_读取失败.png",
+      "page": "P25",
+      "mode": "dark",
+      "label": "深色模式 · 成语自测 · 读取失败",
+      "size": [
+        375,
+        812
+      ],
+      "sha256": "f7173bf9c6e7ad11a99cb64a819c1eea9c48df90ce18348e95120aa358f31053"
     }
   ]
 }

@@ -35,6 +35,8 @@ GROUPS = [
     ("B", "高保真全页-emerald-B-P06-P13-v2.html", "P06–P13 主态"),
     ("C", "高保真全页-emerald-C-P14-P23-v2.html", "P14–P23 主态"),
     ("D", "高保真空态与异常态-emerald-D-v2.html", "空态与异常态"),
+    ("E", "高保真全页-emerald-E-P24-P25-v3.html", "P24–P25 阶段6 主态（v3）"),
+    ("F", "高保真空态与异常态-emerald-F-v3.html", "阶段6 变更状态（v3）"),
 ]
 
 MAGENTA = (255, 0, 255)
@@ -63,7 +65,7 @@ def slug(text):
     return s or "screen"
 
 
-def render(html_path, tag, height=32000):
+def render(html_path, tag, height=40000):
     src = html_path.read_text(encoding="utf-8")
     src = src.replace("</head>", "<style>html,body{background:#FF00FF !important;}</style></head>")
     tmp = Path(os.environ["TEMP"]) / ("baseline_%s.html" % tag)
@@ -126,7 +128,7 @@ def sha256(path):
 
 def build():
     OUT.mkdir(parents=True, exist_ok=True)
-    manifest = {"source": "docs/design/*-v2.html", "groups": [], "screens": []}
+    manifest = {"source": "docs/design/*-v2.html + *-v3.html", "groups": [], "screens": []}
     total = 0
     for letter, fname, desc in GROUPS:
         html_path = DESIGN / fname
@@ -172,7 +174,7 @@ def write_index(manifest):
     lines = [
         "# 截图基线",
         "",
-        "来源：`docs/design/` 下四个 `*-v2.html`（当前视觉事实源）。",
+        "来源：`docs/design/` 下四个 `*-v2.html` + 两个 `*-v3.html`（当前视觉事实源）。",
         "生成：`python tools/baseline.py`；校验：`python tools/baseline.py --check`。",
         "",
         "| 组 | 源文件 | 说明 | 屏数 |",

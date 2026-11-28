@@ -1,10 +1,10 @@
 // GENERATED FILE — DO NOT EDIT.
-// Source: shared/tokens/tokens.json (docs/设计规范-v1.7.md)
+// Source: shared/tokens/tokens.json (docs/设计规范-v1.8.md)
 // Regenerate: python tools/gen_tokens.py
 
 import SwiftUI
 
-/// 设计令牌。数值唯一来源：docs/设计规范-v1.7.md
+/// 设计令牌。数值唯一来源：docs/设计规范-v1.8.md
 public struct TokenColors: Sendable {
     public let accent: Color
     public let accent2: Color
