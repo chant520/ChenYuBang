@@ -3,10 +3,10 @@ package com.chenyubang.feature.idiom
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
-import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.room.Room
@@ -89,12 +89,12 @@ class P05IdiomDetailReviewEntryTest {
             )
         }
         awaitText("复习这个成语")
-        composeTestRule.onNodeWithText("复习这个成语").performScrollTo().assertIsEnabled()
+        composeTestRule.onAllNodesWithText("复习这个成语")[0].performScrollTo().assertIsEnabled()
 
         addMistake("m-2")
         composeTestRule.runOnIdle { revision++ }
         awaitText("复习这个成语")
-        composeTestRule.onNodeWithText("复习这个成语").performClick()
+        composeTestRule.onAllNodesWithText("复习这个成语")[0].performClick()
         composeTestRule.waitUntil(timeoutMillis = 5_000) { started != null }
 
         assertEquals(2, started)
@@ -115,13 +115,38 @@ class P05IdiomDetailReviewEntryTest {
             )
         }
         awaitText("复习这个成语")
-        composeTestRule.onNodeWithText("复习这个成语").performScrollTo().assertIsEnabled()
+        composeTestRule.onAllNodesWithText("复习这个成语")[0].performScrollTo().assertIsEnabled()
         runBlocking { database.reviewDao().setState("m-1", MistakeReviewState.MASTERED) }
 
-        composeTestRule.onNodeWithText("复习这个成语").performClick()
+        composeTestRule.onAllNodesWithText("复习这个成语")[0].performClick()
         awaitText("这个成语下还没有待复习的错题")
 
         assertNull(started)
+    }
+
+    /** 稿面 v2.4 双入口：标签区上方与页尾按钮都可点，且共用同一复习路由回调。 */
+    @Test
+    fun bothReviewEntriesAreClickableAndStartReview() {
+        addMistake("m-1")
+        var starts = 0
+        composeTestRule.setContent {
+            P05IdiomDetailRoute(
+                idiomId = idiomId,
+                database = database,
+                onBack = {},
+                onOpenMistakes = {},
+                onOpenExample = {},
+                onReviewIdiom = { starts++ },
+            )
+        }
+        awaitText("复习这个成语")
+        val entries = composeTestRule.onAllNodesWithText("复习这个成语")
+        entries.assertCountEquals(2)
+        entries[0].performScrollTo().performClick()
+        entries[1].performScrollTo().performClick()
+        composeTestRule.waitUntil(timeoutMillis = 5_000) { starts == 2 }
+
+        assertEquals(2, starts)
     }
 
     private fun awaitText(text: String) {

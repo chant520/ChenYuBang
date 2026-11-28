@@ -2,6 +2,13 @@ import CangyuDesignSystem
 import CangyuTokens
 import SwiftUI
 
+/// P25 双端口径（决策 2）：文案逐字跟齐 Android 主线，集中为常量供单测钉住。
+enum P25SelfTestCopy {
+    static let exitTitle = "退出本轮自测？"
+    static let insufficientTitle = "可自测的候选项不足"
+    static let insufficientDetail = "全库至少需要 4 条词与释义都唯一的成语，当前不足以组成四选一。"
+}
+
 /// P25 纯渲染层：题目、选项、即时反馈、页内小结与退出确认都由真实状态驱动。
 public struct P25SelfTestContent: View {
     private let state: P25SelfTestState
@@ -77,8 +84,8 @@ public struct P25SelfTestContent: View {
             .padding(.vertical, Tokens.Space.block)
         case .insufficientCandidates:
             CEmptyState(
-                title: "可用的候选项不足",
-                description: "全库至少需要 4 条词与释义都唯一的成语，请更新题库后再试。",
+                title: P25SelfTestCopy.insufficientTitle,
+                description: P25SelfTestCopy.insufficientDetail,
                 actionTitle: "返回我的",
                 onAction: actions.onLeave
             )
@@ -193,10 +200,11 @@ public struct P25SelfTestContent: View {
         VStack(alignment: .leading, spacing: Tokens.Space.block) {
             CCard {
                 CLabel("本轮小结")
+                // 决策 2：小结三项数值同用 --text，取消原先正确数/错误数的分色。
                 HStack(alignment: .top, spacing: Tokens.Space.block) {
                     scoreColumn(value: summary.total, label: "题量", valueColor: colors.text)
-                    scoreColumn(value: summary.correct, label: "正确数", valueColor: colors.tintfg)
-                    scoreColumn(value: summary.wrong, label: "错误数", valueColor: colors.errfg)
+                    scoreColumn(value: summary.correct, label: "正确数", valueColor: colors.text)
+                    scoreColumn(value: summary.wrong, label: "错误数", valueColor: colors.text)
                     Spacer(minLength: 0)
                 }
                 .padding(.top, Tokens.Space.lmetaTop)
@@ -221,8 +229,7 @@ public struct P25SelfTestContent: View {
     private var exitConfirmation: some View {
         COverlay(
             style: .dialog,
-            title: "退出成语自测",
-            description: "退出会丢弃本轮进度。",
+            title: P25SelfTestCopy.exitTitle,
             onDismiss: actions.onCancelExit,
             cancelEnabled: false
         ) {

@@ -1,5 +1,6 @@
 package com.chenyubang.feature.idiom
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -80,7 +81,10 @@ fun P24FavoriteContent(
 ) {
     val colors = if (isSystemInDarkTheme()) Tokens.Dark else Tokens.Light
     Column(
-        Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
+        Modifier
+            .fillMaxSize()
+            .background(colors.page)
+            .verticalScroll(rememberScrollState()),
     ) {
         FavoriteHeader(colors = colors, onBack = onBack)
         FavoriteBody(

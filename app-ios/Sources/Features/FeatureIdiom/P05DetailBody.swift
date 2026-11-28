@@ -3,8 +3,8 @@ import CangyuData
 import CangyuDesignSystem
 import CangyuTokens
 
-/// P05 详情正文（释义 → 相关题目 → 录入题占位 → 单成语复习入口）：从长页拆出以控文件/类型长度。
-/// 底部「复习这个成语」按钮与 D1 单成语复习入口逻辑保持不变，仅作视图拆分。
+/// P05 详情正文（词义 → 易错点 → 近义与反义 → 相关题目 → 录入题占位 → 单成语复习入口）。
+/// 稿面 A P05 v2.4：释义+出处合并为「词义」卡；标签区上方与页尾各有一个「复习这个成语」入口。
 struct P05DetailBody: View {
     private let detail: IdiomDetailView
     private let colors: TokenColors
@@ -47,13 +47,28 @@ struct P05DetailBody: View {
             CIcon(.sound, size: Tokens.Icon.n21, strokeWidth: 1.6, color: colors.text3)
                 .accessibilityHidden(true)
         }
-        HStack {
-            CTag(text: detail.color)
-            Spacer(minLength: 0)
+        // 标题/拼音/标签区（稿面 A P05 v2.4）：标签下 12px 处放上方复习入口，与页尾按钮同回调。
+        VStack(alignment: .leading, spacing: Tokens.Space.dangerY) {
+            HStack {
+                CTag(text: detail.color)
+                Spacer(minLength: 0)
+            }
+            reviewButton
         }
 
-        infoCard("释义", detail.sense, strong: true)
-        infoCard("出处", detail.origin)
+        // 词义卡（稿面 A P05 v2.4 A17）：释义 + 出处合并为一卡，近义与反义仍独立成卡。
+        CCard {
+            CLabel("词义")
+            Text(detail.sense)
+                .font(.system(size: Tokens.Font.n13, weight: .semibold))
+                .foregroundStyle(colors.text)
+                .fixedSize(horizontal: false, vertical: true)
+            Text(detail.origin)
+                .font(.system(size: Tokens.Font.n13))
+                .foregroundStyle(colors.text2)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.top, Tokens.Space.lsubTop)
+        }
 
         CCard {
             CLabel("易错点")
@@ -75,13 +90,8 @@ struct P05DetailBody: View {
         relatedExamplesCard()
         myExamplesPlaceholder()
 
-        // D1 单成语复习入口（决策 H）：按该成语待复习错题数判定可点性，为 0 时保持置灰并说明原因。
-        CButton(
-            text: "复习这个成语",
-            variant: .primary,
-            enabled: pendingReviewCount > 0,
-            action: { onReviewIdiom(detail.word) }
-        )
+        // D1 单成语复习入口（决策 H）：页尾按钮与顶部入口共用回调，按待复习数判定可点性。
+        reviewButton
         if pendingReviewCount == 0 {
             Text("这个成语下还没有待复习的错题")
                 .font(.system(size: Tokens.Font.n12))
@@ -89,14 +99,14 @@ struct P05DetailBody: View {
         }
     }
 
-    private func infoCard(_ label: String, _ value: String, strong: Bool = false) -> some View {
-        CCard {
-            CLabel(label)
-            Text(value)
-                .font(.system(size: Tokens.Font.n13, weight: strong ? .semibold : .regular))
-                .foregroundStyle(strong ? colors.text : colors.text2)
-                .fixedSize(horizontal: false, vertical: true)
-        }
+    /// 稿面 v2.4 双入口：标签区上方与页尾复用同一按钮构造与复习回调。
+    private var reviewButton: some View {
+        CButton(
+            text: "复习这个成语",
+            variant: .primary,
+            enabled: pendingReviewCount > 0,
+            action: { onReviewIdiom(detail.word) }
+        )
     }
 
     private func bodyText(_ text: String) -> some View {
