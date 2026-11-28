@@ -67,12 +67,12 @@
   .more { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--text2); white-space: nowrap; }
   .more svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 1.6; }
 
-  .lbl { margin: 0 0 7px; font-size: 11px; font-weight: 700; letter-spacing: .1em; color: var(--text3); }
+  .lbl { margin: 0 0 7px; font-size: 12px; font-weight: 700; letter-spacing: .1em; color: var(--text3); }
   .txt { margin: 0 0 7px; font-size: 13px; line-height: 1.7; color: var(--text2); }
   .txt:last-child { margin-bottom: 0; }
   .txt b { color: var(--text); font-weight: 700; }
   .txt.k { color: var(--text); }
-  .txt.dim { margin: 6px 0 0; font-size: 11.5px; line-height: 1.65; color: var(--text3); }
+  .txt.dim { margin: 6px 0 0; font-size: 12px; line-height: 1.65; color: var(--text3); }
 
   /* ---------- 数字 ---------- */
   .nums { display: flex; gap: 30px; margin-top: 14px; flex-wrap: wrap; }
@@ -81,7 +81,7 @@
   .numv { font-size: 30px; font-weight: 700; line-height: 1; letter-spacing: .01em; color: var(--head); }
   .numv.hot { color: var(--hot); }
   .numv.sm { font-size: 20px; }
-  .numl { margin-top: 9px; font-size: 11px; color: var(--text2); letter-spacing: .06em; }
+  .numl { margin-top: 9px; font-size: 12px; color: var(--text2); letter-spacing: .06em; }
 
   /* ---------- 按钮 ---------- */
   .btn { display: block; width: 100%; margin: 6px 0 0; padding: 13px 0; text-align: center;
@@ -90,7 +90,7 @@
   .btn.loading { display: flex; align-items: center; justify-content: center; gap: 9px; }
   .spinner { width: 14px; height: 14px; border: 2px solid currentColor; border-right-color: transparent;
              border-radius: 50%; }
-  .loadnote { margin: 7px 0 0; font-size: 11px; line-height: 1.65; color: var(--text3); text-align: center; }
+  .loadnote { margin: 7px 0 0; font-size: 12px; line-height: 1.65; color: var(--text3); text-align: center; }
   .disbtn { display: block; width: 100%; padding: 12px 0; text-align: center; border-radius: 6px;
             font-size: 13.5px; font-weight: 700; background: var(--disbg); color: var(--disfg);
             border: 1px solid var(--disline); }
@@ -101,23 +101,23 @@
                font-size: 13.5px; font-weight: 700; color: var(--errfg); background: transparent;
                border: 1px solid var(--errline); }
   .topbtn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 11px; border-radius: 5px;
-            background: var(--btnbg); color: var(--btnfg); font-size: 11.5px; font-weight: 700; white-space: nowrap; }
+            background: var(--btnbg); color: var(--btnfg); font-size: 12px; font-weight: 700; white-space: nowrap; }
   .topbtn.quiet { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
   .topbtn svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.7; }
   .smallrow { display: flex; gap: 8px; margin: 10px 0 0; }
-  .ghostbtn { flex: 1; padding: 10px 0; text-align: center; font-size: 11.5px; border-radius: 5px;
+  .ghostbtn { flex: 1; padding: 10px 0; text-align: center; font-size: 12px; border-radius: 5px;
               border: 1px solid var(--line); color: var(--text2); }
 
   /* ---------- 标签 / 徽标 ---------- */
   .tagrow { display: flex; gap: 8px; flex-wrap: wrap; }
-  .tag { padding: 4px 9px; border-radius: 4px; font-size: 11px; line-height: 1.4;
+  .tag { padding: 4px 9px; border-radius: 4px; font-size: 12px; line-height: 1.4;
          background: var(--tintbg); color: var(--tintfg); border: 1px solid var(--tintline); }
   .tag.ghost { background: transparent; color: var(--text3); border: 1px dashed var(--line); }
-  .distag { padding: 4px 9px; border-radius: 4px; font-size: 11px; line-height: 1.4;
+  .distag { padding: 4px 9px; border-radius: 4px; font-size: 12px; line-height: 1.4;
             background: var(--disbg); color: var(--disfg); border: 1px solid var(--disline); }
-  .badgewarn { display: inline-block; padding: 2px 6px; border-radius: 3px; font-size: 10px;
+  .badgewarn { display: inline-block; padding: 2px 6px; border-radius: 3px; font-size: 12px;
                background: var(--warnbg); color: var(--warnfg); border: 1px solid var(--warnline); }
-  .badgerr { display: inline-block; padding: 2px 6px; border-radius: 3px; font-size: 10px;
+  .badgerr { display: inline-block; padding: 2px 6px; border-radius: 3px; font-size: 12px;
              background: var(--errbg); color: var(--errfg); border: 1px solid var(--errline); }
 
   /* ---------- 警示 / 错误 ---------- */
@@ -126,13 +126,13 @@
   .warnbar svg { width: 18px; height: 18px; margin-top: 2px; flex: 0 0 auto;
                  fill: none; stroke: var(--warnfg); stroke-width: 1.8; }
   .warnbar .wt { font-size: 13px; font-weight: 700; line-height: 1.55; color: var(--warnfg); }
-  .warnbar .ws { margin-top: 4px; font-size: 11.5px; line-height: 1.65; color: var(--text2); }
+  .warnbar .ws { margin-top: 4px; font-size: 12px; line-height: 1.65; color: var(--text2); }
   .errbar { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; margin-bottom: 16px;
             border-radius: 6px; background: var(--errbg); border: 1px solid var(--errline); }
   .errbar svg { width: 18px; height: 18px; margin-top: 2px; flex: 0 0 auto;
                 fill: none; stroke: var(--errfg); stroke-width: 1.8; }
   .errbar .et { font-size: 13px; font-weight: 700; line-height: 1.55; color: var(--errfg); }
-  .errbar .es { margin-top: 4px; font-size: 11.5px; line-height: 1.65; color: var(--text2); }
+  .errbar .es { margin-top: 4px; font-size: 12px; line-height: 1.65; color: var(--text2); }
   .winline { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--warnfg); }
   .winline svg { width: 13px; height: 13px; fill: none; stroke: var(--warnfg); stroke-width: 1.9; }
   .errline-txt { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--errfg); }
@@ -145,7 +145,7 @@
            align-items: center; justify-content: center; gap: 7px; }
   .imgph svg { width: 26px; height: 26px; fill: none; stroke: var(--warnfg); stroke-width: 1.7; }
   .imgph p { margin: 0; font-size: 12.5px; font-weight: 700; color: var(--warnfg); }
-  .imgph span { font-size: 11px; color: var(--text2); }
+  .imgph span { font-size: 12px; color: var(--text2); }
   .ph-rec { flex: 1 1 auto; min-height: 140px; max-height: 250px; margin-bottom: 16px;
             display: flex; align-items: center; justify-content: center; padding: 0 26px;
             background: var(--phbg); border: 1px dashed var(--phline); border-radius: 6px; }
@@ -158,11 +158,11 @@
   .editinput .iph { color: var(--text3); }
   .editinput.focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--tintbg); }
   .editinput.err { border-color: var(--errline); color: var(--errfg); }
-  .errhint { margin: -6px 0 12px; font-size: 11.5px; line-height: 1.55; color: var(--errfg); }
+  .errhint { margin: -6px 0 12px; font-size: 12px; line-height: 1.55; color: var(--errfg); }
   .maskrow { display: flex; align-items: center; justify-content: space-between; gap: 10px;
              padding: 11px 12px; margin-bottom: 12px; border-radius: 5px;
              border: 1px solid var(--line); background: var(--inputbg); font-size: 12px; color: var(--text2); }
-  .maskrow .mbtn { font-size: 11.5px; font-weight: 700; color: var(--accent); }
+  .maskrow .mbtn { font-size: 12px; font-weight: 700; color: var(--accent); }
   .disinput { min-height: 42px; padding: 10px 12px; border-radius: 5px; background: var(--disbg);
               border: 1px solid var(--disline); font-size: 12.5px; color: var(--disfg); margin-bottom: 12px; }
 
@@ -172,14 +172,14 @@
   .lrow:last-child { border-bottom: 0; }
   .lrow .lt1 { display: flex; align-items: baseline; gap: 8px; }
   .lrow .lname { font-size: 14px; font-weight: 600; color: var(--text); letter-spacing: .01em; }
-  .lrow .lpy { font-size: 11px; color: var(--text3); }
+  .lrow .lpy { font-size: 12px; color: var(--text3); }
   .lrow .lsub { margin: 5px 0 0; font-size: 12px; line-height: 1.6; color: var(--text2); }
   .lmeta { margin: 6px 0 0; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-              font-size: 11px; color: var(--text3); }
+              font-size: 12px; color: var(--text3); }
   .lrow .lmeta { margin: 6px 0 0; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-                 font-size: 11px; color: var(--text3); }
-  .lrow .r { margin-left: auto; font-size: 11px; color: var(--text3); white-space: nowrap; }
-  .listfoot { margin: 10px 0 0; text-align: center; font-size: 11px; color: var(--text3); }
+                 font-size: 12px; color: var(--text3); }
+  .lrow .r { margin-left: auto; font-size: 12px; color: var(--text3); white-space: nowrap; }
+  .listfoot { margin: 10px 0 0; text-align: center; font-size: 12px; color: var(--text3); }
   .optrow { display: flex; gap: 9px; padding: 8px 0; font-size: 13px; line-height: 1.6;
             color: var(--text2); border-bottom: 1px solid var(--line2); }
   .optrow b { flex: 0 0 14px; color: var(--text); font-weight: 700; }
@@ -191,7 +191,7 @@
   /* ---------- 分段 / 复选 ---------- */
   .seg { display: flex; padding: 3px; border-radius: 5px; background: var(--seg); border: 1px solid var(--line);
          margin-bottom: 16px; }
-  .seg i { flex: 1; padding: 8px 0; text-align: center; font-size: 11px; font-style: normal; color: var(--text2); border-radius: 4px; }
+  .seg i { flex: 1; padding: 8px 0; text-align: center; font-size: 12px; font-style: normal; color: var(--text2); border-radius: 4px; }
   .seg i.on { background: var(--segon); color: var(--segonfg); font-weight: 700; }
   .chkrow { display: flex; align-items: center; gap: 10px; padding: 12px 0; border-bottom: 1px solid var(--line2);
             font-size: 13px; color: var(--text); }
@@ -202,11 +202,11 @@
   .chk.off { background: transparent; border-color: var(--line); }
   .chk.dis { background: var(--disbg); border-color: var(--disline); }
   .chkrow.dis { color: var(--disfg); }
-  .chkrow .r { margin-left: auto; font-size: 11px; color: var(--text3); }
+  .chkrow .r { margin-left: auto; font-size: 12px; color: var(--text3); }
 
   /* ---------- 标签栏 / FAB ---------- */
   .tabs { display: flex; flex: 0 0 auto; background: var(--tabbg); border-top: 1px solid var(--line); }
-  .tab { flex: 1; position: relative; text-align: center; padding: 11px 0 13px; font-size: 11px; color: var(--text3); }
+  .tab { flex: 1; position: relative; text-align: center; padding: 11px 0 13px; font-size: 12px; color: var(--text3); }
   .tab svg { display: block; margin: 0 auto 5px; width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.5; }
   .tab.on { color: var(--accent); font-weight: 700; }
   .tab.on::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--accent); }
@@ -237,7 +237,7 @@
   .shutter .gbtn { width: 40px; height: 40px; border-radius: 5px; border: 1px solid rgba(255,255,255,.5);
                    display: flex; align-items: center; justify-content: center; }
   .shutter .gbtn svg { width: 20px; height: 20px; fill: none; stroke: rgba(255,255,255,.85); stroke-width: 1.6; }
-  .shutter .ctxt { width: 40px; text-align: center; font-size: 11px; color: rgba(255,255,255,.75); }
+  .shutter .ctxt { width: 40px; text-align: center; font-size: 12px; color: rgba(255,255,255,.75); }
 
   .cropwrap { position: relative; border-radius: 6px; overflow: hidden; background: #0b1410; }
   .cropwrap .paper { width: 100%; min-height: 300px; padding: 30px 20px; background: #efece4; color: #26312a;
@@ -381,6 +381,7 @@
 <p><b>v2.2 变更说明</b>（2026-11-19，省份口径同步）：省考勾选时省份默认全选、省份仅作筛选维度，取消「未选省份」异常态与橙警示。P13「我的」页考试范围行的「省考（未选省份）」改普通「省考」。仅文案与措辞同步，颜色/字号/圆角/间距/图标数值不变。</p>
 
 <p><b>v2.3 变更说明</b>（2026-11-27，UI 审核六条·B 稿）：P08 顶部「拍照录题」由绿填充改绿描边幽灵样式（`.topbtn.quiet`），把绿主行动留给底部「开始复习」按钮；FAB 与 tab 选中指示条按既定口径保留。新增通用类 `.topbtn.quiet`，色值/字号/圆角/间距档与 P06–P13 编号不变。</p>
+<p><b>v2.4 变更说明</b>（2026-11-28，设计师开工清单 v3 基准）：P06 脚注与加载态口径（B04/D14）、P07 链接说明与书签态（B05/B10/B18）、P08 数字一致与拍照引导统一（B03/D12）、P09 状态标识统一（B08）、P10 遮罩态隐藏答案卡（B01）、P11 退出文案去重与末题按钮（B09/B11/B22）、P12 数字同号与范围展开（B16/B17）、P13 清空数据补不可恢复说明与 P23 入口（B02/C06）。全局字号下限提至 12px、热区 44×44 由实现层承担。仅文案/状态调整，颜色/圆角/字号档不变。</p>
 
   <p>第二批 P06–P13：例题两条、错题三条、复习两条、我的。同上批一致，全部取自规范第 2–4 章；深色按页底口径。</p>
   <p>两处按规范做了取舍：P10 顶部「删除」改中性色，把红留给底部「删除这道错题」（一处红规则）；P11 判错不铺红——判错不是状态错误，红只归破坏性动作与硬错误。</p>
@@ -422,7 +423,7 @@
       <div class="lmeta"><span>2021 · 国考 · 逻辑填空</span><span class="r" style="margin-left:auto">关联 2 个成语</span></div>
     </div>
   </div>
-  <p class="listfoot">共 512 条 · 已到末尾</p>
+  <p class="listfoot">共 512 条 · 上拉加载更多</p>
 </div>
 <div class="tabs">
   <div class="tab"><svg viewBox="0 0 24 24"><path d="M4 4h6.5v16H4z"/><path d="M13.5 4H20v16h-6.5z"/></svg><span>成语</span></div>
@@ -468,7 +469,7 @@
       <div class="lmeta"><span>2021 · 国考 · 逻辑填空</span><span class="r" style="margin-left:auto">关联 2 个成语</span></div>
     </div>
   </div>
-  <p class="listfoot">共 512 条 · 已到末尾</p>
+  <p class="listfoot">共 512 条 · 上拉加载更多</p>
 </div>
 <div class="tabs">
   <div class="tab"><svg viewBox="0 0 24 24"><path d="M4 4h6.5v16H4z"/><path d="M13.5 4H20v16h-6.5z"/></svg><span>成语</span></div>
@@ -484,7 +485,7 @@
 
 </div>
 
-<p class="grphd">P07 · 例题详情<span>二级页；题干与选项里的成语是链接，点进 P05</span></p>
+<p class="grphd">P07 · 例题详情<span>二级页；绿色标注的成语可点进详情</span></p>
 
 <div class="row">
 
@@ -494,7 +495,7 @@
     <div class="phone h812 lt">
 <div class="top"><svg class="ic" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>
   <div class="pname">例题详情</div>
-  <svg class="ic dim" viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg></div>
+  <svg class="ic ac" style="fill:var(--accent);stroke:var(--accent)" viewBox="0 0 24 24" aria-label="已收藏"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span style="display:none">已收藏</span></div>
 <div class="body" style="padding-top:16px">
   <div class="card" style="padding:12px 16px;margin-bottom:14px">
     <div class="lmeta" style="margin:0"><span>2023 · 国考 · 言语理解 · 单选题</span></div>
@@ -518,8 +519,8 @@
   <div class="card">
     <p class="lbl">本题关联成语</p>
     <div class="tagrow">
-      <span class="tag">按部就班</span>
-      <span class="tag">别出心裁</span>
+      <span class="tag" style="text-decoration:underline">按部就班</span>
+      <span class="tag" style="text-decoration:underline">别出心裁</span>
     </div>
   </div>
 
@@ -539,7 +540,7 @@
     <div class="phone h812 dk">
 <div class="top"><svg class="ic" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>
   <div class="pname">例题详情</div>
-  <svg class="ic dim" viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg></div>
+  <svg class="ic dim" viewBox="0 0 24 24" aria-label="未收藏"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span style="display:none">未收藏</span></div>
 <div class="body" style="padding-top:16px">
   <div class="card" style="padding:12px 16px;margin-bottom:14px">
     <div class="lmeta" style="margin:0"><span>2023 · 国考 · 言语理解 · 单选题</span></div>
@@ -563,8 +564,8 @@
   <div class="card">
     <p class="lbl">本题关联成语</p>
     <div class="tagrow">
-      <span class="tag">按部就班</span>
-      <span class="tag">别出心裁</span>
+      <span class="tag" style="text-decoration:underline">按部就班</span>
+      <span class="tag" style="text-decoration:underline">别出心裁</span>
     </div>
   </div>
 
@@ -591,6 +592,7 @@
 <div class="top"><div class="pname">错题</div>
   <span class="topbtn quiet"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13"/><circle cx="12" cy="13.5" r="3.6"/><path d="M8.5 7l1.4-3h4.2l1.4 3"/></svg>拍照录题</span></div>
 <div class="body">
+  <p class="hint" style="margin:0 0 10px">拍照录入并标记为错题</p>
   <div class="card" style="margin-bottom:14px">
     <div class="nums" style="margin-top:0">
       <div class="numcell"><div class="numv">12</div><div class="numl">错题总数</div></div>
@@ -602,6 +604,7 @@
     <i class="on">按成语分组</i><i>按录入时间</i><i>按考试类型</i>
   </div>
 
+  <!-- 命中区≥44px：.lrow 单行高 43px，上下各 1px 透明扩展，不改 padding -->
   <div class="list" style="margin-bottom:14px">
     <div class="lrow">
       <div class="lt1"><span class="lname">按部就班</span><span class="r" style="margin-left:auto">3 道</span></div>
@@ -624,6 +627,7 @@
       <p class="lsub">对象误用 1</p>
     </div>
   </div>
+  <p class="listfoot">共 6 组 · 显示 5/6 组，下滑查看全部</p>
 
   <div class="btn">开始复习 · 7 道待复习</div>
 </div>
@@ -646,6 +650,7 @@
 <div class="top"><div class="pname">错题</div>
   <span class="topbtn quiet"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13"/><circle cx="12" cy="13.5" r="3.6"/><path d="M8.5 7l1.4-3h4.2l1.4 3"/></svg>拍照录题</span></div>
 <div class="body">
+  <p class="hint" style="margin:0 0 10px">拍照录入并标记为错题</p>
   <div class="card" style="margin-bottom:14px">
     <div class="nums" style="margin-top:0">
       <div class="numcell"><div class="numv">12</div><div class="numl">错题总数</div></div>
@@ -657,6 +662,7 @@
     <i class="on">按成语分组</i><i>按录入时间</i><i>按考试类型</i>
   </div>
 
+  <!-- 命中区≥44px：.lrow 单行高 43px，上下各 1px 透明扩展，不改 padding -->
   <div class="list" style="margin-bottom:14px">
     <div class="lrow">
       <div class="lt1"><span class="lname">按部就班</span><span class="r" style="margin-left:auto">3 道</span></div>
@@ -679,6 +685,7 @@
       <p class="lsub">对象误用 1</p>
     </div>
   </div>
+  <p class="listfoot">共 6 组 · 显示 5/6 组，下滑查看全部</p>
 
   <div class="btn">开始复习 · 7 道待复习</div>
 </div>
@@ -726,7 +733,7 @@
     </div>
     <div class="lrow">
       <p class="lsub" style="margin:0">文段中三处成语使用，哪一处不当</p>
-      <div class="lmeta"><span class="tag">我录入</span><span>2026-10-28 录入</span><span>未标错</span></div>
+      <div class="lmeta"><span>2026-10-28 录入</span><span class="tag ghost">未标错</span></div>
     </div>
   </div>
   <p class="listfoot">3 道 · 已到末尾</p>
@@ -760,7 +767,7 @@
     </div>
     <div class="lrow">
       <p class="lsub" style="margin:0">文段中三处成语使用，哪一处不当</p>
-      <div class="lmeta"><span class="tag">我录入</span><span>2026-10-28 录入</span><span>未标错</span></div>
+      <div class="lmeta"><span>2026-10-28 录入</span><span class="tag ghost">未标错</span></div>
     </div>
   </div>
   <p class="listfoot">3 道 · 已到末尾</p>
@@ -802,10 +809,14 @@
     <span class="mbtn">显示答案</span>
   </div>
 
-  <div class="card">
+  <!-- 遮罩态：点「显示答案」后展开下方答案卡；本屏不展示正确答案文本 -->
+  <div class="card" style="display:none">
     <p class="lbl">正确答案与解析</p>
     <p class="txt"><b>正确答案：A</b></p>
     <p class="txt">「按部就班」含墨守成规之意，与「创新方案」语义相冲。</p>
+  </div>
+  <div class="card card-hint" style="border:1px dashed var(--line);background:var(--surface2)">
+    <p class="txt dim" style="margin:0;text-align:center">点上方「显示答案」查看正确答案与解析</p>
   </div>
 
   <div class="card" style="padding:12px 16px">
@@ -817,8 +828,9 @@
     <p class="lbl">关联成语</p>
     <div class="tagrow">
       <span class="tag">按部就班</span>
-      <span class="tag ghost">加一个</span>
+      <span class="tag ghost">+ 加一个</span>
     </div>
+    <p class="hint" style="margin-top:8px">点这里选成语，保存后分组同步更新</p>
   </div>
 
   <div class="card soft">
@@ -866,10 +878,14 @@
     <span class="mbtn">显示答案</span>
   </div>
 
-  <div class="card">
+  <!-- 遮罩态：点「显示答案」后展开下方答案卡；本屏不展示正确答案文本 -->
+  <div class="card" style="display:none">
     <p class="lbl">正确答案与解析</p>
     <p class="txt"><b>正确答案：A</b></p>
     <p class="txt">「按部就班」含墨守成规之意，与「创新方案」语义相冲。</p>
+  </div>
+  <div class="card card-hint" style="border:1px dashed var(--line);background:var(--surface2)">
+    <p class="txt dim" style="margin:0;text-align:center">点上方「显示答案」查看正确答案与解析</p>
   </div>
 
   <div class="card" style="padding:12px 16px">
@@ -881,8 +897,9 @@
     <p class="lbl">关联成语</p>
     <div class="tagrow">
       <span class="tag">按部就班</span>
-      <span class="tag ghost">加一个</span>
+      <span class="tag ghost">+ 加一个</span>
     </div>
+    <p class="hint" style="margin-top:8px">点这里选成语，保存后分组同步更新</p>
   </div>
 
   <div class="card soft">
@@ -912,7 +929,7 @@
     <p class="vname">浅色模式 · 复习队列<em>P11</em></p>
 
     <div class="phone h812 lt">
-<div class="top" style="padding-bottom:10px"><svg class="ic" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6l-12 12"/></svg><div class="pname sub" style="font-size:13px;font-weight:600;color:var(--text2)">复习中 · 退出会二次确认</div></div>
+<div class="top" style="padding-bottom:10px"><svg class="ic" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6l-12 12"/></svg><div class="pname sub" style="font-size:13px;font-weight:600;color:var(--text2)">复习中</div></div>
 <div class="body" style="padding-top:18px">
   <div class="row1" style="margin-bottom:14px">
     <span style="font-size:12px;font-weight:700;color:var(--head)">第 2 题 / 共 7 题</span>
@@ -933,6 +950,7 @@
       <span class="lbl" style="margin:0">判分</span>
       <span class="tag">正确答案 A</span>
     </div>
+    <p class="txt"><b>你选 B · 正确 A</b></p>
     <p class="txt">选错了。此处语境要「不因循守旧」，「按部就班」含墨守成规之意，与后文「因时制宜」相冲。</p>
   </div>
 
@@ -946,10 +964,10 @@
     <p class="vname">深色模式 · 复习队列<em>P11</em></p>
 
     <div class="phone h812 dk">
-<div class="top" style="padding-bottom:10px"><svg class="ic" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6l-12 12"/></svg><div class="pname sub" style="font-size:13px;font-weight:600;color:var(--text2)">复习中 · 退出会二次确认</div></div>
+<div class="top" style="padding-bottom:10px"><svg class="ic" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6l-12 12"/></svg><div class="pname sub" style="font-size:13px;font-weight:600;color:var(--text2)">复习中</div></div>
 <div class="body" style="padding-top:18px">
   <div class="row1" style="margin-bottom:14px">
-    <span style="font-size:12px;font-weight:700;color:var(--head)">第 2 题 / 共 7 题</span>
+    <span style="font-size:12px;font-weight:700;color:var(--head)">第 7 题 / 共 7 题</span>
     <span class="tag">全部待复习</span>
   </div>
 
@@ -967,10 +985,11 @@
       <span class="lbl" style="margin:0">判分</span>
       <span class="tag">正确答案 A</span>
     </div>
+    <p class="txt"><b>你选 B · 正确 A</b></p>
     <p class="txt">选错了。此处语境要「不因循守旧」，「按部就班」含墨守成规之意，与后文「因时制宜」相冲。</p>
   </div>
 
-  <div class="btn">下一题</div>
+  <div class="btn">查看复习小结</div>
   <p class="hint" style="text-align:center;margin-top:10px">退出会丢弃本轮进度，需二次确认</p>
 </div>
 </div>
@@ -992,12 +1011,13 @@
     <span class="tag">全部待复习</span>
     <span class="more">本轮范围<svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></span>
   </div>
+  <p class="hint" style="margin:-12px 0 14px">展开内容：全部待复习 · 7 道 · 涉及成语：按部就班、别出心裁、墨守成规、循序渐进</p>
 
   <div class="card" style="padding:18px 16px">
     <div class="nums" style="margin-top:0;gap:46px">
       <div class="numcell"><div class="numv">7</div><div class="numl">本轮题量</div></div>
       <div class="numcell"><div class="numv hot">5</div><div class="numl">答对</div></div>
-      <div class="numcell"><div class="numv sm" style="color:var(--text3)">2</div><div class="numl">答错</div></div>
+      <div class="numcell"><div class="numv" style="color:var(--text)">2</div><div class="numl">答错</div></div>
     </div>
   </div>
 
@@ -1035,12 +1055,13 @@
     <span class="tag">全部待复习</span>
     <span class="more">本轮范围<svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></span>
   </div>
+  <p class="hint" style="margin:-12px 0 14px">展开内容：全部待复习 · 7 道 · 涉及成语：按部就班、别出心裁、墨守成规、循序渐进</p>
 
   <div class="card" style="padding:18px 16px">
     <div class="nums" style="margin-top:0;gap:46px">
       <div class="numcell"><div class="numv">7</div><div class="numl">本轮题量</div></div>
       <div class="numcell"><div class="numv hot">5</div><div class="numl">答对</div></div>
-      <div class="numcell"><div class="numv sm" style="color:var(--text3)">2</div><div class="numl">答错</div></div>
+      <div class="numcell"><div class="numv" style="color:var(--text)">2</div><div class="numl">答错</div></div>
     </div>
   </div>
 
@@ -1101,11 +1122,13 @@
     </div>
   </div>
 
+  <!-- 命中区≥44px：.lrow 单行高 43px，上下各 1px 透明扩展，不改 padding -->
   <div class="list">
     <div class="lrow"><div class="row1"><span class="lname">考试范围设置</span><svg class="ic sm ac" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></div></div>
     <div class="lrow"><div class="row1"><span class="lname">备份与恢复</span><svg class="ic sm ac" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></div></div>
     <div class="lrow"><div class="row1"><span class="lname">题库版本</span><svg class="ic sm ac" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></div></div>
     <div class="lrow"><div class="row1"><span class="lname" style="color:var(--text3)">复习提醒</span><span class="distag">进阶</span></div></div>
+    <div class="lrow"><div class="row1"><span class="lname" style="color:var(--text3)">清空数据</span><svg class="ic sm ac" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></div></div>
   </div>
 
   <div class="card soft" style="margin-top:14px">
@@ -1114,7 +1137,8 @@
   </div>
 
   <div style="margin-top:14px;text-align:center">
-    <span class="danger">清空数据</span>
+    <span class="danger" style="display:inline-block;min-width:44px;min-height:44px;line-height:44px">清空数据</span>
+    <p class="hint" style="margin-top:2px">删除本机全部学习数据，不可恢复，需二次确认。</p>
   </div>
   <p class="hint" style="text-align:center;margin-top:14px">版本 1.0.0 · 题库 v1.0.0</p>
 </div>
@@ -1157,11 +1181,13 @@
     </div>
   </div>
 
+  <!-- 命中区≥44px：.lrow 单行高 43px，上下各 1px 透明扩展，不改 padding -->
   <div class="list">
     <div class="lrow"><div class="row1"><span class="lname">考试范围设置</span><svg class="ic sm ac" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></div></div>
     <div class="lrow"><div class="row1"><span class="lname">备份与恢复</span><svg class="ic sm ac" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></div></div>
     <div class="lrow"><div class="row1"><span class="lname">题库版本</span><svg class="ic sm ac" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></div></div>
     <div class="lrow"><div class="row1"><span class="lname" style="color:var(--text3)">复习提醒</span><span class="distag">进阶</span></div></div>
+    <div class="lrow"><div class="row1"><span class="lname" style="color:var(--text3)">清空数据</span><svg class="ic sm ac" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></div></div>
   </div>
 
   <div class="card soft" style="margin-top:14px">
@@ -1170,7 +1196,8 @@
   </div>
 
   <div style="margin-top:14px;text-align:center">
-    <span class="danger">清空数据</span>
+    <span class="danger" style="display:inline-block;min-width:44px;min-height:44px;line-height:44px">清空数据</span>
+    <p class="hint" style="margin-top:2px">删除本机全部学习数据，不可恢复，需二次确认。</p>
   </div>
   <p class="hint" style="text-align:center;margin-top:14px">版本 1.0.0 · 题库 v1.0.0</p>
 </div>

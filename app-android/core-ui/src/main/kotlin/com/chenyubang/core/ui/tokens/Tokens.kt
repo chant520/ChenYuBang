@@ -1,12 +1,12 @@
 // GENERATED FILE — DO NOT EDIT.
-// Source: shared/tokens/tokens.json (docs/设计规范-v1.7.md)
+// Source: shared/tokens/tokens.json (docs/设计规范-v1.8.md)
 // Regenerate: python tools/gen_tokens.py
 
 package com.chenyubang.core.ui.tokens
 
 import androidx.compose.ui.graphics.Color
 
-/** 设计令牌。数值唯一来源：docs/设计规范-v1.7.md */
+/** 设计令牌。数值唯一来源：docs/设计规范-v1.8.md */
 object Tokens {
 
     /** 浅/深色组共同接口：if/else 选色组时保留类型 */
