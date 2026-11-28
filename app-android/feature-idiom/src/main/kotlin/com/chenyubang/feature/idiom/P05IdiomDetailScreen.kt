@@ -256,30 +256,7 @@ private fun detailBody(
     colors: Tokens.ColorSet,
     actions: IdiomDetailActions,
 ) {
-    // 成语名 + 拼音 + 读音（朗读是未来项，这里只展示图标与拼音，不触发播放）。
-    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = detail.word,
-                color = colors.head,
-                fontSize = Tokens.FontRole.contentTitle.sp,
-                fontWeight = FontWeight.W700,
-            )
-            Text(
-                text = detail.pinyin,
-                color = colors.text3,
-                fontSize = Tokens.FontRole.caption.sp,
-                modifier = Modifier.padding(top = Tokens.Space.lsubTop.dp),
-            )
-        }
-        CChromeGlyph(CChromeIcon.Sound, colors.text3, Modifier.size(Tokens.Icon.n21.dp))
-    }
-    Row {
-        CTag(text = detail.color)
-    }
-
-    InfoCard(label = "释义", value = detail.sense, strong = true, colors = colors)
-    InfoCard(label = "出处", value = detail.origin, colors = colors)
+    DetailIntro(detail = detail, colors = colors, actions = actions)
 
     CCard {
         CLabel(text = "易错点")
@@ -320,20 +297,56 @@ private fun detailBody(
     }
 }
 
+/** 稿面 A P05 v2.4 头部与词义区：标题/拼音/标签 + 上方复习入口 + 释义出处合并卡。 */
 @Composable
-private fun InfoCard(
-    label: String,
-    value: String,
+private fun DetailIntro(
+    detail: IdiomDetailView,
     colors: Tokens.ColorSet,
-    strong: Boolean = false,
+    actions: IdiomDetailActions,
 ) {
+    // 成语名 + 拼音 + 读音（朗读是未来项，这里只展示图标与拼音，不触发播放）。
+    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = detail.word,
+                color = colors.head,
+                fontSize = Tokens.FontRole.contentTitle.sp,
+                fontWeight = FontWeight.W700,
+            )
+            Text(
+                text = detail.pinyin,
+                color = colors.text3,
+                fontSize = Tokens.FontRole.caption.sp,
+                modifier = Modifier.padding(top = Tokens.Space.lsubTop.dp),
+            )
+        }
+        CChromeGlyph(CChromeIcon.Sound, colors.text3, Modifier.size(Tokens.Icon.n21.dp))
+    }
+    // 标签下沿用 12px 间距放上方复习入口，与页尾按钮同回调。
+    Column(verticalArrangement = Arrangement.spacedBy(Tokens.Space.dangerY.dp)) {
+        Row {
+            CTag(text = detail.color)
+        }
+        CButton(
+            text = "复习这个成语",
+            onClick = actions.onReviewIdiom,
+            enabled = actions.canReview,
+        )
+    }
+    // A17：释义 + 出处合并为「词义」一卡，近义与反义仍独立成卡。
     CCard {
-        CLabel(text = label)
+        CLabel(text = "词义")
         Text(
-            text = value,
-            color = if (strong) colors.text else colors.text2,
+            text = detail.sense,
+            color = colors.text,
             fontSize = Tokens.FontRole.body.sp,
-            fontWeight = if (strong) FontWeight.W600 else FontWeight.Normal,
+            fontWeight = FontWeight.W600,
+        )
+        Text(
+            text = detail.origin,
+            color = colors.text2,
+            fontSize = Tokens.FontRole.body.sp,
+            modifier = Modifier.padding(top = Tokens.Space.lsubTop.dp),
         )
     }
 }

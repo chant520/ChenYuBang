@@ -5,6 +5,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.test.isDialog
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
@@ -60,7 +61,8 @@ class P05IdiomDetailSnapshotTest {
             }
         }
         if (scrollToText != null) {
-            composeTestRule.onNodeWithText(scrollToText).performScrollTo()
+            // 复习按钮双入口同文案：取首个（标签区上方）作为滚动锚点。
+            composeTestRule.onAllNodesWithText(scrollToText)[0].performScrollTo()
             composeTestRule.waitForIdle()
         }
         if (openStatusPicker) {
